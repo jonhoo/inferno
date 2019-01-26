@@ -5,9 +5,10 @@ authors = ["Jon Gjengset <jon@thesquareplanet.com>"]
 edition = "2018"
 
 [dependencies]
-regex = "1.0"
 structopt = "0.2"
-lazy_static = "1.2"
+
+[profile.release]
+debug = true
 
 [[bin]]
 name = "inferno-collapse-perf"

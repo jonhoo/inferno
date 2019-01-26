@@ -1,20 +1,9 @@
-use lazy_static::lazy_static;
-use regex::Regex;
 use std::collections::{HashMap, VecDeque};
 use std::fs::File;
 use std::io::prelude::*;
 use std::io::{self, BufReader};
 use structopt::StructOpt;
 
-lazy_static! {
-    static ref MATCH_EVENT_LINE: Regex =
-        regex::Regex::new(r#"^(\S.+?)\s+(\d+)/*(\d+)*\s+"#).unwrap();
-    static ref MATCH_EVENT_LINE_EVENT: Regex = regex::Regex::new(r#"(\S+):\s*$"#).unwrap();
-    static ref MATCH_STACK_LINE: Regex =
-        regex::Regex::new(r#"^\s*(\w+)\s*(.+) \((\S*)\)"#).unwrap();
-}
-
-const INCLUDE_PNAME: bool = true;
 const TIDY_GENERIC: bool = true;
 
 #[derive(Debug, StructOpt)]
@@ -62,12 +51,12 @@ fn main() -> io::Result<()> {
 
     match opt.infile {
         Some(ref f) => {
-            let r = BufReader::new(File::open(f)?);
+            let r = BufReader::with_capacity(128 * 1024, File::open(f)?);
             handle_file(opt, r)
         }
         None => {
             let stdin = io::stdin();
-            let r = BufReader::new(stdin.lock());
+            let r = BufReader::with_capacity(128 * 1024, stdin.lock());
             handle_file(opt, r)
         }
     }
@@ -144,6 +133,42 @@ impl PerfState {
         }
     }
 
+    fn event_line_parts(line: &str) -> Option<(&str, &str, &str)> {
+        let mut word_start = 0;
+        let mut all_digits = false;
+        let mut contains_slash_at = None;
+        for (idx, c) in line.char_indices() {
+            if c == ' ' {
+                if all_digits {
+                    // found an all-digit word
+                    let (pid, tid) = if let Some(slash) = contains_slash_at {
+                        // found PID + TID
+                        (&line[word_start..slash], &line[(slash + 1)..idx])
+                    } else {
+                        // found TID
+                        ("?", &line[word_start..idx])
+                    };
+                    let comm = &line[..(word_start - 1)];
+
+                    // XXX: two spaces in a row would see all_digits = true erroneously
+                    return Some((comm, pid, tid));
+                }
+                word_start = idx + 1;
+                all_digits = true;
+            } else if c == '/' {
+                if all_digits {
+                    contains_slash_at = Some(idx);
+                }
+            } else if c.is_ascii_digit() {
+                // we're still all digits if we were all digits
+            } else {
+                all_digits = false;
+                contains_slash_at = None;
+            }
+        }
+        None
+    }
+
     // we have an event line, like:
     //
     //     java 25607 4794564.109216: cycles:
@@ -155,39 +180,44 @@ impl PerfState {
     //     vote   913    72.176760:     257597 cycles:uppp:
     fn on_event_line(&mut self, line: &str) {
         self.in_event = true;
-        match MATCH_EVENT_LINE.captures(line.trim_end()) {
-            Some(fields) => {
-                let comm = &fields[1];
-                let (pid, tid) = match fields.get(3) {
-                    Some(tid) => (&fields[2], tid.as_str()),
-                    None => ("?", &fields[2]),
-                };
 
-                if let Some(captures) = MATCH_EVENT_LINE_EVENT.captures(line.trim_end()) {
-                    let event = &captures[1];
+        if let Some((comm, pid, tid)) = Self::event_line_parts(line) {
+            if let Some(event) = line.rsplitn(2, ' ').next() {
+                if event.ends_with(':') {
+                    let event = &event[..(event.len() - 1)];
                     // TODO: filter by event
                     if false {
                         self.skip_stack = true;
                     }
                 }
+            }
 
-                // XXX: re-use existing memory in pname if possible
-                self.pname = comm.replace(' ', "_");
-                if self.opt.include_tid {
-                    self.pname.push_str("-");
-                    self.pname.push_str(pid);
-                    self.pname.push_str("/");
-                    self.pname.push_str(tid);
-                } else if self.opt.include_pid {
-                    self.pname.push_str("-");
-                    self.pname.push_str(pid);
-                }
+            // XXX: re-use existing memory in pname if possible
+            self.pname = comm.replace(' ', "_");
+            if self.opt.include_tid {
+                self.pname.push_str("-");
+                self.pname.push_str(pid);
+                self.pname.push_str("/");
+                self.pname.push_str(tid);
+            } else if self.opt.include_pid {
+                self.pname.push_str("-");
+                self.pname.push_str(pid);
             }
-            None => {
-                eprint!("weird event line: {}", line);
-                self.in_event = false;
-            }
+        } else {
+            eprintln!("weird event line: {}", line);
+            self.in_event = false;
         }
+    }
+
+    fn stack_line_parts(line: &str) -> Option<(&str, &str, &str)> {
+        let mut line = line.trim_start().splitn(2, ' ');
+        let pc = line.next()?;
+        let mut line = line.next()?.rsplitn(2, ' ');
+        let mut module = line.next()?;
+        // module is always wrapped in (), so remove those
+        module = &module[1..(module.len() - 1)];
+        let rawfunc = line.next()?;
+        Some((pc, rawfunc, module))
     }
 
     // we have a stack line that shows one stack entry from the preceeding event, like:
@@ -205,80 +235,79 @@ impl PerfState {
             return;
         }
 
-        match MATCH_STACK_LINE.captures(line.trim_end()) {
-            Some(fields) => {
-                let pc = &fields[1];
-                let mut rawfunc = &fields[2];
-                let module = &fields[3];
-
-                // Strip off symbol offsets
-                if let Some(offset) = rawfunc.rfind("+0x") {
-                    let end = &rawfunc[(offset + 3)..];
-                    if end.chars().all(|c| char::is_ascii_hexdigit(&c)) {
-                        // it's a symbol offset!
-                        rawfunc = &rawfunc[..offset];
-                    }
+        if let Some((pc, mut rawfunc, module)) = Self::stack_line_parts(line) {
+            // Strip off symbol offsets
+            if let Some(offset) = rawfunc.rfind("+0x") {
+                let end = &rawfunc[(offset + 3)..];
+                if end.chars().all(|c| char::is_ascii_hexdigit(&c)) {
+                    // it's a symbol offset!
+                    rawfunc = &rawfunc[..offset];
                 }
-
-                // TODO: show_inline
-
-                // skip process names?
-                // see https://github.com/brendangregg/FlameGraph/blob/f857ebc94bfe2a9bfdc4f1536ebacfb7466f69ba/stackcollapse-perf.pl#L269
-                if rawfunc.starts_with('(') {
-                    return;
-                }
-
-                let mut func = with_module_fallback(module, rawfunc, pc, self.opt.include_addrs);
-                if TIDY_GENERIC {
-                    func = tidy_generic(func);
-                }
-
-                // TODO: TIDY_JAVA
-
-                // Annotations
-                //
-                // detect kernel from the module name; eg, frames to parse include:
-                //
-                //     ffffffff8103ce3b native_safe_halt ([kernel.kallsyms])
-                //     8c3453 tcp_sendmsg (/lib/modules/4.3.0-rc1-virtual/build/vmlinux)
-                //     7d8 ipv4_conntrack_local+0x7f8f80b8 ([nf_conntrack_ipv4])
-                //
-                // detect jit from the module name; eg:
-                //
-                //     7f722d142778 Ljava/io/PrintStream;::print (/tmp/perf-19982.map)
-                if self.opt.annotate_kernel
-                    && (module.starts_with('[') || module.ends_with("vmlinux"))
-                    && module != "[unknown]"
-                {
-                    func.push_str("_[k]");
-                }
-                if self.opt.annotate_jit
-                    && module.starts_with("/tmp/perf-")
-                    && module.ends_with(".map")
-                {
-                    func.push_str("_[j]");
-                }
-
-                self.stack.push_front(func);
             }
-            None => {
-                eprint!("weird stack line: {}", line);
+
+            // TODO: show_inline
+
+            // skip process names?
+            // see https://github.com/brendangregg/FlameGraph/blob/f857ebc94bfe2a9bfdc4f1536ebacfb7466f69ba/stackcollapse-perf.pl#L269
+            if rawfunc.starts_with('(') {
+                return;
             }
+
+            let mut func = with_module_fallback(module, rawfunc, pc, self.opt.include_addrs);
+            if TIDY_GENERIC {
+                func = tidy_generic(func);
+            }
+
+            // TODO: TIDY_JAVA
+
+            // Annotations
+            //
+            // detect kernel from the module name; eg, frames to parse include:
+            //
+            //     ffffffff8103ce3b native_safe_halt ([kernel.kallsyms])
+            //     8c3453 tcp_sendmsg (/lib/modules/4.3.0-rc1-virtual/build/vmlinux)
+            //     7d8 ipv4_conntrack_local+0x7f8f80b8 ([nf_conntrack_ipv4])
+            //
+            // detect jit from the module name; eg:
+            //
+            //     7f722d142778 Ljava/io/PrintStream;::print (/tmp/perf-19982.map)
+            if self.opt.annotate_kernel
+                && (module.starts_with('[') || module.ends_with("vmlinux"))
+                && module != "[unknown]"
+            {
+                func.push_str("_[k]");
+            }
+            if self.opt.annotate_jit && module.starts_with("/tmp/perf-") && module.ends_with(".map")
+            {
+                func.push_str("_[j]");
+            }
+
+            self.stack.push_front(func);
+        } else {
+            eprint!("weird stack line: {}", line);
         }
     }
 
     fn after_event(&mut self) {
         // end of stack, so emit stack entry
-        if INCLUDE_PNAME {
-            self.stack.push_front(self.pname.clone());
+
+        // allocate a string that is long enough to hold the entire stack string
+        let mut stack_str = String::with_capacity(
+            self.pname.len() + self.stack.iter().fold(0, |a, s| a + s.len() + 1),
+        );
+
+        // add the comm name
+        stack_str.push_str(&self.pname);
+        // add the other stack entries (if any)
+        for e in self.stack.drain(..) {
+            stack_str.push_str(";");
+            stack_str.push_str(&e);
         }
-        if let Some(mut s) = self.stack.pop_front() {
-            for e in self.stack.drain(..) {
-                s.push_str(";");
-                s.push_str(&e);
-            }
-            *self.occurrences.entry(s).or_insert(0) += 1;
-        }
+
+        // count it!
+        *self.occurrences.entry(stack_str).or_insert(0) += 1;
+
+        // reset for the next event
         self.in_event = false;
         self.skip_stack = false;
         self.stack.clear();
