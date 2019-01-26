@@ -1,8 +1,51 @@
 use std::collections::{HashMap, VecDeque};
 use std::io::prelude::*;
 use std::io::{self, BufReader};
+use structopt::StructOpt;
+
+#[derive(Debug, StructOpt)]
+#[structopt(
+    name = "inferno-collapse-perf",
+    author = "",
+    after_help = "\
+[1] perf script must emit both PID and TIDs for these to work; eg, Linux < 4.1:
+        perf script -f comm,pid,tid,cpu,time,event,ip,sym,dso,trace
+    for Linux >= 4.1:
+        perf script -F comm,pid,tid,cpu,time,event,ip,sym,dso,trace
+    If you save this output add --header on Linux >= 3.14 to include perf info."
+)]
+struct Opt {
+    /// include PID with process names [1]
+    #[structopt(long = "pid")]
+    include_pid: bool,
+
+    /// include TID and PID with process names [1]
+    #[structopt(long = "tid")]
+    include_tid: bool,
+
+    /// include raw addresses where symbols can't be found
+    #[structopt(long = "addrs")]
+    include_addrs: bool,
+
+    /// annotate jit functions with a _[j]
+    #[structopt(long = "jit")]
+    annotate_jit: bool,
+
+    /// annotate kernel functions with a _[k]
+    #[structopt(long = "kernel")]
+    annotate_kernel: bool,
+
+    /// all annotations (--kernel --jit)
+    #[structopt(long = "all")]
+    annotate_all: bool,
+
+    /// perf script output file, or STDIN if not specified
+    infile: Option<String>,
+}
 
 fn main() {
+    let opt = Opt::from_args();
+
     let stdin = io::stdin();
     let stdin = stdin.lock();
     let mut reader = BufReader::new(stdin);
@@ -13,11 +56,6 @@ fn main() {
     let match_stack_line = regex::Regex::new(r#"^\s*(\w+)\s*(.+) \((\S*)\)"#).unwrap();
 
     let include_pname = true;
-    let include_tid = false;
-    let include_pid = false;
-    let include_addrs = false;
-    let annotate_jit = false;
-    let annotate_kernel = false;
     let tidy_generic = true;
 
     let mut in_event = false;
@@ -85,12 +123,12 @@ fn main() {
 
                     // XXX: re-use existing memory in pname if possible
                     pname = comm.replace(' ', "_");
-                    if include_tid {
+                    if opt.include_tid {
                         pname.push_str("-");
                         pname.push_str(pid);
                         pname.push_str("/");
                         pname.push_str(tid);
-                    } else if include_pid {
+                    } else if opt.include_pid {
                         pname.push_str("-");
                         pname.push_str(pid);
                     }
@@ -149,7 +187,7 @@ fn main() {
                             "unknown"
                         };
 
-                        if include_addrs {
+                        if opt.include_addrs {
                             format!("[{} <{}>]", rawfunc, pc)
                         } else {
                             format!("[{}]", rawfunc)
@@ -206,14 +244,16 @@ fn main() {
                     //
                     //     7f722d142778 Ljava/io/PrintStream;::print (/tmp/perf-19982.map)
                     // TODO: annotate_kernel
-                    if annotate_kernel
+                    if opt.annotate_kernel
                         && (module.starts_with('[') || module.ends_with("vmlinux"))
                         && module != "[unknown]"
                     {
                         func.push_str("_[k]");
                     }
                     // TODO: annotate_jit
-                    if annotate_jit && module.starts_with("/tmp/perf-") && module.ends_with(".map")
+                    if opt.annotate_jit
+                        && module.starts_with("/tmp/perf-")
+                        && module.ends_with(".map")
                     {
                         func.push_str("_[j]");
                     }

@@ -6,3 +6,8 @@ edition = "2018"
 
 [dependencies]
 regex = "1.0"
+structopt = "0.2"
+
+[[bin]]
+name = "inferno-collapse-perf"
+path = "src/collapse-perf.rs"
