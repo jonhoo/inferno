@@ -1,8 +1,20 @@
 [package]
 name = "inferno"
 version = "0.1.0"
+
+description = "Rust port of the FlameGraph performance profiling tool suite"
+readme = "README.md"
+
 authors = ["Jon Gjengset <jon@thesquareplanet.com>"]
 edition = "2018"
+
+repository = "https://github.com/jonhoo/inferno.git"
+
+
+keywords = ["perf", "flamegraph", "profiling"]
+categories = ["command-line-utilities", "development-tools::profiling", "visualization"]
+
+license = "CDDL-1.0"
 
 [dependencies]
 structopt = "0.2"
