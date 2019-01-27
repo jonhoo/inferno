@@ -325,23 +325,39 @@ impl PerfState {
 // massage function name to be nicer
 // NOTE: ignoring https://github.com/jvm-profiling-tools/perf-map-agent/pull/35
 fn with_module_fallback(module: &str, rawfunc: &str, pc: &str, include_addrs: bool) -> String {
-    if rawfunc == "[unknown]" {
-        // try to use part of module name as function if unknown
-        let rawfunc = if module != "[unknown]" {
+    if rawfunc != "[unknown]" {
+        return rawfunc.to_string();
+    }
+
+    // try to use part of module name as function if unknown
+    let rawfunc = match (module, include_addrs) {
+        ("[unknown]", true) => "unknown",
+        ("[unknown]", false) => {
+            // no need to process this further
+            return rawfunc.to_string();
+        }
+        (module, _) => {
             // use everything following last / of module as function name
             &module[module.rfind('/').map(|i| i + 1).unwrap_or(0)..]
-        } else {
-            "unknown"
-        };
-
-        if include_addrs {
-            format!("[{} <{}>]", rawfunc, pc)
-        } else {
-            format!("[{}]", rawfunc)
         }
+    };
+
+    // output string is a bit longer than rawfunc but not much
+    let mut res = String::with_capacity(rawfunc.len() + 12);
+
+    if include_addrs {
+        res.push_str("[");
+        res.push_str(rawfunc);
+        res.push_str(" <");
+        res.push_str(pc);
+        res.push_str(">]");
     } else {
-        rawfunc.to_string()
+        res.push_str("[");
+        res.push_str(rawfunc);
+        res.push_str("]");
     }
+
+    res
 }
 
 fn tidy_generic(mut func: String) -> String {
