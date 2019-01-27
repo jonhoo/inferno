@@ -12,6 +12,10 @@ It is developed in part through live coding sessions, which you can find
 [on YouTube](https://www.youtube.com/c/JonGjengset). The first video in
 the sequence is [here](https://www.youtube.com/watch?v=jTpK-bNZiA4).
 
+# Comparison to the Perl implementation
+
+To compare performance, run `./compare.sh`. It requires [hyperfine](https://github.com/sharkdp/hyperfine).
+
 # License
 
 Inferno is licensed under [CDDL
