@@ -5,6 +5,7 @@ use std::io::{self, BufReader};
 use structopt::StructOpt;
 
 const TIDY_GENERIC: bool = true;
+const TIDY_JAVA: bool = true;
 
 #[derive(Debug, StructOpt)]
 #[structopt(
@@ -269,7 +270,9 @@ impl PerfState {
                 func = tidy_generic(func);
             }
 
-            // TODO: TIDY_JAVA
+            if TIDY_JAVA && self.pname == "java" {
+                func = tidy_java(func);
+            }
 
             // Annotations
             //
@@ -401,5 +404,21 @@ fn tidy_generic(mut func: String) -> String {
 
     // The perl version here strips ' and "; we don't do that.
     // see https://github.com/brendangregg/FlameGraph/commit/817c6ea3b92417349605e5715fe6a7cb8cbc9776
+    func
+}
+
+fn tidy_java(mut func: String) -> String {
+    // along with tidy_generic converts the following:
+    //     Lorg/mozilla/javascript/ContextFactory;.call(Lorg/mozilla/javascript/ContextAction;)Ljava/lang/Object;
+    //     Lorg/mozilla/javascript/ContextFactory;.call(Lorg/mozilla/javascript/C
+    //     Lorg/mozilla/javascript/MemberBox;.<init>(Ljava/lang/reflect/Method;)V
+    // into:
+    //     org/mozilla/javascript/ContextFactory:.call
+    //     org/mozilla/javascript/ContextFactory:.call
+    //     org/mozilla/javascript/MemberBox:.init
+    if func.starts_with('L') && func.contains('/') {
+        func.remove(0);
+    }
+
     func
 }
