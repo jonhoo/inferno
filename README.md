@@ -12,6 +12,10 @@ It is developed in part through live coding sessions, which you can find
 [on YouTube](https://www.youtube.com/c/JonGjengset). The first video in
 the sequence is [here](https://www.youtube.com/watch?v=jTpK-bNZiA4).
 
+# Testing
+
+Run `./test.sh` to verify conformity with the original implementation.
+
 # License
 
 Inferno is licensed under [CDDL
