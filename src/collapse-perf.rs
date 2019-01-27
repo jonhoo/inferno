@@ -368,8 +368,6 @@ fn tidy_generic(mut func: String) -> String {
     //    see https://github.com/brendangregg/FlameGraph/pull/72
     //  - C++ anonymous namespace annotations.
     //    see https://github.com/brendangregg/FlameGraph/pull/93
-    //
-    // TODO: turn this into a function
     if let Some(first_paren) = func.find('(') {
         if func[first_paren..].starts_with("anonymous namespace)") {
             // C++ anonymous namespace
