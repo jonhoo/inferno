@@ -46,8 +46,19 @@ struct Opt {
     infile: Option<String>,
 }
 
+impl Opt {
+    fn from_processed_args() -> Opt {
+        let mut opt = Opt::from_args();
+        if opt.annotate_all {
+            opt.annotate_jit = true;
+            opt.annotate_kernel = true;
+        }
+        opt
+    }
+}
+
 fn main() -> io::Result<()> {
-    let opt = Opt::from_args();
+    let opt = Opt::from_processed_args();
 
     match opt.infile {
         Some(ref f) => {
