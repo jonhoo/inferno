@@ -22,6 +22,10 @@ structopt = "0.2"
 [profile.release]
 debug = true
 
+[lib]
+name = "inferno_collapse_perf"
+path = "src/lib.rs"
+
 [[bin]]
 name = "inferno-collapse-perf"
 path = "src/collapse-perf.rs"
