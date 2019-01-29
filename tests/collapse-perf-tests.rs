@@ -1,3 +1,6 @@
+#[macro_use]
+extern crate pretty_assertions;
+
 extern crate inferno_collapse_perf;
 
 use inferno_collapse_perf::{handle_file, Options};
