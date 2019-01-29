@@ -9,8 +9,9 @@ use std::fs::File;
 use std::io::{self, BufRead, BufReader, Cursor};
 use std::path::Path;
 
-// Create tests for test files in the flamegraph/test directory.
-// The test and result file names are derived from the test name.
+// Create tests for test files in $dir. The test files are used as input
+// and the results are compared to result files in the results sub directory.
+// The test and result file names are derived from $name.
 // The part after the last underscore is the flag name to use.
 // For example, perf_cycles_instructions_01_pid will use the following:
 //     test file: perf-cycles-instructions-01.txt
