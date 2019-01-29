@@ -1,11 +1,18 @@
 #!/usr/bin/env bash
 
 set -eu -o pipefail
-set -x
 
-[[ -d ./FlameGraph ]] || git clone https://github.com/brendangregg/FlameGraph &
-cargo build --release &
+cargo build --release --bin inferno-collapse-perf
+BIN="${CARGO_TARGET_DIR:-target}/release/inferno-collapse-perf"
 
-wait
-hyperfine './target/release/inferno-collapse-perf --all test/perf-iperf-stacks-pidtid-01.txt' './FlameGraph/stackcollapse-perf.pl --all test/perf-iperf-stacks-pidtid-01.txt'
-
+(( maxsize = 100 * 1024 ))
+for f in ./flamegraph/test/*.txt; do
+	# only run benchmark on larger files
+	filesize=$(stat -c%s "$f")
+	if (( filesize > maxsize )); then
+		echo "==>  $f  <=="
+		hyperfine "$BIN --all $f" "./flamegraph/stackcollapse-perf.pl --all $f"
+		echo
+		echo
+	fi
+done

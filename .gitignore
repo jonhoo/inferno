@@ -2,4 +2,3 @@
 **/*.rs.bk
 /perf*
 *.log
-/FlameGraph/
