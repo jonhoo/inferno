@@ -176,7 +176,13 @@ impl PerfState {
         let mut module = line.next()?;
         // module is always wrapped in (), so remove those
         module = &module[1..(module.len() - 1)];
-        let rawfunc = line.next()?;
+        let rawfunc = match line.next()? {
+            // Sometimes there are two spaces betwen the pc and the (, like:
+            //     7f1e2215d058  (/lib/x86_64-linux-gnu/libc-2.15.so)
+            // In order to match the perl version, the rawfunc should be " ", and not "".
+            "" => " ",
+            s => s,
+        };
         Some((pc, rawfunc, module))
     }
 
