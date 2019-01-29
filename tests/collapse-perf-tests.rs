@@ -16,8 +16,8 @@ use std::path::Path;
 //     test file: perf-cycles-instructions-01.txt
 //     result file: perf-cycles-instructions-01-collapsed-pid.txt
 //     flag: pid
-macro_rules! collapse_perf_tests {
-    ($($name:ident,)*) => {
+macro_rules! collapse_perf_tests_inner {
+    ($($name:ident),*; $dir:expr) => {
     $(
         #[test]
         #[allow(non_snake_case)]
@@ -31,7 +31,7 @@ macro_rules! collapse_perf_tests {
             let test_file = format!("{}.txt", test_file_stem);
             let result_file = format!("{}-collapsed-{}.txt", test_file_stem, flag.to_string());
 
-            let test_path = Path::new("./flamegraph/test");
+            let test_path = Path::new($dir);
             let results_path = test_path.join("results");
 
             test_collapse_perf(
@@ -41,6 +41,12 @@ macro_rules! collapse_perf_tests {
             ).unwrap()
         }
     )*
+    }
+}
+
+macro_rules! collapse_perf_tests {
+    ($($name:ident),*) => {
+        collapse_perf_tests_inner!($($name),*; "./flamegraph/test");
     }
 }
 
@@ -134,7 +140,7 @@ collapse_perf_tests! {
     perf_vertx_stacks_01_kernel,
     perf_vertx_stacks_01_jit,
     perf_vertx_stacks_01_all,
-    perf_vertx_stacks_01_addrs,
+    perf_vertx_stacks_01_addrs
 }
 
 fn test_collapse_perf(test_file: &str, expected_file: &str, options: Options) -> io::Result<()> {
