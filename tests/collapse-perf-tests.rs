@@ -147,11 +147,11 @@ fn test_collapse_perf(test_file: &str, expected_file: &str, options: Options) ->
     result.set_position(0);
 
     let mut buf = String::new();
-    for line in result.lines() {
+    for (idx, line) in result.lines().enumerate() {
         // Strip out " and ' since perl version does.
         let line = line?.replace("\"", "").replace("'", "");
         expected.read_line(&mut buf)?;
-        assert_eq!(line, buf.trim_end());
+        assert_eq!(line, buf.trim_end(), "\n{}:{}", expected_file, idx + 1);
         buf.clear();
     }
 
