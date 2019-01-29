@@ -19,8 +19,14 @@ license = "CDDL-1.0"
 [dependencies]
 structopt = "0.2"
 
+[dev-dependencies]
+pretty_assertions = "0.5"
+
 [profile.release]
 debug = true
+
+[lib]
+name = "inferno"
 
 [[bin]]
 name = "inferno-collapse-perf"
