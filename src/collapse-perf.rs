@@ -17,7 +17,7 @@ use inferno_collapse_perf::{handle_file, Options};
         perf script -F comm,pid,tid,cpu,time,event,ip,sym,dso,trace
     If you save this output add --header on Linux >= 3.14 to include perf info."
 )]
-pub struct Opt {
+struct Opt {
     /// include PID with process names [1]
     #[structopt(long = "pid")]
     include_pid: bool,
