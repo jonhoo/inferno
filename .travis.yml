@@ -1,0 +1,81 @@
+language: rust
+cache: cargo
+rust:
+  - stable
+  - beta
+  - nightly
+
+# always test things that aren't pushes (like PRs)
+# never test tags or pushes to non-master branches (wait for PR)
+# https://github.com/travis-ci/travis-ci/issues/2200#issuecomment-441395545)
+if: type != push OR (tag IS blank AND branch = master)
+
+# an entry in stage=test will be generated for each rust/os combination.
+# each entry will run these commands.
+script:
+  - cargo test --examples
+  - cargo test --doc
+  - cargo test --lib
+  - cargo test --bins
+jobs:
+  allow_failures:
+    - rust: nightly
+  include:
+    - stage: check # do a pre-screen to make sure this is even worth testing
+      script: cargo check --all-targets
+      rust: stable
+      os: linux
+    - stage: test
+      rust: stable
+      os: osx
+    - rust: stable
+      os: windows
+    - &integration
+      stage: integration # make integration tests its own stage
+      script: cargo test --tests
+      rust: stable
+      os: linux
+    - <<: *integration
+      rust: beta
+    - <<: *integration
+      rust: nightly
+    - stage: lint # we lint on beta to future-proof
+      name: "Rust: beta, rustfmt"
+      rust: beta
+      os: linux
+      script:
+        - rustup component add rustfmt-preview
+        - cargo fmt -v -- --check
+    - name: "Rust: nightly, rustfmt" # and on nightly with allow_fail
+      rust: nightly
+      os: linux
+      script:
+        - rustup component add rustfmt-preview
+        - cargo fmt -v -- --check
+    - name: "Rust: beta, clippy"
+      rust: beta
+      os: linux
+      script:
+        - rustup component add clippy-preview
+        - touch ./src/lib.rs && cargo clippy -- -D warnings
+    - name: "Rust: nightly, clippy"
+      rust: nightly
+      os: linux
+      script:
+        - rustup component add clippy-preview
+        - touch ./src/lib.rs && cargo clippy -- -D warnings
+    - <<: *integration
+      stage: coverage
+      rust: nightly
+      env: CACHE_NAME=coverage
+      script:
+        - RUSTFLAGS="--cfg procmacro2_semver_exempt" cargo install --force cargo-tarpaulin || true
+        - cargo tarpaulin --out Xml
+        - bash <(curl -s https://codecov.io/bash)
+        - cargo clean -p inferno # ensure we don't cache build for coverage
+stages:
+ - check
+ - test
+ - integration
+ - lint
+ - coverage

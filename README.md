@@ -1,3 +1,9 @@
+[![Crates.io](https://img.shields.io/crates/v/inferno.svg)](https://crates.io/crates/inferno)
+[![Documentation](https://docs.rs/inferno/badge.svg)](https://docs.rs/inferno/)
+[![Build Status](https://travis-ci.org/jonhoo/inferno.svg?branch=master)](https://travis-ci.org/jonhoo/inferno)
+[![Codecov](https://codecov.io/github/jonhoo/inferno/coverage.svg?branch=master)](https://codecov.io/gh/jonhoo/inferno)
+[![Dependency status](https://deps.rs/repo/github/jonhoo/inferno/status.svg)](https://deps.rs/repo/github/jonhoo/inferno)
+
 Inferno is a port of parts of the [flamegraph
 toolkit](http://www.brendangregg.com/flamegraphs.html) to Rust, with the
 aim of improving the performance of the original flamegraph tools. The

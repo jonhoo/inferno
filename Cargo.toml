@@ -16,6 +16,10 @@ categories = ["command-line-utilities", "development-tools::profiling", "visuali
 
 license = "CDDL-1.0"
 
+[badges]
+travis-ci = { repository = "jonhoo/inferno" }
+codecov = { repository = "jonhoo/inferno", branch = "master", service = "github" }
+
 [dependencies]
 structopt = "0.2"
 
