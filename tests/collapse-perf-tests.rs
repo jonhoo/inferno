@@ -158,7 +158,12 @@ fn test_collapse_perf(test_file: &str, expected_file: &str, options: Options) ->
     for line in result.lines() {
         // Strip out " and ' since perl version does.
         let line = line?.replace("\"", "").replace("'", "");
-        expected.read_line(&mut buf)?;
+        if expected.read_line(&mut buf)? == 0 {
+            panic!(
+                "\noutput has more lines than expected result file: {}",
+                expected_file
+            );
+        }
         assert_eq!(line, buf.trim_end(), "\n{}:{}", expected_file, line_num);
         buf.clear();
         line_num += 1;
@@ -166,7 +171,7 @@ fn test_collapse_perf(test_file: &str, expected_file: &str, options: Options) ->
 
     if expected.read_line(&mut buf)? > 0 {
         panic!(
-            "\n{} has more lines than test result, beginning at line: {}",
+            "\n{} has more lines than output, beginning at line: {}",
             expected_file, line_num
         )
     }
