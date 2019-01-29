@@ -122,7 +122,8 @@ impl PerfState {
                         // found TID
                         ("?", &line[word_start..idx])
                     };
-                    let comm = &line[..(word_start - 1)];
+                    // also trim comm in case multiple spaces were used to separate
+                    let comm = line[..(word_start - 1)].trim();
                     return Some((comm, pid, tid));
                 }
                 word_start = idx + 1;
@@ -204,12 +205,12 @@ impl PerfState {
 
     fn stack_line_parts(line: &str) -> Option<(&str, &str, &str)> {
         let mut line = line.trim_start().splitn(2, ' ');
-        let pc = line.next()?;
+        let pc = line.next()?.trim_end();
         let mut line = line.next()?.rsplitn(2, ' ');
         let mut module = line.next()?;
         // module is always wrapped in (), so remove those
         module = &module[1..(module.len() - 1)];
-        let rawfunc = match line.next()? {
+        let rawfunc = match line.next()?.trim() {
             // Sometimes there are two spaces betwen the pc and the (, like:
             //     7f1e2215d058  (/lib/x86_64-linux-gnu/libc-2.15.so)
             // In order to match the perl version, the rawfunc should be " ", and not "".
@@ -285,7 +286,7 @@ impl PerfState {
 
             self.stack.push_front(func);
         } else {
-            eprint!("weird stack line: {}", line);
+            eprintln!("weird stack line: {}", line);
         }
     }
 
