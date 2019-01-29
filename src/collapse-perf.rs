@@ -1,10 +1,10 @@
-extern crate inferno_collapse_perf;
+mod collapse;
 
 use std::fs::File;
 use std::io::{self, BufReader};
 use structopt::StructOpt;
 
-use inferno_collapse_perf::{handle_file, Options};
+use crate::collapse::perf::{handle_file, Options};
 
 #[derive(Debug, StructOpt)]
 #[structopt(

@@ -26,8 +26,7 @@ pretty_assertions = "0.5"
 debug = true
 
 [lib]
-name = "inferno_collapse_perf"
-path = "src/lib.rs"
+name = "inferno"
 
 [[bin]]
 name = "inferno-collapse-perf"

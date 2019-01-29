@@ -1,9 +1,9 @@
 #[macro_use]
 extern crate pretty_assertions;
 
-extern crate inferno_collapse_perf;
+extern crate inferno;
 
-use inferno_collapse_perf::{handle_file, Options};
+use inferno::collapse::perf::{handle_file, Options};
 use std::fmt;
 use std::fs::File;
 use std::io::{self, BufRead, BufReader, Cursor};
