@@ -153,12 +153,21 @@ fn test_collapse_perf(test_file: &str, expected_file: &str, options: Options) ->
     result.set_position(0);
 
     let mut buf = String::new();
-    for (idx, line) in result.lines().enumerate() {
+    let mut line_num = 1;
+    for line in result.lines() {
         // Strip out " and ' since perl version does.
         let line = line?.replace("\"", "").replace("'", "");
         expected.read_line(&mut buf)?;
-        assert_eq!(line, buf.trim_end(), "\n{}:{}", expected_file, idx + 1);
+        assert_eq!(line, buf.trim_end(), "\n{}:{}", expected_file, line_num);
         buf.clear();
+        line_num += 1;
+    }
+
+    if expected.read_line(&mut buf)? > 0 {
+        panic!(
+            "\n{} has more lines than test result, beginning at line: {}",
+            expected_file, line_num
+        )
     }
 
     Ok(())
