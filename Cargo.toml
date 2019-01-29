@@ -30,4 +30,4 @@ name = "inferno"
 
 [[bin]]
 name = "inferno-collapse-perf"
-path = "src/collapse-perf.rs"
+path = "src/bin/collapse-perf.rs"

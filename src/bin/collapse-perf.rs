@@ -1,10 +1,8 @@
-mod collapse;
-
 use std::fs::File;
 use std::io::{self, BufReader};
 use structopt::StructOpt;
 
-use crate::collapse::perf::{handle_file, Options};
+use inferno::collapse::perf::{handle_file, Options};
 
 #[derive(Debug, StructOpt)]
 #[structopt(
