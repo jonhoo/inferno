@@ -40,6 +40,10 @@ struct Opt {
     #[structopt(long = "all")]
     annotate_all: bool,
 
+    /// event name filter, defaults to first encountered event
+    #[structopt(long = "event-filter", value_name = "EVENT")]
+    event_filter: Option<String>,
+
     /// perf script output file, or STDIN if not specified
     infile: Option<String>,
 }
@@ -52,6 +56,7 @@ impl Into<Options> for Opt {
             include_addrs: self.include_addrs,
             annotate_jit: self.annotate_jit || self.annotate_all,
             annotate_kernel: self.annotate_kernel || self.annotate_all,
+            event_filter: self.event_filter,
         }
     }
 }

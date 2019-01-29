@@ -21,6 +21,9 @@ pub struct Options {
 
     /// annotate kernel functions with a _[k]
     pub annotate_kernel: bool,
+
+    /// event type filter, defaults to first encountered event
+    pub event_filter: Option<String>,
 }
 
 pub fn handle_file<R: BufRead, W: Write>(opt: Options, mut reader: R, writer: W) -> io::Result<()> {
@@ -49,6 +52,13 @@ pub fn handle_file<R: BufRead, W: Write>(opt: Options, mut reader: R, writer: W)
 }
 
 #[derive(Debug)]
+enum EventFilterState {
+    None,
+    Defaulted,
+    Warned,
+}
+
+#[derive(Debug)]
 struct PerfState {
     /// All lines until the next empty line are stack lines.
     in_event: bool,
@@ -69,6 +79,8 @@ struct PerfState {
 
     /// The options for the current run.
     opt: Options,
+
+    event_filtering: EventFilterState,
 }
 
 impl From<Options> for PerfState {
@@ -79,6 +91,7 @@ impl From<Options> for PerfState {
             stack: VecDeque::default(),
             occurrences: HashMap::default(),
             pname: String::new(),
+            event_filtering: EventFilterState::None,
             opt,
         }
     }
@@ -145,6 +158,26 @@ impl PerfState {
             if let Some(event) = line.rsplitn(2, ' ').next() {
                 if event.ends_with(':') {
                     let event = &event[..(event.len() - 1)];
+
+                    if let Some(ref filter) = self.opt.event_filter {
+                        if event != filter {
+                            if let EventFilterState::Defaulted = self.event_filtering {
+                                // only print this warning if necessary:
+                                // when we defaulted and there was
+                                // multiple event types.
+                                eprintln!("Filtering for events of type: {}", event);
+                                self.event_filtering = EventFilterState::Warned;
+                            }
+                            self.skip_stack = true;
+                            return;
+                        }
+                    } else {
+                        // By default only show events of the first encountered
+                        // event type. Merging together different types, such as
+                        // instructions and cycles, produces misleading results.
+                        self.opt.event_filter = Some(event.to_string());
+                        self.event_filtering = EventFilterState::Defaulted;
+                    }
                     // TODO: filter by event
                     if false {
                         self.skip_stack = true;
@@ -258,22 +291,23 @@ impl PerfState {
 
     fn after_event(&mut self) {
         // end of stack, so emit stack entry
+        if !self.skip_stack {
+            // allocate a string that is long enough to hold the entire stack string
+            let mut stack_str = String::with_capacity(
+                self.pname.len() + self.stack.iter().fold(0, |a, s| a + s.len() + 1),
+            );
 
-        // allocate a string that is long enough to hold the entire stack string
-        let mut stack_str = String::with_capacity(
-            self.pname.len() + self.stack.iter().fold(0, |a, s| a + s.len() + 1),
-        );
+            // add the comm name
+            stack_str.push_str(&self.pname);
+            // add the other stack entries (if any)
+            for e in self.stack.drain(..) {
+                stack_str.push_str(";");
+                stack_str.push_str(&e);
+            }
 
-        // add the comm name
-        stack_str.push_str(&self.pname);
-        // add the other stack entries (if any)
-        for e in self.stack.drain(..) {
-            stack_str.push_str(";");
-            stack_str.push_str(&e);
+            // count it!
+            *self.occurrences.entry(stack_str).or_insert(0) += 1;
         }
-
-        // count it!
-        *self.occurrences.entry(stack_str).or_insert(0) += 1;
 
         // reset for the next event
         self.in_event = false;
