@@ -109,10 +109,11 @@ impl PerfState {
     fn event_line_parts(line: &str) -> Option<(&str, &str, &str)> {
         let mut word_start = 0;
         let mut all_digits = false;
+        let mut last_was_space = false;
         let mut contains_slash_at = None;
         for (idx, c) in line.char_indices() {
             if c == ' ' {
-                if all_digits {
+                if all_digits && !last_was_space {
                     // found an all-digit word
                     let (pid, tid) = if let Some(slash) = contains_slash_at {
                         // found PID + TID
@@ -122,8 +123,6 @@ impl PerfState {
                         ("?", &line[word_start..idx])
                     };
                     let comm = &line[..(word_start - 1)];
-
-                    // XXX: two spaces in a row would see all_digits = true erroneously
                     return Some((comm, pid, tid));
                 }
                 word_start = idx + 1;
@@ -138,6 +137,7 @@ impl PerfState {
                 all_digits = false;
                 contains_slash_at = None;
             }
+            last_was_space = c == ' ';
         }
         None
     }
