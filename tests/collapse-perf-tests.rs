@@ -3,10 +3,10 @@ extern crate pretty_assertions;
 
 extern crate inferno;
 
-use inferno::collapse::perf::{handle_file, Options};
+use inferno::collapse::perf::{handle_file, Options, Result};
 use std::fmt;
 use std::fs::File;
-use std::io::{self, BufRead, BufReader, Cursor};
+use std::io::{BufRead, BufReader, Cursor};
 use std::path::Path;
 
 // Create tests for test files in $dir. The test files are used as input
@@ -144,7 +144,7 @@ collapse_perf_tests! {
     perf_vertx_stacks_01_addrs
 }
 
-fn test_collapse_perf(test_file: &str, expected_file: &str, options: Options) -> io::Result<()> {
+fn test_collapse_perf(test_file: &str, expected_file: &str, options: Options) -> Result {
     let r = BufReader::new(File::open(test_file)?);
 
     let mut result = Cursor::new(Vec::with_capacity(expected_file.len()));

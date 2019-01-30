@@ -22,6 +22,10 @@ codecov = { repository = "jonhoo/inferno", branch = "master", service = "github"
 
 [dependencies]
 structopt = "0.2"
+smallvec = "0.6"
+object = "0.9"
+addr2line = "0.7"
+gimli = "0.16"
 
 [dev-dependencies]
 pretty_assertions = "0.5"

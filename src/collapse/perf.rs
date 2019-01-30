@@ -1,6 +1,16 @@
+use addr2line;
+use smallvec::SmallVec;
+use std::borrow::Cow;
+use std::collections::hash_map::Entry;
 use std::collections::{HashMap, VecDeque};
+use std::error;
+use std::ffi::OsStr;
+use std::fmt::{self, Debug};
+use std::fs;
 use std::io;
 use std::io::prelude::*;
+use std::path::Path;
+use std::result;
 
 const TIDY_GENERIC: bool = true;
 const TIDY_JAVA: bool = true;
@@ -22,11 +32,52 @@ pub struct Options {
     /// annotate kernel functions with a _[k]
     pub annotate_kernel: bool,
 
+    /// un-inline using addr2line
+    pub show_inline: bool,
+
+    /// adds source context to inline
+    pub show_context: bool,
+
     /// event type filter, defaults to first encountered event
     pub event_filter: Option<String>,
 }
 
-pub fn handle_file<R: BufRead, W: Write>(opt: Options, mut reader: R, writer: W) -> io::Result<()> {
+#[derive(Debug)]
+pub enum Error {
+    Io(io::Error),
+    Parse(String),
+}
+
+impl error::Error for Error {
+    fn description(&self) -> &str {
+        match self {
+            Error::Io(e) => e.description(),
+            Error::Parse(s) => &s,
+        }
+    }
+}
+
+impl fmt::Display for Error {
+    fn fmt(&self, f: &mut fmt::Formatter) -> result::Result<(), fmt::Error> {
+        Debug::fmt(self, f)
+    }
+}
+
+impl From<io::Error> for Error {
+    fn from(err: io::Error) -> Error {
+        Error::Io(err)
+    }
+}
+
+impl From<gimli::Error> for Error {
+    fn from(err: gimli::Error) -> Error {
+        Error::Parse(err.to_string())
+    }
+}
+
+pub type Result = result::Result<(), Error>;
+
+pub fn handle_file<R: BufRead, W: Write>(opt: Options, mut reader: R, writer: W) -> Result {
     let mut line = String::new();
     let mut state = PerfState::from(opt);
     loop {
@@ -44,11 +95,11 @@ pub fn handle_file<R: BufRead, W: Write>(opt: Options, mut reader: R, writer: W)
         if line.is_empty() {
             state.after_event();
         } else {
-            state.on_line(line.trim_end());
+            state.on_line(line.trim_end())?;
         }
     }
 
-    state.finish(writer)
+    state.finish(writer).map_err(|e| e.into())
 }
 
 #[derive(Debug)]
@@ -58,7 +109,6 @@ enum EventFilterState {
     Warned,
 }
 
-#[derive(Debug)]
 struct PerfState {
     /// All lines until the next empty line are stack lines.
     in_event: bool,
@@ -71,6 +121,10 @@ struct PerfState {
 
     /// Number of times each call stack has been seen.
     occurrences: HashMap<String, usize>,
+
+    /// Cached Contexts by module name for un_inline() since constructing them is somewhat costly.
+    addr2line_contexts:
+        HashMap<String, addr2line::Context<gimli::EndianRcSlice<gimli::RunTimeEndian>>>,
 
     /// Current comm name.
     ///
@@ -90,6 +144,7 @@ impl From<Options> for PerfState {
             skip_stack: false,
             stack: VecDeque::default(),
             occurrences: HashMap::default(),
+            addr2line_contexts: HashMap::default(),
             pname: String::new(),
             event_filtering: EventFilterState::None,
             opt,
@@ -98,9 +153,10 @@ impl From<Options> for PerfState {
 }
 
 impl PerfState {
-    fn on_line(&mut self, line: &str) {
+    fn on_line(&mut self, line: &str) -> Result {
         if !self.in_event {
-            self.on_event_line(line)
+            self.on_event_line(line);
+            Ok(())
         } else {
             self.on_stack_line(line)
         }
@@ -230,9 +286,9 @@ impl PerfState {
     //     7f533952bc77 _dl_check_map_versions+0x597 (/usr/lib/ld-2.28.so)
     //     7f53389994d0 [unknown] ([unknown])
     //                0 [unknown] ([unknown])
-    fn on_stack_line(&mut self, line: &str) {
+    fn on_stack_line(&mut self, line: &str) -> Result {
         if self.skip_stack {
-            return;
+            return Ok(());
         }
 
         if let Some((pc, mut rawfunc, module)) = Self::stack_line_parts(line) {
@@ -245,12 +301,17 @@ impl PerfState {
                 }
             }
 
-            // TODO: show_inline
+            // --inline flag
+            if self.opt.show_inline && can_un_inline(module) {
+                let un_inlined = self.un_inline(pc, module)?;
+                self.stack.push_front(un_inlined);
+                return Ok(());
+            }
 
             // skip process names?
             // see https://github.com/brendangregg/FlameGraph/blob/f857ebc94bfe2a9bfdc4f1536ebacfb7466f69ba/stackcollapse-perf.pl#L269
             if rawfunc.starts_with('(') {
-                return;
+                return Ok(());
             }
 
             let mut func = with_module_fallback(module, rawfunc, pc, self.opt.include_addrs);
@@ -288,6 +349,8 @@ impl PerfState {
         } else {
             eprintln!("weird stack line: {}", line);
         }
+
+        Ok(())
     }
 
     fn after_event(&mut self) {
@@ -323,6 +386,91 @@ impl PerfState {
             writeln!(writer, "{} {}", key, self.occurrences[key])?;
         }
         Ok(())
+    }
+
+    // Use addr2line to determine the symbol to use for each program counter address
+    // (as opposed to using the symbol names that perf script produces)
+    fn un_inline(&mut self, addr: &str, module: &str) -> result::Result<String, Error> {
+        let addr = u64::from_str_radix(addr, 16).map_err(|e| {
+            Error::Parse(format!(
+                "unable to parse {} as hex address, caused by: {}",
+                addr, e
+            ))
+        })?;
+
+        if let Entry::Vacant(entry) = self.addr2line_contexts.entry(module.into()) {
+            let bytes = fs::read(module)?;
+            let file = &object::File::parse(&bytes).map_err(|e| {
+                Error::Parse(format!(
+                    "unable to parse file: {}, caused by: {}",
+                    module, e
+                ))
+            })?;
+            entry.insert(addr2line::Context::new(file)?);
+        };
+        let ctx = &self.addr2line_contexts[module];
+
+        let mut frames = ctx.find_frames(addr).map_err(|e| {
+            Error::Parse(format!(
+                "unable to parse frames from module: {}, at address: {}. caused by: {}",
+                module, addr, e
+            ))
+        })?;
+
+        let mut full_func = SmallVec::<[String; 1]>::new();
+        let mut total_length = 0;
+        while let Some(frame) = frames.next().unwrap() {
+            let mut function = frame
+                .function
+                .map(|func| {
+                    let name = remove_discriminator(
+                        func.raw_name()
+                            .map(Cow::from)
+                            .unwrap_or_else(|_| Cow::from("??")),
+                    );
+                    strip_rust_hash(addr2line::demangle_auto(name, func.language).as_ref())
+                        .to_string()
+                })
+                .unwrap_or_else(|| "??".into());
+
+            if self.opt.show_context {
+                let loc = frame.location;
+                let (file, line) = match loc {
+                    Some(ref loc) => {
+                        let file = loc
+                            .file
+                            .as_ref()
+                            .map(|f| Path::new(f).file_name())
+                            .map(|f| f.map(OsStr::to_str))
+                            .unwrap_or(None)
+                            .unwrap_or(None);
+                        (file, loc.line)
+                    }
+                    None => (None, None),
+                };
+                function = format!(
+                    "{}:{}:{}",
+                    function,
+                    file.unwrap_or("??"),
+                    line.map(|l| l.to_string()).unwrap_or_else(|| "?".into())
+                );
+            }
+
+            total_length += function.len();
+            full_func.push(function);
+        }
+
+        let mut joined = String::with_capacity(total_length + full_func.len() - 1);
+        let mut first = true;
+        while let Some(func) = full_func.pop() {
+            if !first {
+                joined.push(';');
+            }
+            joined.push_str(&func);
+            first = false;
+        }
+
+        Ok(joined)
     }
 }
 
@@ -411,4 +559,130 @@ fn tidy_java(mut func: String) -> String {
     }
 
     func
+}
+
+// Removes discriminator markers.
+// Equivalent to s/ \(discriminator \S+\)//
+fn remove_discriminator(s: Cow<str>) -> Cow<str> {
+    let disc = " (discriminator ";
+    if let Some(start) = s.find(disc) {
+        let rest = &s[start + disc.len()..];
+        if let Some(end) = rest.find(')') {
+            if rest[..end].chars().all(|c| !c.is_whitespace()) {
+                return Cow::from(format!(
+                    "{}{}",
+                    &s[0..start],
+                    &s[start + disc.len() + end + 1..s.len()]
+                ));
+            }
+        }
+    }
+    s
+}
+
+// Removes Rust hash from function name if it exists.
+// When demangling Rust names, addr2line in binutils removes the hash,
+// but the Rust addr2line crate does not. Calling this function
+// after demangling will make it match binutils.
+fn strip_rust_hash(func: &str) -> &str {
+    if let Some(idx) = func.rfind("::") {
+        if is_rust_hash(&func[idx + 2..]) {
+            return &func[0..idx];
+        }
+    }
+    func
+}
+
+// Rust hashes are hex digits with an `h` prepended.
+fn is_rust_hash(s: &str) -> bool {
+    s.starts_with('h') && s[1..].chars().all(|c| c.is_digit(16))
+}
+
+// Returns whether the module can be un-inlined.
+//
+// Equivalent to the following perl:
+//     $mod !~ m/(perf-\d+.map|kernel\.|\[[^\]]+\])/;
+fn can_un_inline(module: &str) -> bool {
+    // /perf-\d+.map/
+    if let Some(perf) = module.find("perf-") {
+        let rest = &module[perf + 5..];
+        if let Some(map) = rest.find(".map") {
+            if rest[..map].chars().all(|c| c.is_ascii_digit()) {
+                return false;
+            }
+        }
+    }
+
+    // /kernel\./
+    if module.find("kernel.").is_some() {
+        return false;
+    }
+
+    // /\[[^\]]+\]/
+    let mut start = 0;
+    while start < module.len() {
+        if let Some(open) = module[start..].find('[') {
+            let rest = &module[open + 1..];
+            if let Some(close) = rest.find(']') {
+                if close > 1 && rest[..close].chars().all(|c| c != ']') {
+                    return false;
+                }
+            }
+            start = open + 1;
+        } else {
+            break;
+        }
+    }
+
+    true
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_remove_discriminator() {
+        assert_eq!(
+            remove_discriminator(Cow::from("123 (discriminator 456)")),
+            Cow::from("123")
+        );
+        assert_eq!(
+            remove_discriminator(Cow::from("foo:86 (discriminator 98765)")),
+            Cow::from("foo:86")
+        );
+    }
+
+    #[test]
+    fn test_strip_rust_hash() {
+        assert_eq!(
+            strip_rust_hash("inferno::collapse::perf::h123456789ABCDEF0"),
+            "inferno::collapse::perf"
+        );
+        assert_eq!(strip_rust_hash("foo::bar::h21F2A89C449"), "foo::bar");
+        assert_eq!(
+            strip_rust_hash("foo::bar::21F2A89C449"),
+            "foo::bar::21F2A89C449"
+        );
+        assert_eq!(strip_rust_hash("foo::bar"), "foo::bar");
+    }
+
+    #[test]
+    fn test_is_rust_hash() {
+        assert!(is_rust_hash("h21F2A89C449"));
+        assert!(!is_rust_hash("21F2A89C449"));
+        assert!(!is_rust_hash("q21F2A89C449"));
+        assert!(!is_rust_hash("h21F2A89C44Z"));
+    }
+
+    #[test]
+    fn test_can_un_iline() {
+        assert!(!can_un_inline("perf-12345.map"));
+        assert!(!can_un_inline("kernel.foo"));
+        assert!(!can_un_inline("[foo]"));
+        assert!(!can_un_inline("foo[bar]baz"));
+        assert!(can_un_inline("/foo/bar/baz"));
+        assert!(can_un_inline("[]"));
+        assert!(can_un_inline("[]]"));
+    }
 }

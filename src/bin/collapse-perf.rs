@@ -2,7 +2,7 @@ use std::fs::File;
 use std::io::{self, BufReader};
 use structopt::StructOpt;
 
-use inferno::collapse::perf::{handle_file, Options};
+use inferno::collapse::perf::{handle_file, Options, Result};
 
 #[derive(Debug, StructOpt)]
 #[structopt(
@@ -40,6 +40,14 @@ struct Opt {
     #[structopt(long = "all")]
     annotate_all: bool,
 
+    /// un-inline using addr2line
+    #[structopt(name = "inline", long = "inline")]
+    show_inline: bool,
+
+    /// adds source context to --inline
+    #[structopt(long = "context", requires = "inline")]
+    show_context: bool,
+
     /// event name filter, defaults to first encountered event
     #[structopt(long = "event-filter", value_name = "EVENT")]
     event_filter: Option<String>,
@@ -56,12 +64,14 @@ impl Into<Options> for Opt {
             include_addrs: self.include_addrs,
             annotate_jit: self.annotate_jit || self.annotate_all,
             annotate_kernel: self.annotate_kernel || self.annotate_all,
+            show_inline: self.show_inline,
+            show_context: self.show_context,
             event_filter: self.event_filter,
         }
     }
 }
 
-fn main() -> io::Result<()> {
+fn main() -> Result {
     let (infile, options) = {
         let opt = Opt::from_args();
         (opt.infile.clone(), opt.into())
