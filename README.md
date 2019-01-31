@@ -24,8 +24,24 @@ To compare performance, run `./compare.sh`. It requires [hyperfine](https://gith
 
 # License
 
-Inferno is licensed under [CDDL
-1.0](https://opensource.org/licenses/CDDL-1.0) to conform to the license
-[used](https://github.com/brendangregg/FlameGraph/commit/76719a446d6091c88434489cc99d6355c3c3ef41)
-by the upstream flamegraph files (see, for example,
-[`stackcollapse-perf`](https://github.com/brendangregg/FlameGraph/blob/f857ebc94bfe2a9bfdc4f1536ebacfb7466f69ba/stackcollapse-perf.pl#L44L61)).
+Inferno is a port of @brendangregg's awesome original
+[FlameGraph](https://github.com/brendangregg/FlameGraph) project,
+written in Perl, and owes its existence and pretty much of all of its
+functionality entirely to that project. [Like
+FlameGraph](https://github.com/brendangregg/FlameGraph/commit/76719a446d6091c88434489cc99d6355c3c3ef41),
+Inferno is licensed under the [CDDL
+1.0](https://opensource.org/licenses/CDDL-1.0) to avoid any licensing
+issues. Specifically, the CDDL 1.0 grants
+
+> a world-wide, royalty-free, non-exclusive license under intellectual
+> property rights (other than patent or trademark) Licensable by Initial
+> Developer, to use, reproduce, modify, display, perform, sublicense and
+> distribute the Original Software (or portions thereof), with or
+> without Modifications, and/or as part of a Larger Work; and under
+> Patent Claims infringed by the making, using or selling of Original
+> Software, to make, have made, use, practice, sell, and offer for sale,
+> and/or otherwise dispose of the Original Software (or portions
+> thereof).
+
+as long as the source is made available along with the license (3.1),
+both of which are true since you're reading this file!
