@@ -524,20 +524,19 @@ fn tidy_java(mut func: String) -> String {
 
 // Removes discriminator markers.
 //
-// Similar to s/ \(discriminator \S+\)// except we don't greedily match
-// accross ')', assuming the discrimator won't contain this character.
+// stackcollapse-perf does s/ \(discriminator \S+\)//
+// whereas we just remove " (discriminator " up through
+// the next closing parenthesis.
 fn remove_discriminator(s: Cow<str>) -> Cow<str> {
     let disc = " (discriminator ";
     if let Some(start) = s.find(disc) {
         let rest = &s[start + disc.len()..];
         if let Some(end) = rest.find(')') {
-            if rest[..end].chars().all(|c| !c.is_whitespace()) {
-                return Cow::from(format!(
-                    "{}{}",
-                    &s[0..start],
-                    &s[start + disc.len() + end + 1..s.len()]
-                ));
-            }
+            return Cow::from(format!(
+                "{}{}",
+                &s[0..start],
+                &s[start + disc.len() + end + 1..s.len()]
+            ));
         }
     }
     s
@@ -592,14 +591,9 @@ mod tests {
             Cow::from("foo:86 (discriminator ")
         );
         assert_eq!(
-            // Extra space before paren
-            remove_discriminator(Cow::from("foo:86 (discriminator  )")),
-            Cow::from("foo:86 (discriminator  )")
-        );
-        assert_eq!(
-            // Space that doesn't belong
-            remove_discriminator(Cow::from("foo:86 (discriminator 12 34)")),
-            Cow::from("foo:86 (discriminator 12 34)")
+            // No open paren
+            remove_discriminator(Cow::from("foo:86 discriminator 456)")),
+            Cow::from("foo:86 discriminator 456)")
         );
     }
 
