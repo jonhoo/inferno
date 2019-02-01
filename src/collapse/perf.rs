@@ -587,6 +587,21 @@ mod tests {
             remove_discriminator(Cow::from("foo:86 (discriminator 98765)")),
             Cow::from("foo:86")
         );
+        assert_eq!(
+            // No close paren
+            remove_discriminator(Cow::from("foo:86 (discriminator ")),
+            Cow::from("foo:86 (discriminator ")
+        );
+        assert_eq!(
+            // Extra space before paren
+            remove_discriminator(Cow::from("foo:86 (discriminator  )")),
+            Cow::from("foo:86 (discriminator  )")
+        );
+        assert_eq!(
+            // Space that doesn't belong
+            remove_discriminator(Cow::from("foo:86 (discriminator 12 34)")),
+            Cow::from("foo:86 (discriminator 12 34)")
+        );
     }
 
     #[test]
