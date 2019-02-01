@@ -394,6 +394,8 @@ impl PerfState {
                             // Using rustc_demangle directly here since addr2line::demangle_auto
                             // doesn't remove trailing hash value from Rust symbol names.
                             // See https://github.com/gimli-rs/addr2line/issues/108
+                            // Also the "{:#}" formatting is required to not include the
+                            // trailing hash.
                             format!("{:#}", rustc_demangle::demangle(&name))
                         }
                         lang => addr2line::demangle_auto(name, lang).to_string(),
