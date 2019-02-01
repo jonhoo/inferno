@@ -2,7 +2,7 @@ use std::fs::File;
 use std::io::{self, BufReader};
 use structopt::StructOpt;
 
-use inferno::collapse::perf::{handle_file, Options, Result};
+use inferno::collapse::perf::{handle_file, Options};
 
 #[derive(Debug, StructOpt)]
 #[structopt(
@@ -71,7 +71,7 @@ impl Into<Options> for Opt {
     }
 }
 
-fn main() -> Result {
+fn main() -> io::Result<()> {
     let (infile, options) = {
         let opt = Opt::from_args();
         (opt.infile.clone(), opt.into())

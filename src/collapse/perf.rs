@@ -1,16 +1,13 @@
 use addr2line;
+use memmap;
+use rustc_demangle;
 use smallvec::SmallVec;
 use std::borrow::Cow;
 use std::collections::hash_map::Entry;
 use std::collections::{HashMap, VecDeque};
-use std::error;
-use std::ffi::OsStr;
-use std::fmt::{self, Debug};
-use std::fs;
+use std::fs::File;
 use std::io;
 use std::io::prelude::*;
-use std::path::Path;
-use std::result;
 
 const TIDY_GENERIC: bool = true;
 const TIDY_JAVA: bool = true;
@@ -42,42 +39,7 @@ pub struct Options {
     pub event_filter: Option<String>,
 }
 
-#[derive(Debug)]
-pub enum Error {
-    Io(io::Error),
-    Parse(String),
-}
-
-impl error::Error for Error {
-    fn description(&self) -> &str {
-        match self {
-            Error::Io(e) => e.description(),
-            Error::Parse(s) => &s,
-        }
-    }
-}
-
-impl fmt::Display for Error {
-    fn fmt(&self, f: &mut fmt::Formatter) -> result::Result<(), fmt::Error> {
-        Debug::fmt(self, f)
-    }
-}
-
-impl From<io::Error> for Error {
-    fn from(err: io::Error) -> Error {
-        Error::Io(err)
-    }
-}
-
-impl From<gimli::Error> for Error {
-    fn from(err: gimli::Error) -> Error {
-        Error::Parse(err.to_string())
-    }
-}
-
-pub type Result = result::Result<(), Error>;
-
-pub fn handle_file<R: BufRead, W: Write>(opt: Options, mut reader: R, writer: W) -> Result {
+pub fn handle_file<R: BufRead, W: Write>(opt: Options, mut reader: R, writer: W) -> io::Result<()> {
     let mut line = String::new();
     let mut state = PerfState::from(opt);
     loop {
@@ -95,11 +57,11 @@ pub fn handle_file<R: BufRead, W: Write>(opt: Options, mut reader: R, writer: W)
         if line.is_empty() {
             state.after_event();
         } else {
-            state.on_line(line.trim_end())?;
+            state.on_line(line.trim_end());
         }
     }
 
-    state.finish(writer).map_err(|e| e.into())
+    state.finish(writer)
 }
 
 #[derive(Debug)]
@@ -153,10 +115,9 @@ impl From<Options> for PerfState {
 }
 
 impl PerfState {
-    fn on_line(&mut self, line: &str) -> Result {
+    fn on_line(&mut self, line: &str) {
         if !self.in_event {
-            self.on_event_line(line);
-            Ok(())
+            self.on_event_line(line)
         } else {
             self.on_stack_line(line)
         }
@@ -286,9 +247,9 @@ impl PerfState {
     //     7f533952bc77 _dl_check_map_versions+0x597 (/usr/lib/ld-2.28.so)
     //     7f53389994d0 [unknown] ([unknown])
     //                0 [unknown] ([unknown])
-    fn on_stack_line(&mut self, line: &str) -> Result {
+    fn on_stack_line(&mut self, line: &str) {
         if self.skip_stack {
-            return Ok(());
+            return;
         }
 
         if let Some((pc, mut rawfunc, module)) = Self::stack_line_parts(line) {
@@ -303,15 +264,23 @@ impl PerfState {
 
             // --inline flag
             if self.opt.show_inline && can_un_inline(module) {
-                let un_inlined = self.un_inline(pc, module)?;
-                self.stack.push_front(un_inlined);
-                return Ok(());
+                match self.un_inline(pc, module) {
+                    Ok(()) => {
+                        return;
+                    }
+                    Err(e) => {
+                        eprintln!(
+                            "Error attempting to un-inline {} in {}, caused by: {}",
+                            pc, module, e
+                        );
+                    }
+                }
             }
 
             // skip process names?
             // see https://github.com/brendangregg/FlameGraph/blob/f857ebc94bfe2a9bfdc4f1536ebacfb7466f69ba/stackcollapse-perf.pl#L269
             if rawfunc.starts_with('(') {
-                return Ok(());
+                return;
             }
 
             let mut func = with_module_fallback(module, rawfunc, pc, self.opt.include_addrs);
@@ -349,8 +318,6 @@ impl PerfState {
         } else {
             eprintln!("weird stack line: {}", line);
         }
-
-        Ok(())
     }
 
     fn after_event(&mut self) {
@@ -390,87 +357,84 @@ impl PerfState {
 
     // Use addr2line to determine the symbol to use for each program counter address
     // (as opposed to using the symbol names that perf script produces)
-    fn un_inline(&mut self, addr: &str, module: &str) -> result::Result<String, Error> {
-        let addr = u64::from_str_radix(addr, 16).map_err(|e| {
-            Error::Parse(format!(
-                "unable to parse {} as hex address, caused by: {}",
-                addr, e
-            ))
-        })?;
+    fn un_inline(&mut self, addr: &str, module: &str) -> Result<(), String> {
+        let addr = u64::from_str_radix(addr, 16)
+            .map_err(|_| format!("unable to parse {} as hex address", addr))?;
 
         if let Entry::Vacant(entry) = self.addr2line_contexts.entry(module.into()) {
-            let bytes = fs::read(module)?;
-            let file = &object::File::parse(&bytes).map_err(|e| {
-                Error::Parse(format!(
-                    "unable to parse file: {}, caused by: {}",
-                    module, e
-                ))
-            })?;
-            entry.insert(addr2line::Context::new(file)?);
+            let file =
+                File::open(module).map_err(|_| format!("unable to open file: {}", module))?;
+            // Using memmap is unsafe because the underlying file may be modified,
+            // which would cause undefined behavior. It's unlikely to be a problem in practice
+            // since we shouldn't run very long. The potential speed-up is worth it.
+            let map = unsafe {
+                memmap::Mmap::map(&file)
+                    .map_err(|_| format!("unable to memmap file: {}", module))?
+            };
+            let file = &object::File::parse(&*map)
+                .map_err(|_| format!("unable to parse file: {}", module))?;
+            entry.insert(addr2line::Context::new(file).map_err(|e| e.to_string())?);
         };
         let ctx = &self.addr2line_contexts[module];
 
-        let mut frames = ctx.find_frames(addr).map_err(|e| {
-            Error::Parse(format!(
-                "unable to parse frames from module: {}, at address: {}. caused by: {}",
-                module, addr, e
-            ))
+        let mut frames = ctx.find_frames(addr).map_err(|_| {
+            format!(
+                "unable to parse frames from module: {}, at address: {}",
+                module, addr
+            )
         })?;
 
-        let mut full_func = SmallVec::<[String; 1]>::new();
-        let mut total_length = 0;
+        let mut funcs = SmallVec::<[String; 1]>::new();
         while let Some(frame) = frames.next().unwrap() {
-            let mut function = frame
+            let func = frame
                 .function
                 .map(|func| {
-                    let name = remove_discriminator(
-                        func.raw_name()
-                            .map(Cow::from)
-                            .unwrap_or_else(|_| Cow::from("??")),
-                    );
-                    strip_rust_hash(addr2line::demangle_auto(name, func.language).as_ref())
-                        .to_string()
+                    let name = func.raw_name().map(Cow::from);
+                    let name = name.unwrap_or_else(|_| Cow::from("??"));
+                    let name = remove_discriminator(name);
+                    let name = match func.language {
+                        Some(gimli::DW_LANG_Rust) => {
+                            // Using rustc_demangle directly here since addr2line::demangle_auto
+                            // doesn't remove trailing hash value from Rust symbol names.
+                            // See https://github.com/gimli-rs/addr2line/issues/108
+                            format!("{:#}", rustc_demangle::demangle(&name))
+                        }
+                        lang => addr2line::demangle_auto(name, lang).to_string(),
+                    };
+                    name
                 })
                 .unwrap_or_else(|| "??".into());
 
             if self.opt.show_context {
                 let loc = frame.location;
                 let (file, line) = match loc {
-                    Some(ref loc) => {
-                        let file = loc
-                            .file
+                    Some(ref loc) => (
+                        loc.file
                             .as_ref()
-                            .map(|f| Path::new(f).file_name())
-                            .map(|f| f.map(OsStr::to_str))
-                            .unwrap_or(None)
-                            .unwrap_or(None);
-                        (file, loc.line)
-                    }
+                            .and_then(|f| f.rsplitn(2, std::path::MAIN_SEPARATOR).next()),
+                        loc.line,
+                    ),
                     None => (None, None),
                 };
-                function = format!(
-                    "{}:{}:{}",
-                    function,
-                    file.unwrap_or("??"),
-                    line.map(|l| l.to_string()).unwrap_or_else(|| "?".into())
-                );
-            }
 
-            total_length += function.len();
-            full_func.push(function);
+                let func_with_location = match (file, line) {
+                    (Some(file), Some(line)) => format!("{}:{}:{}", func, file, line),
+                    (Some(file), None) => format!("{}:{}:?", func, file),
+                    (None, Some(line)) => format!("{}:??:{}", func, line),
+                    (None, None) => format!("{}:??:?", func),
+                };
+
+                funcs.push(func_with_location);
+            } else {
+                funcs.push(func);
+            }
         }
 
-        let mut joined = String::with_capacity(total_length + full_func.len() - 1);
-        let mut first = true;
-        while let Some(func) = full_func.pop() {
-            if !first {
-                joined.push(';');
-            }
-            joined.push_str(&func);
-            first = false;
+        for func in funcs {
+            self.stack.push_front(func);
         }
 
-        Ok(joined)
+        Ok(())
     }
 }
 
@@ -562,7 +526,9 @@ fn tidy_java(mut func: String) -> String {
 }
 
 // Removes discriminator markers.
-// Equivalent to s/ \(discriminator \S+\)//
+//
+// Similar to s/ \(discriminator \S+\)// except we don't greedily match
+// accross ')', assuming the discrimator won't contain this character.
 fn remove_discriminator(s: Cow<str>) -> Cow<str> {
     let disc = " (discriminator ";
     if let Some(start) = s.find(disc) {
@@ -578,24 +544,6 @@ fn remove_discriminator(s: Cow<str>) -> Cow<str> {
         }
     }
     s
-}
-
-// Removes Rust hash from function name if it exists.
-// When demangling Rust names, addr2line in binutils removes the hash,
-// but the Rust addr2line crate does not. Calling this function
-// after demangling will make it match binutils.
-fn strip_rust_hash(func: &str) -> &str {
-    if let Some(idx) = func.rfind("::") {
-        if is_rust_hash(&func[idx + 2..]) {
-            return &func[0..idx];
-        }
-    }
-    func
-}
-
-// Rust hashes are hex digits with an `h` prepended.
-fn is_rust_hash(s: &str) -> bool {
-    s.starts_with('h') && s[1..].chars().all(|c| c.is_digit(16))
 }
 
 // Returns whether the module can be un-inlined.
@@ -614,24 +562,14 @@ fn can_un_inline(module: &str) -> bool {
     }
 
     // /kernel\./
-    if module.find("kernel.").is_some() {
+    if module.contains("kernel.") {
         return false;
     }
 
-    // /\[[^\]]+\]/
-    let mut start = 0;
-    while start < module.len() {
-        if let Some(open) = module[start..].find('[') {
-            let rest = &module[open + 1..];
-            if let Some(close) = rest.find(']') {
-                if close > 1 && rest[..close].chars().all(|c| c != ']') {
-                    return false;
-                }
-            }
-            start = open + 1;
-        } else {
-            break;
-        }
+    // Reject names enclosed in [], such as [unknown] and [vdso].
+    // This differs from the Perl version, which uses this regex: /\[[^\]]+\]/
+    if module.starts_with('[') && module.ends_with(']') {
+        return false;
     }
 
     true
@@ -654,35 +592,17 @@ mod tests {
     }
 
     #[test]
-    fn test_strip_rust_hash() {
-        assert_eq!(
-            strip_rust_hash("inferno::collapse::perf::h123456789ABCDEF0"),
-            "inferno::collapse::perf"
-        );
-        assert_eq!(strip_rust_hash("foo::bar::h21F2A89C449"), "foo::bar");
-        assert_eq!(
-            strip_rust_hash("foo::bar::21F2A89C449"),
-            "foo::bar::21F2A89C449"
-        );
-        assert_eq!(strip_rust_hash("foo::bar"), "foo::bar");
-    }
-
-    #[test]
-    fn test_is_rust_hash() {
-        assert!(is_rust_hash("h21F2A89C449"));
-        assert!(!is_rust_hash("21F2A89C449"));
-        assert!(!is_rust_hash("q21F2A89C449"));
-        assert!(!is_rust_hash("h21F2A89C44Z"));
-    }
-
-    #[test]
     fn test_can_un_iline() {
-        assert!(!can_un_inline("perf-12345.map"));
-        assert!(!can_un_inline("kernel.foo"));
-        assert!(!can_un_inline("[foo]"));
-        assert!(!can_un_inline("foo[bar]baz"));
-        assert!(can_un_inline("/foo/bar/baz"));
-        assert!(can_un_inline("[]"));
-        assert!(can_un_inline("[]]"));
+        assert!(can_un_inline("/usr/lib/libc-2.24.so"));
+        assert!(can_un_inline("/lib/x86_64-linux-gnu/libpthread-2.15.so"));
+        assert!(can_un_inline(
+            "/mnt/openjdk8/build/linux-x86_64-normal-server-release/jdk/lib/amd64/server/libjvm.so"
+        ));
+        assert!(can_un_inline("/lib/x86_64-linux-gnu/libc-2.19.so"));
+        assert!(!can_un_inline("/tmp/perf-10939.map"));
+        assert!(!can_un_inline("/tmp/perf-31912.map"));
+        assert!(!can_un_inline("[kernel.kallsyms]"));
+        assert!(!can_un_inline("[unknown]"));
+        assert!(!can_un_inline("[vdso]"));
     }
 }
