@@ -392,7 +392,7 @@ impl PerfState {
                     let name = func.raw_name().map(Cow::from);
                     let name = name.unwrap_or_else(|_| Cow::from("??"));
                     let name = remove_discriminator(name);
-                    let name = match func.language {
+                    match func.language {
                         Some(gimli::DW_LANG_Rust) => {
                             // Using rustc_demangle directly here since addr2line::demangle_auto
                             // doesn't remove trailing hash value from Rust symbol names.
@@ -400,8 +400,7 @@ impl PerfState {
                             format!("{:#}", rustc_demangle::demangle(&name))
                         }
                         lang => addr2line::demangle_auto(name, lang).to_string(),
-                    };
-                    name
+                    }
                 })
                 .unwrap_or_else(|| "??".into());
 
