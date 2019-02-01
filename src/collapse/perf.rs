@@ -404,8 +404,7 @@ impl PerfState {
                 .unwrap_or_else(|| "??".into());
 
             if self.opt.show_context {
-                let loc = frame.location;
-                let (file, line) = match loc {
+                let (file, line) = match frame.location {
                     Some(ref loc) => (
                         loc.file
                             .as_ref()
