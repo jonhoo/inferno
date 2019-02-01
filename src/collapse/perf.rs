@@ -1,6 +1,3 @@
-use addr2line;
-use memmap;
-use rustc_demangle;
 use smallvec::SmallVec;
 use std::borrow::Cow;
 use std::collections::hash_map::Entry;
