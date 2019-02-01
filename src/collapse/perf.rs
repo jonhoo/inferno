@@ -546,7 +546,7 @@ fn remove_discriminator(s: Cow<str>) -> Cow<str> {
 
 // Returns whether the module can be un-inlined.
 //
-// Equivalent to the following perl:
+// Roughly equivalent to the following perl from stackcollapse-perf:
 //     $mod !~ m/(perf-\d+.map|kernel\.|\[[^\]]+\])/;
 fn can_un_inline(module: &str) -> bool {
     // /perf-\d+.map/
