@@ -22,6 +22,8 @@ codecov = { repository = "jonhoo/inferno", branch = "master", service = "github"
 
 [dependencies]
 structopt = "0.2"
+quick-xml = "0.13"
+pretty_toa = "1.0.0"
 
 [dev-dependencies]
 pretty_assertions = "0.5"
@@ -35,3 +37,7 @@ name = "inferno"
 [[bin]]
 name = "inferno-collapse-perf"
 path = "src/bin/collapse-perf.rs"
+
+[[bin]]
+name = "inferno-flamegraph"
+path = "src/bin/flamegraph.rs"
