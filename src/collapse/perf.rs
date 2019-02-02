@@ -367,12 +367,12 @@ impl PerfState {
                 // since we shouldn't run very long. The potential speed-up is worth it.
                 let map = unsafe {
                     memmap::Mmap::map(&file)
-                        .map_err(|_| warn!("unable to memmap file: {}", module))
+                        .map_err(|e| warn!("unable to memmap file {}: {:?}", module, e))
                         .ok()?
                 };
 
                 let file = &object::File::parse(&*map)
-                    .map_err(|_| warn!("unable to parse file: {}", module))
+                    .map_err(|e| warn!("unable to parse file {}: {:?}", module, e))
                     .ok()?;
 
                 addr2line::Context::new(file)
@@ -392,18 +392,18 @@ impl PerfState {
 
         let addr = match u64::from_str_radix(addr, 16) {
             Ok(addr) => addr,
-            Err(_) => {
-                warn!("unable to parse {} as hex address", addr);
+            Err(e) => {
+                warn!("unable to parse {} as hex address: {:?}", addr, e);
                 return false;
             }
         };
 
         let mut frames = match ctx.find_frames(addr) {
             Ok(frames) => frames,
-            Err(_) => {
+            Err(e) => {
                 warn!(
-                    "unable to parse frames from module: {}, at address: {}",
-                    module, addr
+                    "unable to parse frames from module {} at address {:#X}: {:?}",
+                    module, addr, e
                 );
                 return false;
             }
