@@ -9,8 +9,9 @@ use std::fs::File;
 use std::io::{self, BufRead, BufReader, Cursor};
 use std::path::Path;
 
-// Create tests for test files in the flamegraph/test directory.
-// The test and result file names are derived from the test name.
+// Create tests for test files in $dir. The test files are used as input
+// and the results are compared to result files in the results sub directory.
+// The test and result file names are derived from $name.
 // The part after the last underscore is the flag name to use.
 // For example, perf_cycles_instructions_01_pid will use the following:
 //     test file: perf-cycles-instructions-01.txt
@@ -153,12 +154,26 @@ fn test_collapse_perf(test_file: &str, expected_file: &str, options: Options) ->
     result.set_position(0);
 
     let mut buf = String::new();
-    for (idx, line) in result.lines().enumerate() {
+    let mut line_num = 1;
+    for line in result.lines() {
         // Strip out " and ' since perl version does.
         let line = line?.replace("\"", "").replace("'", "");
-        expected.read_line(&mut buf)?;
-        assert_eq!(line, buf.trim_end(), "\n{}:{}", expected_file, idx + 1);
+        if expected.read_line(&mut buf)? == 0 {
+            panic!(
+                "\noutput has more lines than expected result file: {}",
+                expected_file
+            );
+        }
+        assert_eq!(line, buf.trim_end(), "\n{}:{}", expected_file, line_num);
         buf.clear();
+        line_num += 1;
+    }
+
+    if expected.read_line(&mut buf)? > 0 {
+        panic!(
+            "\n{} has more lines than output, beginning at line: {}",
+            expected_file, line_num
+        )
     }
 
     Ok(())
