@@ -2,7 +2,7 @@ use std::fs::File;
 use std::io::{self, BufReader};
 use structopt::StructOpt;
 
-use inferno::flamegraph::{handle_file, Options};
+use inferno::flamegraph::{self, Options};
 
 #[derive(Debug, StructOpt)]
 #[structopt(name = "inferno-flamegraph", author = "")]
@@ -27,12 +27,12 @@ fn main() -> quick_xml::Result<()> {
         Some(ref f) => {
             let r =
                 BufReader::with_capacity(128 * 1024, File::open(f).map_err(quick_xml::Error::Io)?);
-            handle_file(options, r, io::stdout().lock())
+            flamegraph::from_reader(options, r, io::stdout().lock())
         }
         None => {
             let stdin = io::stdin();
             let r = BufReader::with_capacity(128 * 1024, stdin.lock());
-            handle_file(options, r, io::stdout().lock())
+            flamegraph::from_reader(options, r, io::stdout().lock())
         }
     }
 }
