@@ -259,10 +259,8 @@ impl PerfState {
             }
 
             // --inline flag
-            if self.opt.show_inline && can_un_inline(module) {
-                if self.un_inline(pc, module) {
-                    return;
-                }
+            if self.opt.show_inline && self.un_inline(pc, module) {
+                return;
             }
 
             // skip process names?
@@ -347,6 +345,10 @@ impl PerfState {
     // (as opposed to using the symbol names that perf script produces).
     // Returns whether it succeeded.
     fn un_inline(&mut self, addr: &str, module: &str) -> bool {
+        if !can_un_inline(addr) {
+            return false;
+        }
+
         let ctx = self
             .addr2line_contexts
             .entry(module.into())
