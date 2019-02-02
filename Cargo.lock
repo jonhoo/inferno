@@ -169,6 +169,7 @@ version = "0.1.0"
 dependencies = [
  "addr2line 0.7.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "gimli 0.16.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "log 0.4.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "memmap 0.7.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "object 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "pretty_assertions 0.5.1 (registry+https://github.com/rust-lang/crates.io-index)",

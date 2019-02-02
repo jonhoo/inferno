@@ -1,6 +1,6 @@
+use gimli::{EndianRcSlice, RunTimeEndian};
 use smallvec::SmallVec;
 use std::borrow::Cow;
-use std::collections::hash_map::Entry;
 use std::collections::{HashMap, VecDeque};
 use std::fs::File;
 use std::io;
@@ -82,8 +82,7 @@ struct PerfState {
     occurrences: HashMap<String, usize>,
 
     /// Cached Contexts by module name for un_inline() since constructing them is somewhat costly.
-    addr2line_contexts:
-        HashMap<String, addr2line::Context<gimli::EndianRcSlice<gimli::RunTimeEndian>>>,
+    addr2line_contexts: HashMap<String, Option<addr2line::Context<EndianRcSlice<RunTimeEndian>>>>,
 
     /// Current comm name.
     ///
@@ -180,7 +179,7 @@ impl PerfState {
                                 // only print this warning if necessary:
                                 // when we defaulted and there was
                                 // multiple event types.
-                                eprintln!("Filtering for events of type: {}", event);
+                                warn!("Filtering for events of type: {}", event);
                                 self.event_filtering = EventFilterState::Warned;
                             }
                             self.skip_stack = true;
@@ -212,7 +211,7 @@ impl PerfState {
                 self.pname.push_str(pid);
             }
         } else {
-            eprintln!("weird event line: {}", line);
+            warn!("weird event line: {}", line);
             self.in_event = false;
         }
     }
@@ -261,16 +260,8 @@ impl PerfState {
 
             // --inline flag
             if self.opt.show_inline && can_un_inline(module) {
-                match self.un_inline(pc, module) {
-                    Ok(()) => {
-                        return;
-                    }
-                    Err(e) => {
-                        eprintln!(
-                            "Error attempting to un-inline {} in {}, caused by: {}",
-                            pc, module, e
-                        );
-                    }
+                if self.un_inline(pc, module) {
+                    return;
                 }
             }
 
@@ -313,7 +304,7 @@ impl PerfState {
 
             self.stack.push_front(func);
         } else {
-            eprintln!("weird stack line: {}", line);
+            warn!("weird stack line: {}", line);
         }
     }
 
@@ -353,33 +344,68 @@ impl PerfState {
     }
 
     // Use addr2line to determine the symbol to use for each program counter address
-    // (as opposed to using the symbol names that perf script produces)
-    fn un_inline(&mut self, addr: &str, module: &str) -> Result<(), String> {
-        let addr = u64::from_str_radix(addr, 16)
-            .map_err(|_| format!("unable to parse {} as hex address", addr))?;
+    // (as opposed to using the symbol names that perf script produces).
+    // Returns whether it succeeded.
+    fn un_inline(&mut self, addr: &str, module: &str) -> bool {
+        let ctx = self
+            .addr2line_contexts
+            .entry(module.into())
+            .or_insert_with(|| {
+                let file = File::open(module)
+                    .map_err(|e| {
+                        warn!(
+                            "unable to open module file {} to resolve {}: {:?}",
+                            module, addr, e
+                        );
+                    })
+                    .ok()?;
 
-        if let Entry::Vacant(entry) = self.addr2line_contexts.entry(module.into()) {
-            let file =
-                File::open(module).map_err(|_| format!("unable to open file: {}", module))?;
-            // Using memmap is unsafe because the underlying file may be modified,
-            // which would cause undefined behavior. It's unlikely to be a problem in practice
-            // since we shouldn't run very long. The potential speed-up is worth it.
-            let map = unsafe {
-                memmap::Mmap::map(&file)
-                    .map_err(|_| format!("unable to memmap file: {}", module))?
-            };
-            let file = &object::File::parse(&*map)
-                .map_err(|_| format!("unable to parse file: {}", module))?;
-            entry.insert(addr2line::Context::new(file).map_err(|e| e.to_string())?);
+                // Using memmap is unsafe because the underlying file may be modified,
+                // which would cause undefined behavior. It's unlikely to be a problem in practice
+                // since we shouldn't run very long. The potential speed-up is worth it.
+                let map = unsafe {
+                    memmap::Mmap::map(&file)
+                        .map_err(|_| warn!("unable to memmap file: {}", module))
+                        .ok()?
+                };
+
+                let file = &object::File::parse(&*map)
+                    .map_err(|_| warn!("unable to parse file: {}", module))
+                    .ok()?;
+
+                addr2line::Context::new(file)
+                    .map_err(|e| {
+                        warn!(
+                            "could not parse debug symbols from module {}: {:?}",
+                            module, e
+                        );
+                    })
+                    .ok()
+            });
+        let ctx = if let Some(ctx) = ctx {
+            ctx
+        } else {
+            return false;
         };
-        let ctx = &self.addr2line_contexts[module];
 
-        let mut frames = ctx.find_frames(addr).map_err(|_| {
-            format!(
-                "unable to parse frames from module: {}, at address: {}",
-                module, addr
-            )
-        })?;
+        let addr = match u64::from_str_radix(addr, 16) {
+            Ok(addr) => addr,
+            Err(_) => {
+                warn!("unable to parse {} as hex address", addr);
+                return false;
+            }
+        };
+
+        let mut frames = match ctx.find_frames(addr) {
+            Ok(frames) => frames,
+            Err(_) => {
+                warn!(
+                    "unable to parse frames from module: {}, at address: {}",
+                    module, addr
+                );
+                return false;
+            }
+        };
 
         let mut funcs = SmallVec::<[String; 1]>::new();
         while let Some(frame) = frames.next().unwrap() {
@@ -431,7 +457,7 @@ impl PerfState {
             self.stack.push_front(func);
         }
 
-        Ok(())
+        true
     }
 }
 
