@@ -270,38 +270,54 @@ impl PerfState {
                 return;
             }
 
-            let mut func = with_module_fallback(module, rawfunc, pc, self.opt.include_addrs);
-            if TIDY_GENERIC {
-                func = tidy_generic(func);
+            // Support Java inlining by splitting on "->". After the first func, the
+            // rest are annotated with "_[i]" to mark them as inlined.
+            // See https://github.com/brendangregg/FlameGraph/pull/89.
+            let mut java_inline =
+                SmallVec::<[String; 1]>::with_capacity(rawfunc.split("->").count() + 1);
+
+            for func in rawfunc.split("->") {
+                let mut func = with_module_fallback(module, func, pc, self.opt.include_addrs);
+                if TIDY_GENERIC {
+                    func = tidy_generic(func);
+                }
+
+                if TIDY_JAVA && self.pname == "java" {
+                    func = tidy_java(func);
+                }
+
+                // Annotations
+                //
+                // detect inlined when java_inline has funcs
+                // detect kernel from the module name; eg, frames to parse include:
+                //
+                //     ffffffff8103ce3b native_safe_halt ([kernel.kallsyms])
+                //     8c3453 tcp_sendmsg (/lib/modules/4.3.0-rc1-virtual/build/vmlinux)
+                //     7d8 ipv4_conntrack_local+0x7f8f80b8 ([nf_conntrack_ipv4])
+                //
+                // detect jit from the module name; eg:
+                //
+                //     7f722d142778 Ljava/io/PrintStream;::print (/tmp/perf-19982.map)
+                if !java_inline.is_empty() {
+                    func.push_str("_[i]"); // inlined
+                } else if self.opt.annotate_kernel
+                    && (module.starts_with('[') || module.ends_with("vmlinux"))
+                    && module != "[unknown]"
+                {
+                    func.push_str("_[k]"); // kernel
+                } else if self.opt.annotate_jit
+                    && module.starts_with("/tmp/perf-")
+                    && module.ends_with(".map")
+                {
+                    func.push_str("_[j]"); // jitted
+                }
+
+                java_inline.push(func);
             }
 
-            if TIDY_JAVA && self.pname == "java" {
-                func = tidy_java(func);
+            while let Some(func) = java_inline.pop() {
+                self.stack.push_front(func);
             }
-
-            // Annotations
-            //
-            // detect kernel from the module name; eg, frames to parse include:
-            //
-            //     ffffffff8103ce3b native_safe_halt ([kernel.kallsyms])
-            //     8c3453 tcp_sendmsg (/lib/modules/4.3.0-rc1-virtual/build/vmlinux)
-            //     7d8 ipv4_conntrack_local+0x7f8f80b8 ([nf_conntrack_ipv4])
-            //
-            // detect jit from the module name; eg:
-            //
-            //     7f722d142778 Ljava/io/PrintStream;::print (/tmp/perf-19982.map)
-            if self.opt.annotate_kernel
-                && (module.starts_with('[') || module.ends_with("vmlinux"))
-                && module != "[unknown]"
-            {
-                func.push_str("_[k]");
-            }
-            if self.opt.annotate_jit && module.starts_with("/tmp/perf-") && module.ends_with(".map")
-            {
-                func.push_str("_[j]");
-            }
-
-            self.stack.push_front(func);
         } else {
             warn!("weird stack line: {}", line);
         }
@@ -447,17 +463,17 @@ impl PerfState {
 
 // massage function name to be nicer
 // NOTE: ignoring https://github.com/jvm-profiling-tools/perf-map-agent/pull/35
-fn with_module_fallback(module: &str, rawfunc: &str, pc: &str, include_addrs: bool) -> String {
-    if rawfunc != "[unknown]" {
-        return rawfunc.to_string();
+fn with_module_fallback(module: &str, func: &str, pc: &str, include_addrs: bool) -> String {
+    if func != "[unknown]" {
+        return func.to_string();
     }
 
     // try to use part of module name as function if unknown
-    let rawfunc = match (module, include_addrs) {
+    let func = match (module, include_addrs) {
         ("[unknown]", true) => "unknown",
         ("[unknown]", false) => {
             // no need to process this further
-            return rawfunc.to_string();
+            return func.to_string();
         }
         (module, _) => {
             // use everything following last / of module as function name
@@ -466,17 +482,17 @@ fn with_module_fallback(module: &str, rawfunc: &str, pc: &str, include_addrs: bo
     };
 
     // output string is a bit longer than rawfunc but not much
-    let mut res = String::with_capacity(rawfunc.len() + 12);
+    let mut res = String::with_capacity(func.len() + 12);
 
     if include_addrs {
         res.push_str("[");
-        res.push_str(rawfunc);
+        res.push_str(func);
         res.push_str(" <");
         res.push_str(pc);
         res.push_str(">]");
     } else {
         res.push_str("[");
-        res.push_str(rawfunc);
+        res.push_str(func);
         res.push_str("]");
     }
 

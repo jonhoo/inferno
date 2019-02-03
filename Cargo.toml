@@ -27,6 +27,8 @@ object = "0.11"
 gimli = "0.16"
 memmap = "0.7"
 log = "0.4"
+quick-xml = "0.13"
+pretty_toa = "1.0.0"
 
 # When a new version of addr2line with this revision
 # is released on crates.io, we can switch to that.
@@ -46,3 +48,7 @@ name = "inferno"
 [[bin]]
 name = "inferno-collapse-perf"
 path = "src/bin/collapse-perf.rs"
+
+[[bin]]
+name = "inferno-flamegraph"
+path = "src/bin/flamegraph.rs"
