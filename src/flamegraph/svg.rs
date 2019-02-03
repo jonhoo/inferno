@@ -44,7 +44,7 @@ where
     Ok(())
 }
 
-pub(super) fn write_prelude<W>(svg: &mut Writer<W>, imageheight: usize) -> quick_xml::Result<()>
+pub(super) fn write_prelude<W>(svg: &mut Writer<W>, imageheight: usize, bgcolor1: &str, bgcolor2: &str) -> quick_xml::Result<()>
 where
     W: Write,
 {
@@ -55,12 +55,12 @@ where
     )))?;
     svg.write_event(Event::Empty(
         BytesStart::borrowed_name(b"stop").with_attributes(
-            iter::once(("stop-color", super::BGCOLOR1)).chain(iter::once(("offset", "5%"))),
+            iter::once(("stop-color", bgcolor1)).chain(iter::once(("offset", "5%"))),
         ),
     ))?;
     svg.write_event(Event::Empty(
         BytesStart::borrowed_name(b"stop").with_attributes(
-            iter::once(("stop-color", super::BGCOLOR2)).chain(iter::once(("offset", "95%"))),
+            iter::once(("stop-color", bgcolor2)).chain(iter::once(("offset", "95%"))),
         ),
     ))?;
     svg.write_event(Event::End(BytesEnd::borrowed(b"linearGradient")))?;

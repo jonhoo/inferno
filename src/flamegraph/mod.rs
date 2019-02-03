@@ -9,6 +9,7 @@ use std::io::prelude::*;
 
 mod merge;
 mod svg;
+pub mod color;
 
 const IMAGEWIDTH: usize = 1200; // max width, pixels
 const FRAMEHEIGHT: usize = 16; // max height is dynamic
@@ -19,13 +20,24 @@ const YPAD1: usize = FONTSIZE * 3; // pad top, include title
 const YPAD2: usize = FONTSIZE * 2 + 10; // pad bottom, include labels
 const XPAD: usize = 10; // pad lefm and right
 const FRAMEPAD: usize = 1; // vertical padding for frames
-const BGCOLOR1: &str = "#eeeeee";
-const BGCOLOR2: &str = "#eeeeb0";
+const PALETTE_FILE: &str = "palette.map";
 
 #[derive(Debug, Default)]
-pub struct Options {}
+pub struct Options {
+    pub colors: color::Palette,
+    pub hash: bool,
+    pub consistent_palette: bool,
+}
 
-pub fn from_str<W: Write>(_opt: Options, input: &str, writer: W) -> quick_xml::Result<()> {
+pub fn from_str<W: Write>(opt: Options, input: &str, writer: W) -> quick_xml::Result<()> {
+    let mut palette_map = if opt.consistent_palette {
+        Some(color::read_palette(PALETTE_FILE).map_err(|err| quick_xml::Error::Io(err))?)
+    } else {
+        None
+    };
+
+    let (bgcolor1, bgcolor2) = color::get_background_colors_for(&opt.colors);
+
     let (mut frames, time, ignored) = merge::frames(input);
     if ignored != 0 {
         eprintln!("Ignored {} lines with invalid format", ignored);
@@ -76,7 +88,7 @@ pub fn from_str<W: Write>(_opt: Options, input: &str, writer: W) -> quick_xml::R
     // draw canvas, and embed interactive JavaScript program
     let imageheight = ((depthmax + 1) * FRAMEHEIGHT) + YPAD1 + YPAD2;
     svg::write_header(&mut svg, imageheight)?;
-    svg::write_prelude(&mut svg, imageheight)?;
+    svg::write_prelude(&mut svg, imageheight, bgcolor1, bgcolor2)?;
 
     // draw frames
     for frame in frames {
@@ -114,16 +126,17 @@ pub fn from_str<W: Write>(_opt: Options, input: &str, writer: W) -> quick_xml::R
         svg.write_event(Event::Text(BytesText::from_plain_str(&*info)))?;
         svg.write_event(Event::End(BytesEnd::borrowed(b"title")))?;
 
-        let color = "rgb(242,10,32)";
-        svg.write_event(Event::Empty(
-            BytesStart::borrowed_name(b"rect").with_attributes(vec![
-                ("x", &*format!("{}", x1)),
-                ("y", &*format!("{}", y1)),
-                ("width", &*format!("{}", x2 - x1)),
-                ("height", &*format!("{}", y2 - y1)),
-                ("fill", color),
-            ]),
-        ))?;
+        if frame.location.function == "--" {
+            filled_rectangle(&mut svg, x1, x2, y1, y2, color::VDGREY)?;
+        } else if frame.location.function == "-" {
+            filled_rectangle(&mut svg, x1, x2, y1, y2, color::DGREY)?;
+        } else if let Some(ref mut palette_map) = palette_map {
+            let color = color::color_map(&opt.colors, opt.hash, &frame.location.function, palette_map);
+            filled_rectangle(&mut svg, x1, x2, y1, y2, color)?;
+        } else {
+            let color = color::color(&opt.colors, opt.hash, frame.location.function);
+            filled_rectangle(&mut svg, x1, x2, y1, y2, &color)?;
+        };
 
         let fitchars = ((x2 - x1) as f64 / (FONTSIZE as f64 * FONTWIDTH)).trunc() as usize;
         let text = if fitchars >= 3 {
@@ -164,6 +177,11 @@ pub fn from_str<W: Write>(_opt: Options, input: &str, writer: W) -> quick_xml::R
 
     svg.write_event(Event::End(BytesEnd::borrowed(b"svg")))?;
     svg.write_event(Event::Eof)?;
+
+    if let Some(palette_map) = palette_map {
+        color::write_palette(PALETTE_FILE, palette_map).map_err(|err| quick_xml::Error::Io(err))?;
+    }
+
     Ok(())
 }
 
@@ -192,4 +210,17 @@ fn deannotate(f: &str) -> &str {
         }
     }
     f
+}
+
+fn filled_rectangle<W: Write>(svg: &mut Writer<W>, x1: usize, x2: usize, y1: usize, y2: usize,
+                              color: &str) -> quick_xml::Result<usize>{
+    svg.write_event(Event::Empty(
+        BytesStart::borrowed_name(b"rect").with_attributes(vec![
+            ("x", &*format!("{}", x1)),
+            ("y", &*format!("{}", y1)),
+            ("width", &*format!("{}", x2 - x1)),
+            ("height", &*format!("{}", y2 - y1)),
+            ("fill", color.as_ref()),
+        ]),
+    ))
 }
