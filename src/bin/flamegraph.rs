@@ -3,7 +3,7 @@ use std::io::{self, BufReader, Read};
 use std::path::PathBuf;
 use structopt::StructOpt;
 
-use inferno::flamegraph::{self, Options};
+use inferno::flamegraph::{self, Options, color::Palette};
 
 #[derive(Debug, StructOpt)]
 #[structopt(name = "inferno-flamegraph", author = "")]
@@ -11,11 +11,24 @@ struct Opt {
     /// Collapsed perf output files. With no INFILE, or INFILE is -, read STDIN.
     #[structopt(name = "INFILE", parse(from_os_str))]
     infiles: Vec<PathBuf>,
+    /// set color palette. choices are: hot (default), mem, io, wakeup, chain, java, js, perl, red, green, blue, aqua, yellow, purple, orange
+    #[structopt(long = "colors", default_value = "hot")]
+    colors: Palette,
+    /// colors are keyed by function name hash
+    #[structopt(long = "hash")]
+    hash: bool,
+    /// use consistent palette (palette.map)
+    #[structopt(long = "cp")]
+    cp: bool
 }
 
 impl Into<Options> for Opt {
     fn into(self) -> Options {
-        Options {}
+        Options {
+            colors: self.colors,
+            hash: self.hash,
+            consistent_palette: self.cp
+        }
     }
 }
 
