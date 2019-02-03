@@ -259,7 +259,8 @@ impl PerfState {
             }
 
             // --inline flag
-            if self.opt.show_inline && self.un_inline(pc, module) {
+            if self.opt.show_inline && can_un_inline(module) {
+                self.un_inline(pc, module);
                 return;
             }
 
@@ -343,12 +344,7 @@ impl PerfState {
 
     // Use addr2line to determine the symbol to use for each program counter address
     // (as opposed to using the symbol names that perf script produces).
-    // Returns whether it succeeded.
-    fn un_inline(&mut self, addr: &str, module: &str) -> bool {
-        if !can_un_inline(addr) {
-            return false;
-        }
-
+    fn un_inline(&mut self, addr: &str, module: &str) {
         let ctx = self
             .addr2line_contexts
             .entry(module.into())
@@ -387,14 +383,14 @@ impl PerfState {
         let ctx = if let Some(ctx) = ctx {
             ctx
         } else {
-            return false;
+            return;
         };
 
         let addr = match u64::from_str_radix(addr, 16) {
             Ok(addr) => addr,
             Err(e) => {
                 warn!("unable to parse {} as hex address: {:?}", addr, e);
-                return false;
+                return;
             }
         };
 
@@ -405,7 +401,7 @@ impl PerfState {
                     "unable to parse frames from module {} at address {:#X}: {:?}",
                     module, addr, e
                 );
-                return false;
+                return;
             }
         };
 
@@ -458,8 +454,6 @@ impl PerfState {
         for func in funcs {
             self.stack.push_front(func);
         }
-
-        true
     }
 }
 
