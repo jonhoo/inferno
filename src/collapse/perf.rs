@@ -26,18 +26,25 @@ pub struct Options {
     pub event_filter: Option<String>,
 }
 
-pub fn handle_file<R: BufRead, W: Write>(opt: Options, mut reader: R, writer: W) -> io::Result<()> {
+fn foreach_line<R: BufRead, F: FnMut(&mut String)>(mut reader: R, mut func: F) -> io::Result<()> {
     let mut line = String::new();
-    let mut state = PerfState::from(opt);
     loop {
         line.clear();
 
         if reader.read_line(&mut line)? == 0 {
             break;
         }
+        func(&mut line);
+    }
+    Ok(())
+}
 
+pub fn handle_file<R: BufRead, W: Write>(opt: Options, reader: R, writer: W) -> io::Result<()> {
+    let mut state = PerfState::from(opt);
+
+    foreach_line(reader, |line| {
         if line.starts_with('#') {
-            continue;
+            return;
         }
 
         let line = line.trim_end();
@@ -46,7 +53,7 @@ pub fn handle_file<R: BufRead, W: Write>(opt: Options, mut reader: R, writer: W)
         } else {
             state.on_line(line.trim_end());
         }
-    }
+    })?;
 
     state.finish(writer)
 }
