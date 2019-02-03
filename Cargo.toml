@@ -23,12 +23,16 @@ codecov = { repository = "jonhoo/inferno", branch = "master", service = "github"
 [dependencies]
 structopt = "0.2"
 smallvec = "0.6"
-object = "0.9"
-addr2line = "0.7"
+object = "0.11"
 gimli = "0.16"
 memmap = "0.7"
-rustc-demangle = "0.1"
 log = "0.4"
+
+# When a new version of addr2line with this revision
+# is released on crates.io, we can switch to that.
+[dependencies.addr2line]
+git = "https://github.com/gimli-rs/addr2line"
+rev = "78f436b9c63b19803a9f5d162ba0b785f5ef6636"
 
 [dev-dependencies]
 pretty_assertions = "0.5"

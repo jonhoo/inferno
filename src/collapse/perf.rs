@@ -407,48 +407,36 @@ impl PerfState {
 
         let mut funcs = SmallVec::<[String; 1]>::new();
         while let Some(frame) = frames.next().unwrap() {
-            let func = frame
-                .function
-                .map(|func| {
-                    let name = func.raw_name().map(Cow::from);
-                    let name = name.unwrap_or_else(|_| Cow::from("??"));
-                    let name = remove_discriminator(name);
-                    match func.language {
-                        Some(gimli::DW_LANG_Rust) => {
-                            // Using rustc_demangle directly here since addr2line::demangle_auto
-                            // doesn't remove trailing hash value from Rust symbol names.
-                            // See https://github.com/gimli-rs/addr2line/issues/108
-                            // Also the "{:#}" formatting is required to not include the
-                            // trailing hash.
-                            format!("{:#}", rustc_demangle::demangle(&name))
-                        }
-                        lang => addr2line::demangle_auto(name, lang).to_string(),
-                    }
-                })
-                .unwrap_or_else(|| "??".into());
+            if let Some(func) = frame.function {
+                let name = func.raw_name().map(Cow::from);
+                let name = name.unwrap_or_else(|_| Cow::from("??"));
+                let name = remove_discriminator(name);
+                let name = addr2line::demangle_auto(name, func.language);
+                if self.opt.show_context {
+                    let (file, line) = match frame.location {
+                        Some(ref loc) => (
+                            loc.file
+                                .as_ref()
+                                .and_then(|f| f.rsplitn(2, std::path::MAIN_SEPARATOR).next()),
+                            loc.line,
+                        ),
+                        None => (None, None),
+                    };
 
-            if self.opt.show_context {
-                let (file, line) = match frame.location {
-                    Some(ref loc) => (
-                        loc.file
-                            .as_ref()
-                            .and_then(|f| f.rsplitn(2, std::path::MAIN_SEPARATOR).next()),
-                        loc.line,
-                    ),
-                    None => (None, None),
-                };
+                    let name_with_location = match (file, line) {
+                        (Some(file), Some(line)) => format!("{}:{}:{}", name, file, line),
+                        (Some(file), None) => format!("{}:{}:?", name, file),
+                        (None, Some(line)) => format!("{}:??:{}", name, line),
+                        (None, None) => format!("{}:??:?", name),
+                    };
 
-                let func_with_location = match (file, line) {
-                    (Some(file), Some(line)) => format!("{}:{}:{}", func, file, line),
-                    (Some(file), None) => format!("{}:{}:?", func, file),
-                    (None, Some(line)) => format!("{}:??:{}", func, line),
-                    (None, None) => format!("{}:??:?", func),
-                };
-
-                funcs.push(func_with_location);
+                    funcs.push(name_with_location);
+                } else {
+                    funcs.push(name.into());
+                }
             } else {
-                funcs.push(func);
-            }
+                funcs.push("??".into());
+            };
         }
 
         for func in funcs {
