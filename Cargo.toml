@@ -22,6 +22,7 @@ codecov = { repository = "jonhoo/inferno", branch = "master", service = "github"
 
 [dependencies]
 structopt = "0.2"
+smallvec = "0.6"
 quick-xml = "0.13"
 pretty_toa = "1.0.0"
 
