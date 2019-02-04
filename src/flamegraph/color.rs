@@ -65,10 +65,13 @@ impl FromStr for Palette {
     }
 }
 
+/// Generate a vector hash for the name string, weighting early over
+/// later characters. We want to pick the same colors for function
+/// names across different flame graphs.
 fn namehash(name: &str) -> f32 {
-    let mut vector = 0f32;
-    let mut weight = 1f32;
-    let mut max = 1f32;
+    let mut vector = 0.0;
+    let mut weight = 1.0;
+    let mut max = 1.0;
     let mut modulo = 10;
 
     let name = {
@@ -85,29 +88,34 @@ fn namehash(name: &str) -> f32 {
         }
     };
 
-    for character in name.bytes() {
+    for character in name.bytes().take(3) {
         let i = (character % modulo) as f32;
         vector += (i / ((modulo - 1) as f32)) * weight;
         modulo += 1;
         max += weight;
         weight *= 0.70;
-
-        if modulo > 12 {
-            break
-        }
     }
 
-    (1f32 - vector / max)
+    (1.0 - vector / max)
 }
 
+/// Handle both annotations (_[j], _[i], ...; which are
+/// accurate), as well as input that lacks any annotations, as
+/// best as possible. Without annotations, we get a little hacky
+/// and match on java|org|com, etc.
 fn handle_java_palette(s: &str) -> Palette {
     if s.ends_with("]") {
         if let Some(ai) = s.rfind("_[") {
             if s[ai..].len() == 4 {
-                let suffix_char = &s[ai+2..ai+3];
-                if suffix_char.starts_with("k") { return Palette::Orange }
-                if suffix_char.starts_with("i") { return Palette::Aqua }
-                if suffix_char.starts_with("j") { return Palette::Green }
+                match &s[ai+2..ai+3] {
+                    // kernel annotation
+                    "k" => return Palette::Orange,
+                    // inline annotation
+                    "i" => return Palette::Aqua,
+                    // jit annotation
+                    "j" => return Palette::Green,
+                    _ => {},
+                }
             }
         }
     }
@@ -119,50 +127,51 @@ fn handle_java_palette(s: &str) -> Palette {
         java_prefix.starts_with("com/") ||
         java_prefix.starts_with("io/") ||
         java_prefix.starts_with("sun/") {
+        // Java
         Palette::Green
     } else if s.contains("::") {
+        // C++
         Palette::Yellow
     } else {
+        // system
         Palette::Red
     }
 }
 
 fn handle_perl_palette(s: &str) -> Palette {
-    if s.contains("::") {
-        Palette::Yellow
+    if s.ends_with("_[k]") {
+        Palette::Orange
     } else if s.contains("Perl") || s.contains(".pl") {
         Palette::Green
-    } else if s.ends_with("_[k]") {
-        Palette::Orange
+    } else if s.contains("::") {
+        Palette::Yellow
     } else {
         Palette::Red
     }
 }
 
 fn handle_js_palette(s: &str) -> Palette {
-    if s.ends_with("_[j]") {
+    if s.trim().is_empty() {
+        return Palette::Green
+    } else if s.ends_with("_[k]") {
+        return Palette::Orange
+    } else if s.contains("::") {
+        return Palette::Yellow
+    } else if s.contains(":") {
+        return Palette::Aqua
+    } else if let Some(ai) = s.find("/") {
+        if (&s[ai..]).contains(".js") {
+            return Palette::Green
+        }
+    } else if s.ends_with("_[j]") {
         if s.contains("/") {
             return Palette::Green
         } else {
             return Palette::Aqua
         }
-    } else if s.contains("::") {
-        return Palette::Yellow
-    } else if let Some(ai) = s.find("/") {
-        if (&s[ai..]).contains(".js") {
-            return Palette::Green
-        }
     }
 
-    if s.contains(":") {
-        Palette::Aqua
-    } else if s == " " {
-        Palette::Green
-    } else if s.contains("_[k]") {
-        Palette::Orange
-    } else {
-        Palette::Red
-    }
+    Palette::Red
 }
 
 fn handle_wakeup_palette(_s: &str) -> Palette {
@@ -177,19 +186,22 @@ fn handle_chain_palette(s: &str) -> Palette {
     }
 }
 
-fn coefficients_for_palette(palette: &Palette, name: &str, v1: f32, v2: f32, v3: f32) ->
-    ((u8, u8, f32), (u8, u8, f32), (u8, u8, f32)) {
+macro_rules! t {
+    ($b:expr, $a:expr, $x:expr) => ($b + ($a as f32 * $x) as u8)
+}
+
+fn rgb_components_for_palette(palette: &Palette, name: &str, v1: f32, v2: f32, v3: f32) -> (u8, u8, u8) {
     let real_palette = match palette {
-        Palette::Hot => return ((205, 50, v3), (0, 230, v1), (0, 55, v2)),
-        Palette::Mem => return ((0, 0, v3), (190, 50, v2), (0, 210, v1)),
-        Palette::Io => return ((80, 60, v1), (80, 60, v1), (190, 55, v2)),
-        Palette::Red => return ((200, 55, v1), (50, 80, v1), (50, 80, v1)),
-        Palette::Green => return ((50, 60, v1), (200, 55, v1), (50, 60, v1)),
-        Palette::Blue => return ((80, 60, v1), (80, 60, v1), (205, 60, v1)),
-        Palette::Yellow => return ((175, 55, v1), (175, 55, v1), (50, 20, v1)),
-        Palette::Purple => return ((190, 65, v1), (80, 60, v1), (190, 65, v1)),
-        Palette::Aqua => return ((50, 60, v1), (165, 55, v1), (165, 55, v1)),
-        Palette::Orange => return ((190, 65, v1), (90, 65, v1), (0, 0, v1)),
+        Palette::Hot => return (t!(205, 50, v3), t!(0, 230, v1), t!(0, 55, v2)),
+        Palette::Mem => return (t!(0, 0, v3), t!(190, 50, v2), t!(0, 210, v1)),
+        Palette::Io => return (t!(80, 60, v1), t!(80, 60, v1), t!(190, 55, v2)),
+        Palette::Red => return (t!(200, 55, v1), t!(50, 80, v1), t!(50, 80, v1)),
+        Palette::Green => return (t!(50, 60, v1), t!(200, 55, v1), t!(50, 60, v1)),
+        Palette::Blue => return (t!(80, 60, v1), t!(80, 60, v1), t!(205, 50, v1)),
+        Palette::Yellow => return (t!(175, 55, v1), t!(175, 55, v1), t!(50, 20, v1)),
+        Palette::Purple => return (t!(190, 65, v1), t!(80, 60, v1), t!(190, 65, v1)),
+        Palette::Aqua => return (t!(50, 60, v1), t!(165, 55, v1), t!(165, 55, v1)),
+        Palette::Orange => return (t!(190, 65, v1), t!(90, 65, v1), t!(0, 0, v1)),
         Palette::Java => handle_java_palette(name),
         Palette::Perl => handle_perl_palette(name),
         Palette::Js => handle_js_palette(name),
@@ -197,21 +209,11 @@ fn coefficients_for_palette(palette: &Palette, name: &str, v1: f32, v2: f32, v3:
         Palette::Chain => handle_chain_palette(name),
     };
 
-    coefficients_for_palette(&real_palette, name, v1, v2, v3)
-}
-
-fn affine_transform(a: u8, b: u8, x: f32) -> u8 {
-    b + (a as f32 * x) as u8
+    rgb_components_for_palette(&real_palette, name, v1, v2, v3)
 }
 
 fn color_from_palette(palette: &Palette, name: &str, v1: f32, v2: f32, v3: f32) -> String {
-    let ((r_b, r_a, r_x),
-         (g_b, g_a, g_x),
-         (b_b, b_a, b_x)) = coefficients_for_palette(palette, name, v1, v2, v3);
-
-    let red = affine_transform(r_a, r_b, r_x);
-    let green = affine_transform(g_a, g_b, g_x);
-    let blue = affine_transform(b_a, b_b, b_x);
+    let (red, green, blue) = rgb_components_for_palette(palette, name, v1, v2, v3);
 
     format!("rgb({},{},{})", red, green, blue)
 }
@@ -245,6 +247,8 @@ pub(super) fn read_palette(file: &str) -> io::Result<HashMap<String, String>> {
     let mut map = HashMap::default();
     let path = Path::new(file);
 
+    // If the file does not exist, it is probably the first call to flamegraph with a consistent
+    // palette: there is nothing to load.
     if path.exists() {
         let file = File::open(path)?;
         let file = BufReader::new(file);
