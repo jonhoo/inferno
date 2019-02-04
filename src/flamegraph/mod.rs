@@ -7,9 +7,9 @@ use std::borrow::Cow;
 use std::io;
 use std::io::prelude::*;
 
+mod color;
 mod merge;
 mod svg;
-mod color;
 pub use color::Palette;
 
 const IMAGEWIDTH: usize = 1200; // max width, pixels
@@ -37,7 +37,7 @@ pub fn from_str<W: Write>(opt: Options, input: &str, writer: W) -> quick_xml::Re
         None
     };
 
-    let (bgcolor1, bgcolor2) = color::get_background_colors_for(&opt.colors);
+    let (bgcolor1, bgcolor2) = color::bgcolor_for(&opt.colors);
 
     let (mut frames, time, ignored) = merge::frames(input);
     if ignored != 0 {
@@ -132,7 +132,8 @@ pub fn from_str<W: Write>(opt: Options, input: &str, writer: W) -> quick_xml::Re
         } else if frame.location.function == "-" {
             filled_rectangle(&mut svg, x1, x2, y1, y2, color::DGREY)?;
         } else if let Some(ref mut palette_map) = palette_map {
-            let color = color::color_map(&opt.colors, opt.hash, &frame.location.function, palette_map);
+            let color =
+                color::color_map(&opt.colors, opt.hash, &frame.location.function, palette_map);
             filled_rectangle(&mut svg, x1, x2, y1, y2, color)?;
         } else {
             let color = color::color(&opt.colors, opt.hash, frame.location.function);
@@ -213,8 +214,14 @@ fn deannotate(f: &str) -> &str {
     f
 }
 
-fn filled_rectangle<W: Write>(svg: &mut Writer<W>, x1: usize, x2: usize, y1: usize, y2: usize,
-                              color: &str) -> quick_xml::Result<usize>{
+fn filled_rectangle<W: Write>(
+    svg: &mut Writer<W>,
+    x1: usize,
+    x2: usize,
+    y1: usize,
+    y2: usize,
+    color: &str,
+) -> quick_xml::Result<usize> {
     svg.write_event(Event::Empty(
         BytesStart::borrowed_name(b"rect").with_attributes(vec![
             ("x", &*format!("{}", x1)),

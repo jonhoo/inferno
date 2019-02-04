@@ -2,7 +2,7 @@ use std::fs::File;
 use std::io::{self, BufReader};
 use structopt::StructOpt;
 
-use inferno::flamegraph::{self, Options, color::Palette};
+use inferno::flamegraph::{self, Options, Palette};
 
 #[derive(Debug, StructOpt)]
 #[structopt(name = "inferno-flamegraph", author = "")]
@@ -10,8 +10,14 @@ struct Opt {
     /// collapsed perf output file, or STDIN if not specified
     infile: Option<String>,
     /// set color palette
-    #[structopt(short = "c", long = "colors", default_value = "hot", raw(possible_values =
-    r#"&["hot","mem","io","wakeup","java","js","perl","red","green","blue","aqua","yellow","purple","orange"]"#))]
+    #[structopt(
+        short = "c",
+        long = "colors",
+        default_value = "hot",
+        raw(
+            possible_values = r#"&["hot","mem","io","wakeup","java","js","perl","red","green","blue","aqua","yellow","purple","orange"]"#
+        )
+    )]
     colors: Palette,
     /// colors are keyed by function name hash
     #[structopt(long = "hash")]
@@ -26,7 +32,7 @@ impl Into<Options> for Opt {
         Options {
             colors: self.colors,
             hash: self.hash,
-            consistent_palette: self.cp
+            consistent_palette: self.cp,
         }
     }
 }
