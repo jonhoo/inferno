@@ -241,7 +241,7 @@ pub(super) fn bgcolor_for(palette: &Palette) -> (&'static str, &'static str) {
     }
 }
 
-pub(super) fn read_palette(file: &str) -> Result<HashMap<String, String>, io::Error> {
+pub(super) fn read_palette(file: &str) -> io::Result<HashMap<String, String>> {
     let mut map = HashMap::default();
     let path = Path::new(file);
 
