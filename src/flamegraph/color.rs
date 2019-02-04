@@ -1,12 +1,12 @@
-use std::str::FromStr;
 use std::collections::HashMap;
+use std::fs::File;
 use std::fs::OpenOptions;
 use std::io;
+use std::io::BufRead;
+use std::io::BufReader;
 use std::io::Write;
 use std::path::Path;
-use std::fs::File;
-use std::io::BufReader;
-use std::io::BufRead;
+use std::str::FromStr;
 
 pub(super) const VDGREY: &str = "rgb(160,160,160)";
 pub(super) const DGREY: &str = "rgb(200,200,200)";
@@ -60,7 +60,7 @@ impl FromStr for Palette {
             "yellow" => Ok(Palette::Yellow),
             "purple" => Ok(Palette::Purple),
             "orange" => Ok(Palette::Orange),
-            unknown=> Err(format!("unknown color palette: {}", unknown))
+            unknown => Err(format!("unknown color palette: {}", unknown)),
         }
     }
 }
@@ -107,14 +107,14 @@ fn handle_java_palette(s: &str) -> Palette {
     if s.ends_with("]") {
         if let Some(ai) = s.rfind("_[") {
             if s[ai..].len() == 4 {
-                match &s[ai+2..ai+3] {
+                match &s[ai + 2..ai + 3] {
                     // kernel annotation
                     "k" => return Palette::Orange,
                     // inline annotation
                     "i" => return Palette::Aqua,
                     // jit annotation
                     "j" => return Palette::Green,
-                    _ => {},
+                    _ => {}
                 }
             }
         }
@@ -122,11 +122,12 @@ fn handle_java_palette(s: &str) -> Palette {
 
     let java_prefix = if s.starts_with("L") { &s[1..] } else { s };
 
-    if java_prefix.starts_with("java/") ||
-        java_prefix.starts_with("org/") ||
-        java_prefix.starts_with("com/") ||
-        java_prefix.starts_with("io/") ||
-        java_prefix.starts_with("sun/") {
+    if java_prefix.starts_with("java/")
+        || java_prefix.starts_with("org/")
+        || java_prefix.starts_with("com/")
+        || java_prefix.starts_with("io/")
+        || java_prefix.starts_with("sun/")
+    {
         // Java
         Palette::Green
     } else if s.contains("::") {
@@ -152,22 +153,22 @@ fn handle_perl_palette(s: &str) -> Palette {
 
 fn handle_js_palette(s: &str) -> Palette {
     if s.trim().is_empty() {
-        return Palette::Green
+        return Palette::Green;
     } else if s.ends_with("_[k]") {
-        return Palette::Orange
+        return Palette::Orange;
     } else if s.contains("::") {
-        return Palette::Yellow
+        return Palette::Yellow;
     } else if s.contains(":") {
-        return Palette::Aqua
+        return Palette::Aqua;
     } else if let Some(ai) = s.find("/") {
         if (&s[ai..]).contains(".js") {
-            return Palette::Green
+            return Palette::Green;
         }
     } else if s.ends_with("_[j]") {
         if s.contains("/") {
-            return Palette::Green
+            return Palette::Green;
         } else {
-            return Palette::Aqua
+            return Palette::Aqua;
         }
     }
 
@@ -187,10 +188,18 @@ fn handle_chain_palette(s: &str) -> Palette {
 }
 
 macro_rules! t {
-    ($b:expr, $a:expr, $x:expr) => ($b + ($a as f32 * $x) as u8)
+    ($b:expr, $a:expr, $x:expr) => {
+        $b + ($a as f32 * $x) as u8
+    };
 }
 
-fn rgb_components_for_palette(palette: &Palette, name: &str, v1: f32, v2: f32, v3: f32) -> (u8, u8, u8) {
+fn rgb_components_for_palette(
+    palette: &Palette,
+    name: &str,
+    v1: f32,
+    v2: f32,
+    v3: f32,
+) -> (u8, u8, u8) {
     let real_palette = match palette {
         Palette::Hot => return (t!(205, 50, v3), t!(0, 230, v1), t!(0, 55, v2)),
         Palette::Mem => return (t!(0, 0, v3), t!(190, 50, v2), t!(0, 210, v1)),
@@ -218,8 +227,15 @@ fn color_from_palette(palette: &Palette, name: &str, v1: f32, v2: f32, v3: f32) 
     format!("rgb({},{},{})", red, green, blue)
 }
 
-pub(super) fn color_map<'a>(palette: &Palette, hash: bool, name: &'a str, palette_map: &'a mut HashMap<String, String>) -> &'a str {
-    palette_map.entry(name.to_string()).or_insert_with(|| color(palette, hash, name))
+pub(super) fn color_map<'a>(
+    palette: &Palette,
+    hash: bool,
+    name: &'a str,
+    palette_map: &'a mut HashMap<String, String>,
+) -> &'a str {
+    palette_map
+        .entry(name.to_string())
+        .or_insert_with(|| color(palette, hash, name))
 }
 
 pub(super) fn color(palette: &Palette, hash: bool, name: &str) -> String {
@@ -239,7 +255,7 @@ pub(super) fn bgcolor_for(palette: &Palette) -> (&'static str, &'static str) {
     match palette {
         Palette::Hot | Palette::Java | Palette::Js | Palette::Perl => YELLOW_GRADIENT,
         Palette::Mem | Palette::Chain => BLUE_GRADIENT,
-        _ => GRAY_GRADIENT
+        _ => GRAY_GRADIENT,
     }
 }
 
@@ -263,7 +279,10 @@ pub(super) fn read_palette(file: &str) -> io::Result<HashMap<String, String>> {
     Ok(map)
 }
 
-pub(super) fn write_palette(file: &str, palette_map: HashMap<String, String>) -> Result<(), io::Error> {
+pub(super) fn write_palette(
+    file: &str,
+    palette_map: HashMap<String, String>,
+) -> Result<(), io::Error> {
     let mut file = OpenOptions::new().write(true).create(true).open(file)?;
     let mut entries = palette_map.into_iter().collect::<Vec<_>>();
     entries.sort_unstable();

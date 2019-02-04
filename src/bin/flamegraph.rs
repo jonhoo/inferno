@@ -12,8 +12,14 @@ struct Opt {
     #[structopt(name = "INFILE", parse(from_os_str))]
     infiles: Vec<PathBuf>,
     /// set color palette
-    #[structopt(short = "c", long = "colors", default_value = "hot", raw(possible_values =
-    r#"&["hot","mem","io","wakeup","java","js","perl","red","green","blue","aqua","yellow","purple","orange"]"#))]
+    #[structopt(
+        short = "c",
+        long = "colors",
+        default_value = "hot",
+        raw(
+            possible_values = r#"&["hot","mem","io","wakeup","java","js","perl","red","green","blue","aqua","yellow","purple","orange"]"#
+        )
+    )]
     colors: Palette,
     /// colors are keyed by function name hash
     #[structopt(long = "hash")]
@@ -28,7 +34,7 @@ impl Into<Options> for Opt {
         Options {
             colors: self.colors,
             hash: self.hash,
-            consistent_palette: self.cp
+            consistent_palette: self.cp,
         }
     }
 }

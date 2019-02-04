@@ -7,9 +7,9 @@ use std::io;
 use std::io::prelude::*;
 use str_stack::StrStack;
 
+mod color;
 mod merge;
 mod svg;
-mod color;
 pub use color::Palette;
 
 const IMAGEWIDTH: usize = 1200; // max width, pixels
@@ -145,7 +145,8 @@ where
         } else if frame.location.function == "-" {
             filled_rectangle(&mut svg, &mut buffer, x1, x2, y1, y2, color::DGREY)?;
         } else if let Some(ref mut palette_map) = palette_map {
-            let color = color::color_map(&opt.colors, opt.hash, &frame.location.function, palette_map);
+            let color =
+                color::color_map(&opt.colors, opt.hash, &frame.location.function, palette_map);
             filled_rectangle(&mut svg, &mut buffer, x1, x2, y1, y2, color)?;
         } else {
             let color = color::color(&opt.colors, opt.hash, frame.location.function);
@@ -246,8 +247,15 @@ fn deannotate(f: &str) -> &str {
     f
 }
 
-fn filled_rectangle<W: Write>(svg: &mut Writer<W>, buffer: &mut StrStack, x1: usize, x2: usize, y1: usize, y2: usize,
-                              color: &str) -> quick_xml::Result<usize>{
+fn filled_rectangle<W: Write>(
+    svg: &mut Writer<W>,
+    buffer: &mut StrStack,
+    x1: usize,
+    x2: usize,
+    y1: usize,
+    y2: usize,
+    color: &str,
+) -> quick_xml::Result<usize> {
     let x = write!(buffer, "{}", x1);
     let y = write!(buffer, "{}", y1);
     let width = write!(buffer, "{}", x2 - x1);

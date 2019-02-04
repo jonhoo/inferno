@@ -69,7 +69,12 @@ where
     Ok(())
 }
 
-pub(super) fn write_prelude<W>(svg: &mut Writer<W>, imageheight: usize, bgcolor1: &str, bgcolor2: &str) -> quick_xml::Result<()>
+pub(super) fn write_prelude<W>(
+    svg: &mut Writer<W>,
+    imageheight: usize,
+    bgcolor1: &str,
+    bgcolor2: &str,
+) -> quick_xml::Result<()>
 where
     W: Write,
 {
