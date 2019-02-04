@@ -9,7 +9,8 @@ use str_stack::StrStack;
 
 mod merge;
 mod svg;
-pub mod color;
+mod color;
+pub use color::Palette;
 
 const IMAGEWIDTH: usize = 1200; // max width, pixels
 const FRAMEHEIGHT: usize = 16; // max height is dynamic
@@ -46,7 +47,7 @@ where
         None
     };
 
-    let (bgcolor1, bgcolor2) = color::get_background_colors_for(&opt.colors);
+    let (bgcolor1, bgcolor2) = color::bgcolor_for(&opt.colors);
 
     let mut buffer = StrStack::new();
     let (mut frames, time, ignored) = merge::frames(lines);
