@@ -11,7 +11,7 @@ struct Opt {
     /// Collapsed perf output files. With no INFILE, or INFILE is -, read STDIN.
     #[structopt(name = "INFILE", parse(from_os_str))]
     infiles: Vec<PathBuf>,
-    /// set color palette. choices are: hot (default), mem, io, wakeup, chain, java, js, perl, red, green, blue, aqua, yellow, purple, orange
+    /// set color palette. choices are: hot, mem, io, wakeup, java, js, perl, red, green, blue, aqua, yellow, purple, orange
     #[structopt(long = "colors", default_value = "hot")]
     colors: Palette,
     /// colors are keyed by function name hash

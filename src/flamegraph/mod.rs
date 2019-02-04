@@ -253,12 +253,12 @@ fn filled_rectangle<W: Write>(svg: &mut Writer<W>, buffer: &mut StrStack, x1: us
     let height = write!(buffer, "{}", y2 - y1);
 
     svg.write_event(Event::Empty(
-        BytesStart::borrowed_name(b"rect").with_attributes(args![
+        BytesStart::borrowed_name(b"rect").with_attributes(args!(
                 "x" => &buffer[x],
                 "y" => &buffer[y],
                 "width" => &buffer[width],
                 "height" => &buffer[height],
                 "fill" => color
-        ]),
-    ))
+        ),
+    )))
 }

@@ -1,6 +1,3 @@
-use std::fmt::Display;
-use std::fmt::Formatter;
-use std::fmt::Error;
 use std::str::FromStr;
 use std::collections::HashMap;
 use std::fs::OpenOptions;
@@ -68,22 +65,10 @@ impl FromStr for Palette {
     }
 }
 
-struct RGB {
-    red: u8,
-    green: u8,
-    blue: u8,
-}
-
-impl Display for RGB {
-    fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
-        write!(f, "rbg({},{},{})", self.red, self.green, self.blue)
-    }
-}
-
-fn namehash(name: &str) -> f64 {
-    let mut vector = 0f64;
-    let mut weight = 1f64;
-    let mut max = 1f64;
+fn namehash(name: &str) -> f32 {
+    let mut vector = 0f32;
+    let mut weight = 1f32;
+    let mut max = 1f32;
     let mut modulo = 10;
 
     let name = {
@@ -101,8 +86,8 @@ fn namehash(name: &str) -> f64 {
     };
 
     for character in name.bytes() {
-        let i = (character % modulo) as f64;
-        vector += (i / ((modulo - 1) as f64)) * weight;
+        let i = (character % modulo) as f32;
+        vector += (i / ((modulo - 1) as f32)) * weight;
         modulo += 1;
         max += weight;
         weight *= 0.70;
@@ -112,7 +97,7 @@ fn namehash(name: &str) -> f64 {
         }
     }
 
-    (1f64 - vector / max)
+    (1f32 - vector / max)
 }
 
 fn handle_java_palette(s: &str) -> Palette {
@@ -129,11 +114,11 @@ fn handle_java_palette(s: &str) -> Palette {
 
     let java_prefix = if s.starts_with("L") { &s[1..] } else { s };
 
-    if java_prefix.starts_with("java") ||
-        java_prefix.starts_with("org") ||
-        java_prefix.starts_with("com") ||
-        java_prefix.starts_with("io") ||
-        java_prefix.starts_with("sun") {
+    if java_prefix.starts_with("java/") ||
+        java_prefix.starts_with("org/") ||
+        java_prefix.starts_with("com/") ||
+        java_prefix.starts_with("io/") ||
+        java_prefix.starts_with("sun/") {
         Palette::Green
     } else if s.contains("::") {
         Palette::Yellow
@@ -192,8 +177,8 @@ fn handle_chain_palette(s: &str) -> Palette {
     }
 }
 
-fn coefficients_for_palette(palette: &Palette, name: &str, v1: f64, v2: f64, v3: f64) ->
-    ((u8, u8, f64), (u8, u8, f64), (u8, u8, f64)) {
+fn coefficients_for_palette(palette: &Palette, name: &str, v1: f32, v2: f32, v3: f32) ->
+    ((u8, u8, f32), (u8, u8, f32), (u8, u8, f32)) {
     let real_palette = match palette {
         Palette::Hot => return ((205, 50, v3), (0, 230, v1), (0, 55, v2)),
         Palette::Mem => return ((0, 0, v3), (190, 50, v2), (0, 210, v1)),
@@ -215,20 +200,20 @@ fn coefficients_for_palette(palette: &Palette, name: &str, v1: f64, v2: f64, v3:
     coefficients_for_palette(&real_palette, name, v1, v2, v3)
 }
 
-fn affine_transform(a: u8, b: u8, x: f64) -> u8 {
-    b + (a as f64 * x) as u8
+fn affine_transform(a: u8, b: u8, x: f32) -> u8 {
+    b + (a as f32 * x) as u8
 }
 
-fn color_from_palette(palette: &Palette, name: &str, v1: f64, v2: f64, v3: f64) -> RGB {
+fn color_from_palette(palette: &Palette, name: &str, v1: f32, v2: f32, v3: f32) -> String {
     let ((r_b, r_a, r_x),
          (g_b, g_a, g_x),
          (b_b, b_a, b_x)) = coefficients_for_palette(palette, name, v1, v2, v3);
 
-    RGB {
-        red: affine_transform(r_a, r_b, r_x),
-        green: affine_transform(g_a, g_b, g_x),
-        blue: affine_transform(b_a, b_b, b_x),
-    }
+    let red = affine_transform(r_a, r_b, r_x);
+    let green = affine_transform(g_a, g_b, g_x);
+    let blue = affine_transform(b_a, b_b, b_x);
+
+    format!("rgb({},{},{})", red, green, blue)
 }
 
 pub(super) fn color_map<'a>(palette: &Palette, hash: bool, name: &'a str, palette_map: &'a mut HashMap<String, String>) -> &'a str {
@@ -245,20 +230,14 @@ pub(super) fn color(palette: &Palette, hash: bool, name: &str) -> String {
         (rand::random(), rand::random(), rand::random())
     };
 
-    color_from_palette(palette, name, v1, v2, v3).to_string()
+    color_from_palette(palette, name, v1, v2, v3)
 }
 
 pub(super) fn get_background_colors_for(palette: &Palette) -> (&str, &str) {
     match palette {
-        Palette::Hot | Palette::Java | Palette::Js | Palette::Perl => {
-            YELLOW_GRADIENT
-        },
-        Palette::Mem | Palette::Chain => {
-            BLUE_GRADIENT
-        },
-        _ => {
-            GRAY_GRADIENT
-        }
+        Palette::Hot | Palette::Java | Palette::Js | Palette::Perl => YELLOW_GRADIENT,
+        Palette::Mem | Palette::Chain => BLUE_GRADIENT,
+        _ => GRAY_GRADIENT
     }
 }
 
@@ -283,7 +262,7 @@ pub(super) fn read_palette(file: &str) -> Result<HashMap<String, String>, io::Er
 pub(super) fn write_palette(file: &str, palette_map: HashMap<String, String>) -> Result<(), io::Error> {
     let mut file = OpenOptions::new().write(true).create(true).open(file)?;
     let mut entries = palette_map.into_iter().collect::<Vec<_>>();
-    entries.sort_by(|a, b| b.1.cmp(&a.1));
+    entries.sort_unstable();
 
     for (name, color) in entries {
         file.write_all(format!("{}->{}\n", name, color.to_string()).as_bytes())?
