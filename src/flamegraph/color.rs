@@ -233,7 +233,7 @@ pub(super) fn color(palette: &Palette, hash: bool, name: &str) -> String {
     color_from_palette(palette, name, v1, v2, v3)
 }
 
-pub(super) fn get_background_colors_for(palette: &Palette) -> (&str, &str) {
+pub(super) fn bgcolor_for(palette: &Palette) -> (&'static str, &'static str) {
     match palette {
         Palette::Hot | Palette::Java | Palette::Js | Palette::Perl => YELLOW_GRADIENT,
         Palette::Mem | Palette::Chain => BLUE_GRADIENT,
