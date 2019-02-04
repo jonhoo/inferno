@@ -9,7 +9,7 @@ use inferno::flamegraph::{self, Options, color::Palette};
 struct Opt {
     /// collapsed perf output file, or STDIN if not specified
     infile: Option<String>,
-    /// set color palette. choices are: hot (default), mem, io, wakeup, chain, java, js, perl, red, green, blue, aqua, yellow, purple, orange
+    /// set color palette. choices are: hot, mem, io, wakeup, chain, java, js, perl, red, green, blue, aqua, yellow, purple, orange
     #[structopt(long = "colors", default_value = "hot")]
     colors: Palette,
     /// colors are keyed by function name hash

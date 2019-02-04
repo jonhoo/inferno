@@ -220,7 +220,7 @@ fn filled_rectangle<W: Write>(svg: &mut Writer<W>, x1: usize, x2: usize, y1: usi
             ("y", &*format!("{}", y1)),
             ("width", &*format!("{}", x2 - x1)),
             ("height", &*format!("{}", y2 - y1)),
-            ("fill", color.as_ref()),
+            ("fill", color),
         ]),
     ))
 }
