@@ -9,7 +9,8 @@ use std::io::prelude::*;
 
 mod merge;
 mod svg;
-pub mod color;
+mod color;
+pub use color::Palette;
 
 const IMAGEWIDTH: usize = 1200; // max width, pixels
 const FRAMEHEIGHT: usize = 16; // max height is dynamic
