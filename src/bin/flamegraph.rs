@@ -1,6 +1,5 @@
 use std::fs::File;
 use std::io::{self, BufReader};
-use std::iter;
 use std::path::PathBuf;
 use structopt::StructOpt;
 
@@ -34,7 +33,9 @@ fn main() -> quick_xml::Result<()> {
     if infiles.is_empty() {
         let stdin = io::stdin();
         let r = BufReader::with_capacity(128 * 1024, stdin.lock());
-        flamegraph::from_readers(options, iter::once(r), io::stdout().lock())
+        flamegraph::from_reader(options, r, io::stdout().lock())
+    } else if infiles.len() == 1 {
+        flamegraph::from_reader(options, &infiles[0], io::stdout().lock())
     } else {
         flamegraph::from_readers(options, infiles, io::stdout().lock())
     }

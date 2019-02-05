@@ -171,6 +171,19 @@ where
     Ok(())
 }
 
+pub fn from_reader<R, W>(opt: Options, mut reader: R, writer: W) -> quick_xml::Result<()>
+where
+    R: Read,
+    W: Write,
+{
+    let mut input = String::new();
+    reader
+        .read_to_string(&mut input)
+        .map_err(quick_xml::Error::Io)?;
+
+    from_sorted_lines(opt, input.lines(), writer)
+}
+
 pub fn from_readers<R, W>(opt: Options, readers: R, writer: W) -> quick_xml::Result<()>
 where
     R: IntoIterator,
@@ -186,7 +199,6 @@ where
 
     let mut lines: Vec<&str> = input.lines().collect();
     lines.sort_unstable();
-
     from_sorted_lines(opt, lines, writer)
 }
 
