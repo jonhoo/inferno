@@ -15,13 +15,13 @@ const YELLOW_GRADIENT: (&str, &str) = ("#eeeeee", "#eeeeb0");
 const BLUE_GRADIENT: (&str, &str) = ("#eeeeee", "#e0e0ff");
 const GRAY_GRADIENT: (&str, &str) = ("#f8f8f8", "#e8e8e8");
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Palette {
     Basic(BasicPalette),
     Multi(MultiPalette),
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum BasicPalette {
     Hot,
     Mem,
@@ -35,7 +35,7 @@ pub enum BasicPalette {
     Orange,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum MultiPalette {
     Java,
     Js,
@@ -207,14 +207,14 @@ macro_rules! t {
 }
 
 fn rgb_components_for_palette(
-    palette: &Palette,
+    palette: Palette,
     name: &str,
     v1: f32,
     v2: f32,
     v3: f32,
 ) -> (u8, u8, u8) {
     let basic_palette = match palette {
-        Palette::Basic(basic) => basic.to_owned(),
+        Palette::Basic(basic) => basic,
         Palette::Multi(MultiPalette::Java) => handle_java_palette(name),
         Palette::Multi(MultiPalette::Perl) => handle_perl_palette(name),
         Palette::Multi(MultiPalette::Js) => handle_js_palette(name),
@@ -236,14 +236,14 @@ fn rgb_components_for_palette(
     }
 }
 
-fn color_from_palette(palette: &Palette, name: &str, v1: f32, v2: f32, v3: f32) -> String {
+fn color_from_palette(palette: Palette, name: &str, v1: f32, v2: f32, v3: f32) -> String {
     let (red, green, blue) = rgb_components_for_palette(palette, name, v1, v2, v3);
 
     format!("rgb({},{},{})", red, green, blue)
 }
 
 pub(super) fn color_map<'a>(
-    palette: &Palette,
+    palette: Palette,
     hash: bool,
     name: &'a str,
     palette_map: &'a mut HashMap<String, String>,
@@ -253,7 +253,7 @@ pub(super) fn color_map<'a>(
         .or_insert_with(|| color(palette, hash, name))
 }
 
-pub(super) fn color(palette: &Palette, hash: bool, name: &str) -> String {
+pub(super) fn color(palette: Palette, hash: bool, name: &str) -> String {
     let (v1, v2, v3) = if hash {
         let name_hash = namehash(name);
         let reverse_name_hash = namehash(&name.chars().rev().collect::<String>());
@@ -266,7 +266,7 @@ pub(super) fn color(palette: &Palette, hash: bool, name: &str) -> String {
     color_from_palette(palette, name, v1, v2, v3)
 }
 
-pub(super) fn bgcolor_for(palette: &Palette) -> (&'static str, &'static str) {
+pub(super) fn bgcolor_for(palette: Palette) -> (&'static str, &'static str) {
     match palette {
         Palette::Basic(BasicPalette::Hot)
         | Palette::Multi(MultiPalette::Java)
