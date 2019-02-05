@@ -9,6 +9,7 @@ use std::io::prelude::*;
 
 mod color;
 mod merge;
+mod palettes;
 mod svg;
 pub use color::Palette;
 use svg::StyleOptions;
