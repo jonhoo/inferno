@@ -97,15 +97,3 @@ pub(super) mod wakeup {
         BasicPalette::Aqua
     }
 }
-
-pub(super) mod chain {
-    use crate::flamegraph::color::BasicPalette;
-
-    pub fn resolve(name: &str) -> BasicPalette {
-        if name.contains("_[w]") {
-            BasicPalette::Aqua
-        } else {
-            BasicPalette::Blue
-        }
-    }
-}
