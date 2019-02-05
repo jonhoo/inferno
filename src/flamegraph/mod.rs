@@ -42,7 +42,7 @@ where
     W: Write,
 {
     let mut palette_map = if opt.consistent_palette {
-        Some(color::read_palette(PALETTE_FILE).map_err(|err| quick_xml::Error::Io(err))?)
+        Some(color::read_palette(PALETTE_FILE).map_err(quick_xml::Error::Io)?)
     } else {
         None
     };
@@ -199,7 +199,7 @@ where
     svg.write_event(Event::Eof)?;
 
     if let Some(palette_map) = palette_map {
-        color::write_palette(PALETTE_FILE, palette_map).map_err(|err| quick_xml::Error::Io(err))?;
+        color::write_palette(PALETTE_FILE, palette_map).map_err(quick_xml::Error::Io)?;
     }
 
     Ok(())
