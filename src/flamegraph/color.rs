@@ -303,6 +303,7 @@ pub(super) fn write_palette(
 ) -> Result<(), io::Error> {
     let mut file = OpenOptions::new().write(true).create(true).open(file)?;
     let mut entries = palette_map.into_iter().collect::<Vec<_>>();
+    // We sort the palette because the Perl implementation does.
     entries.sort_unstable();
 
     for (name, color) in entries {
