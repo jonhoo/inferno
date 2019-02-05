@@ -1,3 +1,4 @@
+use crate::flamegraph::palettes;
 use std::collections::HashMap;
 use std::fs::File;
 use std::fs::OpenOptions;
@@ -112,94 +113,6 @@ fn namehash(name: &str) -> f32 {
     (1.0 - vector / max)
 }
 
-/// Handle both annotations (_[j], _[i], ...; which are
-/// accurate), as well as input that lacks any annotations, as
-/// best as possible. Without annotations, we get a little hacky
-/// and match on java|org|com, etc.
-fn handle_java_palette(s: &str) -> BasicPalette {
-    if s.ends_with(']') {
-        if let Some(ai) = s.rfind("_[") {
-            if s[ai..].len() == 4 {
-                match &s[ai + 2..ai + 3] {
-                    // kernel annotation
-                    "k" => return BasicPalette::Orange,
-                    // inline annotation
-                    "i" => return BasicPalette::Aqua,
-                    // jit annotation
-                    "j" => return BasicPalette::Green,
-                    _ => {}
-                }
-            }
-        }
-    }
-
-    let java_prefix = if s.starts_with('L') { &s[1..] } else { s };
-
-    if java_prefix.starts_with("java/")
-        || java_prefix.starts_with("org/")
-        || java_prefix.starts_with("com/")
-        || java_prefix.starts_with("io/")
-        || java_prefix.starts_with("sun/")
-    {
-        // Java
-        BasicPalette::Green
-    } else if s.contains("::") {
-        // C++
-        BasicPalette::Yellow
-    } else {
-        // system
-        BasicPalette::Red
-    }
-}
-
-fn handle_perl_palette(s: &str) -> BasicPalette {
-    if s.ends_with("_[k]") {
-        BasicPalette::Orange
-    } else if s.contains("Perl") || s.contains(".pl") {
-        BasicPalette::Green
-    } else if s.contains("::") {
-        BasicPalette::Yellow
-    } else {
-        BasicPalette::Red
-    }
-}
-
-fn handle_js_palette(s: &str) -> BasicPalette {
-    if s.trim().is_empty() {
-        return BasicPalette::Green;
-    } else if s.ends_with("_[k]") {
-        return BasicPalette::Orange;
-    } else if s.ends_with("_[j]") {
-        if s.contains('/') {
-            return BasicPalette::Green;
-        } else {
-            return BasicPalette::Aqua;
-        }
-    } else if s.contains("::") {
-        return BasicPalette::Yellow;
-    } else if s.contains(':') {
-        return BasicPalette::Aqua;
-    } else if let Some(ai) = s.find('/') {
-        if (&s[ai..]).contains(".js") {
-            return BasicPalette::Green;
-        }
-    }
-
-    BasicPalette::Red
-}
-
-fn handle_wakeup_palette(_s: &str) -> BasicPalette {
-    BasicPalette::Aqua
-}
-
-fn handle_chain_palette(s: &str) -> BasicPalette {
-    if s.contains("_[w]") {
-        BasicPalette::Aqua
-    } else {
-        BasicPalette::Blue
-    }
-}
-
 macro_rules! t {
     ($b:expr, $a:expr, $x:expr) => {
         $b + ($a as f32 * $x) as u8
@@ -215,11 +128,11 @@ fn rgb_components_for_palette(
 ) -> (u8, u8, u8) {
     let basic_palette = match palette {
         Palette::Basic(basic) => basic,
-        Palette::Multi(MultiPalette::Java) => handle_java_palette(name),
-        Palette::Multi(MultiPalette::Perl) => handle_perl_palette(name),
-        Palette::Multi(MultiPalette::Js) => handle_js_palette(name),
-        Palette::Multi(MultiPalette::Wakeup) => handle_wakeup_palette(name),
-        Palette::Multi(MultiPalette::Chain) => handle_chain_palette(name),
+        Palette::Multi(MultiPalette::Java) => palettes::java::resolve(name),
+        Palette::Multi(MultiPalette::Perl) => palettes::perl::resolve(name),
+        Palette::Multi(MultiPalette::Js) => palettes::js::resolve(name),
+        Palette::Multi(MultiPalette::Wakeup) => palettes::wakeup::resolve(name),
+        Palette::Multi(MultiPalette::Chain) => palettes::chain::resolve(name),
     };
 
     match basic_palette {
