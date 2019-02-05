@@ -41,6 +41,22 @@ pub(super) struct TextItem<'a, I> {
     pub(super) extra: I,
 }
 
+pub(super) struct StyleOptions<'a> {
+    imageheight: usize,
+    bgcolor1: &'a str,
+    bgcolor2: &'a str,
+}
+
+impl<'a> StyleOptions<'a> {
+    pub(super) fn new(imageheight: usize, bgcolor1: &'a str, bgcolor2: &'a str) -> Self {
+        StyleOptions {
+            imageheight,
+            bgcolor1,
+            bgcolor2,
+        }
+    }
+}
+
 pub(super) fn write_header<W>(svg: &mut Writer<W>, imageheight: usize) -> quick_xml::Result<()>
 where
     W: Write,
@@ -69,11 +85,9 @@ where
     Ok(())
 }
 
-pub(super) fn write_prelude<W>(
+pub(super) fn write_prelude<'a, W>(
     svg: &mut Writer<W>,
-    imageheight: usize,
-    bgcolor1: &str,
-    bgcolor2: &str,
+    style_options: &StyleOptions<'a>,
 ) -> quick_xml::Result<()>
 where
     W: Write,
@@ -85,12 +99,12 @@ where
     )))?;
     svg.write_event(Event::Empty(
         BytesStart::borrowed_name(b"stop").with_attributes(
-            iter::once(("stop-color", bgcolor1)).chain(iter::once(("offset", "5%"))),
+            iter::once(("stop-color", style_options.bgcolor1)).chain(iter::once(("offset", "5%"))),
         ),
     ))?;
     svg.write_event(Event::Empty(
         BytesStart::borrowed_name(b"stop").with_attributes(
-            iter::once(("stop-color", bgcolor2)).chain(iter::once(("offset", "95%"))),
+            iter::once(("stop-color", style_options.bgcolor2)).chain(iter::once(("offset", "95%"))),
         ),
     ))?;
     svg.write_event(Event::End(BytesEnd::borrowed(b"linearGradient")))?;
@@ -130,7 +144,7 @@ var searchcolor = 'rgb(230,0,230)';",
             ("x", "0"),
             ("y", "0"),
             ("width", &*format!("{}", super::IMAGEWIDTH)),
-            ("height", &*format!("{}", imageheight)),
+            ("height", &*format!("{}", style_options.imageheight)),
             ("fill", "url(#background)"),
         ]),
     ))?;
@@ -158,7 +172,7 @@ var searchcolor = 'rgb(230,0,230)';",
             color: "rgb(0, 0, 0)",
             size: super::FONTSIZE,
             x: super::XPAD as f64,
-            y: (imageheight - (super::YPAD2 / 2)) as f64,
+            y: (style_options.imageheight - (super::YPAD2 / 2)) as f64,
             text: " ".into(),
             location: None,
             extra: iter::once(("id", "details")),
@@ -210,7 +224,7 @@ var searchcolor = 'rgb(230,0,230)';",
             color: "rgb(0, 0, 0)",
             size: super::FONTSIZE,
             x: (super::IMAGEWIDTH - super::XPAD - 100) as f64,
-            y: (imageheight - (super::YPAD2 / 2)) as f64,
+            y: (style_options.imageheight - (super::YPAD2 / 2)) as f64,
             text: " ".into(),
             location: None,
             extra: iter::once(("id", "matched")),
