@@ -1,4 +1,6 @@
 use crate::flamegraph::palettes;
+use rand::rngs::ThreadRng;
+use rand::Rng;
 use std::collections::HashMap;
 use std::fs::File;
 use std::fs::OpenOptions;
@@ -160,20 +162,26 @@ pub(super) fn color_map<'a>(
     hash: bool,
     name: &'a str,
     palette_map: &'a mut HashMap<String, String>,
+    thread_rng: &mut ThreadRng,
 ) -> &'a str {
     palette_map
         .entry(name.to_string())
-        .or_insert_with(|| color(palette, hash, name))
+        .or_insert_with(|| color(palette, hash, name, thread_rng))
 }
 
-pub(super) fn color(palette: Palette, hash: bool, name: &str) -> String {
+pub(super) fn color(
+    palette: Palette,
+    hash: bool,
+    name: &str,
+    thread_rng: &mut ThreadRng,
+) -> String {
     let (v1, v2, v3) = if hash {
         let name_hash = namehash(name);
         let reverse_name_hash = namehash(&name.chars().rev().collect::<String>());
 
         (name_hash, reverse_name_hash, reverse_name_hash)
     } else {
-        (rand::random(), rand::random(), rand::random())
+        (thread_rng.gen(), thread_rng.gen(), thread_rng.gen())
     };
 
     color_from_palette(palette, name, v1, v2, v3)
