@@ -34,7 +34,7 @@ pub fn from_str<W: Write>(_opt: Options, input: &str, writer: W) -> quick_xml::R
     // let's start writing the svg!
     let mut svg = Writer::new(writer);
     if time == 0 {
-        warn!("ERROR: No stack counts found");
+        error!("No stack counts found");
         // emit an error message SVG, for tools automating flamegraph use
         let imageheight = FONTSIZE * 5;
         svg::write_header(&mut svg, imageheight)?;
