@@ -74,7 +74,7 @@ fn flow<'a, LI, TI>(
     }
 }
 
-pub(super) fn frames(input: &str) -> (Vec<TimedFrame>, usize, usize) {
+pub(super) fn frames<'a>(input: &'a str) -> (Vec<TimedFrame<'a>>, usize, usize) {
     let mut time = 0;
     let mut ignored = 0;
     let mut last = "";
