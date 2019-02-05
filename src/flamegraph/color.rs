@@ -75,13 +75,13 @@ fn namehash(name: &str) -> f32 {
     let mut modulo = 10;
 
     let name = {
-        let looking_for_module_name = if name.starts_with("`") {
+        let looking_for_module_name = if name.starts_with('`') {
             &name[1..]
         } else {
             name
         };
 
-        if let Some(index) = looking_for_module_name.find("`") {
+        if let Some(index) = looking_for_module_name.find('`') {
             &looking_for_module_name[index + 1..]
         } else {
             name
@@ -89,8 +89,8 @@ fn namehash(name: &str) -> f32 {
     };
 
     for character in name.bytes().take(3) {
-        let i = (character % modulo) as f32;
-        vector += (i / ((modulo - 1) as f32)) * weight;
+        let i = f32::from(character % modulo);
+        vector += (i / f32::from(modulo - 1)) * weight;
         modulo += 1;
         max += weight;
         weight *= 0.70;
@@ -104,7 +104,7 @@ fn namehash(name: &str) -> f32 {
 /// best as possible. Without annotations, we get a little hacky
 /// and match on java|org|com, etc.
 fn handle_java_palette(s: &str) -> Palette {
-    if s.ends_with("]") {
+    if s.ends_with(']') {
         if let Some(ai) = s.rfind("_[") {
             if s[ai..].len() == 4 {
                 match &s[ai + 2..ai + 3] {
@@ -120,7 +120,7 @@ fn handle_java_palette(s: &str) -> Palette {
         }
     }
 
-    let java_prefix = if s.starts_with("L") { &s[1..] } else { s };
+    let java_prefix = if s.starts_with('L') { &s[1..] } else { s };
 
     if java_prefix.starts_with("java/")
         || java_prefix.starts_with("org/")
@@ -158,14 +158,14 @@ fn handle_js_palette(s: &str) -> Palette {
         return Palette::Orange;
     } else if s.contains("::") {
         return Palette::Yellow;
-    } else if s.contains(":") {
+    } else if s.contains(':') {
         return Palette::Aqua;
-    } else if let Some(ai) = s.find("/") {
+    } else if let Some(ai) = s.find('/') {
         if (&s[ai..]).contains(".js") {
             return Palette::Green;
         }
     } else if s.ends_with("_[j]") {
-        if s.contains("/") {
+        if s.contains('/') {
             return Palette::Green;
         } else {
             return Palette::Aqua;

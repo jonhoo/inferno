@@ -32,7 +32,7 @@ pub struct Options {
 
 pub fn from_str<W: Write>(opt: Options, input: &str, writer: W) -> quick_xml::Result<()> {
     let mut palette_map = if opt.consistent_palette {
-        Some(color::read_palette(PALETTE_FILE).map_err(|err| quick_xml::Error::Io(err))?)
+        Some(color::read_palette(PALETTE_FILE).map_err(quick_xml::Error::Io)?)
     } else {
         None
     };
@@ -181,7 +181,7 @@ pub fn from_str<W: Write>(opt: Options, input: &str, writer: W) -> quick_xml::Re
     svg.write_event(Event::Eof)?;
 
     if let Some(palette_map) = palette_map {
-        color::write_palette(PALETTE_FILE, palette_map).map_err(|err| quick_xml::Error::Io(err))?;
+        color::write_palette(PALETTE_FILE, palette_map).map_err(quick_xml::Error::Io)?;
     }
 
     Ok(())
