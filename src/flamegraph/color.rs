@@ -44,7 +44,6 @@ pub enum MultiPalette {
     Js,
     Perl,
     Wakeup,
-    Chain,
 }
 
 impl Default for Palette {
@@ -62,7 +61,6 @@ impl FromStr for Palette {
             "mem" => Ok(Palette::Basic(BasicPalette::Mem)),
             "io" => Ok(Palette::Basic(BasicPalette::Io)),
             "wakeup" => Ok(Palette::Multi(MultiPalette::Wakeup)),
-            "chain" => Ok(Palette::Multi(MultiPalette::Chain)),
             "java" => Ok(Palette::Multi(MultiPalette::Java)),
             "js" => Ok(Palette::Multi(MultiPalette::Js)),
             "perl" => Ok(Palette::Multi(MultiPalette::Perl)),
@@ -134,7 +132,6 @@ fn rgb_components_for_palette(
         Palette::Multi(MultiPalette::Perl) => palettes::perl::resolve(name),
         Palette::Multi(MultiPalette::Js) => palettes::js::resolve(name),
         Palette::Multi(MultiPalette::Wakeup) => palettes::wakeup::resolve(name),
-        Palette::Multi(MultiPalette::Chain) => palettes::chain::resolve(name),
     };
 
     match basic_palette {
@@ -193,7 +190,7 @@ pub(super) fn bgcolor_for(palette: Palette) -> (&'static str, &'static str) {
         | Palette::Multi(MultiPalette::Java)
         | Palette::Multi(MultiPalette::Js)
         | Palette::Multi(MultiPalette::Perl) => YELLOW_GRADIENT,
-        Palette::Basic(BasicPalette::Mem) | Palette::Multi(MultiPalette::Chain) => BLUE_GRADIENT,
+        Palette::Basic(BasicPalette::Mem) => BLUE_GRADIENT,
         _ => GRAY_GRADIENT,
     }
 }
