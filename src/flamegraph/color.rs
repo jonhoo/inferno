@@ -169,6 +169,12 @@ fn handle_js_palette(s: &str) -> BasicPalette {
         return BasicPalette::Green;
     } else if s.ends_with("_[k]") {
         return BasicPalette::Orange;
+    } else if s.ends_with("_[j]") {
+        if s.contains('/') {
+            return BasicPalette::Green;
+        } else {
+            return BasicPalette::Aqua;
+        }
     } else if s.contains("::") {
         return BasicPalette::Yellow;
     } else if s.contains(':') {
@@ -176,12 +182,6 @@ fn handle_js_palette(s: &str) -> BasicPalette {
     } else if let Some(ai) = s.find('/') {
         if (&s[ai..]).contains(".js") {
             return BasicPalette::Green;
-        }
-    } else if s.ends_with("_[j]") {
-        if s.contains('/') {
-            return BasicPalette::Green;
-        } else {
-            return BasicPalette::Aqua;
         }
     }
 
