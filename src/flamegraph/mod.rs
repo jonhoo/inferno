@@ -10,6 +10,7 @@ use std::io::prelude::*;
 mod color;
 mod merge;
 mod svg;
+use crate::flamegraph::svg::StyleOptions;
 pub use color::Palette;
 
 const IMAGEWIDTH: usize = 1200; // max width, pixels
@@ -89,7 +90,9 @@ pub fn from_str<W: Write>(opt: Options, input: &str, writer: W) -> quick_xml::Re
     // draw canvas, and embed interactive JavaScript program
     let imageheight = ((depthmax + 1) * FRAMEHEIGHT) + YPAD1 + YPAD2;
     svg::write_header(&mut svg, imageheight)?;
-    svg::write_prelude(&mut svg, imageheight, bgcolor1, bgcolor2)?;
+
+    let style_options = StyleOptions::new(imageheight, bgcolor1, bgcolor2);
+    svg::write_prelude(&mut svg, &style_options)?;
 
     // draw frames
     for frame in frames {
