@@ -99,6 +99,11 @@ pub fn from_str<W: Write>(opt: Options, input: &str, writer: W) -> quick_xml::Re
     };
     svg::write_prelude(&mut svg, &style_options)?;
 
+    // Used when picking color parameters at random, when no option determines how to pick these
+    // parameters. We instanciate it here because it may be called once for each iteration in the
+    // frames loop.
+    let mut thread_rng = rand::thread_rng();
+
     // draw frames
     for frame in frames {
         let x1 = XPAD + (frame.start_time as f64 * widthpertime) as usize;
@@ -140,11 +145,21 @@ pub fn from_str<W: Write>(opt: Options, input: &str, writer: W) -> quick_xml::Re
         } else if frame.location.function == "-" {
             filled_rectangle(&mut svg, x1, x2, y1, y2, color::DGREY)?;
         } else if let Some(ref mut palette_map) = palette_map {
-            let color =
-                color::color_map(opt.colors, opt.hash, &frame.location.function, palette_map);
+            let color = color::color_map(
+                opt.colors,
+                opt.hash,
+                &frame.location.function,
+                palette_map,
+                &mut thread_rng,
+            );
             filled_rectangle(&mut svg, x1, x2, y1, y2, color)?;
         } else {
-            let color = color::color(opt.colors, opt.hash, frame.location.function);
+            let color = color::color(
+                opt.colors,
+                opt.hash,
+                frame.location.function,
+                &mut thread_rng,
+            );
             filled_rectangle(&mut svg, x1, x2, y1, y2, &color)?;
         };
 
