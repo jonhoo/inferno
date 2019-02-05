@@ -17,14 +17,15 @@ const GRAY_GRADIENT: (&str, &str) = ("#f8f8f8", "#e8e8e8");
 
 #[derive(Debug, PartialEq)]
 pub enum Palette {
+    Basic(BasicPalette),
+    Multi(MultiPalette),
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub enum BasicPalette {
     Hot,
     Mem,
     Io,
-    Wakeup,
-    Chain,
-    Java,
-    Js,
-    Perl,
     Red,
     Green,
     Blue,
@@ -34,9 +35,18 @@ pub enum Palette {
     Orange,
 }
 
+#[derive(Debug, PartialEq)]
+pub enum MultiPalette {
+    Java,
+    Js,
+    Perl,
+    Wakeup,
+    Chain,
+}
+
 impl Default for Palette {
     fn default() -> Self {
-        Palette::Hot
+        Palette::Basic(BasicPalette::Hot)
     }
 }
 
@@ -45,21 +55,21 @@ impl FromStr for Palette {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
-            "hot" => Ok(Palette::Hot),
-            "mem" => Ok(Palette::Mem),
-            "io" => Ok(Palette::Io),
-            "wakeup" => Ok(Palette::Wakeup),
-            "chain" => Ok(Palette::Chain),
-            "java" => Ok(Palette::Java),
-            "js" => Ok(Palette::Js),
-            "perl" => Ok(Palette::Perl),
-            "red" => Ok(Palette::Red),
-            "green" => Ok(Palette::Green),
-            "blue" => Ok(Palette::Blue),
-            "aqua" => Ok(Palette::Aqua),
-            "yellow" => Ok(Palette::Yellow),
-            "purple" => Ok(Palette::Purple),
-            "orange" => Ok(Palette::Orange),
+            "hot" => Ok(Palette::Basic(BasicPalette::Hot)),
+            "mem" => Ok(Palette::Basic(BasicPalette::Mem)),
+            "io" => Ok(Palette::Basic(BasicPalette::Io)),
+            "wakeup" => Ok(Palette::Multi(MultiPalette::Wakeup)),
+            "chain" => Ok(Palette::Multi(MultiPalette::Chain)),
+            "java" => Ok(Palette::Multi(MultiPalette::Java)),
+            "js" => Ok(Palette::Multi(MultiPalette::Js)),
+            "perl" => Ok(Palette::Multi(MultiPalette::Perl)),
+            "red" => Ok(Palette::Basic(BasicPalette::Red)),
+            "green" => Ok(Palette::Basic(BasicPalette::Green)),
+            "blue" => Ok(Palette::Basic(BasicPalette::Blue)),
+            "aqua" => Ok(Palette::Basic(BasicPalette::Aqua)),
+            "yellow" => Ok(Palette::Basic(BasicPalette::Yellow)),
+            "purple" => Ok(Palette::Basic(BasicPalette::Purple)),
+            "orange" => Ok(Palette::Basic(BasicPalette::Orange)),
             unknown => Err(format!("unknown color palette: {}", unknown)),
         }
     }
@@ -106,17 +116,17 @@ fn namehash(name: &str) -> f32 {
 /// accurate), as well as input that lacks any annotations, as
 /// best as possible. Without annotations, we get a little hacky
 /// and match on java|org|com, etc.
-fn handle_java_palette(s: &str) -> Palette {
+fn handle_java_palette(s: &str) -> BasicPalette {
     if s.ends_with(']') {
         if let Some(ai) = s.rfind("_[") {
             if s[ai..].len() == 4 {
                 match &s[ai + 2..ai + 3] {
                     // kernel annotation
-                    "k" => return Palette::Orange,
+                    "k" => return BasicPalette::Orange,
                     // inline annotation
-                    "i" => return Palette::Aqua,
+                    "i" => return BasicPalette::Aqua,
                     // jit annotation
-                    "j" => return Palette::Green,
+                    "j" => return BasicPalette::Green,
                     _ => {}
                 }
             }
@@ -132,61 +142,61 @@ fn handle_java_palette(s: &str) -> Palette {
         || java_prefix.starts_with("sun/")
     {
         // Java
-        Palette::Green
+        BasicPalette::Green
     } else if s.contains("::") {
         // C++
-        Palette::Yellow
+        BasicPalette::Yellow
     } else {
         // system
-        Palette::Red
+        BasicPalette::Red
     }
 }
 
-fn handle_perl_palette(s: &str) -> Palette {
+fn handle_perl_palette(s: &str) -> BasicPalette {
     if s.ends_with("_[k]") {
-        Palette::Orange
+        BasicPalette::Orange
     } else if s.contains("Perl") || s.contains(".pl") {
-        Palette::Green
+        BasicPalette::Green
     } else if s.contains("::") {
-        Palette::Yellow
+        BasicPalette::Yellow
     } else {
-        Palette::Red
+        BasicPalette::Red
     }
 }
 
-fn handle_js_palette(s: &str) -> Palette {
+fn handle_js_palette(s: &str) -> BasicPalette {
     if s.trim().is_empty() {
-        return Palette::Green;
+        return BasicPalette::Green;
     } else if s.ends_with("_[k]") {
-        return Palette::Orange;
+        return BasicPalette::Orange;
     } else if s.contains("::") {
-        return Palette::Yellow;
+        return BasicPalette::Yellow;
     } else if s.contains(':') {
-        return Palette::Aqua;
+        return BasicPalette::Aqua;
     } else if let Some(ai) = s.find('/') {
         if (&s[ai..]).contains(".js") {
-            return Palette::Green;
+            return BasicPalette::Green;
         }
     } else if s.ends_with("_[j]") {
         if s.contains('/') {
-            return Palette::Green;
+            return BasicPalette::Green;
         } else {
-            return Palette::Aqua;
+            return BasicPalette::Aqua;
         }
     }
 
-    Palette::Red
+    BasicPalette::Red
 }
 
-fn handle_wakeup_palette(_s: &str) -> Palette {
-    Palette::Aqua
+fn handle_wakeup_palette(_s: &str) -> BasicPalette {
+    BasicPalette::Aqua
 }
 
-fn handle_chain_palette(s: &str) -> Palette {
+fn handle_chain_palette(s: &str) -> BasicPalette {
     if s.contains("_[w]") {
-        Palette::Aqua
+        BasicPalette::Aqua
     } else {
-        Palette::Blue
+        BasicPalette::Blue
     }
 }
 
@@ -203,25 +213,27 @@ fn rgb_components_for_palette(
     v2: f32,
     v3: f32,
 ) -> (u8, u8, u8) {
-    let real_palette = match palette {
-        Palette::Hot => return (t!(205, 50, v3), t!(0, 230, v1), t!(0, 55, v2)),
-        Palette::Mem => return (t!(0, 0, v3), t!(190, 50, v2), t!(0, 210, v1)),
-        Palette::Io => return (t!(80, 60, v1), t!(80, 60, v1), t!(190, 55, v2)),
-        Palette::Red => return (t!(200, 55, v1), t!(50, 80, v1), t!(50, 80, v1)),
-        Palette::Green => return (t!(50, 60, v1), t!(200, 55, v1), t!(50, 60, v1)),
-        Palette::Blue => return (t!(80, 60, v1), t!(80, 60, v1), t!(205, 50, v1)),
-        Palette::Yellow => return (t!(175, 55, v1), t!(175, 55, v1), t!(50, 20, v1)),
-        Palette::Purple => return (t!(190, 65, v1), t!(80, 60, v1), t!(190, 65, v1)),
-        Palette::Aqua => return (t!(50, 60, v1), t!(165, 55, v1), t!(165, 55, v1)),
-        Palette::Orange => return (t!(190, 65, v1), t!(90, 65, v1), t!(0, 0, v1)),
-        Palette::Java => handle_java_palette(name),
-        Palette::Perl => handle_perl_palette(name),
-        Palette::Js => handle_js_palette(name),
-        Palette::Wakeup => handle_wakeup_palette(name),
-        Palette::Chain => handle_chain_palette(name),
+    let basic_palette = match palette {
+        Palette::Basic(basic) => basic.to_owned(),
+        Palette::Multi(MultiPalette::Java) => handle_java_palette(name),
+        Palette::Multi(MultiPalette::Perl) => handle_perl_palette(name),
+        Palette::Multi(MultiPalette::Js) => handle_js_palette(name),
+        Palette::Multi(MultiPalette::Wakeup) => handle_wakeup_palette(name),
+        Palette::Multi(MultiPalette::Chain) => handle_chain_palette(name),
     };
 
-    rgb_components_for_palette(&real_palette, name, v1, v2, v3)
+    match basic_palette {
+        BasicPalette::Hot => (t!(205, 50, v3), t!(0, 230, v1), t!(0, 55, v2)),
+        BasicPalette::Mem => (t!(0, 0, v3), t!(190, 50, v2), t!(0, 210, v1)),
+        BasicPalette::Io => (t!(80, 60, v1), t!(80, 60, v1), t!(190, 55, v2)),
+        BasicPalette::Red => (t!(200, 55, v1), t!(50, 80, v1), t!(50, 80, v1)),
+        BasicPalette::Green => (t!(50, 60, v1), t!(200, 55, v1), t!(50, 60, v1)),
+        BasicPalette::Blue => (t!(80, 60, v1), t!(80, 60, v1), t!(205, 50, v1)),
+        BasicPalette::Yellow => (t!(175, 55, v1), t!(175, 55, v1), t!(50, 20, v1)),
+        BasicPalette::Purple => (t!(190, 65, v1), t!(80, 60, v1), t!(190, 65, v1)),
+        BasicPalette::Aqua => (t!(50, 60, v1), t!(165, 55, v1), t!(165, 55, v1)),
+        BasicPalette::Orange => (t!(190, 65, v1), t!(90, 65, v1), t!(0, 0, v1)),
+    }
 }
 
 fn color_from_palette(palette: &Palette, name: &str, v1: f32, v2: f32, v3: f32) -> String {
@@ -256,8 +268,11 @@ pub(super) fn color(palette: &Palette, hash: bool, name: &str) -> String {
 
 pub(super) fn bgcolor_for(palette: &Palette) -> (&'static str, &'static str) {
     match palette {
-        Palette::Hot | Palette::Java | Palette::Js | Palette::Perl => YELLOW_GRADIENT,
-        Palette::Mem | Palette::Chain => BLUE_GRADIENT,
+        Palette::Basic(BasicPalette::Hot)
+        | Palette::Multi(MultiPalette::Java)
+        | Palette::Multi(MultiPalette::Js)
+        | Palette::Multi(MultiPalette::Perl) => YELLOW_GRADIENT,
+        Palette::Basic(BasicPalette::Mem) | Palette::Multi(MultiPalette::Chain) => BLUE_GRADIENT,
         _ => GRAY_GRADIENT,
     }
 }
