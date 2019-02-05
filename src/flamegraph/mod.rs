@@ -38,7 +38,7 @@ pub fn from_str<W: Write>(opt: Options, input: &str, writer: W) -> quick_xml::Re
         None
     };
 
-    let (bgcolor1, bgcolor2) = color::bgcolor_for(&opt.colors);
+    let (bgcolor1, bgcolor2) = color::bgcolor_for(opt.colors);
 
     let (mut frames, time, ignored) = merge::frames(input);
     if ignored != 0 {
@@ -136,10 +136,10 @@ pub fn from_str<W: Write>(opt: Options, input: &str, writer: W) -> quick_xml::Re
             filled_rectangle(&mut svg, x1, x2, y1, y2, color::DGREY)?;
         } else if let Some(ref mut palette_map) = palette_map {
             let color =
-                color::color_map(&opt.colors, opt.hash, &frame.location.function, palette_map);
+                color::color_map(opt.colors, opt.hash, &frame.location.function, palette_map);
             filled_rectangle(&mut svg, x1, x2, y1, y2, color)?;
         } else {
-            let color = color::color(&opt.colors, opt.hash, frame.location.function);
+            let color = color::color(opt.colors, opt.hash, frame.location.function);
             filled_rectangle(&mut svg, x1, x2, y1, y2, &color)?;
         };
 
