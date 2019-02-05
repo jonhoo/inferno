@@ -88,6 +88,9 @@ fn namehash(name: &str) -> f32 {
         }
     };
 
+    // The Perl implementation does a check for modulo > 12,
+    // but that's equivalent to just iterating over the first three characters
+    // (as long as modulo starts equal to 10)
     for character in name.bytes().take(3) {
         let i = f32::from(character % modulo);
         vector += (i / f32::from(modulo - 1)) * weight;
