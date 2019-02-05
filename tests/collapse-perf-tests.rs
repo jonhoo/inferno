@@ -4,7 +4,6 @@ extern crate pretty_assertions;
 extern crate inferno;
 
 use inferno::collapse::perf::{handle_file, Options};
-use std::fmt;
 use std::fs::File;
 use std::io::{self, BufRead, BufReader, Cursor};
 use std::path::Path;
@@ -12,7 +11,7 @@ use std::path::Path;
 // Create tests for test files in $dir. The test files are used as input
 // and the results are compared to result files in the results sub directory.
 // The test and result file names are derived from $name.
-// The part after the last underscore is the flag name to use.
+// The part after the double underscore are underscore separated options.
 // For example, perf_cycles_instructions_01_pid will use the following:
 //     test file: perf-cycles-instructions-01.txt
 //     result file: perf-cycles-instructions-01-collapsed-pid.txt
@@ -24,13 +23,13 @@ macro_rules! collapse_perf_tests_inner {
         #[allow(non_snake_case)]
         fn $name() {
             let test_name = stringify!($name);
-            let last_underscore = test_name
-                .rfind('_')
-                .expect("test name must have underscore");
-            let test_file_stem = (&test_name[0..last_underscore]).replace("_", "-");
-            let flag: Flag = (&test_name[last_underscore + 1..test_name.len()]).into();
+
+            let mut split_name = test_name.split("__");
+            let test_file_stem = split_name.next().unwrap().replace("_", "-");
+            let options: Vec<_> = split_name.next().map(|s| s.split('_').collect()).unwrap_or_default();
+
             let test_file = format!("{}.txt", test_file_stem);
-            let result_file = format!("{}-collapsed-{}.txt", test_file_stem, flag.to_string());
+            let result_file = format!("{}-collapsed-{}.txt", test_file_stem, options.join("+"));
 
             let test_path = Path::new($dir);
             let results_path = test_path.join("results");
@@ -38,110 +37,121 @@ macro_rules! collapse_perf_tests_inner {
             test_collapse_perf(
                 test_path.join(test_file).to_str().unwrap(),
                 results_path.join(result_file).to_str().unwrap(),
-                flag.into(),
+                options_from_vec(options),
             ).unwrap()
         }
     )*
     }
 }
 
-macro_rules! collapse_perf_tests {
+macro_rules! collapse_perf_tests_upstream {
     ($($name:ident),*) => {
         collapse_perf_tests_inner!($($name),*; "./flamegraph/test");
     }
 }
 
+collapse_perf_tests_upstream! {
+    perf_cycles_instructions_01__pid,
+    perf_cycles_instructions_01__tid,
+    perf_cycles_instructions_01__kernel,
+    perf_cycles_instructions_01__jit,
+    perf_cycles_instructions_01__all,
+    perf_cycles_instructions_01__addrs,
+
+    perf_dd_stacks_01__pid,
+    perf_dd_stacks_01__tid,
+    perf_dd_stacks_01__kernel,
+    perf_dd_stacks_01__jit,
+    perf_dd_stacks_01__all,
+    perf_dd_stacks_01__addrs,
+
+    perf_funcab_cmd_01__pid,
+    perf_funcab_cmd_01__tid,
+    perf_funcab_cmd_01__kernel,
+    perf_funcab_cmd_01__jit,
+    perf_funcab_cmd_01__all,
+    perf_funcab_cmd_01__addrs,
+
+    perf_funcab_pid_01__pid,
+    perf_funcab_pid_01__tid,
+    perf_funcab_pid_01__kernel,
+    perf_funcab_pid_01__jit,
+    perf_funcab_pid_01__all,
+    perf_funcab_pid_01__addrs,
+
+    perf_iperf_stacks_pidtid_01__pid,
+    perf_iperf_stacks_pidtid_01__tid,
+    perf_iperf_stacks_pidtid_01__kernel,
+    perf_iperf_stacks_pidtid_01__jit,
+    perf_iperf_stacks_pidtid_01__all,
+    perf_iperf_stacks_pidtid_01__addrs,
+
+    perf_java_faults_01__pid,
+    perf_java_faults_01__tid,
+    perf_java_faults_01__kernel,
+    perf_java_faults_01__jit,
+    perf_java_faults_01__all,
+    perf_java_faults_01__addrs,
+
+    perf_java_stacks_01__pid,
+    perf_java_stacks_01__tid,
+    perf_java_stacks_01__kernel,
+    perf_java_stacks_01__jit,
+    perf_java_stacks_01__all,
+    perf_java_stacks_01__addrs,
+
+    perf_java_stacks_02__pid,
+    perf_java_stacks_02__tid,
+    perf_java_stacks_02__kernel,
+    perf_java_stacks_02__jit,
+    perf_java_stacks_02__all,
+    perf_java_stacks_02__addrs,
+
+    perf_js_stacks_01__pid,
+    perf_js_stacks_01__tid,
+    perf_js_stacks_01__kernel,
+    perf_js_stacks_01__jit,
+    perf_js_stacks_01__all,
+    perf_js_stacks_01__addrs,
+
+    perf_mirageos_stacks_01__pid,
+    perf_mirageos_stacks_01__tid,
+    perf_mirageos_stacks_01__kernel,
+    perf_mirageos_stacks_01__jit,
+    perf_mirageos_stacks_01__all,
+    perf_mirageos_stacks_01__addrs,
+
+    perf_numa_stacks_01__pid,
+    perf_numa_stacks_01__tid,
+    perf_numa_stacks_01__kernel,
+    perf_numa_stacks_01__jit,
+    perf_numa_stacks_01__all,
+    perf_numa_stacks_01__addrs,
+
+    perf_rust_Yamakaky_dcpu__pid,
+    perf_rust_Yamakaky_dcpu__tid,
+    perf_rust_Yamakaky_dcpu__kernel,
+    perf_rust_Yamakaky_dcpu__jit,
+    perf_rust_Yamakaky_dcpu__all,
+    perf_rust_Yamakaky_dcpu__addrs,
+
+    perf_vertx_stacks_01__pid,
+    perf_vertx_stacks_01__tid,
+    perf_vertx_stacks_01__kernel,
+    perf_vertx_stacks_01__jit,
+    perf_vertx_stacks_01__all,
+    perf_vertx_stacks_01__addrs
+}
+
+macro_rules! collapse_perf_tests {
+    ($($name:ident),*) => {
+        collapse_perf_tests_inner!($($name),*; "./tests/data");
+    }
+}
+
 collapse_perf_tests! {
-    perf_cycles_instructions_01_pid,
-    perf_cycles_instructions_01_tid,
-    perf_cycles_instructions_01_kernel,
-    perf_cycles_instructions_01_jit,
-    perf_cycles_instructions_01_all,
-    perf_cycles_instructions_01_addrs,
-
-    perf_dd_stacks_01_pid,
-    perf_dd_stacks_01_tid,
-    perf_dd_stacks_01_kernel,
-    perf_dd_stacks_01_jit,
-    perf_dd_stacks_01_all,
-    perf_dd_stacks_01_addrs,
-
-    perf_funcab_cmd_01_pid,
-    perf_funcab_cmd_01_tid,
-    perf_funcab_cmd_01_kernel,
-    perf_funcab_cmd_01_jit,
-    perf_funcab_cmd_01_all,
-    perf_funcab_cmd_01_addrs,
-
-    perf_funcab_pid_01_pid,
-    perf_funcab_pid_01_tid,
-    perf_funcab_pid_01_kernel,
-    perf_funcab_pid_01_jit,
-    perf_funcab_pid_01_all,
-    perf_funcab_pid_01_addrs,
-
-    perf_iperf_stacks_pidtid_01_pid,
-    perf_iperf_stacks_pidtid_01_tid,
-    perf_iperf_stacks_pidtid_01_kernel,
-    perf_iperf_stacks_pidtid_01_jit,
-    perf_iperf_stacks_pidtid_01_all,
-    perf_iperf_stacks_pidtid_01_addrs,
-
-    perf_java_faults_01_pid,
-    perf_java_faults_01_tid,
-    perf_java_faults_01_kernel,
-    perf_java_faults_01_jit,
-    perf_java_faults_01_all,
-    perf_java_faults_01_addrs,
-
-    perf_java_stacks_01_pid,
-    perf_java_stacks_01_tid,
-    perf_java_stacks_01_kernel,
-    perf_java_stacks_01_jit,
-    perf_java_stacks_01_all,
-    perf_java_stacks_01_addrs,
-
-    perf_java_stacks_02_pid,
-    perf_java_stacks_02_tid,
-    perf_java_stacks_02_kernel,
-    perf_java_stacks_02_jit,
-    perf_java_stacks_02_all,
-    perf_java_stacks_02_addrs,
-
-    perf_js_stacks_01_pid,
-    perf_js_stacks_01_tid,
-    perf_js_stacks_01_kernel,
-    perf_js_stacks_01_jit,
-    perf_js_stacks_01_all,
-    perf_js_stacks_01_addrs,
-
-    perf_mirageos_stacks_01_pid,
-    perf_mirageos_stacks_01_tid,
-    perf_mirageos_stacks_01_kernel,
-    perf_mirageos_stacks_01_jit,
-    perf_mirageos_stacks_01_all,
-    perf_mirageos_stacks_01_addrs,
-
-    perf_numa_stacks_01_pid,
-    perf_numa_stacks_01_tid,
-    perf_numa_stacks_01_kernel,
-    perf_numa_stacks_01_jit,
-    perf_numa_stacks_01_all,
-    perf_numa_stacks_01_addrs,
-
-    perf_rust_Yamakaky_dcpu_pid,
-    perf_rust_Yamakaky_dcpu_tid,
-    perf_rust_Yamakaky_dcpu_kernel,
-    perf_rust_Yamakaky_dcpu_jit,
-    perf_rust_Yamakaky_dcpu_all,
-    perf_rust_Yamakaky_dcpu_addrs,
-
-    perf_vertx_stacks_01_pid,
-    perf_vertx_stacks_01_tid,
-    perf_vertx_stacks_01_kernel,
-    perf_vertx_stacks_01_jit,
-    perf_vertx_stacks_01_all,
-    perf_vertx_stacks_01_addrs
+    perf_inline_counter__inline,
+    perf_inline_counter__inline_context
 }
 
 fn test_collapse_perf(test_file: &str, expected_file: &str, options: Options) -> io::Result<()> {
@@ -179,68 +189,23 @@ fn test_collapse_perf(test_file: &str, expected_file: &str, options: Options) ->
     Ok(())
 }
 
-#[derive(Copy, Clone)]
-enum Flag {
-    PID,
-    TID,
-    KERNEL,
-    JIT,
-    ALL,
-    ADDRS,
-}
-
-impl From<&str> for Flag {
-    fn from(s: &str) -> Flag {
-        match s {
-            "pid" => Flag::PID,
-            "tid" => Flag::TID,
-            "kernel" => Flag::KERNEL,
-            "jit" => Flag::JIT,
-            "all" => Flag::ALL,
-            "addrs" => Flag::ADDRS,
-            flag => panic!("unknown flag: {}", flag),
+fn options_from_vec(opt_vec: Vec<&str>) -> Options {
+    let mut options = Options::default();
+    for option in opt_vec {
+        match option {
+            "pid" => options.include_pid = true,
+            "tid" => options.include_tid = true,
+            "addrs" => options.include_addrs = true,
+            "jit" => options.annotate_jit = true,
+            "kernel" => options.annotate_kernel = true,
+            "all" => {
+                options.annotate_jit = true;
+                options.annotate_kernel = true;
+            }
+            "inline" => options.show_inline = true,
+            "context" => options.show_context = true,
+            opt => panic!("invalid option: {}", opt),
         }
     }
-}
-
-impl fmt::Display for Flag {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        f.write_str(match self {
-            Flag::PID => "pid",
-            Flag::TID => "tid",
-            Flag::KERNEL => "kernel",
-            Flag::JIT => "jit",
-            Flag::ALL => "all",
-            Flag::ADDRS => "addrs",
-        })
-    }
-}
-
-impl Into<Options> for Flag {
-    fn into(self) -> Options {
-        let mut options = Options::default();
-        match self {
-            Flag::PID => {
-                options.include_pid = true;
-            }
-            Flag::TID => {
-                options.include_tid = true;
-            }
-            Flag::KERNEL => {
-                options.annotate_kernel = true;
-            }
-            Flag::JIT => {
-                options.annotate_jit = true;
-            }
-            Flag::ALL => {
-                options.annotate_kernel = true;
-                options.annotate_jit = true;
-            }
-            Flag::ADDRS => {
-                options.include_addrs = true;
-            }
-        };
-
-        options
-    }
+    options
 }

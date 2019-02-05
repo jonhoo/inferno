@@ -1,0 +1,120 @@
+inline_counter 19857 148707.990881:     250000 cpu-clock:uhH: 
+	          401b94 main+0x1c (./tests/data/inline_counter)
+
+inline_counter 19857 148707.991428:     250000 cpu-clock:uhH: 
+	          401b94 main+0x1c (./tests/data/inline_counter)
+
+inline_counter 19857 148707.995794:     250000 cpu-clock:uhH: 
+	          401b94 main+0x1c (./tests/data/inline_counter)
+
+inline_counter 19857 148707.996331:     250000 cpu-clock:uhH: 
+	          401b94 main+0x1c (./tests/data/inline_counter)
+
+inline_counter 19857 148707.999922:     250000 cpu-clock:uhH: 
+	          401b94 main+0x1c (./tests/data/inline_counter)
+
+inline_counter 19857 148708.000997:     250000 cpu-clock:uhH: 
+	          401b94 main+0x1c (./tests/data/inline_counter)
+
+inline_counter 19857 148708.001525:     250000 cpu-clock:uhH: 
+	          401b94 main+0x1c (./tests/data/inline_counter)
+
+inline_counter 19857 148708.004298:     250000 cpu-clock:uhH: 
+	          401b97 main+0x1f (./tests/data/inline_counter)
+
+inline_counter 19857 148708.004842:     250000 cpu-clock:uhH: 
+	          401b97 main+0x1f (./tests/data/inline_counter)
+
+inline_counter 19857 148708.006795:     250000 cpu-clock:uhH: 
+	          401b94 main+0x1c (./tests/data/inline_counter)
+
+inline_counter 19857 148708.007440:     250000 cpu-clock:uhH: 
+	          401b97 main+0x1f (./tests/data/inline_counter)
+
+inline_counter 19857 148708.010614:     250000 cpu-clock:uhH: 
+	          401b94 main+0x1c (./tests/data/inline_counter)
+
+inline_counter 19857 148708.011563:     250000 cpu-clock:uhH: 
+	          401b97 main+0x1f (./tests/data/inline_counter)
+
+inline_counter 19857 148708.011716:     250000 cpu-clock:uhH: 
+	          401b94 main+0x1c (./tests/data/inline_counter)
+
+inline_counter 19857 148708.011979:     250000 cpu-clock:uhH: 
+	          401b97 main+0x1f (./tests/data/inline_counter)
+
+inline_counter 19857 148708.020585:     250000 cpu-clock:uhH: 
+	          401bb0 main+0x38 (./tests/data/inline_counter)
+
+inline_counter 19857 148708.021990:     250000 cpu-clock:uhH: 
+	          401bb0 main+0x38 (./tests/data/inline_counter)
+
+inline_counter 19857 148708.022522:     250000 cpu-clock:uhH: 
+	          401bb0 main+0x38 (./tests/data/inline_counter)
+
+inline_counter 19857 148708.024132:     250000 cpu-clock:uhH: 
+	          401bb3 main+0x3b (./tests/data/inline_counter)
+
+inline_counter 19857 148708.024671:     250000 cpu-clock:uhH: 
+	          401bb0 main+0x38 (./tests/data/inline_counter)
+
+inline_counter 19857 148708.026357:     250000 cpu-clock:uhH: 
+	          401bac main+0x34 (./tests/data/inline_counter)
+
+inline_counter 19857 148708.026505:     250000 cpu-clock:uhH: 
+	          401bb0 main+0x38 (./tests/data/inline_counter)
+
+inline_counter 19857 148708.031091:     250000 cpu-clock:uhH: 
+	          401bac main+0x34 (./tests/data/inline_counter)
+
+inline_counter 19857 148708.033597:     250000 cpu-clock:uhH: 
+	          401bb0 main+0x38 (./tests/data/inline_counter)
+
+inline_counter 19857 148708.039626:     250000 cpu-clock:uhH: 
+	          401bb0 main+0x38 (./tests/data/inline_counter)
+
+inline_counter 19857 148708.041076:     250000 cpu-clock:uhH: 
+	          401bb0 main+0x38 (./tests/data/inline_counter)
+
+inline_counter 19857 148708.041306:     250000 cpu-clock:uhH: 
+	          401bb3 main+0x3b (./tests/data/inline_counter)
+
+inline_counter 19857 148708.044214:     250000 cpu-clock:uhH: 
+	          401b69 not_inlined+0x14 (./tests/data/inline_counter)
+
+inline_counter 19857 148708.044738:     250000 cpu-clock:uhH: 
+	          401b6d not_inlined+0x18 (./tests/data/inline_counter)
+
+inline_counter 19857 148708.048034:     250000 cpu-clock:uhH: 
+	          401b6d not_inlined+0x18 (./tests/data/inline_counter)
+
+inline_counter 19857 148708.051115:     250000 cpu-clock:uhH: 
+	          401b6d not_inlined+0x18 (./tests/data/inline_counter)
+
+inline_counter 19857 148708.051292:     250000 cpu-clock:uhH: 
+	          401b70 not_inlined+0x1b (./tests/data/inline_counter)
+
+inline_counter 19857 148708.051550:     250000 cpu-clock:uhH: 
+	          401b70 not_inlined+0x1b (./tests/data/inline_counter)
+
+inline_counter 19857 148708.054084:     250000 cpu-clock:uhH: 
+	          401b6d not_inlined+0x18 (./tests/data/inline_counter)
+
+inline_counter 19857 148708.054608:     250000 cpu-clock:uhH: 
+	          401b6d not_inlined+0x18 (./tests/data/inline_counter)
+
+inline_counter 19857 148708.061112:     250000 cpu-clock:uhH: 
+	          401b70 not_inlined+0x1b (./tests/data/inline_counter)
+
+inline_counter 19857 148708.063784:     250000 cpu-clock:uhH: 
+	          401b69 not_inlined+0x14 (./tests/data/inline_counter)
+
+inline_counter 19857 148708.064387:     250000 cpu-clock:uhH: 
+	          401b6d not_inlined+0x18 (./tests/data/inline_counter)
+
+inline_counter 19857 148708.064982:     250000 cpu-clock:uhH: 
+	          401b6d not_inlined+0x18 (./tests/data/inline_counter)
+
+inline_counter 19857 148708.065281:     250000 cpu-clock:uhH: 
+	          401b70 not_inlined+0x1b (./tests/data/inline_counter)
+
