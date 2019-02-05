@@ -9,7 +9,6 @@ use str_stack::StrStack;
 
 mod color;
 mod merge;
-mod palettes;
 mod svg;
 pub use color::Palette;
 use svg::StyleOptions;

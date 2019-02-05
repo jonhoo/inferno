@@ -1,4 +1,3 @@
-use crate::flamegraph::palettes;
 use rand::rngs::ThreadRng;
 use rand::Rng;
 use std::collections::HashMap;
@@ -10,6 +9,8 @@ use std::io::BufReader;
 use std::io::Write;
 use std::path::Path;
 use std::str::FromStr;
+
+mod palettes;
 
 pub(super) const VDGREY: &str = "rgb(160,160,160)";
 pub(super) const DGREY: &str = "rgb(200,200,200)";
