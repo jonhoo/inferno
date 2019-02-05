@@ -25,8 +25,12 @@ const BGCOLOR2: &str = "#eeeeb0";
 #[derive(Debug, Default)]
 pub struct Options {}
 
-pub fn from_str<W: Write>(_opt: Options, input: &str, writer: W) -> quick_xml::Result<()> {
-    let (mut frames, time, ignored) = merge::frames(input);
+pub fn from_sorted_lines<'a, I, W>(_opt: Options, lines: I, writer: W) -> quick_xml::Result<()>
+where
+    I: IntoIterator<Item = &'a str>,
+    W: Write,
+{
+    let (mut frames, time, ignored) = merge::frames(lines);
     if ignored != 0 {
         eprintln!("Ignored {} lines with invalid format", ignored);
     }
@@ -167,20 +171,23 @@ pub fn from_str<W: Write>(_opt: Options, input: &str, writer: W) -> quick_xml::R
     Ok(())
 }
 
-pub fn from_reader<R: Read, W: Write>(
-    opt: Options,
-    mut reader: R,
-    writer: W,
-) -> quick_xml::Result<()> {
-    // TODO: technically need to pre-process lines (reverse stacks + sort in case of multi-file)
-    // would also let us only operate on &str
-
+pub fn from_readers<R, W>(opt: Options, readers: R, writer: W) -> quick_xml::Result<()>
+where
+    R: IntoIterator,
+    R::Item: Read,
+    W: Write,
+{
     let mut input = String::new();
-    reader
-        .read_to_string(&mut input)
-        .map_err(quick_xml::Error::Io)?;
+    for mut reader in readers {
+        reader
+            .read_to_string(&mut input)
+            .map_err(quick_xml::Error::Io)?;
+    }
 
-    from_str(opt, &input, writer)
+    let mut lines: Vec<&str> = input.lines().collect();
+    lines.sort_unstable();
+
+    from_sorted_lines(opt, lines, writer)
 }
 
 fn deannotate(f: &str) -> &str {

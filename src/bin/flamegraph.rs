@@ -1,5 +1,7 @@
 use std::fs::File;
 use std::io::{self, BufReader};
+use std::iter;
+use std::path::PathBuf;
 use structopt::StructOpt;
 
 use inferno::flamegraph::{self, Options};
@@ -7,8 +9,9 @@ use inferno::flamegraph::{self, Options};
 #[derive(Debug, StructOpt)]
 #[structopt(name = "inferno-flamegraph", author = "")]
 struct Opt {
-    /// collapsed perf output file, or STDIN if not specified
-    infile: Option<String>,
+    /// collapsed perf output files, or STDIN if not specified
+    #[structopt(name = "INFILE", parse(from_os_str))]
+    infiles: Vec<PathBuf>,
 }
 
 impl Into<Options> for Opt {
@@ -18,21 +21,21 @@ impl Into<Options> for Opt {
 }
 
 fn main() -> quick_xml::Result<()> {
-    let (infile, options) = {
+    let (infiles, options) = {
         let opt = Opt::from_args();
-        (opt.infile.clone(), opt.into())
+        let infiles = opt
+            .infiles
+            .iter()
+            .map(|f| File::open(f).map_err(quick_xml::Error::Io))
+            .collect::<Result<Vec<_>, _>>()?;
+        (infiles, opt.into())
     };
 
-    match infile {
-        Some(ref f) => {
-            let r =
-                BufReader::with_capacity(128 * 1024, File::open(f).map_err(quick_xml::Error::Io)?);
-            flamegraph::from_reader(options, r, io::stdout().lock())
-        }
-        None => {
-            let stdin = io::stdin();
-            let r = BufReader::with_capacity(128 * 1024, stdin.lock());
-            flamegraph::from_reader(options, r, io::stdout().lock())
-        }
+    if infiles.is_empty() {
+        let stdin = io::stdin();
+        let r = BufReader::with_capacity(128 * 1024, stdin.lock());
+        flamegraph::from_readers(options, iter::once(r), io::stdout().lock())
+    } else {
+        flamegraph::from_readers(options, infiles, io::stdout().lock())
     }
 }
