@@ -17,19 +17,9 @@ pub(super) struct TextItem<'a, I> {
 }
 
 pub(super) struct StyleOptions<'a> {
-    imageheight: usize,
-    bgcolor1: &'a str,
-    bgcolor2: &'a str,
-}
-
-impl<'a> StyleOptions<'a> {
-    pub(super) fn new(imageheight: usize, bgcolor1: &'a str, bgcolor2: &'a str) -> Self {
-        StyleOptions {
-            imageheight,
-            bgcolor1,
-            bgcolor2,
-        }
-    }
+    pub(super) imageheight: usize,
+    pub(super) bgcolor1: &'a str,
+    pub(super) bgcolor2: &'a str,
 }
 
 pub(super) fn write_header<W>(svg: &mut Writer<W>, imageheight: usize) -> quick_xml::Result<()>
