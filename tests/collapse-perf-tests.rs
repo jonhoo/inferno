@@ -26,7 +26,7 @@ macro_rules! collapse_perf_tests_inner {
 
             let mut split_name = test_name.split("__");
             let test_file_stem = split_name.next().unwrap().replace("_", "-");
-            let options = split_name.next().map(|s| s.split('_').collect()).unwrap_or(Vec::new());
+            let options: Vec<_> = split_name.next().map(|s| s.split('_').collect()).unwrap_or_default();
 
             let test_file = format!("{}.txt", test_file_stem);
             let result_file = format!("{}-collapsed-{}.txt", test_file_stem, options.join("+"));
