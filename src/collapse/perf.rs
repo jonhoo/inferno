@@ -1,3 +1,4 @@
+use gimli::{EndianRcSlice, RunTimeEndian};
 use smallvec::SmallVec;
 use std::borrow::Cow;
 use std::collections::{HashMap, VecDeque};
