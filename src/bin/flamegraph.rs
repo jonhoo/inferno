@@ -1,5 +1,5 @@
 use std::fs::File;
-use std::io::{self, BufReader};
+use std::io::{self, BufReader, Read};
 use std::path::PathBuf;
 use structopt::StructOpt;
 
@@ -29,12 +29,22 @@ fn main() -> quick_xml::Result<()> {
         let r = File::open(&opt.infiles[0]).map_err(quick_xml::Error::Io)?;
         flamegraph::from_reader(opt.into(), r, io::stdout().lock())
     } else {
-        let r = opt
-            .infiles
-            .iter()
-            .map(|f| File::open(f).map_err(quick_xml::Error::Io))
-            .collect::<Result<Vec<_>, _>>()?;
+        let stdin = io::stdin();
+        let mut stdin_added = false;
+        let mut readers: Vec<Box<Read>> = Vec::with_capacity(opt.infiles.len());
+        for infile in opt.infiles.iter() {
+            if infile.to_str() == Some("-") {
+                if !stdin_added {
+                    let r = BufReader::with_capacity(128 * 1024, stdin.lock());
+                    readers.push(Box::new(r));
+                    stdin_added = true;
+                }
+            } else {
+                let r = File::open(infile).map_err(quick_xml::Error::Io)?;
+                readers.push(Box::new(r));
+            }
+        }
 
-        flamegraph::from_readers(opt.into(), r, io::stdout().lock())
+        flamegraph::from_readers(opt.into(), readers, io::stdout().lock())
     }
 }
