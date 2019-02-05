@@ -74,13 +74,16 @@ fn flow<'a, LI, TI>(
     }
 }
 
-pub(super) fn frames<'a>(input: &'a str) -> (Vec<TimedFrame<'a>>, usize, usize) {
+pub(super) fn frames<'a, I>(lines: I) -> (Vec<TimedFrame<'a>>, usize, usize)
+where
+    I: IntoIterator<Item = &'a str>,
+{
     let mut time = 0;
     let mut ignored = 0;
     let mut last = "";
     let mut tmp = Default::default();
     let mut frames = Default::default();
-    for line in input.lines() {
+    for line in lines {
         let mut line = line.trim();
         if line.is_empty() {
             continue;

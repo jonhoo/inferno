@@ -1,5 +1,6 @@
 use std::fs::File;
-use std::io::{self, BufReader};
+use std::io::{self, BufReader, Read};
+use std::path::PathBuf;
 use structopt::StructOpt;
 
 use inferno::flamegraph::{self, Options};
@@ -7,8 +8,9 @@ use inferno::flamegraph::{self, Options};
 #[derive(Debug, StructOpt)]
 #[structopt(name = "inferno-flamegraph", author = "")]
 struct Opt {
-    /// collapsed perf output file, or STDIN if not specified
-    infile: Option<String>,
+    /// Collapsed perf output files. With no INFILE, or INFILE is -, read STDIN.
+    #[structopt(name = "INFILE", parse(from_os_str))]
+    infiles: Vec<PathBuf>,
 }
 
 impl Into<Options> for Opt {
@@ -18,21 +20,31 @@ impl Into<Options> for Opt {
 }
 
 fn main() -> quick_xml::Result<()> {
-    let (infile, options) = {
-        let opt = Opt::from_args();
-        (opt.infile.clone(), opt.into())
-    };
+    let opt = Opt::from_args();
+    if opt.infiles.is_empty() || opt.infiles.len() == 1 && opt.infiles[0].to_str() == Some("-") {
+        let stdin = io::stdin();
+        let r = BufReader::with_capacity(128 * 1024, stdin.lock());
+        flamegraph::from_reader(opt.into(), r, io::stdout().lock())
+    } else if opt.infiles.len() == 1 {
+        let r = File::open(&opt.infiles[0]).map_err(quick_xml::Error::Io)?;
+        flamegraph::from_reader(opt.into(), r, io::stdout().lock())
+    } else {
+        let stdin = io::stdin();
+        let mut stdin_added = false;
+        let mut readers: Vec<Box<Read>> = Vec::with_capacity(opt.infiles.len());
+        for infile in opt.infiles.iter() {
+            if infile.to_str() == Some("-") {
+                if !stdin_added {
+                    let r = BufReader::with_capacity(128 * 1024, stdin.lock());
+                    readers.push(Box::new(r));
+                    stdin_added = true;
+                }
+            } else {
+                let r = File::open(infile).map_err(quick_xml::Error::Io)?;
+                readers.push(Box::new(r));
+            }
+        }
 
-    match infile {
-        Some(ref f) => {
-            let r =
-                BufReader::with_capacity(128 * 1024, File::open(f).map_err(quick_xml::Error::Io)?);
-            flamegraph::from_reader(options, r, io::stdout().lock())
-        }
-        None => {
-            let stdin = io::stdin();
-            let r = BufReader::with_capacity(128 * 1024, stdin.lock());
-            flamegraph::from_reader(options, r, io::stdout().lock())
-        }
+        flamegraph::from_readers(opt.into(), readers, io::stdout().lock())
     }
 }
