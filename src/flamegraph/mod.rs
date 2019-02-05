@@ -28,13 +28,13 @@ pub struct Options {}
 pub fn from_str<W: Write>(_opt: Options, input: &str, writer: W) -> quick_xml::Result<()> {
     let (mut frames, time, ignored) = merge::frames(input);
     if ignored != 0 {
-        eprintln!("Ignored {} lines with invalid format", ignored);
+        warn!("Ignored {} lines with invalid format", ignored);
     }
 
     // let's start writing the svg!
     let mut svg = Writer::new(writer);
     if time == 0 {
-        eprintln!("ERROR: No stack counts found");
+        warn!("ERROR: No stack counts found");
         // emit an error message SVG, for tools automating flamegraph use
         let imageheight = FONTSIZE * 5;
         svg::write_header(&mut svg, imageheight)?;
