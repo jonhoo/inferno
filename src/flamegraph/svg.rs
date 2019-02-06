@@ -3,15 +3,40 @@ use quick_xml::{
     events::{BytesEnd, BytesStart, BytesText, Event},
     Writer,
 };
+use std::borrow::Cow;
 use std::io::prelude::*;
 use std::iter;
+use str_stack::StrStack;
+
+pub(super) enum TextArgument<'a> {
+    String(Cow<'a, str>),
+    FromBuffer(usize),
+}
+
+impl<'a> From<&'a str> for TextArgument<'a> {
+    fn from(s: &'a str) -> Self {
+        TextArgument::String(Cow::from(s))
+    }
+}
+
+impl<'a> From<String> for TextArgument<'a> {
+    fn from(s: String) -> Self {
+        TextArgument::String(Cow::from(s))
+    }
+}
+
+impl<'a> From<usize> for TextArgument<'a> {
+    fn from(i: usize) -> Self {
+        TextArgument::FromBuffer(i)
+    }
+}
 
 pub(super) struct TextItem<'a, I> {
     pub(super) color: &'a str,
     pub(super) size: usize,
     pub(super) x: f64,
     pub(super) y: f64,
-    pub(super) text: &'a str,
+    pub(super) text: TextArgument<'a>,
     pub(super) location: Option<&'a str>,
     pub(super) extra: I,
 }
@@ -105,14 +130,17 @@ var searchcolor = 'rgb(230,0,230)';",
         ]),
     ))?;
 
+    // We don't care too much about allocating just for the prelude
+    let mut buf = StrStack::new();
     write_str(
         svg,
+        &mut buf,
         TextItem {
             color: "rgb(0, 0, 0)",
             size: super::FONTSIZE + 5,
             x: (super::IMAGEWIDTH / 2) as f64,
             y: (super::FONTSIZE * 2) as f64,
-            text: "Flame Graph",
+            text: "Flame Graph".into(),
             location: Some("middle"),
             extra: None,
         },
@@ -120,12 +148,13 @@ var searchcolor = 'rgb(230,0,230)';",
 
     write_str(
         svg,
+        &mut buf,
         TextItem {
             color: "rgb(0, 0, 0)",
             size: super::FONTSIZE,
             x: super::XPAD as f64,
             y: (imageheight - (super::YPAD2 / 2)) as f64,
-            text: " ",
+            text: " ".into(),
             location: None,
             extra: iter::once(("id", "details")),
         },
@@ -133,12 +162,13 @@ var searchcolor = 'rgb(230,0,230)';",
 
     write_str(
         svg,
+        &mut buf,
         TextItem {
             color: "rgb(0, 0, 0)",
             size: super::FONTSIZE,
             x: super::XPAD as f64,
             y: (super::FONTSIZE * 2) as f64,
-            text: "Reset Zoom",
+            text: "Reset Zoom".into(),
             location: None,
             extra: vec![
                 ("id", "unzoom"),
@@ -150,12 +180,13 @@ var searchcolor = 'rgb(230,0,230)';",
 
     write_str(
         svg,
+        &mut buf,
         TextItem {
             color: "rgb(0, 0, 0)",
             size: super::FONTSIZE,
             x: (super::IMAGEWIDTH - super::XPAD - 100) as f64,
             y: (super::FONTSIZE * 2) as f64,
-            text: "Search",
+            text: "Search".into(),
             location: None,
             extra: vec![
                 ("id", "search"),
@@ -169,12 +200,13 @@ var searchcolor = 'rgb(230,0,230)';",
 
     write_str(
         svg,
+        &mut buf,
         TextItem {
             color: "rgb(0, 0, 0)",
             size: super::FONTSIZE,
             x: (super::IMAGEWIDTH - super::XPAD - 100) as f64,
             y: (imageheight - (super::YPAD2 / 2)) as f64,
-            text: " ",
+            text: " ".into(),
             location: None,
             extra: iter::once(("id", "matched")),
         },
@@ -185,12 +217,16 @@ var searchcolor = 'rgb(230,0,230)';",
 
 pub(super) fn write_str<'a, W, I>(
     svg: &mut Writer<W>,
+    buf: &mut StrStack,
     item: TextItem<'a, I>,
 ) -> quick_xml::Result<()>
 where
     W: Write,
     I: IntoIterator<Item = (&'a str, &'a str)>,
 {
+    let x = write!(buf, "{:.2}", item.x);
+    let y = write!(buf, "{:.2}", item.y);
+    let fs = write!(buf, "{}", item.size);
     let mut text = BytesStart::borrowed_name(b"text").with_attributes(item.extra);
     text.push_attribute(Attribute::from((
         "text-anchor",
@@ -198,20 +234,24 @@ where
     )));
     text.push_attribute(Attribute {
         key: b"x",
-        value: Vec::from(format!("{:.2}", item.x)).into(),
+        value: Cow::from(buf[x].as_bytes()),
     });
     text.push_attribute(Attribute {
         key: b"y",
-        value: Vec::from(format!("{:.2}", item.y)).into(),
+        value: Cow::from(buf[y].as_bytes()),
     });
     text.push_attribute(Attribute {
         key: b"font-size",
-        value: Vec::from(item.size.to_string()).into(),
+        value: Cow::from(buf[fs].as_bytes()),
     });
     text.push_attribute(Attribute::from(("font-family", "Verdana")));
     text.push_attribute(Attribute::from(("fill", item.color)));
     svg.write_event(Event::Start(text))?;
-    svg.write_event(Event::Text(BytesText::from_plain_str(item.text)))?;
+    let s = match item.text {
+        TextArgument::String(ref s) => &*s,
+        TextArgument::FromBuffer(i) => &buf[i],
+    };
+    svg.write_event(Event::Text(BytesText::from_plain_str(s)))?;
     svg.write_event(Event::End(BytesEnd::borrowed(b"text")))?;
     Ok(())
 }
