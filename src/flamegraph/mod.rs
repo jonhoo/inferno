@@ -174,7 +174,7 @@ where
                 size: FONTSIZE,
                 x: x1 as f64 + 3.0,
                 y: 3.0 + (y1 + y2) as f64 / 2.0,
-                text: text,
+                text,
                 location: None,
                 extra: None,
             },
