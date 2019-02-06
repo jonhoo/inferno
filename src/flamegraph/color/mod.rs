@@ -1,13 +1,11 @@
 use rand::rngs::ThreadRng;
 use rand::Rng;
-use std::collections::HashMap;
 use std::str::FromStr;
 
 mod palette_map;
 mod palettes;
 
-pub(super) use palette_map::read_palette;
-pub(super) use palette_map::write_palette;
+pub(super) use palette_map::PaletteMap;
 
 pub(super) const VDGREY: &str = "rgb(160,160,160)";
 pub(super) const DGREY: &str = "rgb(200,200,200)";
@@ -150,18 +148,6 @@ fn color_from_palette(palette: Palette, name: &str, v1: f32, v2: f32, v3: f32) -
     let (red, green, blue) = rgb_components_for_palette(palette, name, v1, v2, v3);
 
     format!("rgb({},{},{})", red, green, blue)
-}
-
-pub(super) fn color_map<'a>(
-    palette: Palette,
-    hash: bool,
-    name: &'a str,
-    palette_map: &'a mut HashMap<String, String>,
-    thread_rng: &mut ThreadRng,
-) -> &'a str {
-    palette_map
-        .entry(name.to_string())
-        .or_insert_with(|| color(palette, hash, name, thread_rng))
 }
 
 pub(super) fn color(
