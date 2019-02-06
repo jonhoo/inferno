@@ -33,7 +33,7 @@ pub struct Options {
 
 pub fn from_str<W: Write>(opt: Options, input: &str, writer: W) -> quick_xml::Result<()> {
     let mut palette_map = if opt.consistent_palette {
-        Some(color::read_palette(PALETTE_FILE).map_err(quick_xml::Error::Io)?)
+        Some(color::PaletteMap::load(PALETTE_FILE).map_err(quick_xml::Error::Io)?)
     } else {
         None
     };
@@ -144,13 +144,9 @@ pub fn from_str<W: Write>(opt: Options, input: &str, writer: W) -> quick_xml::Re
         } else if frame.location.function == "-" {
             filled_rectangle(&mut svg, x1, x2, y1, y2, color::DGREY)?;
         } else if let Some(ref mut palette_map) = palette_map {
-            let color = color::color_map(
-                opt.colors,
-                opt.hash,
-                &frame.location.function,
-                palette_map,
-                &mut thread_rng,
-            );
+            let color = palette_map.find_color_for(&frame.location.function, |name| {
+                color::color(opt.colors, opt.hash, name, &mut thread_rng)
+            });
             filled_rectangle(&mut svg, x1, x2, y1, y2, color)?;
         } else {
             let color = color::color(
@@ -203,7 +199,9 @@ pub fn from_str<W: Write>(opt: Options, input: &str, writer: W) -> quick_xml::Re
     svg.write_event(Event::Eof)?;
 
     if let Some(palette_map) = palette_map {
-        color::write_palette(PALETTE_FILE, palette_map).map_err(quick_xml::Error::Io)?;
+        palette_map
+            .save(PALETTE_FILE)
+            .map_err(quick_xml::Error::Io)?;
     }
 
     Ok(())
