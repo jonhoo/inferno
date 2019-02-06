@@ -3,9 +3,9 @@ use quick_xml::{
     events::{BytesEnd, BytesStart, BytesText, Event},
     Writer,
 };
-use std::borrow::Cow;
 use std::io;
 use std::io::prelude::*;
+use str_stack::StrStack;
 
 mod merge;
 mod svg;
@@ -25,11 +25,28 @@ const BGCOLOR2: &str = "#eeeeb0";
 #[derive(Debug, Default)]
 pub struct Options {}
 
+#[macro_export]
+macro_rules! buf_write {
+    ($buf:ident, $fmt:expr, $($args:tt)*) => {{
+        use std::fmt::Write;
+        let mut w = $buf.writer();
+        write!(w, $fmt, $($args)*).expect("writing to string shouldn't fail");
+        w.finish()
+    }}
+}
+
+macro_rules! args {
+    ($($key:expr => $value:expr),*) => {{
+        [$(($key, $value),)*].into_iter().map(|(k, v): &(&str, &str)| (*k, *v))
+    }};
+}
+
 pub fn from_sorted_lines<'a, I, W>(_opt: Options, lines: I, writer: W) -> quick_xml::Result<()>
 where
     I: IntoIterator<Item = &'a str>,
     W: Write,
 {
+    let mut buffer = StrStack::new();
     let (mut frames, time, ignored) = merge::frames(lines);
     if ignored != 0 {
         warn!("Ignored {} lines with invalid format", ignored);
@@ -44,12 +61,13 @@ where
         svg::write_header(&mut svg, imageheight)?;
         svg::write_str(
             &mut svg,
+            &mut buffer,
             svg::TextItem {
                 color: "black",
                 size: FONTSIZE + 2,
                 x: (IMAGEWIDTH / 2) as f64,
                 y: (FONTSIZE * 2) as f64,
-                text: "ERROR: No valid input provided to flamegraph",
+                text: "ERROR: No valid input provided to flamegraph".into(),
                 location: Some("middle"),
                 extra: None,
             },
@@ -93,12 +111,13 @@ where
         let samples_txt = samples.thousands_sep();
 
         let info = if frame.location.function.is_empty() && frame.location.depth == 0 {
-            format!("all ({} samples, 100%)", samples_txt)
+            buf_write!(buffer, "all ({} samples, 100%)", samples_txt)
         } else {
             let pct = (100 * samples) as f64 / timemax as f64;
 
             // strip any annotation
-            format!(
+            buf_write!(
+                buffer,
                 "{} ({} samples, {:.2}%)",
                 deannotate(&frame.location.function),
                 samples_txt,
@@ -107,62 +126,71 @@ where
         };
 
         svg.write_event(Event::Start(
-            BytesStart::borrowed_name(b"g").with_attributes(vec![
-                ("class", "func_g"),
-                ("onmouseover", "s(this)"),
-                ("onmouseout", "c()"),
-                ("onclick", "zoom(this)"),
-            ]),
+            BytesStart::borrowed_name(b"g").with_attributes(args!(
+                "class" => "func_g",
+                "onmouseover" => "s(this)",
+                "onmouseout" => "c()",
+                "onclick" => "zoom(this)"
+            )),
         ))?;
         svg.write_event(Event::Start(BytesStart::borrowed_name(b"title")))?;
-        svg.write_event(Event::Text(BytesText::from_plain_str(&*info)))?;
+        svg.write_event(Event::Text(BytesText::from_plain_str(&buffer[info])))?;
         svg.write_event(Event::End(BytesEnd::borrowed(b"title")))?;
 
         let color = "rgb(242,10,32)";
+        let x = buf_write!(buffer, "{}", x1);
+        let y = buf_write!(buffer, "{}", y1);
+        let width = buf_write!(buffer, "{}", x2 - x1);
+        let height = buf_write!(buffer, "{}", y2 - y1);
         svg.write_event(Event::Empty(
-            BytesStart::borrowed_name(b"rect").with_attributes(vec![
-                ("x", &*format!("{}", x1)),
-                ("y", &*format!("{}", y1)),
-                ("width", &*format!("{}", x2 - x1)),
-                ("height", &*format!("{}", y2 - y1)),
-                ("fill", color),
-            ]),
+            BytesStart::borrowed_name(b"rect").with_attributes(args!(
+                "x" => &buffer[x],
+                "y" => &buffer[y],
+                "width" => &buffer[width],
+                "height" => &buffer[height],
+                "fill" => color
+            )),
         ))?;
 
         let fitchars = ((x2 - x1) as f64 / (FONTSIZE as f64 * FONTWIDTH)).trunc() as usize;
-        let text = if fitchars >= 3 {
+        let text: svg::TextArgument = if fitchars >= 3 {
             // room for one char plus two dots
             let f = deannotate(&frame.location.function);
 
             // TODO: use Unicode grapheme clusters instead
             if f.len() < fitchars {
                 // no need to truncate
-                Cow::from(f)
+                f.into()
             } else {
                 // need to truncate :'(
-                let mut s = String::with_capacity(fitchars);
-                s.extend(f.chars().take(fitchars - 2));
-                s.push_str("..");
-                Cow::from(s)
+                use std::fmt::Write;
+                let mut w = buffer.writer();
+                for c in f.chars().take(fitchars - 2) {
+                    w.write_char(c).expect("writing to buffer shouldn't fail");
+                }
+                w.write_str("..").expect("writing to buffer shouldn't fail");
+                w.finish().into()
             }
         } else {
             // don't show the function name
-            Cow::from("")
+            "".into()
         };
 
         svg::write_str(
             &mut svg,
+            &mut buffer,
             svg::TextItem {
                 color: "rgb(0, 0, 0)",
                 size: FONTSIZE,
                 x: x1 as f64 + 3.0,
                 y: 3.0 + (y1 + y2) as f64 / 2.0,
-                text: &*text,
+                text: text,
                 location: None,
                 extra: None,
             },
         )?;
 
+        buffer.clear();
         svg.write_event(Event::End(BytesEnd::borrowed(b"g")))?;
     }
 
