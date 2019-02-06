@@ -119,23 +119,21 @@ fn namehash<I: Iterator<Item = u8>>(mut name: I) -> f32 {
     // If the computation finishes normally, we search for the first next '`'.
     // After that, either we have found a '`' (end of prefix), and we need to compute the hash from there,
     // or there is no '`' in the iterator and we have the hash computed!
+    // In the Perl implementation, the hash was computed while `modulo > 12`, which means 3 iterations
+    // maximum because modulo is initialized at 10.
 
     match name.next() {
         None => return namehash_variables.result(),
         Some(first_char) => namehash_variables.update(first_char),
     }
 
-    for character in name.by_ref() {
+    for character in name.by_ref().take(3) {
         if character == b'`' {
             module_name_found = true;
             break;
         }
 
         namehash_variables.update(character);
-
-        if namehash_variables.modulo > 12 {
-            break;
-        }
     }
 
     module_name_found = module_name_found || name.any(|c| c == b'`');
