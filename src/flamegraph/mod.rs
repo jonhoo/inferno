@@ -25,16 +25,6 @@ const BGCOLOR2: &str = "#eeeeb0";
 #[derive(Debug, Default)]
 pub struct Options {}
 
-#[macro_export]
-macro_rules! buf_write {
-    ($buf:ident, $fmt:expr, $($args:tt)*) => {{
-        use std::fmt::Write;
-        let mut w = $buf.writer();
-        write!(w, $fmt, $($args)*).expect("writing to string shouldn't fail");
-        w.finish()
-    }}
-}
-
 macro_rules! args {
     ($($key:expr => $value:expr),*) => {{
         [$(($key, $value),)*].into_iter().map(|(k, v): &(&str, &str)| (*k, *v))
@@ -111,12 +101,12 @@ where
         let samples_txt = samples.thousands_sep();
 
         let info = if frame.location.function.is_empty() && frame.location.depth == 0 {
-            buf_write!(buffer, "all ({} samples, 100%)", samples_txt)
+            write!(buffer, "all ({} samples, 100%)", samples_txt)
         } else {
             let pct = (100 * samples) as f64 / timemax as f64;
 
             // strip any annotation
-            buf_write!(
+            write!(
                 buffer,
                 "{} ({} samples, {:.2}%)",
                 deannotate(&frame.location.function),
@@ -138,10 +128,10 @@ where
         svg.write_event(Event::End(BytesEnd::borrowed(b"title")))?;
 
         let color = "rgb(242,10,32)";
-        let x = buf_write!(buffer, "{}", x1);
-        let y = buf_write!(buffer, "{}", y1);
-        let width = buf_write!(buffer, "{}", x2 - x1);
-        let height = buf_write!(buffer, "{}", y2 - y1);
+        let x = write!(buffer, "{}", x1);
+        let y = write!(buffer, "{}", y1);
+        let width = write!(buffer, "{}", x2 - x1);
+        let height = write!(buffer, "{}", y2 - y1);
         svg.write_event(Event::Empty(
             BytesStart::borrowed_name(b"rect").with_attributes(args!(
                 "x" => &buffer[x],

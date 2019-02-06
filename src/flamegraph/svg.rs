@@ -1,4 +1,3 @@
-use crate::buf_write;
 use quick_xml::{
     events::attributes::Attribute,
     events::{BytesEnd, BytesStart, BytesText, Event},
@@ -225,9 +224,9 @@ where
     W: Write,
     I: IntoIterator<Item = (&'a str, &'a str)>,
 {
-    let x = buf_write!(buf, "{:.2}", item.x);
-    let y = buf_write!(buf, "{:.2}", item.y);
-    let fs = buf_write!(buf, "{}", item.size);
+    let x = write!(buf, "{:.2}", item.x);
+    let y = write!(buf, "{:.2}", item.y);
+    let fs = write!(buf, "{}", item.size);
     let mut text = BytesStart::borrowed_name(b"text").with_attributes(item.extra);
     text.push_attribute(Attribute::from((
         "text-anchor",
