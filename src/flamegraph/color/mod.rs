@@ -72,41 +72,83 @@ impl FromStr for Palette {
     }
 }
 
+struct NamehashVariables {
+    vector: f32,
+    weight: f32,
+    max: f32,
+    modulo: u8,
+}
+
+impl NamehashVariables {
+    fn init() -> Self {
+        NamehashVariables {
+            vector: 0.0,
+            weight: 1.0,
+            max: 1.0,
+            modulo: 10,
+        }
+    }
+
+    fn update(&mut self, character: u8) {
+        let i = f32::from(character % self.modulo);
+        self.vector += (i / f32::from(self.modulo - 1)) * self.weight;
+        self.modulo += 1;
+        self.max += self.weight;
+        self.weight *= 0.70;
+    }
+
+    fn result(&self) -> f32 {
+        (1.0 - self.vector / self.max)
+    }
+}
+
 /// Generate a vector hash for the name string, weighting early over
 /// later characters. We want to pick the same colors for function
 /// names across different flame graphs.
-fn namehash(name: &str) -> f32 {
-    let mut vector = 0.0;
-    let mut weight = 1.0;
-    let mut max = 1.0;
-    let mut modulo = 10;
+fn namehash<I: Iterator<Item = u8>>(mut name: I) -> f32 {
+    let mut namehash_variables = NamehashVariables::init();
+    let mut module_name_found = false;
 
-    let name = {
-        let looking_for_module_name = if name.starts_with('`') {
-            &name[1..]
-        } else {
-            name
-        };
+    // The original Perl regex is: $name =~ s/.(.*?)`//;
+    // Ie. we want to remove everything before the first '`'. If '`' is the first character,
+    // we remove everything before the second '`'. If there is no '`', we keep everything.
+    // This becomes tricky because we want to compute the hash and do the potential deletion
+    // ine one pass only.
+    // So, we start computing the hash and we check for '`' after the first character.
+    // If we find '`' before the end of the computation (3 characters), we stop the computation.
+    // If the computation finishes normally, we search for the first next '`'.
+    // After that, either we have found a '`' (end of prefix), and we need to compute the hash from there,
+    // or there is no '`' in the iterator and we have the hash computed!
 
-        if let Some(index) = looking_for_module_name.find('`') {
-            &looking_for_module_name[index + 1..]
-        } else {
-            name
-        }
-    };
-
-    // The Perl implementation does a check for modulo > 12,
-    // but that's equivalent to just iterating over the first three characters
-    // (as long as modulo starts equal to 10)
-    for character in name.bytes().take(3) {
-        let i = f32::from(character % modulo);
-        vector += (i / f32::from(modulo - 1)) * weight;
-        modulo += 1;
-        max += weight;
-        weight *= 0.70;
+    match name.next() {
+        None => return namehash_variables.result(),
+        Some(first_char) => namehash_variables.update(first_char),
     }
 
-    (1.0 - vector / max)
+    for character in name.by_ref() {
+        if character == b'`' {
+            module_name_found = true;
+            break;
+        }
+
+        namehash_variables.update(character);
+
+        if namehash_variables.modulo > 12 {
+            break;
+        }
+    }
+
+    module_name_found = module_name_found || name.any(|c| c == b'`');
+
+    if module_name_found {
+        namehash_variables = NamehashVariables::init();
+
+        for character in name.take(3) {
+            namehash_variables.update(character)
+        }
+    }
+
+    namehash_variables.result()
 }
 
 macro_rules! t {
@@ -157,8 +199,8 @@ pub(super) fn color(
     thread_rng: &mut ThreadRng,
 ) -> String {
     let (v1, v2, v3) = if hash {
-        let name_hash = namehash(name);
-        let reverse_name_hash = namehash(&name.chars().rev().collect::<String>());
+        let name_hash = namehash(name.bytes());
+        let reverse_name_hash = namehash(name.bytes().rev());
 
         (name_hash, reverse_name_hash, reverse_name_hash)
     } else {
