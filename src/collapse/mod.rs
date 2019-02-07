@@ -15,12 +15,21 @@ pub mod guess;
 ///   [crate-level documentation]: ../../index.html
 pub mod perf;
 
+/// Stack collapsing for the output of [`Xdebug`](https://xdebug.org/docs/execution_trace).
+///
+/// See the [crate-level documentation] for details.
+///
+///   [crate-level documentation]: ../../index.html
+pub mod xdebug;
+
 /// Stack collapsing for the output of [`sample`](https://gist.github.com/loderunner/36724cc9ee8db66db305#profiling-with-sample) on macOS.
 ///
 /// See the [crate-level documentation] for details.
 ///
 ///   [crate-level documentation]: ../../index.html
+
 pub mod sample;
+
 
 pub(crate) mod common;
 
