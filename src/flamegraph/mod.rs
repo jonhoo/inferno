@@ -1,14 +1,15 @@
-use pretty_toa::ThousandsSep;
+mod merge;
+mod svg;
+
+use std::io;
+use std::io::prelude::*;
+
+use num_format::Locale;
 use quick_xml::{
     events::{BytesEnd, BytesStart, BytesText, Event},
     Writer,
 };
-use std::io;
-use std::io::prelude::*;
 use str_stack::StrStack;
-
-mod merge;
-mod svg;
 
 const IMAGEWIDTH: usize = 1200; // max width, pixels
 const FRAMEHEIGHT: usize = 16; // max height is dynamic
@@ -98,7 +99,11 @@ where
         let y2 = imageheight - YPAD2 - frame.location.depth * FRAMEHEIGHT;
 
         let samples = frame.end_time - frame.start_time;
-        let samples_txt = samples.thousands_sep();
+
+        // add thousands separators to `samples`
+        let mut b = num_format::Buffer::default();
+        let _ = b.write_formatted(&samples, &Locale::en);
+        let samples_txt = b.as_str();
 
         let info = if frame.location.function.is_empty() && frame.location.depth == 0 {
             write!(buffer, "all ({} samples, 100%)", samples_txt)
