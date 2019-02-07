@@ -92,6 +92,7 @@ where
     svg::write_prelude(&mut svg, imageheight)?;
 
     // draw frames
+    let mut samples_txt_buffer = num_format::Buffer::default();
     for frame in frames {
         let x1 = XPAD + (frame.start_time as f64 * widthpertime) as usize;
         let x2 = XPAD + (frame.end_time as f64 * widthpertime) as usize;
@@ -101,9 +102,8 @@ where
         let samples = frame.end_time - frame.start_time;
 
         // add thousands separators to `samples`
-        let mut b = num_format::Buffer::default();
-        let _ = b.write_formatted(&samples, &Locale::en);
-        let samples_txt = b.as_str();
+        let _ = samples_txt_buffer.write_formatted(&samples, &Locale::en);
+        let samples_txt = samples_txt_buffer.as_str();
 
         let info = if frame.location.function.is_empty() && frame.location.depth == 0 {
             write!(buffer, "all ({} samples, 100%)", samples_txt)
