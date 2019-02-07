@@ -30,12 +30,7 @@ log = "0.4"
 quick-xml = "0.13"
 pretty_toa = "1.0.0"
 str_stack = "0.1"
-
-# When a new version of addr2line with this revision
-# is released on crates.io, we can switch to that.
-[dependencies.addr2line]
-git = "https://github.com/gimli-rs/addr2line"
-rev = "78f436b9c63b19803a9f5d162ba0b785f5ef6636"
+addr2line = "0.8"
 
 [dev-dependencies]
 pretty_assertions = "0.5"
