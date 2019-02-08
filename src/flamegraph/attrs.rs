@@ -30,38 +30,38 @@ impl FuncFrameAttrsMap {
             }
 
             let mut line = line.trim().splitn(2, '\t');
-            if let Some(func) = line.next() {
-                if !func.is_empty() {
-                    let funcattrs = funcattr_map.0.entry(func.to_string()).or_default();
-                    if let Some(namevals) = line.next() {
-                        for nameval in namevals.split('\t') {
-                            let mut nameval = nameval.splitn(2, '=');
-                            if let Some(name) = nameval.next() {
-                                if !name.is_empty() {
-                                    if let Some(value) = nameval.next() {
-                                        let value = value.to_string();
-                                        match name {
-                                            "title" => funcattrs.title = Some(value),
-                                            "class" => funcattrs.g.class = Some(value),
-                                            "style" => funcattrs.g.style = Some(value),
-                                            "onmouseover" => funcattrs.g.onmouseover = Some(value),
-                                            "onmouseout" => funcattrs.g.onmouseout = Some(value),
-                                            "onclick" => funcattrs.g.onclick = Some(value),
-                                            "href" => funcattrs.a.href = Some(value),
-                                            "target" => funcattrs.a.target = Some(value),
-                                            "g_extra" => {
-                                                parse_extra_attrs(&mut funcattrs.g.extra, &value)
-                                            }
-                                            "a_extra" => {
-                                                parse_extra_attrs(&mut funcattrs.a.extra, &value)
-                                            }
-                                            _ => warn!(
-                                                "invalid attribute {} found for {}",
-                                                name, func
-                                            ),
-                                        }
-                                    }
-                                }
+
+            let func = if let Some(f) = line.next() {
+                f
+            } else {
+                continue;
+            };
+
+            if func.is_empty() {
+                continue;
+            }
+            let funcattrs = funcattr_map.0.entry(func.to_string()).or_default();
+            if let Some(namevals) = line.next() {
+                for nameval in namevals.split('\t') {
+                    let mut nameval = nameval.splitn(2, '=');
+                    if let Some(name) = nameval.next() {
+                        if name.is_empty() {
+                            continue;
+                        }
+                        if let Some(value) = nameval.next() {
+                            let value = value.to_string();
+                            match name {
+                                "title" => funcattrs.title = Some(value),
+                                "class" => funcattrs.g.class = Some(value),
+                                "style" => funcattrs.g.style = Some(value),
+                                "onmouseover" => funcattrs.g.onmouseover = Some(value),
+                                "onmouseout" => funcattrs.g.onmouseout = Some(value),
+                                "onclick" => funcattrs.g.onclick = Some(value),
+                                "href" => funcattrs.a.href = Some(value),
+                                "target" => funcattrs.a.target = Some(value),
+                                "g_extra" => parse_extra_attrs(&mut funcattrs.g.extra, &value),
+                                "a_extra" => parse_extra_attrs(&mut funcattrs.a.extra, &value),
+                                _ => warn!("invalid attribute {} found for {}", name, func),
                             }
                         }
                     }
