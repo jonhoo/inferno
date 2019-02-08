@@ -3,6 +3,16 @@ use std::fs::File;
 use std::io::{self, BufRead, BufReader};
 use std::path::PathBuf;
 
+macro_rules! unwrap_or_continue {
+    ($e:expr) => {{
+        if let Some(x) = $e {
+            x
+        } else {
+            continue;
+        }
+    }};
+}
+
 /// Provides a way to customize the attributes on the SVG elements for a frame.
 #[derive(PartialEq, Eq, Debug, Default)]
 pub struct FuncFrameAttrsMap(HashMap<String, FrameAttrs>);
@@ -30,41 +40,31 @@ impl FuncFrameAttrsMap {
             }
 
             let mut line = line.trim().splitn(2, '\t');
-
-            let func = if let Some(f) = line.next() {
-                f
-            } else {
-                continue;
-            };
-
+            let func = unwrap_or_continue!(line.next());
             if func.is_empty() {
                 continue;
             }
             let funcattrs = funcattr_map.0.entry(func.to_string()).or_default();
-            if let Some(namevals) = line.next() {
-                for nameval in namevals.split('\t') {
-                    let mut nameval = nameval.splitn(2, '=');
-                    if let Some(name) = nameval.next() {
-                        if name.is_empty() {
-                            continue;
-                        }
-                        if let Some(value) = nameval.next() {
-                            let value = value.to_string();
-                            match name {
-                                "title" => funcattrs.title = Some(value),
-                                "class" => funcattrs.g.class = Some(value),
-                                "style" => funcattrs.g.style = Some(value),
-                                "onmouseover" => funcattrs.g.onmouseover = Some(value),
-                                "onmouseout" => funcattrs.g.onmouseout = Some(value),
-                                "onclick" => funcattrs.g.onclick = Some(value),
-                                "href" => funcattrs.a.href = Some(value),
-                                "target" => funcattrs.a.target = Some(value),
-                                "g_extra" => parse_extra_attrs(&mut funcattrs.g.extra, &value),
-                                "a_extra" => parse_extra_attrs(&mut funcattrs.a.extra, &value),
-                                _ => warn!("invalid attribute {} found for {}", name, func),
-                            }
-                        }
-                    }
+            let namevals = unwrap_or_continue!(line.next());
+            for nameval in namevals.split('\t') {
+                let mut nameval = nameval.splitn(2, '=');
+                let name = unwrap_or_continue!(nameval.next());
+                if name.is_empty() {
+                    continue;
+                }
+                let value = unwrap_or_continue!(nameval.next()).to_string();
+                match name {
+                    "title" => funcattrs.title = Some(value),
+                    "class" => funcattrs.g.class = Some(value),
+                    "style" => funcattrs.g.style = Some(value),
+                    "onmouseover" => funcattrs.g.onmouseover = Some(value),
+                    "onmouseout" => funcattrs.g.onmouseout = Some(value),
+                    "onclick" => funcattrs.g.onclick = Some(value),
+                    "href" => funcattrs.a.href = Some(value),
+                    "target" => funcattrs.a.target = Some(value),
+                    "g_extra" => parse_extra_attrs(&mut funcattrs.g.extra, &value),
+                    "a_extra" => parse_extra_attrs(&mut funcattrs.a.extra, &value),
+                    _ => warn!("invalid attribute {} found for {}", name, func),
                 }
             }
         }
