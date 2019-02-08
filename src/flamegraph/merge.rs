@@ -36,8 +36,8 @@ fn flow<'a, LI, TI>(
         }
 
         // move along prefix iterators
-        let _ = last.next();
-        let _ = this.next();
+        last.next();
+        this.next();
         shared_depth += 1;
     }
 
