@@ -117,6 +117,8 @@ pub struct GElementAttrs {
 pub struct AElementAttrs {
     /// If set to None the `a` tag will not be added
     pub href: Option<String>,
+
+    /// Defaults to "_top"
     pub target: Option<String>,
 
     /// Extra attributes to include
