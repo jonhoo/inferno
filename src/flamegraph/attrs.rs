@@ -126,13 +126,7 @@ pub struct AElementAttrs {
 }
 
 fn parse_extra_attrs(attrs: &mut HashMap<String, String>, s: &str) {
-    for (name, value) in name_value_pairs(s) {
-        attrs.insert(name, value);
-    }
-}
-
-fn name_value_pairs(s: &str) -> AttrIter {
-    AttrIter { s }
+    attrs.extend(AttrIter { s });
 }
 
 struct AttrIter<'a> {
