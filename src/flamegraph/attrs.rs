@@ -141,23 +141,17 @@ impl<'a> Iterator for AttrIter<'a> {
     type Item = (String, String);
 
     fn next(&mut self) -> Option<(String, String)> {
-        if let Some(equal) = self.s.find('=') {
-            if let Some(open_quote) = self.s[equal..].find('"') {
-                if let Some(end_quote) = self.s[equal + open_quote + 1..].find('"') {
-                    let mut nameval = self.s[..equal + open_quote + end_quote + 2].splitn(2, '=');
-                    if let Some(name) = nameval.next() {
-                        let name = name.trim();
-                        if !name.is_empty() {
-                            if let Some(value) = nameval.next() {
-                                self.s = &self.s[equal + open_quote + end_quote + 2..];
-                                let value = value.trim().trim_matches('"');
-                                return Some((name.to_string(), value.to_string()));
-                            }
-                        }
-                    }
-                }
-            }
+        let equal = self.s.find('=')?;
+        let open_quote = self.s[equal..].find('"')?;
+        let end_quote = self.s[equal + open_quote + 1..].find('"')?;
+        let mut nameval = self.s[..equal + open_quote + end_quote + 2].splitn(2, '=');
+        let name = nameval.next()?.trim();
+        if !name.is_empty() {
+            self.s = &self.s[equal + open_quote + end_quote + 2..];
+            let value = nameval.next()?.trim().trim_matches('"');
+            return Some((name.to_string(), value.to_string()));
         }
+
         None
     }
 }
