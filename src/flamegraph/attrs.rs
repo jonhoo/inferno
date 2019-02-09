@@ -48,22 +48,26 @@ impl FuncFrameAttrsMap {
             let namevals = unwrap_or_continue!(line.next());
             for nameval in namevals.split('\t') {
                 let mut nameval = nameval.splitn(2, '=');
-                let name = unwrap_or_continue!(nameval.next());
+                let name = unwrap_or_continue!(nameval.next()).trim();
                 if name.is_empty() {
                     continue;
                 }
-                let value = unwrap_or_continue!(nameval.next()).to_string();
+                let mut value = unwrap_or_continue!(nameval.next()).trim();
+                // Remove optional quotes
+                if value.starts_with('"') && value.ends_with('"') {
+                    value = &value[1..value.len() - 1];
+                }
                 match name {
-                    "title" => funcattrs.title = Some(value),
-                    "class" => funcattrs.g.class = Some(value),
-                    "style" => funcattrs.g.style = Some(value),
-                    "onmouseover" => funcattrs.g.onmouseover = Some(value),
-                    "onmouseout" => funcattrs.g.onmouseout = Some(value),
-                    "onclick" => funcattrs.g.onclick = Some(value),
-                    "href" => funcattrs.a.href = Some(value),
-                    "target" => funcattrs.a.target = Some(value),
-                    "g_extra" => parse_extra_attrs(&mut funcattrs.g.extra, &value),
-                    "a_extra" => parse_extra_attrs(&mut funcattrs.a.extra, &value),
+                    "title" => funcattrs.title = Some(value.to_string()),
+                    "class" => funcattrs.g.class = Some(value.to_string()),
+                    "style" => funcattrs.g.style = Some(value.to_string()),
+                    "onmouseover" => funcattrs.g.onmouseover = Some(value.to_string()),
+                    "onmouseout" => funcattrs.g.onmouseout = Some(value.to_string()),
+                    "onclick" => funcattrs.g.onclick = Some(value.to_string()),
+                    "href" => funcattrs.a.href = Some(value.to_string()),
+                    "target" => funcattrs.a.target = Some(value.to_string()),
+                    "g_extra" => parse_extra_attrs(&mut funcattrs.g.extra, value),
+                    "a_extra" => parse_extra_attrs(&mut funcattrs.a.extra, value),
                     _ => warn!("invalid attribute {} found for {}", name, func),
                 }
             }
@@ -137,18 +141,44 @@ impl<'a> Iterator for AttrIter<'a> {
     type Item = (String, String);
 
     fn next(&mut self) -> Option<(String, String)> {
-        let equal = self.s.find('=')?;
-        let open_quote = self.s[equal..].find('"')?;
-        let end_quote = self.s[equal + open_quote + 1..].find('"')?;
-        let mut nameval = self.s[..equal + open_quote + end_quote + 2].splitn(2, '=');
-        let name = nameval.next()?.trim();
-        if !name.is_empty() {
-            self.s = &self.s[equal + open_quote + end_quote + 2..];
-            let value = nameval.next()?.trim().trim_matches('"');
-            return Some((name.to_string(), value.to_string()));
+        let mut name_rest = self.s.splitn(2, '=');
+        let name = name_rest.next()?.trim();
+        if name.is_empty() {
+            warn!("\"=\" found with no name in extra attributes");
+            return None;
+        }
+        let mut split_name = name.split_whitespace().rev();
+        let name = split_name.next()?;
+        for extra in split_name {
+            warn!(
+                "extra attribute {} has no value (did you mean to quote the value?)",
+                extra
+            );
         }
 
-        None
+        let rest = name_rest.next()?.trim_left();
+        if rest.is_empty() {
+            warn!("no value after \"=\" for extra attribute {}", name);
+        }
+
+        let (value, rest) = if rest.starts_with('"') {
+            if let Some(eq) = rest[1..].find('"') {
+                (&rest[1..eq + 1], &rest[eq + 1..])
+            } else {
+                warn!("no end quote found for extra attribute {}", name);
+                return None;
+            }
+        } else {
+            if let Some(w) = rest.find(char::is_whitespace) {
+                (&rest[..w], &rest[w + 1..])
+            } else {
+                (rest, "")
+            }
+        };
+
+        self.s = rest;
+
+        Some((name.to_string(), value.to_string()))
     }
 }
 
@@ -160,16 +190,20 @@ mod test {
     fn funcattr_map_from_reader() {
         let foo = vec![
             "foo",
+            // Without quotes
             "title=foo title",
-            "class=foo class",
-            "style=foo style",
+            // With quotes
+            r#"class="foo class""#,
+            r#"style="foo style""#,
             "onmouseover=foo_onmouseover()",
             "onmouseout=foo_onmouseout()",
             "onclick=foo_onclick()",
-            r#"g_extra=gextra1="foo gextra1" gextra2="foo gextra2""#,
+            // gextra1 without quotes, gextra2 with quotes
+            r#"g_extra=gextra1=gextra1 gextra2="foo gextra2""#,
             "href=foo href",
             "target=foo target",
-            r#"a_extra=aextra1="foo aextra1" aextra2="foo aextra2""#,
+            // Extra quotes around a_extra value
+            r#"a_extra="aextra1="foo aextra1" aextra2="foo aextra2"""#,
         ]
         .join("\t");
 
@@ -178,7 +212,9 @@ mod test {
             "class=bar class",
             "onmouseover=bar_onmouseover()",
             "href=bar href",
-            r#"a_extra=aextra="bar aextra""#,
+            // With an invalid attribute that has no value
+            // This gets skipped and logged.
+            r#"a_extra=aextra1=foo invalid aextra2=bar"#,
         ]
         .join("\t");
 
@@ -187,7 +223,7 @@ mod test {
 
         let mut expected_inner = HashMap::new();
         let mut foo_g_extra = HashMap::new();
-        foo_g_extra.insert("gextra1".to_owned(), "foo gextra1".to_owned());
+        foo_g_extra.insert("gextra1".to_owned(), "gextra1".to_owned());
         foo_g_extra.insert("gextra2".to_owned(), "foo gextra2".to_owned());
         let mut foo_a_extra = HashMap::new();
         foo_a_extra.insert("aextra1".to_owned(), "foo aextra1".to_owned());
@@ -214,7 +250,8 @@ mod test {
         );
 
         let mut bar_a_extra = HashMap::new();
-        bar_a_extra.insert("aextra".to_owned(), "bar aextra".to_owned());
+        bar_a_extra.insert("aextra1".to_owned(), "foo".to_owned());
+        bar_a_extra.insert("aextra2".to_owned(), "bar".to_owned());
 
         expected_inner.insert(
             "bar".to_owned(),
