@@ -156,24 +156,22 @@ impl<'a> Iterator for AttrIter<'a> {
             );
         }
 
-        let rest = name_rest.next()?.trim_left();
+        let rest = name_rest.next()?.trim_start();
         if rest.is_empty() {
             warn!("no value after \"=\" for extra attribute {}", name);
         }
 
         let (value, rest) = if rest.starts_with('"') {
             if let Some(eq) = rest[1..].find('"') {
-                (&rest[1..eq + 1], &rest[eq + 1..])
+                (&rest[1..=eq], &rest[eq + 1..])
             } else {
                 warn!("no end quote found for extra attribute {}", name);
                 return None;
             }
+        } else if let Some(w) = rest.find(char::is_whitespace) {
+            (&rest[..w], &rest[w + 1..])
         } else {
-            if let Some(w) = rest.find(char::is_whitespace) {
-                (&rest[..w], &rest[w + 1..])
-            } else {
-                (rest, "")
-            }
+            (rest, "")
         };
 
         self.s = rest;
