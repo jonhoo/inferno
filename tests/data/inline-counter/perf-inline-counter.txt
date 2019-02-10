@@ -1,234 +1,243 @@
-inline-counter  1849   348.751728:     250000 cpu-clock:uhH: 
-	          401b97 main+0x1f (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.193547:     250000 cpu-clock:uhH: 
+	          401b97 main+0x1f (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.752172:     250000 cpu-clock:uhH: 
-	          401b90 main+0x18 (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.194312:     250000 cpu-clock:uhH: 
+	          401b94 main+0x1c (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.752262:     250000 cpu-clock:uhH: 
-	          401b97 main+0x1f (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.195655:     250000 cpu-clock:uhH: 
+	          401b94 main+0x1c (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.753016:     250000 cpu-clock:uhH: 
-	          401b90 main+0x18 (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.197770:     250000 cpu-clock:uhH: 
+	          401b94 main+0x1c (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.755485:     250000 cpu-clock:uhH: 
-	          401b97 main+0x1f (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.199315:     250000 cpu-clock:uhH: 
+	          401b97 main+0x1f (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.756360:     250000 cpu-clock:uhH: 
-	          401b94 main+0x1c (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.200153:     250000 cpu-clock:uhH: 
+	          401b94 main+0x1c (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.758200:     250000 cpu-clock:uhH: 
-	          401b90 main+0x18 (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.200419:     250000 cpu-clock:uhH: 
+	          401b94 main+0x1c (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.758944:     250000 cpu-clock:uhH: 
-	          401b97 main+0x1f (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.202423:     250000 cpu-clock:uhH: 
+	          401b94 main+0x1c (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.759598:     250000 cpu-clock:uhH: 
-	          401b94 main+0x1c (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.203989:     250000 cpu-clock:uhH: 
+	          401b94 main+0x1c (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.759781:     250000 cpu-clock:uhH: 
-	          401b97 main+0x1f (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.204543:     250000 cpu-clock:uhH: 
+	          401b94 main+0x1c (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.761143:     250000 cpu-clock:uhH: 
-	          401b94 main+0x1c (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.204649:     250000 cpu-clock:uhH: 
+	          401b90 main+0x18 (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.761361:     250000 cpu-clock:uhH: 
-	          401b94 main+0x1c (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.205589:     250000 cpu-clock:uhH: 
+	          401b94 main+0x1c (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.762221:     250000 cpu-clock:uhH: 
-	          401b97 main+0x1f (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.206134:     250000 cpu-clock:uhH: 
+	          401b94 main+0x1c (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.762650:     250000 cpu-clock:uhH: 
-	          401b94 main+0x1c (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.206462:     250000 cpu-clock:uhH: 
+	          401b94 main+0x1c (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.762756:     250000 cpu-clock:uhH: 
-	          401b90 main+0x18 (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.207453:     250000 cpu-clock:uhH: 
+	          401b97 main+0x1f (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.763570:     250000 cpu-clock:uhH: 
-	          401b94 main+0x1c (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.208097:     250000 cpu-clock:uhH: 
+	          401b94 main+0x1c (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.763968:     250000 cpu-clock:uhH: 
-	          401b94 main+0x1c (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.208219:     250000 cpu-clock:uhH: 
+	          401b97 main+0x1f (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.764021:     250000 cpu-clock:uhH: 
-	          401b94 main+0x1c (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.208431:     250000 cpu-clock:uhH: 
+	          401b94 main+0x1c (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.765076:     250000 cpu-clock:uhH: 
-	          401b94 main+0x1c (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.208868:     250000 cpu-clock:uhH: 
+	          401b94 main+0x1c (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.765617:     250000 cpu-clock:uhH: 
-	          401b94 main+0x1c (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.208967:     250000 cpu-clock:uhH: 
+	          401b94 main+0x1c (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.765769:     250000 cpu-clock:uhH: 
-	          401b94 main+0x1c (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.209246:     250000 cpu-clock:uhH: 
+	          401b90 main+0x18 (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.766202:     250000 cpu-clock:uhH: 
-	          401b94 main+0x1c (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.212845:     250000 cpu-clock:uhH: 
+	          401b94 main+0x1c (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.769833:     250000 cpu-clock:uhH: 
-	          401b97 main+0x1f (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.214528:     250000 cpu-clock:uhH: 
+	          401b94 main+0x1c (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.771186:     250000 cpu-clock:uhH: 
-	          401b94 main+0x1c (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.215510:     250000 cpu-clock:uhH: 
+	          401b94 main+0x1c (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.772584:     250000 cpu-clock:uhH: 
-	          401b97 main+0x1f (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.217080:     250000 cpu-clock:uhH: 
+	          401b94 main+0x1c (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.774218:     250000 cpu-clock:uhH: 
-	          401b97 main+0x1f (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.217955:     250000 cpu-clock:uhH: 
+	          401b90 main+0x18 (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.775074:     250000 cpu-clock:uhH: 
-	          401b94 main+0x1c (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.218169:     250000 cpu-clock:uhH: 
+	          401b97 main+0x1f (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.775255:     250000 cpu-clock:uhH: 
-	          401b94 main+0x1c (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.218383:     250000 cpu-clock:uhH: 
+	          401b94 main+0x1c (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.775760:     250000 cpu-clock:uhH: 
-	          401b97 main+0x1f (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.218653:     250000 cpu-clock:uhH: 
+	          401b94 main+0x1c (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.777799:     250000 cpu-clock:uhH: 
-	          401bb0 main+0x38 (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.219007:     250000 cpu-clock:uhH: 
+	          401b90 main+0x18 (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.779162:     250000 cpu-clock:uhH: 
-	          401bb0 main+0x38 (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.219164:     250000 cpu-clock:uhH: 
+	          401b97 main+0x1f (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.779506:     250000 cpu-clock:uhH: 
-	          401bb0 main+0x38 (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.219491:     250000 cpu-clock:uhH: 
+	          401b97 main+0x1f (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.781082:     250000 cpu-clock:uhH: 
-	          401bb0 main+0x38 (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.222490:     250000 cpu-clock:uhH: 
+	          401bb0 main+0x38 (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.781689:     250000 cpu-clock:uhH: 
-	          401bb3 main+0x3b (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.224564:     250000 cpu-clock:uhH: 
+	          401bb0 main+0x38 (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.782134:     250000 cpu-clock:uhH: 
-	          401bac main+0x34 (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.224819:     250000 cpu-clock:uhH: 
+	          401bb3 main+0x3b (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.782255:     250000 cpu-clock:uhH: 
-	          401bb0 main+0x38 (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.225766:     250000 cpu-clock:uhH: 
+	          401bb0 main+0x38 (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.782528:     250000 cpu-clock:uhH: 
-	          401bb0 main+0x38 (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.225925:     250000 cpu-clock:uhH: 
+	          401bb3 main+0x3b (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.782788:     250000 cpu-clock:uhH: 
-	          401bac main+0x34 (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.227821:     250000 cpu-clock:uhH: 
+	          401bb0 main+0x38 (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.785362:     250000 cpu-clock:uhH: 
-	          401bb3 main+0x3b (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.229096:     250000 cpu-clock:uhH: 
+	          401bb0 main+0x38 (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.787287:     250000 cpu-clock:uhH: 
-	          401bb0 main+0x38 (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.229275:     250000 cpu-clock:uhH: 
+	          401bb0 main+0x38 (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.787992:     250000 cpu-clock:uhH: 
-	          401bb0 main+0x38 (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.229754:     250000 cpu-clock:uhH: 
+	          401bb3 main+0x3b (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.789558:     250000 cpu-clock:uhH: 
-	          401bb0 main+0x38 (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.230623:     250000 cpu-clock:uhH: 
+	          401bb0 main+0x38 (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.790416:     250000 cpu-clock:uhH: 
-	          401bb3 main+0x3b (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.231136:     250000 cpu-clock:uhH: 
+	          401bb3 main+0x3b (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.790518:     250000 cpu-clock:uhH: 
-	          401bb0 main+0x38 (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.231166:     250000 cpu-clock:uhH: 
+	          401bb3 main+0x3b (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.791185:     250000 cpu-clock:uhH: 
-	          401bb0 main+0x38 (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.232244:     250000 cpu-clock:uhH: 
+	          401bb0 main+0x38 (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.791426:     250000 cpu-clock:uhH: 
-	          401bb0 main+0x38 (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.233052:     250000 cpu-clock:uhH: 
+	          401bb3 main+0x3b (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.791497:     250000 cpu-clock:uhH: 
-	          401bb3 main+0x3b (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.233632:     250000 cpu-clock:uhH: 
+	          401bb3 main+0x3b (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.792205:     250000 cpu-clock:uhH: 
-	          401bb3 main+0x3b (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.233666:     250000 cpu-clock:uhH: 
+	          401bb3 main+0x3b (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.792470:     250000 cpu-clock:uhH: 
-	          401bb0 main+0x38 (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.234745:     250000 cpu-clock:uhH: 
+	          401bb3 main+0x3b (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.792527:     250000 cpu-clock:uhH: 
-	          401bac main+0x34 (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.235905:     250000 cpu-clock:uhH: 
+	          401bb3 main+0x3b (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.794463:     250000 cpu-clock:uhH: 
-	          401bb0 main+0x38 (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.236730:     250000 cpu-clock:uhH: 
+	          401bb0 main+0x38 (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.795737:     250000 cpu-clock:uhH: 
-	          401bb0 main+0x38 (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.236916:     250000 cpu-clock:uhH: 
+	          401bb0 main+0x38 (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.798344:     250000 cpu-clock:uhH: 
-	          401bb3 main+0x3b (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.238312:     250000 cpu-clock:uhH: 
+	          401bb0 main+0x38 (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.800434:     250000 cpu-clock:uhH: 
-	          401b6d not_inlined+0x18 (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.239298:     250000 cpu-clock:uhH: 
+	          401bb3 main+0x3b (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.801186:     250000 cpu-clock:uhH: 
-	          401b69 not_inlined+0x14 (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.239921:     250000 cpu-clock:uhH: 
+	          401bb3 main+0x3b (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.801278:     250000 cpu-clock:uhH: 
-	          401b6d not_inlined+0x18 (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.241656:     250000 cpu-clock:uhH: 
+	          401bb0 main+0x38 (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.802127:     250000 cpu-clock:uhH: 
-	          401b6d not_inlined+0x18 (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.243058:     250000 cpu-clock:uhH: 
+	          401bac main+0x34 (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.802735:     250000 cpu-clock:uhH: 
-	          401b6d not_inlined+0x18 (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.243929:     250000 cpu-clock:uhH: 
+	          401b70 not_inlined+0x1b (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.805157:     250000 cpu-clock:uhH: 
-	          401b6d not_inlined+0x18 (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.244645:     250000 cpu-clock:uhH: 
+	          401b70 not_inlined+0x1b (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.807171:     250000 cpu-clock:uhH: 
-	          401b69 not_inlined+0x14 (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.245099:     250000 cpu-clock:uhH: 
+	          401b70 not_inlined+0x1b (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.807265:     250000 cpu-clock:uhH: 
-	          401b70 not_inlined+0x1b (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.245167:     250000 cpu-clock:uhH: 
+	          401b6d not_inlined+0x18 (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.808329:     250000 cpu-clock:uhH: 
-	          401b70 not_inlined+0x1b (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.245408:     250000 cpu-clock:uhH: 
+	          401b70 not_inlined+0x1b (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.808627:     250000 cpu-clock:uhH: 
-	          401b70 not_inlined+0x1b (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.245656:     250000 cpu-clock:uhH: 
+	          401b70 not_inlined+0x1b (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.808996:     250000 cpu-clock:uhH: 
-	          401b6d not_inlined+0x18 (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.249005:     250000 cpu-clock:uhH: 
+	          401b70 not_inlined+0x1b (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.809269:     250000 cpu-clock:uhH: 
-	          401b6d not_inlined+0x18 (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.249598:     250000 cpu-clock:uhH: 
+	          401b6d not_inlined+0x18 (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.810781:     250000 cpu-clock:uhH: 
-	          401b6d not_inlined+0x18 (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.252016:     250000 cpu-clock:uhH: 
+	          401b70 not_inlined+0x1b (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.811187:     250000 cpu-clock:uhH: 
-	          401b70 not_inlined+0x1b (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.253815:     250000 cpu-clock:uhH: 
+	          401b6d not_inlined+0x18 (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.812999:     250000 cpu-clock:uhH: 
-	          401b70 not_inlined+0x1b (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.254542:     250000 cpu-clock:uhH: 
+	          401b6d not_inlined+0x18 (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.815316:     250000 cpu-clock:uhH: 
-	          401b6d not_inlined+0x18 (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.254669:     250000 cpu-clock:uhH: 
+	          401b70 not_inlined+0x1b (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.817037:     250000 cpu-clock:uhH: 
-	          401b6d not_inlined+0x18 (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.254964:     250000 cpu-clock:uhH: 
+	          401b6d not_inlined+0x18 (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.818055:     250000 cpu-clock:uhH: 
-	          401b70 not_inlined+0x1b (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.255431:     250000 cpu-clock:uhH: 
+	          401b6d not_inlined+0x18 (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.818230:     250000 cpu-clock:uhH: 
-	          401b70 not_inlined+0x1b (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.255686:     250000 cpu-clock:uhH: 
+	          401b70 not_inlined+0x1b (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.818925:     250000 cpu-clock:uhH: 
-	          401b70 not_inlined+0x1b (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.255967:     250000 cpu-clock:uhH: 
+	          401b6d not_inlined+0x18 (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.818975:     250000 cpu-clock:uhH: 
-	          401b69 not_inlined+0x14 (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.259432:     250000 cpu-clock:uhH: 
+	          401b6d not_inlined+0x18 (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.819259:     250000 cpu-clock:uhH: 
-	          401b69 not_inlined+0x14 (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.261904:     250000 cpu-clock:uhH: 
+	          401b69 not_inlined+0x14 (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.820353:     250000 cpu-clock:uhH: 
-	          401b6d not_inlined+0x18 (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.263777:     250000 cpu-clock:uhH: 
+	          401b6d not_inlined+0x18 (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.821843:     250000 cpu-clock:uhH: 
-	          401b6d not_inlined+0x18 (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.264828:     250000 cpu-clock:uhH: 
+	          401b69 not_inlined+0x14 (./tests/data/inline-counter/inline-counter)
 
-inline-counter  1849   348.822990:     250000 cpu-clock:uhH: 
-	          401b6d not_inlined+0x18 (/home/jrhansen/projects/rust/inferno/tests/data/inline-counter/inline-counter)
+inline-counter 26037  8801.264904:     250000 cpu-clock:uhH: 
+	          401b70 not_inlined+0x1b (./tests/data/inline-counter/inline-counter)
+
+inline-counter 26037  8801.265411:     250000 cpu-clock:uhH: 
+	          401b69 not_inlined+0x14 (./tests/data/inline-counter/inline-counter)
+
+inline-counter 26037  8801.265692:     250000 cpu-clock:uhH: 
+	          401b6d not_inlined+0x18 (./tests/data/inline-counter/inline-counter)
+
+inline-counter 26037  8801.265980:     250000 cpu-clock:uhH: 
+	          401b69 not_inlined+0x14 (./tests/data/inline-counter/inline-counter)
 

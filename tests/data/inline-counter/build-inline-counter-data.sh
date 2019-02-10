@@ -7,7 +7,7 @@ perf record --call-graph dwarf ./inline-counter
 perf script --no-inline > perf-inline-counter.txt
 
 # Make the path to the binary relative to the project root.
-sed 's/(.*\/tests\/inline-counter\/data\//(.\/tests\/inline-counter\/data\//' perf-inline-counter.txt -i
+sed 's/(.*\/tests\/data\/inline-counter/(.\/tests\/data\/inline-counter/' perf-inline-counter.txt -i
 
 # Cleanup
 rm perf.data

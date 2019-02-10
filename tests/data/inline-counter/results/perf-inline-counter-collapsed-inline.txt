@@ -1,3 +1,3 @@
-inline-counter;main;count_to 29
-inline-counter;main;double_inline;count_to 24
-inline-counter;not_inlined;count_to 25
+inline-counter;main;count_to 32
+inline-counter;main;double_inline;count_to 25
+inline-counter;not_inlined;count_to 24
