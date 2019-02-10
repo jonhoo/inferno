@@ -85,18 +85,17 @@ fn parse_rgb_string(s: &str) -> Option<(u8, u8, u8)> {
         return None;
     }
 
-    let string_end = s.len() - 1;
-
-    let r_start = "rgb(".len();
-    let r_end_index = &s[r_start..string_end].find(',')?;
-    let r_str = s[..r_end_index - 1].trim();
+    let s = &s["rgb(".len()..s.len() - 1];
+    let r_end_index = s.find(',')?;
+    let r_str = s[..r_end_index].trim();
     let r = u8::from_str(r_str).ok()?;
 
-    let g_end_index = &s[r_end_index + 1..string_end].find(',')?;
-    let g_str = s[..g_end_index - 1].trim();
+    let s = &s[r_end_index + 1..];
+    let g_end_index = s.find(',')?;
+    let g_str = s[..g_end_index].trim();
     let g = u8::from_str(g_str).ok()?;
 
-    let b_str = s[g_end_index + 1..string_end].trim();
+    let b_str = &s[g_end_index + 1..].trim();
     let b = u8::from_str(b_str).ok()?;
 
     Some((r, g, b))
