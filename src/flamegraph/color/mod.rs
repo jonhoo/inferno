@@ -212,3 +212,33 @@ pub(super) fn bgcolor_for(palette: Palette) -> (&'static str, &'static str) {
         _ => GRAY_GRADIENT,
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::namehash;
+
+    macro_rules! test_hash {
+        ($name:expr, $expected:expr) => {
+            assert_eq!(namehash($name.bytes()), $expected)
+        };
+    }
+
+    #[test]
+    fn namehash_test() {
+        test_hash!(
+            "org/mozilla/javascript/NativeFunction:.initScriptFunction_[j]",
+            0.77964604
+        );
+        test_hash!(
+            "]j[_noitcnuFtpircStini.:noitcnuFevitaN/tpircsavaj/allizom/gro",
+            0.64415313
+        );
+        test_hash!("genunix`kmem_cache_free", 0.46692634);
+        test_hash!("eerf_ehcac_memk`xinuneg", 0.84041037);
+        test_hash!("unix`0xfffffffffb8001d6", 0.41813117);
+        test_hash!("6d1008bfffffffffx0`xinu", 0.84041037);
+        test_hash!("un`0xfffffffffb8001d6", 0.41813117);
+        test_hash!("``0xfffffffffb8001d6", 0.41813117);
+        test_hash!("", 1.0);
+    }
+}
