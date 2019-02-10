@@ -127,7 +127,7 @@ fn namehash<I: Iterator<Item = u8>>(mut name: I) -> f32 {
         Some(first_char) => namehash_variables.update(first_char),
     }
 
-    for character in name.by_ref().take(3) {
+    for character in name.by_ref().take(2) {
         if character == b'`' {
             module_name_found = true;
             break;
