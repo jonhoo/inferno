@@ -1,3 +1,4 @@
+use std::borrow::Cow;
 use std::collections::HashMap;
 use std::fs::File;
 use std::fs::OpenOptions;
@@ -8,9 +9,9 @@ use std::io::Write;
 use std::path::Path;
 use std::str::FromStr;
 
-pub struct PaletteMap(HashMap<String, (u8, u8, u8)>);
+pub struct PaletteMap<'a>(HashMap<Cow<'a, str>, (u8, u8, u8)>);
 
-impl PaletteMap {
+impl<'a> PaletteMap<'a> {
     pub fn load(file: &str) -> quick_xml::Result<Self> {
         let mut map = HashMap::default();
         let path = Path::new(file);
@@ -23,10 +24,27 @@ impl PaletteMap {
 
             for line in file.lines() {
                 let line = line.map_err(quick_xml::Error::Io)?;
-                let words = line.split("->").collect::<Vec<_>>();
-                let rgb_color = parse_rgb_string(words[1])
-                    .ok_or_else(|| quick_xml::Error::UnexpectedToken(words[1].to_string()))?;
-                map.insert(words[0].to_string(), rgb_color);
+
+                // A line is formatted like this: NAME -> rbg(RED, GREEN, BLUE)
+                let mut words = line.split("->");
+
+                let name = match words.next() {
+                    Some(name) => name,
+                    None => return Err(quick_xml::Error::UnexpectedToken(line)),
+                };
+
+                let color = match words.next() {
+                    Some(name) => name,
+                    None => return Err(quick_xml::Error::UnexpectedToken(line)),
+                };
+
+                if words.next().is_some() {
+                    return Err(quick_xml::Error::UnexpectedToken(line));
+                }
+
+                let rgb_color = parse_rgb_string(color)
+                    .ok_or_else(|| quick_xml::Error::UnexpectedToken(color.to_string()))?;
+                map.insert(Cow::from(name.to_string()), rgb_color);
             }
         }
 
@@ -48,14 +66,14 @@ impl PaletteMap {
         Ok(())
     }
 
-    pub fn find_color_for<'a, F: FnMut(&'a str) -> (u8, u8, u8)>(
-        &'a mut self,
+    pub fn find_color_for<F: FnMut(&'a str) -> (u8, u8, u8)>(
+        &mut self,
         name: &'a str,
         mut compute_color: F,
     ) -> (u8, u8, u8) {
         *self
             .0
-            .entry(name.to_string())
+            .entry(Cow::from(name))
             .or_insert_with(|| compute_color(name))
     }
 }
