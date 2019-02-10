@@ -1,4 +1,3 @@
-use indexmap::IndexMap;
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::{self, BufRead, BufReader};
@@ -114,7 +113,7 @@ pub struct GElementAttrs {
     pub onclick: Option<String>,
 
     /// Extra attributes to include
-    pub extra: IndexMap<String, String>,
+    pub extra: Vec<(String, String)>,
 }
 
 /// Attributes to set on the SVG `a` element
@@ -127,10 +126,10 @@ pub struct AElementAttrs {
     pub target: Option<String>,
 
     /// Extra attributes to include
-    pub extra: IndexMap<String, String>,
+    pub extra: Vec<(String, String)>,
 }
 
-fn parse_extra_attrs(attrs: &mut IndexMap<String, String>, s: &str) {
+fn parse_extra_attrs(attrs: &mut Vec<(String, String)>, s: &str) {
     attrs.extend(AttrIter { s });
 }
 
@@ -221,12 +220,14 @@ mod test {
         let r = s.as_bytes();
 
         let mut expected_inner = HashMap::new();
-        let mut foo_g_extra = IndexMap::new();
-        foo_g_extra.insert("gextra1".to_owned(), "gextra1".to_owned());
-        foo_g_extra.insert("gextra2".to_owned(), "foo gextra2".to_owned());
-        let mut foo_a_extra = IndexMap::new();
-        foo_a_extra.insert("aextra1".to_owned(), "foo aextra1".to_owned());
-        foo_a_extra.insert("aextra2".to_owned(), "foo aextra2".to_owned());
+        let foo_g_extra: Vec<(String, String)> = vec![
+            ("gextra1".to_owned(), "gextra1".to_owned()),
+            ("gextra2".to_owned(), "foo gextra2".to_owned()),
+        ];
+        let foo_a_extra: Vec<(String, String)> = vec![
+            ("aextra1".to_owned(), "foo aextra1".to_owned()),
+            ("aextra2".to_owned(), "foo aextra2".to_owned()),
+        ];
 
         expected_inner.insert(
             "foo".to_owned(),
@@ -248,9 +249,10 @@ mod test {
             },
         );
 
-        let mut bar_a_extra = IndexMap::new();
-        bar_a_extra.insert("aextra1".to_owned(), "foo".to_owned());
-        bar_a_extra.insert("aextra2".to_owned(), "bar".to_owned());
+        let bar_a_extra: Vec<(String, String)> = vec![
+            ("aextra1".to_owned(), "foo".to_owned()),
+            ("aextra2".to_owned(), "bar".to_owned()),
+        ];
 
         expected_inner.insert(
             "bar".to_owned(),
@@ -262,7 +264,7 @@ mod test {
                     onmouseover: Some("bar_onmouseover()".to_owned()),
                     onmouseout: None,
                     onclick: None,
-                    extra: IndexMap::default(),
+                    extra: Vec::default(),
                 },
                 a: AElementAttrs {
                     href: Some("bar href".to_owned()),
