@@ -289,6 +289,6 @@ fn filled_rectangle<W: Write>(
                 "width" => &buffer[width],
                 "height" => &buffer[height],
                 "fill" => &buffer[color]
-        ),
-    )))
+        )),
+    ))
 }

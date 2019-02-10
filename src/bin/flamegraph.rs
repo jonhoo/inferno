@@ -26,7 +26,7 @@ struct Opt {
     hash: bool,
     /// use consistent palette (palette.map)
     #[structopt(long = "cp")]
-    cp: bool
+    cp: bool,
 }
 
 impl Into<Options> for Opt {
