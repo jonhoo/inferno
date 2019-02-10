@@ -145,7 +145,7 @@ collapse_perf_tests_upstream! {
 
 macro_rules! collapse_perf_tests {
     ($($name:ident),*) => {
-        collapse_perf_tests_inner!($($name),*; "./tests/data");
+        collapse_perf_tests_inner!($($name),*; "./tests/data/inline-counter");
     }
 }
 

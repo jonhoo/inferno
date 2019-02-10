@@ -1,3 +1,9 @@
+mod attrs;
+mod merge;
+mod svg;
+
+pub use attrs::FuncFrameAttrsMap;
+
 use pretty_toa::ThousandsSep;
 use quick_xml::{
     events::{BytesEnd, BytesStart, BytesText, Event},
@@ -6,9 +12,6 @@ use quick_xml::{
 use std::io;
 use std::io::prelude::*;
 use str_stack::StrStack;
-
-mod merge;
-mod svg;
 
 const IMAGEWIDTH: usize = 1200; // max width, pixels
 const FRAMEHEIGHT: usize = 16; // max height is dynamic
@@ -23,7 +26,9 @@ const BGCOLOR1: &str = "#eeeeee";
 const BGCOLOR2: &str = "#eeeeb0";
 
 #[derive(Debug, Default)]
-pub struct Options {}
+pub struct Options {
+    pub func_frameattrs: FuncFrameAttrsMap,
+}
 
 macro_rules! args {
     ($($key:expr => $value:expr),*) => {{
@@ -31,7 +36,7 @@ macro_rules! args {
     }};
 }
 
-pub fn from_sorted_lines<'a, I, W>(_opt: Options, lines: I, writer: W) -> quick_xml::Result<()>
+pub fn from_sorted_lines<'a, I, W>(opt: Options, lines: I, writer: W) -> quick_xml::Result<()>
 where
     I: IntoIterator<Item = &'a str>,
     W: Write,
@@ -115,17 +120,84 @@ where
             )
         };
 
-        svg.write_event(Event::Start(
-            BytesStart::borrowed_name(b"g").with_attributes(args!(
-                "class" => "func_g",
-                "onmouseover" => "s(this)",
-                "onmouseout" => "c()",
-                "onclick" => "zoom(this)"
-            )),
-        ))?;
+        let mut title = &buffer[info];
+        let mut class = "func_g";
+        let mut onmouseover = "s(this)";
+        let mut onmouseout = "c()";
+        let mut onclick = "zoom(this)";
+        let mut style = None;
+        let mut g_extra = None;
+        let mut href = None;
+        let mut target = "_top";
+        let mut a_extra = None;
+
+        // Handle any overridden or extra attributes.
+        if let Some(attrs) = opt
+            .func_frameattrs
+            .frameattrs_for_func(frame.location.function)
+        {
+            if let Some(ref c) = attrs.g.class {
+                class = c.as_str();
+            }
+            if let Some(ref c) = attrs.g.style {
+                style = Some(c.as_str());
+            }
+            if let Some(ref o) = attrs.g.onmouseover {
+                onmouseover = o.as_str();
+            }
+            if let Some(ref o) = attrs.g.onmouseout {
+                onmouseout = o.as_str();
+            }
+            if let Some(ref o) = attrs.g.onclick {
+                onclick = o.as_str();
+            }
+            if let Some(ref t) = attrs.title {
+                title = t.as_str();
+            }
+            g_extra = Some(&attrs.g.extra);
+            if let Some(ref h) = attrs.a.href {
+                href = Some(h.as_str());
+            }
+            if let Some(ref t) = attrs.a.target {
+                target = t.as_str();
+            }
+            a_extra = Some(&attrs.a.extra);
+        }
+
+        svg.write_event(Event::Start({
+            let mut g = BytesStart::borrowed_name(b"g").with_attributes(args!(
+                "class" => class
+            ));
+            if let Some(style) = style {
+                g.extend_attributes(std::iter::once(("style", style)));
+            }
+            g.extend_attributes(args!(
+                "onmouseover" => onmouseover,
+                "onmouseout" => onmouseout,
+                "onclick" => onclick
+            ));
+            if let Some(extra) = g_extra {
+                g.extend_attributes(extra.iter().map(|(k, v)| (k.as_str(), v.as_str())));
+            }
+            g
+        }))?;
+
         svg.write_event(Event::Start(BytesStart::borrowed_name(b"title")))?;
-        svg.write_event(Event::Text(BytesText::from_plain_str(&buffer[info])))?;
+        svg.write_event(Event::Text(BytesText::from_plain_str(title)))?;
         svg.write_event(Event::End(BytesEnd::borrowed(b"title")))?;
+
+        if let Some(href) = href {
+            svg.write_event(Event::Start({
+                let mut a = BytesStart::borrowed_name(b"a").with_attributes(args!(
+                    "xlink:href" => href,
+                    "target" => target
+                ));
+                if let Some(extra) = a_extra {
+                    a.extend_attributes(extra.iter().map(|(k, v)| (k.as_str(), v.as_str())));
+                }
+                a
+            }))?;
+        }
 
         let color = "rgb(242,10,32)";
         let x = write!(buffer, "{}", x1);
@@ -181,6 +253,9 @@ where
         )?;
 
         buffer.clear();
+        if href.is_some() {
+            svg.write_event(Event::End(BytesEnd::borrowed(b"a")))?;
+        }
         svg.write_event(Event::End(BytesEnd::borrowed(b"g")))?;
     }
 
