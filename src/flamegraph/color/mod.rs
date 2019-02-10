@@ -7,8 +7,8 @@ mod palettes;
 
 pub(super) use palette_map::PaletteMap;
 
-pub(super) const VDGREY: &str = "rgb(160,160,160)";
-pub(super) const DGREY: &str = "rgb(200,200,200)";
+pub(super) const VDGREY: (u8, u8, u8) = (160, 160, 160);
+pub(super) const DGREY: (u8, u8, u8) = (200, 200, 200);
 
 const YELLOW_GRADIENT: (&str, &str) = ("#eeeeee", "#eeeeb0");
 const BLUE_GRADIENT: (&str, &str) = ("#eeeeee", "#e0e0ff");
@@ -184,18 +184,12 @@ fn rgb_components_for_palette(
     }
 }
 
-fn color_from_palette(palette: Palette, name: &str, v1: f32, v2: f32, v3: f32) -> String {
-    let (red, green, blue) = rgb_components_for_palette(palette, name, v1, v2, v3);
-
-    format!("rgb({},{},{})", red, green, blue)
-}
-
 pub(super) fn color(
     palette: Palette,
     hash: bool,
     name: &str,
     thread_rng: &mut ThreadRng,
-) -> String {
+) -> (u8, u8, u8) {
     let (v1, v2, v3) = if hash {
         let name_hash = namehash(name.bytes());
         let reverse_name_hash = namehash(name.bytes().rev());
@@ -205,7 +199,7 @@ pub(super) fn color(
         (thread_rng.gen(), thread_rng.gen(), thread_rng.gen())
     };
 
-    color_from_palette(palette, name, v1, v2, v3)
+    rgb_components_for_palette(palette, name, v1, v2, v3)
 }
 
 pub(super) fn bgcolor_for(palette: Palette) -> (&'static str, &'static str) {

@@ -37,7 +37,7 @@ where
     W: Write,
 {
     let mut palette_map = if opt.consistent_palette {
-        Some(color::PaletteMap::load(PALETTE_FILE).map_err(quick_xml::Error::Io)?)
+        Some(color::PaletteMap::load(PALETTE_FILE)?)
     } else {
         None
     };
@@ -159,7 +159,7 @@ where
                 frame.location.function,
                 &mut thread_rng,
             );
-            filled_rectangle(&mut svg, x1, x2, y1, y2, &color)?;
+            filled_rectangle(&mut svg, x1, x2, y1, y2, color)?;
         };
 
         let fitchars = ((x2 - x1) as f64 / (FONTSIZE as f64 * FONTWIDTH)).trunc() as usize;
@@ -259,7 +259,7 @@ fn filled_rectangle<W: Write>(
     x2: usize,
     y1: usize,
     y2: usize,
-    color: &str,
+    color: (u8, u8, u8),
 ) -> quick_xml::Result<usize> {
     svg.write_event(Event::Empty(
         BytesStart::borrowed_name(b"rect").with_attributes(vec![
@@ -267,7 +267,10 @@ fn filled_rectangle<W: Write>(
             ("y", &*format!("{}", y1)),
             ("width", &*format!("{}", x2 - x1)),
             ("height", &*format!("{}", y2 - y1)),
-            ("fill", color),
+            (
+                "fill",
+                &*format!("rgb({},{},{})", color.0, color.1, color.2),
+            ),
         ]),
     ))
 }
