@@ -31,7 +31,7 @@ pub struct Options {
     pub consistent_palette: bool,
 }
 
-pub fn from_sorted_lines<'a, I, W>(_opt: Options, lines: I, writer: W) -> quick_xml::Result<()>
+pub fn from_sorted_lines<'a, I, W>(opt: Options, lines: I, writer: W) -> quick_xml::Result<()>
 where
     I: IntoIterator<Item = &'a str>,
     W: Write,
