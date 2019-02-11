@@ -4,7 +4,7 @@ extern crate pretty_assertions;
 extern crate inferno;
 
 use inferno::flamegraph;
-use std::fs::File;
+use std::fs::{self, File};
 use std::io::{BufRead, BufReader, Cursor};
 use std::path::PathBuf;
 
@@ -20,7 +20,8 @@ fn flamegraph_nameattr() {
     };
 
     let r = File::open(input_file).unwrap();
-    let mut result = Cursor::new(Vec::new());
+    let expected_len = fs::metadata(expected_result_file).unwrap().len() as usize;
+    let mut result = Cursor::new(Vec::with_capacity(expected_len));
     flamegraph::from_reader(options, r, &mut result).unwrap();
     let mut expected = BufReader::new(File::open(expected_result_file).unwrap());
 
