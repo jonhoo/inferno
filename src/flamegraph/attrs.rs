@@ -185,7 +185,7 @@ mod test {
     use super::*;
 
     #[test]
-    fn funcattr_map_from_reader() {
+    fn func_frame_attrs_map_from_reader() {
         let foo = vec![
             "foo",
             // Without quotes
