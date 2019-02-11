@@ -147,8 +147,8 @@ impl<'a> Iterator for AttrIter<'a> {
             warn!("\"=\" found with no name in extra attributes");
             return None;
         }
-        let mut split_name = name.split_whitespace().rev();
-        let name = split_name.next()?;
+        let mut split_name = name.split_whitespace();
+        let name = split_name.next_back()?;
         for extra in split_name {
             warn!(
                 "extra attribute {} has no value (did you mean to quote the value?)",
