@@ -164,8 +164,9 @@ where
             a_extra = Some(&attrs.a.extra);
         }
 
+        let g_origin = BytesStart::borrowed_name(b"g");
         svg.write_event(Event::Start({
-            let mut g = BytesStart::borrowed_name(b"g").with_attributes(args!(
+            let mut g = g_origin.clone().with_attributes(args!(
                 "class" => class
             ));
             if let Some(style) = style {
