@@ -1,3 +1,4 @@
+use super::Options;
 use quick_xml::{
     events::attributes::Attribute,
     events::{BytesEnd, BytesStart, BytesText, Event},
@@ -69,7 +70,11 @@ where
     Ok(())
 }
 
-pub(super) fn write_prelude<W>(svg: &mut Writer<W>, imageheight: usize) -> quick_xml::Result<()>
+pub(super) fn write_prelude<W>(
+    svg: &mut Writer<W>,
+    imageheight: usize,
+    opt: &Options,
+) -> quick_xml::Result<()>
 where
     W: Write,
 {
@@ -109,11 +114,12 @@ var nametype = 'Function:';
 var fontsize = {};
 var fontwidth = {};
 var xpad = {};
-var inverted = false;
+var inverted = {};
 var searchcolor = 'rgb(230,0,230)';",
         super::FONTSIZE,
         super::FONTWIDTH,
         super::XPAD,
+        opt.direction.is_inverted(),
     ))))?;
     svg.write_event(Event::CData(BytesText::from_escaped_str(include_str!(
         "flamegraph.js"
@@ -140,7 +146,7 @@ var searchcolor = 'rgb(230,0,230)';",
             size: super::FONTSIZE + 5,
             x: (super::IMAGEWIDTH / 2) as f64,
             y: (super::FONTSIZE * 2) as f64,
-            text: "Flame Graph".into(),
+            text: opt.title.clone().into(),
             location: Some("middle"),
             extra: None,
         },

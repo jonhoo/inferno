@@ -3,7 +3,7 @@ use std::io::{self, BufReader, Read};
 use std::path::PathBuf;
 use structopt::StructOpt;
 
-use inferno::flamegraph::{self, FuncFrameAttrsMap, Options};
+use inferno::flamegraph::{self, Direction, FuncFrameAttrsMap, Options};
 
 #[derive(Debug, StructOpt)]
 #[structopt(name = "inferno-flamegraph", author = "")]
@@ -13,6 +13,12 @@ struct Opt {
     /// then a sequence of tab separated name=value pairs.
     #[structopt(long = "nameattr")]
     nameattr_file: Option<PathBuf>,
+
+    /// The `--inverted` flag.
+    /// Changes the flame graph such that the entire plot is up-side-down.
+    /// Also, changing the title of the plot.
+    #[structopt(short = "i", long = "inverted")]
+    inverted: bool,
 
     /// Collapsed perf output files. With no INFILE, or INFILE is -, read STDIN.
     #[structopt(name = "INFILE", parse(from_os_str))]
@@ -28,7 +34,21 @@ impl Into<Options> for Opt {
             },
             None => FuncFrameAttrsMap::default(),
         };
-        Options { func_frameattrs }
+        let direction = if self.inverted {
+            Direction::Inverted
+        } else {
+            Direction::Straight
+        };
+        let title = if self.inverted {
+            "Icicle Graph".to_string()
+        } else {
+            "Flame Graph".to_string()
+        };
+        Options {
+            func_frameattrs,
+            direction,
+            title,
+        }
     }
 }
 
