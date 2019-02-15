@@ -17,6 +17,8 @@ fn flamegraph_nameattr() {
     let options = flamegraph::Options {
         func_frameattrs: flamegraph::FuncFrameAttrsMap::from_file(&PathBuf::from(nameattr_file))
             .unwrap(),
+        direction: flamegraph::Direction::Straight,
+        title: "Flame Graph".to_string(),
     };
 
     let r = File::open(input_file).unwrap();
