@@ -20,20 +20,26 @@ the sequence is [here](https://www.youtube.com/watch?v=jTpK-bNZiA4).
 
 # Dependency
 
-  You need to have the `perf` tool installed on your Linux systems.
-  This can involve package similar to `linux-tools-generic` for Ubuntu, `linux-tools` for Debian.
-  You may need to tweak a kernel config such as `echo 0 | sudo tee /proc/sys/kernel/perf_event_paranoid`.
+You need to have the [`perf`](https://perf.wiki.kernel.org/index.php/Main_Page) tool installed on your Linux systems.
+This can involve installing package like `linux-tools-generic` for Ubuntu or `linux-tools` for Debian.
+You may need to tweak a kernel config such as `echo 0 | sudo tee /proc/sys/kernel/perf_event_paranoid`, see [this stackoverflow answer](https://unix.stackexchange.com/a/14256) for details.
 
 # How to Use
 
-  Build Inferno
-    `cargo build --release`
+Build Inferno
+```
+cargo build --release
+```
 
-  Run a program using profiling with perf
-    `perf record -g -F 99 -a [your program]`
+Run a program using profiling with perf
+```
+perf record -g [your program]
+```
 
-  Transform perf output to svg
-    `perf script | ./target/release/inferno-collapse-perf | ./target/release/inferno-flamegraph > out.svg`
+Transform perf output to svg
+```
+perf script | ./target/release/inferno-collapse-perf | ./target/release/inferno-flamegraph > out.svg
+```
 
 # Comparison to the Perl implementation
 
