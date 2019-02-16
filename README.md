@@ -18,6 +18,23 @@ It is developed in part through live coding sessions, which you can find
 [on YouTube](https://www.youtube.com/c/JonGjengset). The first video in
 the sequence is [here](https://www.youtube.com/watch?v=jTpK-bNZiA4).
 
+# Dependency
+
+  You need to have the `perf` tool installed on your Linux systems.
+  This can involve package similar to `linux-tools-generic` for Ubuntu, `linux-tools` for Debian.
+  You may need to tweak a kernel config such as `echo 0 | sudo tee /proc/sys/kernel/perf_event_paranoid`.
+
+# How to Use
+
+  Build Inferno
+    `cargo build --release`
+
+  Run a program using profiling with perf
+    `perf record -g -F 99 -a [your program]`
+
+  Transform perf output to svg
+    `perf script | ./target/release/inferno-collapse-perf | ./target/release/inferno-flamegraph > out.svg`
+
 # Comparison to the Perl implementation
 
 To compare performance, run `./compare.sh`. It requires [hyperfine](https://github.com/sharkdp/hyperfine).
