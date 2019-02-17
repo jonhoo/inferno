@@ -1,4 +1,4 @@
-use super::Options;
+use super::{Direction, Options};
 use quick_xml::{
     events::attributes::Attribute,
     events::{BytesEnd, BytesStart, BytesText, Event},
@@ -119,7 +119,7 @@ var searchcolor = 'rgb(230,0,230)';",
         super::FONTSIZE,
         super::FONTWIDTH,
         super::XPAD,
-        opt.direction.is_inverted(),
+        opt.direction == Direction::Inverted,
     ))))?;
     svg.write_event(Event::CData(BytesText::from_escaped_str(include_str!(
         "flamegraph.js"
@@ -146,7 +146,7 @@ var searchcolor = 'rgb(230,0,230)';",
             size: super::FONTSIZE + 5,
             x: (super::IMAGEWIDTH / 2) as f64,
             y: (super::FONTSIZE * 2) as f64,
-            text: opt.title.clone().into(),
+            text: (&*opt.title).into(),
             location: Some("middle"),
             extra: None,
         },

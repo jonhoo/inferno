@@ -9,7 +9,6 @@ use quick_xml::{
     events::{BytesEnd, BytesStart, BytesText, Event},
     Writer,
 };
-use std::default::Default;
 use std::io;
 use std::io::prelude::*;
 use str_stack::StrStack;
@@ -33,7 +32,7 @@ pub struct Options {
     pub title: String,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq)]
 pub enum Direction {
     Straight,
     Inverted,
@@ -328,14 +327,5 @@ fn deannotate(f: &str) -> &str {
 impl Default for Direction {
     fn default() -> Self {
         Direction::Straight
-    }
-}
-
-impl Direction {
-    pub fn is_inverted(&self) -> bool {
-        match self {
-            Direction::Inverted => true,
-            Direction::Straight => false,
-        }
     }
 }
