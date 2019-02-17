@@ -27,18 +27,18 @@ You may need to tweak a kernel config such as `echo 0 | sudo tee /proc/sys/kerne
 # How to Use
 
 Build Inferno
-```
-cargo build --release
+```console
+$ cargo build --release
 ```
 
 Run a program using profiling with perf
-```
-perf record -g [your program]
+```console
+$ perf record -g [your program]
 ```
 
 Transform perf output to svg
-```
-perf script | ./target/release/inferno-collapse-perf | ./target/release/inferno-flamegraph > out.svg
+```console
+$ perf script | ./target/release/inferno-collapse-perf | ./target/release/inferno-flamegraph > out.svg
 ```
 
 # Comparison to the Perl implementation
