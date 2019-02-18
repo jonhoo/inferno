@@ -28,6 +28,14 @@ const BGCOLOR2: &str = "#eeeeb0";
 #[derive(Debug, Default)]
 pub struct Options {
     pub func_frameattrs: FuncFrameAttrsMap,
+    pub direction: Direction,
+    pub title: String,
+}
+
+#[derive(Debug, Clone, Copy, Eq, PartialEq)]
+pub enum Direction {
+    Straight,
+    Inverted,
 }
 
 macro_rules! args {
@@ -93,14 +101,24 @@ where
     // draw canvas, and embed interactive JavaScript program
     let imageheight = ((depthmax + 1) * FRAMEHEIGHT) + YPAD1 + YPAD2;
     svg::write_header(&mut svg, imageheight)?;
-    svg::write_prelude(&mut svg, imageheight)?;
+    svg::write_prelude(&mut svg, imageheight, &opt)?;
 
     // draw frames
     for frame in frames {
         let x1 = XPAD + (frame.start_time as f64 * widthpertime) as usize;
         let x2 = XPAD + (frame.end_time as f64 * widthpertime) as usize;
-        let y1 = imageheight - YPAD2 - (frame.location.depth + 1) * FRAMEHEIGHT + FRAMEPAD;
-        let y2 = imageheight - YPAD2 - frame.location.depth * FRAMEHEIGHT;
+        let (y1, y2) = match opt.direction {
+            Direction::Straight => {
+                let y1 = imageheight - YPAD2 - (frame.location.depth + 1) * FRAMEHEIGHT + FRAMEPAD;
+                let y2 = imageheight - YPAD2 - frame.location.depth * FRAMEHEIGHT;
+                (y1, y2)
+            }
+            Direction::Inverted => {
+                let y1 = YPAD1 + frame.location.depth * FRAMEHEIGHT;
+                let y2 = YPAD1 + (frame.location.depth + 1) * FRAMEHEIGHT - FRAMEPAD;
+                (y1, y2)
+            }
+        };
 
         let samples = frame.end_time - frame.start_time;
         let samples_txt = samples.thousands_sep();
@@ -304,4 +322,10 @@ fn deannotate(f: &str) -> &str {
         }
     }
     f
+}
+
+impl Default for Direction {
+    fn default() -> Self {
+        Direction::Straight
+    }
 }
