@@ -14,9 +14,7 @@ struct Opt {
     #[structopt(long = "nameattr")]
     nameattr_file: Option<PathBuf>,
 
-    /// The `--inverted` flag.
-    /// Changes the flame graph such that the entire plot is up-side-down.
-    /// Also, changing the title of the plot.
+    /// Plot the flame graph up-side-down.
     #[structopt(short = "i", long = "inverted")]
     inverted: bool,
 
