@@ -53,19 +53,22 @@ macro_rules! args {
 }
 
 struct FrameAttributes<'a> {
-title: &'a str,
-class: &'a str,
-onmouseover: &'a str,
-onmouseout: &'a str,
-onclick: &'a str,
-style: Option<&'a str>,
-g_extra: Option<&'a Vec<(String, String)>>,
-href: Option<&'a str>,
-target: &'a str,
-a_extra: Option<&'a Vec<(String, String)>>,
+    title: &'a str,
+    class: &'a str,
+    onmouseover: &'a str,
+    onmouseout: &'a str,
+    onclick: &'a str,
+    style: Option<&'a str>,
+    g_extra: Option<&'a Vec<(String, String)>>,
+    href: Option<&'a str>,
+    target: &'a str,
+    a_extra: Option<&'a Vec<(String, String)>>,
 }
 
-fn override_or_add_attributes<'a>(title: &'a str, attributes: Option<&'a attrs::FrameAttrs>) -> FrameAttributes<'a> {
+fn override_or_add_attributes<'a>(
+    title: &'a str,
+    attributes: Option<&'a attrs::FrameAttrs>,
+) -> FrameAttributes<'a> {
     let mut title = title;
     let mut class = "func_g";
     let mut onmouseover = "s(this)";
@@ -78,8 +81,7 @@ fn override_or_add_attributes<'a>(title: &'a str, attributes: Option<&'a attrs::
     let mut a_extra = None;
 
     // Handle any overridden or extra attributes.
-    if let Some(attrs) = attributes
-    {
+    if let Some(attrs) = attributes {
         if let Some(ref c) = attrs.g.class {
             class = c.as_str();
         }
@@ -109,7 +111,16 @@ fn override_or_add_attributes<'a>(title: &'a str, attributes: Option<&'a attrs::
     }
 
     FrameAttributes {
-        title, class, onmouseover, onmouseout, onclick, style, g_extra, href, target, a_extra
+        title,
+        class,
+        onmouseover,
+        onmouseout,
+        onclick,
+        style,
+        g_extra,
+        href,
+        target,
+        a_extra,
     }
 }
 
@@ -226,7 +237,9 @@ where
             )
         };
 
-        let frame_attributes = opt.func_frameattrs.frameattrs_for_func(frame.location.function);
+        let frame_attributes = opt
+            .func_frameattrs
+            .frameattrs_for_func(frame.location.function);
         let frame_attributes = override_or_add_attributes(&buffer[info], frame_attributes);
         let href_is_some = frame_attributes.href.is_some();
 
@@ -249,7 +262,9 @@ where
         }))?;
 
         svg.write_event(Event::Start(BytesStart::borrowed_name(b"title")))?;
-        svg.write_event(Event::Text(BytesText::from_plain_str(frame_attributes.title)))?;
+        svg.write_event(Event::Text(BytesText::from_plain_str(
+            frame_attributes.title,
+        )))?;
         svg.write_event(Event::End(BytesEnd::borrowed(b"title")))?;
 
         if let Some(href) = frame_attributes.href {
