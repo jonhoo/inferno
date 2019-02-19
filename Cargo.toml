@@ -1,6 +1,6 @@
 [package]
 name = "inferno"
-version = "0.1.0"
+version = "0.2.0"
 
 description = "Rust port of the FlameGraph performance profiling tool suite"
 readme = "README.md"
@@ -26,16 +26,12 @@ smallvec = "0.6"
 object = "0.11"
 gimli = "0.16"
 memmap = "0.7"
-num-format = "0.2"
+num-format = { version = "0.3", default-features = false }
 log = "0.4"
 quick-xml = "0.13"
 str_stack = "0.1"
-
-# When a new version of addr2line with this revision
-# is released on crates.io, we can switch to that.
-[dependencies.addr2line]
-git = "https://github.com/gimli-rs/addr2line"
-rev = "78f436b9c63b19803a9f5d162ba0b785f5ef6636"
+addr2line = "0.8"
+indexmap = "1.0"
 
 [dev-dependencies]
 pretty_assertions = "0.5"

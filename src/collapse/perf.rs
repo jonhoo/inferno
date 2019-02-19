@@ -1,4 +1,3 @@
-use gimli::{EndianRcSlice, RunTimeEndian};
 use smallvec::SmallVec;
 use std::borrow::Cow;
 use std::collections::{HashMap, VecDeque};
@@ -82,7 +81,7 @@ struct PerfState {
     occurrences: HashMap<String, usize>,
 
     /// Cached Contexts by module name for un_inline() since constructing them is somewhat costly.
-    addr2line_contexts: HashMap<String, Option<addr2line::Context<EndianRcSlice<RunTimeEndian>>>>,
+    addr2line_contexts: HashMap<String, Option<addr2line::Context>>,
 
     /// Current comm name.
     ///
