@@ -1,3 +1,0 @@
-inline_counter;main;count_to 15
-inline_counter;main;double_inline;count_to 12
-inline_counter;not_inlined;count_to 13

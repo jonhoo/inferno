@@ -1,3 +1,0 @@
-inline_counter;main:inline_counter.c:16;count_to:inline_counter.c:4 15
-inline_counter;main:inline_counter.c:17;double_inline:inline_counter.c:8;count_to:inline_counter.c:4 12
-inline_counter;not_inlined:inline_counter.c:12;count_to:inline_counter.c:4 13

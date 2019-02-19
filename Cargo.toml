@@ -1,6 +1,6 @@
 [package]
 name = "inferno"
-version = "0.1.0"
+version = "0.2.0"
 
 description = "Rust port of the FlameGraph performance profiling tool suite"
 readme = "README.md"
@@ -31,6 +31,7 @@ quick-xml = "0.13"
 pretty_toa = "1.0.0"
 str_stack = "0.1"
 addr2line = "0.8"
+indexmap = "1.0"
 rand = "0.6.5"
 
 [dev-dependencies]
