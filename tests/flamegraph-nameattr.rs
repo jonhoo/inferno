@@ -15,6 +15,10 @@ fn flamegraph_nameattr() {
     let nameattr_file = "./tests/data/nameattr/nameattr.txt";
 
     let options = flamegraph::Options {
+        colors: Default::default(),
+        bgcolors: Default::default(),
+        hash: true,
+        consistent_palette: Default::default(),
         func_frameattrs: flamegraph::FuncFrameAttrsMap::from_file(&PathBuf::from(nameattr_file))
             .unwrap(),
         direction: flamegraph::Direction::Straight,
