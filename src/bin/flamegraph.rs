@@ -3,7 +3,7 @@ use std::io::{self, BufReader, Read};
 use std::path::PathBuf;
 use structopt::StructOpt;
 
-use inferno::flamegraph::{self, Direction, FuncFrameAttrsMap, Options, Palette};
+use inferno::flamegraph::{self, BackgroundColor, Direction, FuncFrameAttrsMap, Options, Palette};
 
 #[derive(Debug, StructOpt)]
 #[structopt(name = "inferno-flamegraph", author = "")]
@@ -31,6 +31,9 @@ struct Opt {
         )
     )]
     colors: Palette,
+    /// set background colors. Gradient choices are yellow (default), blue, green, grey; flat colors use "#rrggbb"
+    #[structopt(long = "bgcolors")]
+    bgcolors: Option<BackgroundColor>,
     /// colors are keyed by function name hash
     #[structopt(long = "hash")]
     hash: bool,
@@ -60,6 +63,7 @@ impl Into<Options> for Opt {
         };
         Options {
             colors: self.colors,
+            bgcolors: self.bgcolors,
             hash: self.hash,
             consistent_palette: self.cp,
             func_frameattrs,

@@ -1,5 +1,6 @@
 use rand::rngs::ThreadRng;
 use rand::Rng;
+use std::borrow::Cow;
 use std::str::FromStr;
 
 mod palette_map;
@@ -12,7 +13,17 @@ pub(super) const DGREY: (u8, u8, u8) = (200, 200, 200);
 
 const YELLOW_GRADIENT: (&str, &str) = ("#eeeeee", "#eeeeb0");
 const BLUE_GRADIENT: (&str, &str) = ("#eeeeee", "#e0e0ff");
+const GREEN_GRADIENT: (&str, &str) = ("#eef2ee", "#e0ffe0");
 const GRAY_GRADIENT: (&str, &str) = ("#f8f8f8", "#e8e8e8");
+
+#[derive(Clone, Copy, Debug)]
+pub enum BackgroundColor {
+    Yellow,
+    Blue,
+    Green,
+    Grey,
+    Flat(u8, u8, u8),
+}
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Palette {
@@ -40,6 +51,48 @@ pub enum MultiPalette {
     Js,
     Perl,
     Wakeup,
+}
+
+impl Default for BackgroundColor {
+    fn default() -> Self {
+        BackgroundColor::Yellow
+    }
+}
+
+impl FromStr for BackgroundColor {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "yellow" => Ok(BackgroundColor::Yellow),
+            "blue" => Ok(BackgroundColor::Blue),
+            "green" => Ok(BackgroundColor::Green),
+            "grey" => Ok(BackgroundColor::Grey),
+            flat => parse_flat_bgcolor(flat)
+                .map(|(r, g, b)| BackgroundColor::Flat(r, g, b))
+                .ok_or_else(|| format!("unknown background color: {}", flat)),
+        }
+    }
+}
+
+macro_rules! u8_from_hex_iter {
+    ($slice:expr) => {
+        (($slice.next()?.to_digit(16)? as u8) << 4) | ($slice.next()?.to_digit(16)? as u8)
+    };
+}
+
+fn parse_flat_bgcolor(s: &str) -> Option<(u8, u8, u8)> {
+    if !s.starts_with('#') || (s.len() != 7) {
+        None
+    } else {
+        let mut s = s[1..].chars();
+
+        let r = u8_from_hex_iter!(s);
+        let g = u8_from_hex_iter!(s);
+        let b = u8_from_hex_iter!(s);
+
+        Some((r, g, b))
+    }
 }
 
 impl Default for Palette {
@@ -202,20 +255,66 @@ pub(super) fn color(
     rgb_components_for_palette(palette, name, v1, v2, v3)
 }
 
-pub(super) fn bgcolor_for(palette: Palette) -> (&'static str, &'static str) {
+fn default_bg_color_for(palette: Palette) -> BackgroundColor {
     match palette {
-        Palette::Basic(BasicPalette::Hot)
-        | Palette::Multi(MultiPalette::Java)
-        | Palette::Multi(MultiPalette::Js)
-        | Palette::Multi(MultiPalette::Perl) => YELLOW_GRADIENT,
-        Palette::Basic(BasicPalette::Mem) => BLUE_GRADIENT,
-        _ => GRAY_GRADIENT,
+        Palette::Basic(BasicPalette::Mem) => BackgroundColor::Green,
+        Palette::Basic(BasicPalette::Io) | Palette::Multi(MultiPalette::Wakeup) => {
+            BackgroundColor::Blue
+        }
+        Palette::Basic(BasicPalette::Red)
+        | Palette::Basic(BasicPalette::Green)
+        | Palette::Basic(BasicPalette::Blue)
+        | Palette::Basic(BasicPalette::Aqua)
+        | Palette::Basic(BasicPalette::Yellow)
+        | Palette::Basic(BasicPalette::Purple)
+        | Palette::Basic(BasicPalette::Orange) => BackgroundColor::Grey,
+        _ => BackgroundColor::Yellow,
+    }
+}
+
+macro_rules! cow {
+    ($gradient:expr) => {
+        (Cow::from($gradient.0), Cow::from($gradient.1))
+    };
+}
+
+pub(super) fn bgcolor_for<'a>(
+    bgcolor: Option<BackgroundColor>,
+    palette: Palette,
+) -> (Cow<'a, str>, Cow<'a, str>) {
+    let bgcolor = bgcolor.unwrap_or_else(|| default_bg_color_for(palette));
+
+    match bgcolor {
+        BackgroundColor::Yellow => cow!(YELLOW_GRADIENT),
+        BackgroundColor::Blue => cow!(BLUE_GRADIENT),
+        BackgroundColor::Green => cow!(GREEN_GRADIENT),
+        BackgroundColor::Grey => cow!(GRAY_GRADIENT),
+        BackgroundColor::Flat(r, g, b) => {
+            let color = format!("#{:02x}{:02x}{:02x}", r, g, b);
+            let first = Cow::from(color);
+            let second = first.clone();
+            (first, second)
+        }
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::namehash;
+    use super::parse_flat_bgcolor;
+
+    #[test]
+    fn bgcolor_parse_test() {
+        assert_eq!(parse_flat_bgcolor("#ffffff"), Some((0xff, 0xff, 0xff)));
+        assert_eq!(parse_flat_bgcolor("#000000"), Some((0x00, 0x00, 0x00)));
+        assert_eq!(parse_flat_bgcolor("#abcdef"), Some((0xab, 0xcd, 0xef)));
+        assert_eq!(parse_flat_bgcolor("#123456"), Some((0x12, 0x34, 0x56)));
+        assert_eq!(parse_flat_bgcolor("#789000"), Some((0x78, 0x90, 0x00)));
+        assert_eq!(parse_flat_bgcolor("ffffff"), None);
+        assert_eq!(parse_flat_bgcolor("#fffffff"), None);
+        assert_eq!(parse_flat_bgcolor("#xfffff"), None);
+        assert_eq!(parse_flat_bgcolor("# fffff"), None);
+    }
 
     macro_rules! test_hash {
         ($name:expr, $expected:expr) => {

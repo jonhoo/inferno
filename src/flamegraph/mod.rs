@@ -14,6 +14,7 @@ use str_stack::StrStack;
 mod color;
 mod merge;
 mod svg;
+pub use color::BackgroundColor;
 pub use color::Palette;
 use svg::StyleOptions;
 
@@ -31,6 +32,7 @@ const PALETTE_FILE: &str = "palette.map";
 #[derive(Debug, Default)]
 pub struct Options {
     pub colors: color::Palette,
+    pub bgcolors: Option<color::BackgroundColor>,
     pub hash: bool,
     pub consistent_palette: bool,
     pub func_frameattrs: FuncFrameAttrsMap,
@@ -61,7 +63,7 @@ where
         None
     };
 
-    let (bgcolor1, bgcolor2) = color::bgcolor_for(opt.colors);
+    let (bgcolor1, bgcolor2) = color::bgcolor_for(opt.bgcolors, opt.colors);
 
     let mut buffer = StrStack::new();
     let (mut frames, time, ignored) = merge::frames(lines);

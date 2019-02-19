@@ -44,8 +44,8 @@ pub(super) struct TextItem<'a, I> {
 
 pub(super) struct StyleOptions<'a> {
     pub(super) imageheight: usize,
-    pub(super) bgcolor1: &'a str,
-    pub(super) bgcolor2: &'a str,
+    pub(super) bgcolor1: Cow<'a, str>,
+    pub(super) bgcolor2: Cow<'a, str>,
 }
 
 pub(super) fn write_header<W>(svg: &mut Writer<W>, imageheight: usize) -> quick_xml::Result<()>
@@ -91,12 +91,14 @@ where
     )))?;
     svg.write_event(Event::Empty(
         BytesStart::borrowed_name(b"stop").with_attributes(
-            iter::once(("stop-color", style_options.bgcolor1)).chain(iter::once(("offset", "5%"))),
+            iter::once(("stop-color", &*style_options.bgcolor1))
+                .chain(iter::once(("offset", "5%"))),
         ),
     ))?;
     svg.write_event(Event::Empty(
         BytesStart::borrowed_name(b"stop").with_attributes(
-            iter::once(("stop-color", style_options.bgcolor2)).chain(iter::once(("offset", "95%"))),
+            iter::once(("stop-color", &*style_options.bgcolor2))
+                .chain(iter::once(("offset", "95%"))),
         ),
     ))?;
     svg.write_event(Event::End(BytesEnd::borrowed(b"linearGradient")))?;
