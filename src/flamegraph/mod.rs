@@ -52,6 +52,67 @@ macro_rules! args {
     }};
 }
 
+struct FrameAttributes<'a> {
+title: &'a str,
+class: &'a str,
+onmouseover: &'a str,
+onmouseout: &'a str,
+onclick: &'a str,
+style: Option<&'a str>,
+g_extra: Option<&'a Vec<(String, String)>>,
+href: Option<&'a str>,
+target: &'a str,
+a_extra: Option<&'a Vec<(String, String)>>,
+}
+
+fn override_or_add_attributes<'a>(title: &'a str, attributes: Option<&'a attrs::FrameAttrs>) -> FrameAttributes<'a> {
+    let mut title = title;
+    let mut class = "func_g";
+    let mut onmouseover = "s(this)";
+    let mut onmouseout = "c()";
+    let mut onclick = "zoom(this)";
+    let mut style = None;
+    let mut g_extra = None;
+    let mut href = None;
+    let mut target = "_top";
+    let mut a_extra = None;
+
+    // Handle any overridden or extra attributes.
+    if let Some(attrs) = attributes
+    {
+        if let Some(ref c) = attrs.g.class {
+            class = c.as_str();
+        }
+        if let Some(ref c) = attrs.g.style {
+            style = Some(c.as_str());
+        }
+        if let Some(ref o) = attrs.g.onmouseover {
+            onmouseover = o.as_str();
+        }
+        if let Some(ref o) = attrs.g.onmouseout {
+            onmouseout = o.as_str();
+        }
+        if let Some(ref o) = attrs.g.onclick {
+            onclick = o.as_str();
+        }
+        if let Some(ref t) = attrs.title {
+            title = t.as_str();
+        }
+        g_extra = Some(&attrs.g.extra);
+        if let Some(ref h) = attrs.a.href {
+            href = Some(h.as_str());
+        }
+        if let Some(ref t) = attrs.a.target {
+            target = t.as_str();
+        }
+        a_extra = Some(&attrs.a.extra);
+    }
+
+    FrameAttributes {
+        title, class, onmouseover, onmouseout, onclick, style, g_extra, href, target, a_extra
+    }
+}
+
 pub fn from_sorted_lines<'a, I, W>(opt: Options, lines: I, writer: W) -> quick_xml::Result<()>
 where
     I: IntoIterator<Item = &'a str>,
@@ -165,79 +226,39 @@ where
             )
         };
 
-        let mut title = &buffer[info];
-        let mut class = "func_g";
-        let mut onmouseover = "s(this)";
-        let mut onmouseout = "c()";
-        let mut onclick = "zoom(this)";
-        let mut style = None;
-        let mut g_extra = None;
-        let mut href = None;
-        let mut target = "_top";
-        let mut a_extra = None;
-
-        // Handle any overridden or extra attributes.
-        if let Some(attrs) = opt
-            .func_frameattrs
-            .frameattrs_for_func(frame.location.function)
-        {
-            if let Some(ref c) = attrs.g.class {
-                class = c.as_str();
-            }
-            if let Some(ref c) = attrs.g.style {
-                style = Some(c.as_str());
-            }
-            if let Some(ref o) = attrs.g.onmouseover {
-                onmouseover = o.as_str();
-            }
-            if let Some(ref o) = attrs.g.onmouseout {
-                onmouseout = o.as_str();
-            }
-            if let Some(ref o) = attrs.g.onclick {
-                onclick = o.as_str();
-            }
-            if let Some(ref t) = attrs.title {
-                title = t.as_str();
-            }
-            g_extra = Some(&attrs.g.extra);
-            if let Some(ref h) = attrs.a.href {
-                href = Some(h.as_str());
-            }
-            if let Some(ref t) = attrs.a.target {
-                target = t.as_str();
-            }
-            a_extra = Some(&attrs.a.extra);
-        }
+        let frame_attributes = opt.func_frameattrs.frameattrs_for_func(frame.location.function);
+        let frame_attributes = override_or_add_attributes(&buffer[info], frame_attributes);
+        let href_is_some = frame_attributes.href.is_some();
 
         svg.write_event(Event::Start({
             let mut g = BytesStart::borrowed_name(b"g").with_attributes(args!(
-                "class" => class
+                "class" => frame_attributes.class
             ));
-            if let Some(style) = style {
+            if let Some(style) = frame_attributes.style {
                 g.extend_attributes(std::iter::once(("style", style)));
             }
             g.extend_attributes(args!(
-                "onmouseover" => onmouseover,
-                "onmouseout" => onmouseout,
-                "onclick" => onclick
+                "onmouseover" => frame_attributes.onmouseover,
+                "onmouseout" => frame_attributes.onmouseout,
+                "onclick" => frame_attributes.onclick
             ));
-            if let Some(extra) = g_extra {
+            if let Some(extra) = frame_attributes.g_extra {
                 g.extend_attributes(extra.iter().map(|(k, v)| (k.as_str(), v.as_str())));
             }
             g
         }))?;
 
         svg.write_event(Event::Start(BytesStart::borrowed_name(b"title")))?;
-        svg.write_event(Event::Text(BytesText::from_plain_str(title)))?;
+        svg.write_event(Event::Text(BytesText::from_plain_str(frame_attributes.title)))?;
         svg.write_event(Event::End(BytesEnd::borrowed(b"title")))?;
 
-        if let Some(href) = href {
+        if let Some(href) = frame_attributes.href {
             svg.write_event(Event::Start({
                 let mut a = BytesStart::borrowed_name(b"a").with_attributes(args!(
                     "xlink:href" => href,
-                    "target" => target
+                    "target" => frame_attributes.target
                 ));
-                if let Some(extra) = a_extra {
+                if let Some(extra) = frame_attributes.a_extra {
                     a.extend_attributes(extra.iter().map(|(k, v)| (k.as_str(), v.as_str())));
                 }
                 a
@@ -302,7 +323,7 @@ where
         )?;
 
         buffer.clear();
-        if href.is_some() {
+        if href_is_some {
             svg.write_event(Event::End(BytesEnd::borrowed(b"a")))?;
         }
         svg.write_event(Event::End(BytesEnd::borrowed(b"g")))?;
