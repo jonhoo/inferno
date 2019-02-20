@@ -2,13 +2,14 @@ mod attrs;
 
 pub use attrs::FuncFrameAttrsMap;
 
-use pretty_toa::ThousandsSep;
+use std::io;
+use std::io::prelude::*;
+
+use num_format::Locale;
 use quick_xml::{
     events::{BytesEnd, BytesStart, BytesText, Event},
     Writer,
 };
-use std::io;
-use std::io::prelude::*;
 use str_stack::StrStack;
 
 mod color;
@@ -202,7 +203,11 @@ where
     // frames loop.
     let mut thread_rng = rand::thread_rng();
 
+    // struct to reuse accross loops to avoid allocations
+    let mut event_start = Event::Start({ BytesStart::owned_name("g") });
+
     // draw frames
+    let mut samples_txt_buffer = num_format::Buffer::default();
     for frame in frames {
         let x1 = XPAD + (frame.start_time as f64 * widthpertime) as usize;
         let x2 = XPAD + (frame.end_time as f64 * widthpertime) as usize;
@@ -220,7 +225,10 @@ where
         };
 
         let samples = frame.end_time - frame.start_time;
-        let samples_txt = samples.thousands_sep();
+
+        // add thousands separators to `samples`
+        let _ = samples_txt_buffer.write_formatted(&samples, &Locale::en);
+        let samples_txt = samples_txt_buffer.as_str();
 
         let info = if frame.location.function.is_empty() && frame.location.depth == 0 {
             write!(buffer, "all ({} samples, 100%)", samples_txt)
@@ -243,23 +251,27 @@ where
         let frame_attributes = override_or_add_attributes(&buffer[info], frame_attributes);
         let href_is_some = frame_attributes.href.is_some();
 
-        svg.write_event(Event::Start({
-            let mut g = BytesStart::borrowed_name(b"g").with_attributes(args!(
-                "class" => frame_attributes.class
-            ));
-            if let Some(style) = frame_attributes.style {
-                g.extend_attributes(std::iter::once(("style", style)));
-            }
+        if let Event::Start(ref mut g) = event_start {
+            // clear the BytesStart
+            g.clear_attributes();
+
             g.extend_attributes(args!(
+                "class" => frame_attributes.class,
                 "onmouseover" => frame_attributes.onmouseover,
                 "onmouseout" => frame_attributes.onmouseout,
                 "onclick" => frame_attributes.onclick
             ));
+
+            // add optional attributes
+            if let Some(style) = frame_attributes.style {
+                g.extend_attributes(std::iter::once(("style", style)));
+            }
             if let Some(extra) = frame_attributes.g_extra {
                 g.extend_attributes(extra.iter().map(|(k, v)| (k.as_str(), v.as_str())));
             }
-            g
-        }))?;
+        }
+
+        svg.write_event(&event_start)?;
 
         svg.write_event(Event::Start(BytesStart::borrowed_name(b"title")))?;
         svg.write_event(Event::Text(BytesText::from_plain_str(
