@@ -30,6 +30,7 @@ pub(super) mod java {
 
         if java_prefix.starts_with("java/")
             || java_prefix.starts_with("javax/")
+            || java_prefix.starts_with("jdk/")
             || java_prefix.starts_with("net/")
             || java_prefix.starts_with("org/")
             || java_prefix.starts_with("com/")
