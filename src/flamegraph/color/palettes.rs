@@ -68,7 +68,7 @@ pub(super) mod js {
     use crate::flamegraph::color::BasicPalette;
 
     pub fn resolve(name: &str) -> BasicPalette {
-        if name.trim().is_empty() {
+        if !name.is_empty() && name.trim().is_empty() {
             return BasicPalette::Green;
         } else if name.ends_with("_[k]") {
             return BasicPalette::Orange;
