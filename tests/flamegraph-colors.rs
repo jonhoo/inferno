@@ -57,10 +57,8 @@ fn flamegraph_colors_java() {
         colors: Palette::from_str("java").unwrap(),
         bgcolors: Some(BackgroundColor::from_str("blue").unwrap()),
         hash: true,
-        consistent_palette: Default::default(),
-        func_frameattrs: Default::default(),
-        direction: Default::default(),
         title: "Flame Graph".to_string(),
+        ..Default::default()
     };
 
     do_test(input_file, expected_result_file, options)
@@ -75,10 +73,8 @@ fn flamegraph_colors_js() {
         colors: Palette::from_str("js").unwrap(),
         bgcolors: Some(BackgroundColor::from_str("green").unwrap()),
         hash: true,
-        consistent_palette: Default::default(),
-        func_frameattrs: Default::default(),
-        direction: Default::default(),
         title: "Flame Graph".to_string(),
+        ..Default::default()
     };
 
     do_test(input_file, expected_result_file, options)
