@@ -104,6 +104,9 @@ where
     svg::write_header(&mut svg, imageheight)?;
     svg::write_prelude(&mut svg, imageheight, &opt)?;
 
+    // struct to reuse accross loops to avoid allocations
+    let mut event_start = Event::Start({ BytesStart::owned_name("g") });
+
     // draw frames
     let mut samples_txt_buffer = num_format::Buffer::default();
     for frame in frames {
@@ -187,23 +190,27 @@ where
             a_extra = Some(&attrs.a.extra);
         }
 
-        svg.write_event(Event::Start({
-            let mut g = BytesStart::borrowed_name(b"g").with_attributes(args!(
-                "class" => class
-            ));
-            if let Some(style) = style {
-                g.extend_attributes(std::iter::once(("style", style)));
-            }
+        if let Event::Start(ref mut g) = event_start {
+            // clear the BytesStart
+            g.clear_attributes();
+
             g.extend_attributes(args!(
+                "class" => class,
                 "onmouseover" => onmouseover,
                 "onmouseout" => onmouseout,
                 "onclick" => onclick
             ));
+
+            // add optional attributes
+            if let Some(style) = style {
+                g.extend_attributes(std::iter::once(("style", style)));
+            }
             if let Some(extra) = g_extra {
                 g.extend_attributes(extra.iter().map(|(k, v)| (k.as_str(), v.as_str())));
             }
-            g
-        }))?;
+        }
+
+        svg.write_event(&event_start)?;
 
         svg.write_event(Event::Start(BytesStart::borrowed_name(b"title")))?;
         svg.write_event(Event::Text(BytesText::from_plain_str(title)))?;
