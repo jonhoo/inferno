@@ -2,7 +2,7 @@ mod attrs;
 mod merge;
 mod svg;
 
-pub use self::attrs::FuncFrameAttrsMap;
+pub use attrs::FuncFrameAttrsMap;
 
 use std::io;
 use std::io::prelude::*;
