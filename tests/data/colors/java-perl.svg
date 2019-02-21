@@ -1,0 +1,1441 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" width="1200" height="1206" onload="init(evt)" viewBox="0 0 1200 1206" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<!-- Flame graph stack visualization. See https://github.com/brendangregg/FlameGraph for latest version, and http://www.brendangregg.com/flamegraphs.html for examples. -->
+<!-- NOTES:  -->
+<defs>
+	<linearGradient id="background" y1="0" y2="1" x1="0" x2="0" >
+		<stop stop-color="#eeeeee" offset="5%" />
+		<stop stop-color="#e0e0ff" offset="95%" />
+	</linearGradient>
+</defs>
+<style type="text/css">
+	text { font-family:Verdana; font-size:12px; fill:rgb(0,0,0); }
+	#search { opacity:0.1; cursor:pointer; }
+	#search:hover, #search.show { opacity:1; }
+	#subtitle { text-anchor:middle; font-color:rgb(160,160,160); }
+	#title { text-anchor:middle; font-size:17px}
+	#unzoom { cursor:pointer; }
+	#frames > *:hover { stroke:black; stroke-width:0.5; cursor:pointer; }
+	.hide { display:none; }
+	.parent { opacity:0.5; }
+</style>
+<script type="text/ecmascript">
+<![CDATA[
+	"use strict";
+	var details, searchbtn, unzoombtn, matchedtxt, svg, searching;
+	function init(evt) {
+		details = document.getElementById("details").firstChild;
+		searchbtn = document.getElementById("search");
+		unzoombtn = document.getElementById("unzoom");
+		matchedtxt = document.getElementById("matched");
+		svg = document.getElementsByTagName("svg")[0];
+		searching = 0;
+	}
+
+	window.addEventListener("click", function(e) {
+		var target = find_group(e.target);
+		if (target) {
+			if (target.nodeName == "a") {
+				if (e.ctrlKey === false) return;
+				e.preventDefault();
+			}
+			if (target.classList.contains("parent")) unzoom();
+			zoom(target);
+		}
+		else if (e.target.id == "unzoom") unzoom();
+		else if (e.target.id == "search") search_prompt();
+	}, false)
+
+	// mouse-over for info
+	// show
+	window.addEventListener("mouseover", function(e) {
+		var target = find_group(e.target);
+		if (target) details.nodeValue = "Function: " + g_to_text(target);
+	}, false)
+
+	// clear
+	window.addEventListener("mouseout", function(e) {
+		var target = find_group(e.target);
+		if (target) details.nodeValue = ' ';
+	}, false)
+
+	// ctrl-F for search
+	window.addEventListener("keydown",function (e) {
+		if (e.keyCode === 114 || (e.ctrlKey && e.keyCode === 70)) {
+			e.preventDefault();
+			search_prompt();
+		}
+	}, false)
+
+	// functions
+	function find_child(node, selector) {
+		var children = node.querySelectorAll(selector);
+		if (children.length) return children[0];
+		return;
+	}
+	function find_group(node) {
+		var parent = node.parentElement;
+		if (!parent) return;
+		if (parent.id == "frames") return node;
+		return find_group(parent);
+	}
+	function orig_save(e, attr, val) {
+		if (e.attributes["_orig_" + attr] != undefined) return;
+		if (e.attributes[attr] == undefined) return;
+		if (val == undefined) val = e.attributes[attr].value;
+		e.setAttribute("_orig_" + attr, val);
+	}
+	function orig_load(e, attr) {
+		if (e.attributes["_orig_"+attr] == undefined) return;
+		e.attributes[attr].value = e.attributes["_orig_" + attr].value;
+		e.removeAttribute("_orig_"+attr);
+	}
+	function g_to_text(e) {
+		var text = find_child(e, "title").firstChild.nodeValue;
+		return (text)
+	}
+	function g_to_func(e) {
+		var func = g_to_text(e);
+		// if there's any manipulation we want to do to the function
+		// name before it's searched, do it here before returning.
+		return (func);
+	}
+	function update_text(e) {
+		var r = find_child(e, "rect");
+		var t = find_child(e, "text");
+		var w = parseFloat(r.attributes.width.value) -3;
+		var txt = find_child(e, "title").textContent.replace(/\([^(]*\)$/,"");
+		t.attributes.x.value = parseFloat(r.attributes.x.value) + 3;
+
+		// Smaller than this size won't fit anything
+		if (w < 2 * 12 * 0.59) {
+			t.textContent = "";
+			return;
+		}
+
+		t.textContent = txt;
+		// Fit in full text width
+		if (/^ *$/.test(txt) || t.getSubStringLength(0, txt.length) < w)
+			return;
+
+		for (var x = txt.length - 2; x > 0; x--) {
+			if (t.getSubStringLength(0, x + 2) <= w) {
+				t.textContent = txt.substring(0, x) + "..";
+				return;
+			}
+		}
+		t.textContent = "";
+	}
+
+	// zoom
+	function zoom_reset(e) {
+		if (e.attributes != undefined) {
+			orig_load(e, "x");
+			orig_load(e, "width");
+		}
+		if (e.childNodes == undefined) return;
+		for (var i = 0, c = e.childNodes; i < c.length; i++) {
+			zoom_reset(c[i]);
+		}
+	}
+	function zoom_child(e, x, ratio) {
+		if (e.attributes != undefined) {
+			if (e.attributes.x != undefined) {
+				orig_save(e, "x");
+				e.attributes.x.value = (parseFloat(e.attributes.x.value) - x - 10) * ratio + 10;
+				if (e.tagName == "text")
+					e.attributes.x.value = find_child(e.parentNode, "rect[x]").attributes.x.value + 3;
+			}
+			if (e.attributes.width != undefined) {
+				orig_save(e, "width");
+				e.attributes.width.value = parseFloat(e.attributes.width.value) * ratio;
+			}
+		}
+
+		if (e.childNodes == undefined) return;
+		for (var i = 0, c = e.childNodes; i < c.length; i++) {
+			zoom_child(c[i], x - 10, ratio);
+		}
+	}
+	function zoom_parent(e) {
+		if (e.attributes) {
+			if (e.attributes.x != undefined) {
+				orig_save(e, "x");
+				e.attributes.x.value = 10;
+			}
+			if (e.attributes.width != undefined) {
+				orig_save(e, "width");
+				e.attributes.width.value = parseInt(svg.width.baseVal.value) - (10 * 2);
+			}
+		}
+		if (e.childNodes == undefined) return;
+		for (var i = 0, c = e.childNodes; i < c.length; i++) {
+			zoom_parent(c[i]);
+		}
+	}
+	function zoom(node) {
+		var attr = find_child(node, "rect").attributes;
+		var width = parseFloat(attr.width.value);
+		var xmin = parseFloat(attr.x.value);
+		var xmax = parseFloat(xmin + width);
+		var ymin = parseFloat(attr.y.value);
+		var ratio = (svg.width.baseVal.value - 2 * 10) / width;
+
+		// XXX: Workaround for JavaScript float issues (fix me)
+		var fudge = 0.0001;
+
+		unzoombtn.classList.remove("hide");
+
+		var el = document.getElementById("frames").children;
+		for (var i = 0; i < el.length; i++) {
+			var e = el[i];
+			var a = find_child(e, "rect").attributes;
+			var ex = parseFloat(a.x.value);
+			var ew = parseFloat(a.width.value);
+			var upstack;
+			// Is it an ancestor
+			if (0 == 0) {
+				upstack = parseFloat(a.y.value) > ymin;
+			} else {
+				upstack = parseFloat(a.y.value) < ymin;
+			}
+			if (upstack) {
+				// Direct ancestor
+				if (ex <= xmin && (ex+ew+fudge) >= xmax) {
+					e.classList.add("parent");
+					zoom_parent(e);
+					update_text(e);
+				}
+				// not in current path
+				else
+					e.classList.add("hide");
+			}
+			// Children maybe
+			else {
+				// no common path
+				if (ex < xmin || ex + fudge >= xmax) {
+					e.classList.add("hide");
+				}
+				else {
+					zoom_child(e, xmin, ratio);
+					update_text(e);
+				}
+			}
+		}
+	}
+	function unzoom() {
+		unzoombtn.classList.add("hide");
+		var el = document.getElementById("frames").children;
+		for(var i = 0; i < el.length; i++) {
+			el[i].classList.remove("parent");
+			el[i].classList.remove("hide");
+			zoom_reset(el[i]);
+			update_text(el[i]);
+		}
+	}
+
+	// search
+	function reset_search() {
+		var el = document.querySelectorAll("#frames rect");
+		for (var i = 0; i < el.length; i++) {
+			orig_load(el[i], "fill")
+		}
+	}
+	function search_prompt() {
+		if (!searching) {
+			var term = prompt("Enter a search term (regexp " +
+			    "allowed, eg: ^ext4_)", "");
+			if (term != null) {
+				search(term)
+			}
+		} else {
+			reset_search();
+			searching = 0;
+			searchbtn.classList.remove("show");
+			searchbtn.firstChild.nodeValue = "Search"
+			matchedtxt.classList.add("hide");
+			matchedtxt.firstChild.nodeValue = ""
+		}
+	}
+	function search(term) {
+		var re = new RegExp(term);
+		var el = document.getElementById("frames").children;
+		var matches = new Object();
+		var maxwidth = 0;
+		for (var i = 0; i < el.length; i++) {
+			var e = el[i];
+			var func = g_to_func(e);
+			var rect = find_child(e, "rect");
+			if (func == null || rect == null)
+				continue;
+
+			// Save max width. Only works as we have a root frame
+			var w = parseFloat(rect.attributes.width.value);
+			if (w > maxwidth)
+				maxwidth = w;
+
+			if (func.match(re)) {
+				// highlight
+				var x = parseFloat(rect.attributes.x.value);
+				orig_save(rect, "fill");
+				rect.attributes.fill.value = "rgb(230,0,230)";
+
+				// remember matches
+				if (matches[x] == undefined) {
+					matches[x] = w;
+				} else {
+					if (w > matches[x]) {
+						// overwrite with parent
+						matches[x] = w;
+					}
+				}
+				searching = 1;
+			}
+		}
+		if (!searching)
+			return;
+
+		searchbtn.classList.add("show");
+		searchbtn.firstChild.nodeValue = "Reset Search";
+
+		// calculate percent matched, excluding vertical overlap
+		var count = 0;
+		var lastx = -1;
+		var lastw = 0;
+		var keys = Array();
+		for (k in matches) {
+			if (matches.hasOwnProperty(k))
+				keys.push(k);
+		}
+		// sort the matched frames by their x location
+		// ascending, then width descending
+		keys.sort(function(a, b){
+			return a - b;
+		});
+		// Step through frames saving only the biggest bottom-up frames
+		// thanks to the sort order. This relies on the tree property
+		// where children are always smaller than their parents.
+		var fudge = 0.0001;	// JavaScript floating point
+		for (var k in keys) {
+			var x = parseFloat(keys[k]);
+			var w = matches[keys[k]];
+			if (x >= lastx + lastw - fudge) {
+				count += w;
+				lastx = x;
+				lastw = w;
+			}
+		}
+		// display matched percent
+		matchedtxt.classList.remove("hide");
+		var pct = 100 * count / maxwidth;
+		if (pct != 100) pct = pct.toFixed(1)
+		matchedtxt.firstChild.nodeValue = "Matched: " + pct + "%";
+	}
+]]>
+</script>
+<rect x="0.0" y="0" width="1200.0" height="1206.0" fill="url(#background)"  />
+<text id="title" x="600.00" y="24" >Flame Graph</text>
+<text id="details" x="10.00" y="1189" > </text>
+<text id="unzoom" x="10.00" y="24" class="hide">Reset Zoom</text>
+<text id="search" x="1090.00" y="24" >Search</text>
+<text id="matched" x="1090.00" y="1189" > </text>
+<g id="frames">
+<g >
+<title>start_thread (32 samples, 71.11%)</title><rect x="193.6" y="1125" width="839.1" height="15.0" fill="rgb(237,104,104)" rx="2" ry="2" />
+<text  x="196.56" y="1135.5" >start_thread</text>
+</g>
+<g >
+<title>tcp_v4_do_rcv (1 samples, 2.22%)</title><rect x="114.9" y="661" width="26.2" height="15.0" fill="rgb(237,137,0)" rx="2" ry="2" />
+<text  x="117.89" y="671.5" >t..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_90:.call (4 samples, 8.89%)</title><rect x="508.2" y="757" width="104.9" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="511.22" y="767.5" >org/mozilla/..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/optimizer/OptRuntime:.call2 (1 samples, 2.22%)</title><rect x="927.8" y="693" width="26.2" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="930.78" y="703.5" >o..</text>
+</g>
+<g >
+<title>ip_local_out (1 samples, 2.22%)</title><rect x="114.9" y="917" width="26.2" height="15.0" fill="rgb(230,130,0)" rx="2" ry="2" />
+<text  x="117.89" y="927.5" >i..</text>
+</g>
+<g >
+<title>sun/nio/ch/FileDispatcherImpl:.write0 (2 samples, 4.44%)</title><rect x="272.2" y="677" width="52.5" height="15.0" fill="rgb(88,235,88)" rx="2" ry="2" />
+<text  x="275.22" y="687.5" >sun/n..</text>
+</g>
+<g >
+<title>rcu_idle_enter (1 samples, 2.22%)</title><rect x="1163.8" y="1045" width="26.2" height="15.0" fill="rgb(237,137,0)" rx="2" ry="2" />
+<text  x="1166.78" y="1055.5" >r..</text>
+</g>
+<g >
+<title>ip_rcv_finish (1 samples, 2.22%)</title><rect x="272.2" y="277" width="26.2" height="15.0" fill="rgb(230,130,0)" rx="2" ry="2" />
+<text  x="275.22" y="287.5" >i..</text>
+</g>
+<g >
+<title>x86_pmu_enable (4 samples, 8.89%)</title><rect x="10.0" y="869" width="104.9" height="15.0" fill="rgb(248,148,0)" rx="2" ry="2" />
+<text  x="13.00" y="879.5" >x86_pmu_enable</text>
+</g>
+<g >
+<title>[perf] (5 samples, 11.11%)</title><rect x="1032.7" y="1093" width="131.1" height="15.0" fill="rgb(246,118,118)" rx="2" ry="2" />
+<text  x="1035.67" y="1103.5" >[perf]</text>
+</g>
+<g >
+<title>__tcp_push_pending_frames (2 samples, 4.44%)</title><rect x="272.2" y="533" width="52.5" height="15.0" fill="rgb(226,126,0)" rx="2" ry="2" />
+<text  x="275.22" y="543.5" >__tcp..</text>
+</g>
+<g >
+<title>JavaCalls::call_virtual (32 samples, 71.11%)</title><rect x="193.6" y="1029" width="839.1" height="15.0" fill="rgb(203,203,60)" rx="2" ry="2" />
+<text  x="196.56" y="1039.5" >JavaCalls::call_virtual</text>
+</g>
+<g >
+<title>inet_sendmsg (2 samples, 4.44%)</title><rect x="272.2" y="565" width="52.5" height="15.0" fill="rgb(239,139,0)" rx="2" ry="2" />
+<text  x="275.22" y="575.5" >inet_..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_91:._c_anonymous_3 (3 samples, 6.67%)</title><rect x="613.1" y="709" width="78.7" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="616.11" y="719.5" >org/mozil..</text>
+</g>
+<g >
+<title>cpu_function_call (4 samples, 8.89%)</title><rect x="1032.7" y="949" width="104.9" height="15.0" fill="rgb(223,123,0)" rx="2" ry="2" />
+<text  x="1035.67" y="959.5" >cpu_function..</text>
+</g>
+<g >
+<title>system_call_fastpath (4 samples, 8.89%)</title><rect x="1032.7" y="1045" width="104.9" height="15.0" fill="rgb(237,137,0)" rx="2" ry="2" />
+<text  x="1035.67" y="1055.5" >system_call_..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/ScriptRuntime:.setObjectProp (1 samples, 2.22%)</title><rect x="770.4" y="693" width="26.3" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="773.44" y="703.5" >o..</text>
+</g>
+<g >
+<title>intel_pmu_enable_all (4 samples, 8.89%)</title><rect x="377.1" y="613" width="104.9" height="15.0" fill="rgb(236,136,0)" rx="2" ry="2" />
+<text  x="380.11" y="623.5" >intel_pmu_en..</text>
+</g>
+<g >
+<title>do_softirq_own_stack (1 samples, 2.22%)</title><rect x="114.9" y="837" width="26.2" height="15.0" fill="rgb(243,143,0)" rx="2" ry="2" />
+<text  x="117.89" y="847.5" >d..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/NativeJavaMethod:.call (1 samples, 2.22%)</title><rect x="586.9" y="693" width="26.2" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="589.89" y="703.5" >o..</text>
+</g>
+<g >
+<title>io/netty/channel/DefaultChannelHandlerContext:.fireChannelReadComplete (3 samples, 6.67%)</title><rect x="246.0" y="885" width="78.7" height="15.0" fill="rgb(89,235,89)" rx="2" ry="2" />
+<text  x="249.00" y="895.5" >io/netty/..</text>
+</g>
+<g >
+<title>io/netty/channel/DefaultChannelHandlerContext:.flush (3 samples, 6.67%)</title><rect x="246.0" y="757" width="78.7" height="15.0" fill="rgb(89,235,89)" rx="2" ry="2" />
+<text  x="249.00" y="767.5" >io/netty/..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_80:.call (1 samples, 2.22%)</title><rect x="482.0" y="773" width="26.2" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="485.00" y="783.5" >o..</text>
+</g>
+<g >
+<title>io/netty/channel/nio/AbstractNioByteChannel$NioByteUnsafe:.read (31 samples, 68.89%)</title><rect x="193.6" y="901" width="812.8" height="15.0" fill="rgb(89,235,89)" rx="2" ry="2" />
+<text  x="196.56" y="911.5" >io/netty/channel/nio/AbstractNioByteChannel$NioByteUnsafe:.read</text>
+</g>
+<g >
+<title>Interpreter (32 samples, 71.11%)</title><rect x="193.6" y="981" width="839.1" height="15.0" fill="rgb(97,243,97)" rx="2" ry="2" />
+<text  x="196.56" y="991.5" >Interpreter</text>
+</g>
+<g >
+<title>io/netty/buffer/PooledUnsafeDirectByteBuf:.getBytes (3 samples, 6.67%)</title><rect x="246.0" y="709" width="78.7" height="15.0" fill="rgb(89,235,89)" rx="2" ry="2" />
+<text  x="249.00" y="719.5" >io/netty/..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/ScriptRuntime:.setObjectProp (1 samples, 2.22%)</title><rect x="613.1" y="581" width="26.2" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="616.11" y="591.5" >o..</text>
+</g>
+<g >
+<title>page_fault (1 samples, 2.22%)</title><rect x="1137.6" y="1061" width="26.2" height="15.0" fill="rgb(231,131,0)" rx="2" ry="2" />
+<text  x="1140.56" y="1071.5" >p..</text>
+</g>
+<g >
+<title>__wake_up_common (1 samples, 2.22%)</title><rect x="272.2" y="85" width="26.2" height="15.0" fill="rgb(223,123,0)" rx="2" ry="2" />
+<text  x="275.22" y="95.5" >_..</text>
+</g>
+<g >
+<title>tcp_ack (1 samples, 2.22%)</title><rect x="114.9" y="629" width="26.2" height="15.0" fill="rgb(237,137,0)" rx="2" ry="2" />
+<text  x="117.89" y="639.5" >t..</text>
+</g>
+<g >
+<title>io/netty/handler/codec/http/HttpObjectDecoder:.findWhitespace (1 samples, 2.22%)</title><rect x="980.2" y="837" width="26.2" height="15.0" fill="rgb(89,235,89)" rx="2" ry="2" />
+<text  x="983.22" y="847.5" >i..</text>
+</g>
+<g >
+<title>x86_pmu_commit_txn (4 samples, 8.89%)</title><rect x="377.1" y="661" width="104.9" height="15.0" fill="rgb(248,148,0)" rx="2" ry="2" />
+<text  x="380.11" y="671.5" >x86_pmu_comm..</text>
+</g>
+<g >
+<title>call_function_single_interrupt (4 samples, 8.89%)</title><rect x="796.7" y="645" width="104.9" height="15.0" fill="rgb(221,121,0)" rx="2" ry="2" />
+<text  x="799.67" y="655.5" >call_functio..</text>
+</g>
+<g >
+<title>net_rx_action (1 samples, 2.22%)</title><rect x="272.2" y="357" width="26.2" height="15.0" fill="rgb(244,144,0)" rx="2" ry="2" />
+<text  x="275.22" y="367.5" >n..</text>
+</g>
+<g >
+<title>tcp_transmit_skb (1 samples, 2.22%)</title><rect x="114.9" y="949" width="26.2" height="15.0" fill="rgb(237,137,0)" rx="2" ry="2" />
+<text  x="117.89" y="959.5" >t..</text>
+</g>
+<g >
+<title>org/vertx/java/core/net/impl/VertxHandler:.channelRead (23 samples, 51.11%)</title><rect x="350.9" y="837" width="603.1" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="353.89" y="847.5" >org/vertx/java/core/net/impl/VertxHandler:.channelRead</text>
+</g>
+<g >
+<title>remote_function (4 samples, 8.89%)</title><rect x="10.0" y="949" width="104.9" height="15.0" fill="rgb(242,142,0)" rx="2" ry="2" />
+<text  x="13.00" y="959.5" >remote_funct..</text>
+</g>
+<g >
+<title>io/netty/handler/codec/http/HttpMethod:.valueOf (1 samples, 2.22%)</title><rect x="954.0" y="837" width="26.2" height="15.0" fill="rgb(89,235,89)" rx="2" ry="2" />
+<text  x="957.00" y="847.5" >i..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_80:.call (1 samples, 2.22%)</title><rect x="482.0" y="757" width="26.2" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="485.00" y="767.5" >o..</text>
+</g>
+<g >
+<title>smp_call_function_single_interrupt (4 samples, 8.89%)</title><rect x="10.0" y="981" width="104.9" height="15.0" fill="rgb(225,125,0)" rx="2" ry="2" />
+<text  x="13.00" y="991.5" >smp_call_fun..</text>
+</g>
+<g >
+<title>sys_write (7 samples, 15.56%)</title><rect x="10.0" y="1077" width="183.6" height="15.0" fill="rgb(237,137,0)" rx="2" ry="2" />
+<text  x="13.00" y="1087.5" >sys_write</text>
+</g>
+<g >
+<title>do_softirq (1 samples, 2.22%)</title><rect x="114.9" y="853" width="26.2" height="15.0" fill="rgb(243,143,0)" rx="2" ry="2" />
+<text  x="117.89" y="863.5" >d..</text>
+</g>
+<g >
+<title>generic_smp_call_function_single_interrupt (4 samples, 8.89%)</title><rect x="796.7" y="613" width="104.9" height="15.0" fill="rgb(243,143,0)" rx="2" ry="2" />
+<text  x="799.67" y="623.5" >generic_smp_..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/BaseFunction:.construct (8 samples, 17.78%)</title><rect x="744.2" y="741" width="209.8" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="747.22" y="751.5" >org/mozilla/javascript/Base..</text>
+</g>
+<g >
+<title>do_softirq (1 samples, 2.22%)</title><rect x="272.2" y="405" width="26.2" height="15.0" fill="rgb(243,143,0)" rx="2" ry="2" />
+<text  x="275.22" y="415.5" >d..</text>
+</g>
+<g >
+<title>io/netty/channel/nio/AbstractNioByteChannel:.doWrite (3 samples, 6.67%)</title><rect x="246.0" y="725" width="78.7" height="15.0" fill="rgb(89,235,89)" rx="2" ry="2" />
+<text  x="249.00" y="735.5" >io/netty/..</text>
+</g>
+<g >
+<title>call_stub (32 samples, 71.11%)</title><rect x="193.6" y="997" width="839.1" height="15.0" fill="rgb(79,226,79)" rx="2" ry="2" />
+<text  x="196.56" y="1007.5" >call_stub</text>
+</g>
+<g >
+<title>sun/nio/ch/EPollArrayWrapper:.epollWait (1 samples, 2.22%)</title><rect x="1006.4" y="869" width="26.3" height="15.0" fill="rgb(88,235,88)" rx="2" ry="2" />
+<text  x="1009.44" y="879.5" >s..</text>
+</g>
+<g >
+<title>org/vertx/java/core/http/impl/VertxHttpHandler:.channelRead (23 samples, 51.11%)</title><rect x="350.9" y="821" width="603.1" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="353.89" y="831.5" >org/vertx/java/core/http/impl/VertxHttpHandler:.channelRead</text>
+</g>
+<g >
+<title>vfs_write (2 samples, 4.44%)</title><rect x="272.2" y="613" width="52.5" height="15.0" fill="rgb(226,126,0)" rx="2" ry="2" />
+<text  x="275.22" y="623.5" >vfs_w..</text>
+</g>
+<g >
+<title>sock_aio_write (2 samples, 4.44%)</title><rect x="272.2" y="581" width="52.5" height="15.0" fill="rgb(239,139,0)" rx="2" ry="2" />
+<text  x="275.22" y="591.5" >sock_..</text>
+</g>
+<g >
+<title>JavaCalls::call_virtual (32 samples, 71.11%)</title><rect x="193.6" y="1045" width="839.1" height="15.0" fill="rgb(203,203,60)" rx="2" ry="2" />
+<text  x="196.56" y="1055.5" >JavaCalls::call_virtual</text>
+</g>
+<g >
+<title>local_bh_enable (1 samples, 2.22%)</title><rect x="114.9" y="869" width="26.2" height="15.0" fill="rgb(232,132,0)" rx="2" ry="2" />
+<text  x="117.89" y="879.5" >l..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/ScriptableObject:.getSlot (1 samples, 2.22%)</title><rect x="770.4" y="661" width="26.3" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="773.44" y="671.5" >o..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_90:.call (1 samples, 2.22%)</title><rect x="586.9" y="709" width="26.2" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="589.89" y="719.5" >o..</text>
+</g>
+<g >
+<title>sun/nio/ch/EPollArrayWrapper:.poll (1 samples, 2.22%)</title><rect x="1006.4" y="885" width="26.3" height="15.0" fill="rgb(88,235,88)" rx="2" ry="2" />
+<text  x="1009.44" y="895.5" >s..</text>
+</g>
+<g >
+<title>__perf_event_enable (4 samples, 8.89%)</title><rect x="796.7" y="581" width="104.9" height="15.0" fill="rgb(230,130,0)" rx="2" ry="2" />
+<text  x="799.67" y="591.5" >__perf_event..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_93:.call (9 samples, 20.00%)</title><rect x="718.0" y="757" width="236.0" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="721.00" y="767.5" >org/mozilla/javascript/gen/file..</text>
+</g>
+<g >
+<title>do_softirq_own_stack (1 samples, 2.22%)</title><rect x="272.2" y="389" width="26.2" height="15.0" fill="rgb(243,143,0)" rx="2" ry="2" />
+<text  x="275.22" y="399.5" >d..</text>
+</g>
+<g >
+<title>remote_function (4 samples, 8.89%)</title><rect x="796.7" y="597" width="104.9" height="15.0" fill="rgb(242,142,0)" rx="2" ry="2" />
+<text  x="799.67" y="607.5" >remote_funct..</text>
+</g>
+<g >
+<title>smp_call_function_single_interrupt (4 samples, 8.89%)</title><rect x="377.1" y="741" width="104.9" height="15.0" fill="rgb(225,125,0)" rx="2" ry="2" />
+<text  x="380.11" y="751.5" >smp_call_fun..</text>
+</g>
+<g >
+<title>__alloc_skb (1 samples, 2.22%)</title><rect x="141.1" y="965" width="26.2" height="15.0" fill="rgb(232,132,0)" rx="2" ry="2" />
+<text  x="144.11" y="975.5" >_..</text>
+</g>
+<g >
+<title>ip_finish_output (1 samples, 2.22%)</title><rect x="272.2" y="437" width="26.2" height="15.0" fill="rgb(230,130,0)" rx="2" ry="2" />
+<text  x="275.22" y="447.5" >i..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/ScriptRuntime:.setObjectProp (1 samples, 2.22%)</title><rect x="560.7" y="693" width="26.2" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="563.67" y="703.5" >o..</text>
+</g>
+<g >
+<title>sock_def_readable (1 samples, 2.22%)</title><rect x="272.2" y="165" width="26.2" height="15.0" fill="rgb(239,139,0)" rx="2" ry="2" />
+<text  x="275.22" y="175.5" >s..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/ScriptableObject:.getSlot (1 samples, 2.22%)</title><rect x="665.6" y="661" width="26.2" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="668.56" y="671.5" >o..</text>
+</g>
+<g >
+<title>do_sync_write (2 samples, 4.44%)</title><rect x="272.2" y="597" width="52.5" height="15.0" fill="rgb(243,143,0)" rx="2" ry="2" />
+<text  x="275.22" y="607.5" >do_sy..</text>
+</g>
+<g >
+<title>tcp_v4_rcv (1 samples, 2.22%)</title><rect x="272.2" y="229" width="26.2" height="15.0" fill="rgb(237,137,0)" rx="2" ry="2" />
+<text  x="275.22" y="239.5" >t..</text>
+</g>
+<g >
+<title>__wake_up_common (1 samples, 2.22%)</title><rect x="272.2" y="133" width="26.2" height="15.0" fill="rgb(223,123,0)" rx="2" ry="2" />
+<text  x="275.22" y="143.5" >_..</text>
+</g>
+<g >
+<title>perf (5 samples, 11.11%)</title><rect x="1032.7" y="1141" width="131.1" height="15.0" fill="rgb(244,114,114)" rx="2" ry="2" />
+<text  x="1035.67" y="1151.5" >perf</text>
+</g>
+<g >
+<title>cpu_startup_entry (1 samples, 2.22%)</title><rect x="1163.8" y="1061" width="26.2" height="15.0" fill="rgb(223,123,0)" rx="2" ry="2" />
+<text  x="1166.78" y="1071.5" >c..</text>
+</g>
+<g >
+<title>java_start (32 samples, 71.11%)</title><rect x="193.6" y="1109" width="839.1" height="15.0" fill="rgb(224,86,86)" rx="2" ry="2" />
+<text  x="196.56" y="1119.5" >java_start</text>
+</g>
+<g >
+<title>[unknown] (7 samples, 15.56%)</title><rect x="10.0" y="1125" width="183.6" height="15.0" fill="rgb(243,112,112)" rx="2" ry="2" />
+<text  x="13.00" y="1135.5" >[unknown]</text>
+</g>
+<g >
+<title>__netif_receive_skb_core (1 samples, 2.22%)</title><rect x="272.2" y="309" width="26.2" height="15.0" fill="rgb(231,131,0)" rx="2" ry="2" />
+<text  x="275.22" y="319.5" >_..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/BaseFunction:.construct (3 samples, 6.67%)</title><rect x="508.2" y="741" width="78.7" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="511.22" y="751.5" >org/mozil..</text>
+</g>
+<g >
+<title>group_sched_in (4 samples, 8.89%)</title><rect x="1032.7" y="885" width="104.9" height="15.0" fill="rgb(239,139,0)" rx="2" ry="2" />
+<text  x="1035.67" y="895.5" >group_sched_in</text>
+</g>
+<g >
+<title>tcp_write_xmit (1 samples, 2.22%)</title><rect x="114.9" y="965" width="26.2" height="15.0" fill="rgb(237,137,0)" rx="2" ry="2" />
+<text  x="117.89" y="975.5" >t..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_streams_js_49:.call (1 samples, 2.22%)</title><rect x="613.1" y="629" width="26.2" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="616.11" y="639.5" >o..</text>
+</g>
+<g >
+<title>generic_smp_call_function_single_interrupt (4 samples, 8.89%)</title><rect x="377.1" y="725" width="104.9" height="15.0" fill="rgb(243,143,0)" rx="2" ry="2" />
+<text  x="380.11" y="735.5" >generic_smp_..</text>
+</g>
+<g >
+<title>__netif_receive_skb_core (1 samples, 2.22%)</title><rect x="114.9" y="757" width="26.2" height="15.0" fill="rgb(231,131,0)" rx="2" ry="2" />
+<text  x="117.89" y="767.5" >_..</text>
+</g>
+<g >
+<title>org/vertx/java/core/http/impl/DefaultHttpServer$ServerHandler:.doMessageReceived (23 samples, 51.11%)</title><rect x="350.9" y="805" width="603.1" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="353.89" y="815.5" >org/vertx/java/core/http/impl/DefaultHttpServer$ServerHandler:.doMessageReceived</text>
+</g>
+<g >
+<title>org/mozilla/javascript/BaseFunction:.construct (1 samples, 2.22%)</title><rect x="482.0" y="741" width="26.2" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="485.00" y="751.5" >o..</text>
+</g>
+<g >
+<title>java/lang/reflect/Method:.invoke (1 samples, 2.22%)</title><rect x="586.9" y="661" width="26.2" height="15.0" fill="rgb(77,224,77)" rx="2" ry="2" />
+<text  x="589.89" y="671.5" >j..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/ScriptableObject:.getSlot (1 samples, 2.22%)</title><rect x="560.7" y="661" width="26.2" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="563.67" y="671.5" >o..</text>
+</g>
+<g >
+<title>ip_queue_xmit (1 samples, 2.22%)</title><rect x="114.9" y="933" width="26.2" height="15.0" fill="rgb(230,130,0)" rx="2" ry="2" />
+<text  x="117.89" y="943.5" >i..</text>
+</g>
+<g >
+<title>io/netty/channel/DefaultChannelHandlerContext:.fireChannelReadComplete (3 samples, 6.67%)</title><rect x="246.0" y="853" width="78.7" height="15.0" fill="rgb(89,235,89)" rx="2" ry="2" />
+<text  x="249.00" y="863.5" >io/netty/..</text>
+</g>
+<g >
+<title>tcp_write_xmit (2 samples, 4.44%)</title><rect x="272.2" y="517" width="52.5" height="15.0" fill="rgb(237,137,0)" rx="2" ry="2" />
+<text  x="275.22" y="527.5" >tcp_w..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/gen/file__home_bgregg_bench_Server_js_js_4:._c_anonymous_1 (1 samples, 2.22%)</title><rect x="586.9" y="725" width="26.2" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="589.89" y="735.5" >o..</text>
+</g>
+<g >
+<title>start_kernel (1 samples, 2.22%)</title><rect x="1163.8" y="1093" width="26.2" height="15.0" fill="rgb(234,134,0)" rx="2" ry="2" />
+<text  x="1166.78" y="1103.5" >s..</text>
+</g>
+<g >
+<title>local_bh_enable (1 samples, 2.22%)</title><rect x="272.2" y="421" width="26.2" height="15.0" fill="rgb(232,132,0)" rx="2" ry="2" />
+<text  x="275.22" y="431.5" >l..</text>
+</g>
+<g >
+<title>io/netty/channel/nio/NioEventLoop:.run (32 samples, 71.11%)</title><rect x="193.6" y="949" width="839.1" height="15.0" fill="rgb(89,235,89)" rx="2" ry="2" />
+<text  x="196.56" y="959.5" >io/netty/channel/nio/NioEventLoop:.run</text>
+</g>
+<g >
+<title>java/lang/Thread:.blockedOn (1 samples, 2.22%)</title><rect x="219.8" y="853" width="26.2" height="15.0" fill="rgb(77,224,77)" rx="2" ry="2" />
+<text  x="222.78" y="863.5" >j..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/BaseFunction:.construct (1 samples, 2.22%)</title><rect x="613.1" y="693" width="26.2" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="616.11" y="703.5" >o..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/ScriptRuntime:.nameOrFunction (1 samples, 2.22%)</title><rect x="534.4" y="693" width="26.3" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="537.44" y="703.5" >o..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/IdScriptableObject:.get (1 samples, 2.22%)</title><rect x="534.4" y="677" width="26.3" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="537.44" y="687.5" >o..</text>
+</g>
+<g >
+<title>swapper (1 samples, 2.22%)</title><rect x="1163.8" y="1141" width="26.2" height="15.0" fill="rgb(233,99,99)" rx="2" ry="2" />
+<text  x="1166.78" y="1151.5" >s..</text>
+</g>
+<g >
+<title>__kmalloc_reserve.isra.26 (1 samples, 2.22%)</title><rect x="141.1" y="949" width="26.2" height="15.0" fill="rgb(223,123,0)" rx="2" ry="2" />
+<text  x="144.11" y="959.5" >_..</text>
+</g>
+<g >
+<title>tcp_current_mss (1 samples, 2.22%)</title><rect x="167.3" y="965" width="26.3" height="15.0" fill="rgb(237,137,0)" rx="2" ry="2" />
+<text  x="170.33" y="975.5" >t..</text>
+</g>
+<g >
+<title>native_write_msr_safe (4 samples, 8.89%)</title><rect x="377.1" y="597" width="104.9" height="15.0" fill="rgb(234,134,0)" rx="2" ry="2" />
+<text  x="380.11" y="607.5" >native_write..</text>
+</g>
+<g >
+<title>__libc_enable_asynccancel (1 samples, 2.22%)</title><rect x="1006.4" y="853" width="26.3" height="15.0" fill="rgb(236,103,103)" rx="2" ry="2" />
+<text  x="1009.44" y="863.5" >_..</text>
+</g>
+<g >
+<title>x86_pmu_commit_txn (4 samples, 8.89%)</title><rect x="10.0" y="901" width="104.9" height="15.0" fill="rgb(248,148,0)" rx="2" ry="2" />
+<text  x="13.00" y="911.5" >x86_pmu_comm..</text>
+</g>
+<g >
+<title>ip_finish_output (1 samples, 2.22%)</title><rect x="114.9" y="885" width="26.2" height="15.0" fill="rgb(230,130,0)" rx="2" ry="2" />
+<text  x="117.89" y="895.5" >i..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/optimizer/OptRuntime:.call2 (1 samples, 2.22%)</title><rect x="613.1" y="645" width="26.2" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="616.11" y="655.5" >o..</text>
+</g>
+<g >
+<title>smp_call_function_single (4 samples, 8.89%)</title><rect x="1032.7" y="933" width="104.9" height="15.0" fill="rgb(225,125,0)" rx="2" ry="2" />
+<text  x="1035.67" y="943.5" >smp_call_fun..</text>
+</g>
+<g >
+<title>org/vertx/java/core/net/impl/VertxHandler:.channelReadComplete (3 samples, 6.67%)</title><rect x="246.0" y="837" width="78.7" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="249.00" y="847.5" >org/vertx..</text>
+</g>
+<g >
+<title>thread_entry (32 samples, 71.11%)</title><rect x="193.6" y="1061" width="839.1" height="15.0" fill="rgb(232,97,97)" rx="2" ry="2" />
+<text  x="196.56" y="1071.5" >thread_entry</text>
+</g>
+<g >
+<title>Interpreter (32 samples, 71.11%)</title><rect x="193.6" y="965" width="839.1" height="15.0" fill="rgb(97,243,97)" rx="2" ry="2" />
+<text  x="196.56" y="975.5" >Interpreter</text>
+</g>
+<g >
+<title>native_write_msr_safe (4 samples, 8.89%)</title><rect x="796.7" y="485" width="104.9" height="15.0" fill="rgb(234,134,0)" rx="2" ry="2" />
+<text  x="799.67" y="495.5" >native_write..</text>
+</g>
+<g >
+<title>tcp_sendmsg (2 samples, 4.44%)</title><rect x="272.2" y="549" width="52.5" height="15.0" fill="rgb(237,137,0)" rx="2" ry="2" />
+<text  x="275.22" y="559.5" >tcp_s..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_93:.getParamCount (1 samples, 2.22%)</title><rect x="901.6" y="693" width="26.2" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="904.56" y="703.5" >o..</text>
+</g>
+<g >
+<title>inet_sendmsg (7 samples, 15.56%)</title><rect x="10.0" y="1013" width="183.6" height="15.0" fill="rgb(239,139,0)" rx="2" ry="2" />
+<text  x="13.00" y="1023.5" >inet_sendmsg</text>
+</g>
+<g >
+<title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_91:.call (1 samples, 2.22%)</title><rect x="691.8" y="725" width="26.2" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="694.78" y="735.5" >o..</text>
+</g>
+<g >
+<title>io/netty/channel/DefaultChannelHandlerContext:.flush (3 samples, 6.67%)</title><rect x="246.0" y="789" width="78.7" height="15.0" fill="rgb(89,235,89)" rx="2" ry="2" />
+<text  x="249.00" y="799.5" >io/netty/..</text>
+</g>
+<g >
+<title>net_rx_action (1 samples, 2.22%)</title><rect x="114.9" y="805" width="26.2" height="15.0" fill="rgb(244,144,0)" rx="2" ry="2" />
+<text  x="117.89" y="815.5" >n..</text>
+</g>
+<g >
+<title>native_write_msr_safe (4 samples, 8.89%)</title><rect x="1032.7" y="805" width="104.9" height="15.0" fill="rgb(234,134,0)" rx="2" ry="2" />
+<text  x="1035.67" y="815.5" >native_write..</text>
+</g>
+<g >
+<title>sun/nio/ch/SelectorImpl:.lockAndDoSelect (1 samples, 2.22%)</title><rect x="1006.4" y="917" width="26.3" height="15.0" fill="rgb(88,235,88)" rx="2" ry="2" />
+<text  x="1009.44" y="927.5" >s..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/ScriptRuntime:.setObjectProp (1 samples, 2.22%)</title><rect x="927.8" y="661" width="26.2" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="930.78" y="671.5" >o..</text>
+</g>
+<g >
+<title>vfs_write (7 samples, 15.56%)</title><rect x="10.0" y="1061" width="183.6" height="15.0" fill="rgb(226,126,0)" rx="2" ry="2" />
+<text  x="13.00" y="1071.5" >vfs_write</text>
+</g>
+<g >
+<title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_91:.call (1 samples, 2.22%)</title><rect x="613.1" y="677" width="26.2" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="616.11" y="687.5" >o..</text>
+</g>
+<g >
+<title>ip_output (1 samples, 2.22%)</title><rect x="114.9" y="901" width="26.2" height="15.0" fill="rgb(230,130,0)" rx="2" ry="2" />
+<text  x="117.89" y="911.5" >i..</text>
+</g>
+<g >
+<title>io/netty/channel/nio/NioEventLoop:.processSelectedKey (31 samples, 68.89%)</title><rect x="193.6" y="917" width="812.8" height="15.0" fill="rgb(89,235,89)" rx="2" ry="2" />
+<text  x="196.56" y="927.5" >io/netty/channel/nio/NioEventLoop:.processSelectedKey</text>
+</g>
+<g >
+<title>io/netty/buffer/AbstractByteBuf:.writeBytes (2 samples, 4.44%)</title><rect x="193.6" y="885" width="52.4" height="15.0" fill="rgb(89,235,89)" rx="2" ry="2" />
+<text  x="196.56" y="895.5" >io/ne..</text>
+</g>
+<g >
+<title>ip_output (1 samples, 2.22%)</title><rect x="272.2" y="453" width="26.2" height="15.0" fill="rgb(230,130,0)" rx="2" ry="2" />
+<text  x="275.22" y="463.5" >i..</text>
+</g>
+<g >
+<title>perf_ioctl (4 samples, 8.89%)</title><rect x="1032.7" y="997" width="104.9" height="15.0" fill="rgb(242,142,0)" rx="2" ry="2" />
+<text  x="1035.67" y="1007.5" >perf_ioctl</text>
+</g>
+<g >
+<title>io/netty/handler/codec/http/HttpObjectDecoder:.decode (2 samples, 4.44%)</title><rect x="954.0" y="853" width="52.4" height="15.0" fill="rgb(89,235,89)" rx="2" ry="2" />
+<text  x="957.00" y="863.5" >io/ne..</text>
+</g>
+<g >
+<title>sys_ioctl (4 samples, 8.89%)</title><rect x="1032.7" y="1029" width="104.9" height="15.0" fill="rgb(237,137,0)" rx="2" ry="2" />
+<text  x="1035.67" y="1039.5" >sys_ioctl</text>
+</g>
+<g >
+<title>tcp_send_mss (1 samples, 2.22%)</title><rect x="167.3" y="981" width="26.3" height="15.0" fill="rgb(237,137,0)" rx="2" ry="2" />
+<text  x="170.33" y="991.5" >t..</text>
+</g>
+<g >
+<title>perf_pmu_enable (4 samples, 8.89%)</title><rect x="1032.7" y="853" width="104.9" height="15.0" fill="rgb(242,142,0)" rx="2" ry="2" />
+<text  x="1035.67" y="863.5" >perf_pmu_ena..</text>
+</g>
+<g >
+<title>__tcp_v4_send_check (1 samples, 2.22%)</title><rect x="298.4" y="469" width="26.3" height="15.0" fill="rgb(226,126,0)" rx="2" ry="2" />
+<text  x="301.44" y="479.5" >_..</text>
+</g>
+<g >
+<title>io/netty/handler/codec/http/DefaultHttpHeaders:.add0 (1 samples, 2.22%)</title><rect x="691.8" y="661" width="26.2" height="15.0" fill="rgb(89,235,89)" rx="2" ry="2" />
+<text  x="694.78" y="671.5" >i..</text>
+</g>
+<g >
+<title>ip_queue_xmit (1 samples, 2.22%)</title><rect x="272.2" y="485" width="26.2" height="15.0" fill="rgb(230,130,0)" rx="2" ry="2" />
+<text  x="275.22" y="495.5" >i..</text>
+</g>
+<g >
+<title>io/netty/channel/ChannelOutboundHandlerAdapter:.flush (3 samples, 6.67%)</title><rect x="246.0" y="773" width="78.7" height="15.0" fill="rgb(89,235,89)" rx="2" ry="2" />
+<text  x="249.00" y="783.5" >io/netty/..</text>
+</g>
+<g >
+<title>io/netty/handler/codec/ByteToMessageDecoder:.channelRead (26 samples, 57.78%)</title><rect x="324.7" y="869" width="681.7" height="15.0" fill="rgb(89,235,89)" rx="2" ry="2" />
+<text  x="327.67" y="879.5" >io/netty/handler/codec/ByteToMessageDecoder:.channelRead</text>
+</g>
+<g >
+<title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_80:._c_anonymous_21 (1 samples, 2.22%)</title><rect x="482.0" y="661" width="26.2" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="485.00" y="671.5" >o..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_93:._c_anonymous_21 (1 samples, 2.22%)</title><rect x="744.2" y="661" width="26.2" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="747.22" y="671.5" >o..</text>
+</g>
+<g >
+<title>[perf] (5 samples, 11.11%)</title><rect x="1032.7" y="1109" width="131.1" height="15.0" fill="rgb(246,118,118)" rx="2" ry="2" />
+<text  x="1035.67" y="1119.5" >[perf]</text>
+</g>
+<g >
+<title>__do_softirq (1 samples, 2.22%)</title><rect x="272.2" y="373" width="26.2" height="15.0" fill="rgb(230,130,0)" rx="2" ry="2" />
+<text  x="275.22" y="383.5" >_..</text>
+</g>
+<g >
+<title>tcp_rcv_established (1 samples, 2.22%)</title><rect x="272.2" y="197" width="26.2" height="15.0" fill="rgb(237,137,0)" rx="2" ry="2" />
+<text  x="275.22" y="207.5" >t..</text>
+</g>
+<g >
+<title>do_sync_write (7 samples, 15.56%)</title><rect x="10.0" y="1045" width="183.6" height="15.0" fill="rgb(243,143,0)" rx="2" ry="2" />
+<text  x="13.00" y="1055.5" >do_sync_write</text>
+</g>
+<g >
+<title>org/mozilla/javascript/WrapFactory:.wrap (4 samples, 8.89%)</title><rect x="377.1" y="773" width="104.9" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="380.11" y="783.5" >org/mozilla/..</text>
+</g>
+<g >
+<title>ip_local_deliver_finish (1 samples, 2.22%)</title><rect x="272.2" y="245" width="26.2" height="15.0" fill="rgb(230,130,0)" rx="2" ry="2" />
+<text  x="275.22" y="255.5" >i..</text>
+</g>
+<g >
+<title>ip_rcv_finish (1 samples, 2.22%)</title><rect x="114.9" y="725" width="26.2" height="15.0" fill="rgb(230,130,0)" rx="2" ry="2" />
+<text  x="117.89" y="735.5" >i..</text>
+</g>
+<g >
+<title>x86_pmu_enable (4 samples, 8.89%)</title><rect x="1032.7" y="837" width="104.9" height="15.0" fill="rgb(248,148,0)" rx="2" ry="2" />
+<text  x="1035.67" y="847.5" >x86_pmu_enable</text>
+</g>
+<g >
+<title>call_function_single_interrupt (4 samples, 8.89%)</title><rect x="377.1" y="757" width="104.9" height="15.0" fill="rgb(221,121,0)" rx="2" ry="2" />
+<text  x="380.11" y="767.5" >call_functio..</text>
+</g>
+<g >
+<title>tcp_data_queue (1 samples, 2.22%)</title><rect x="272.2" y="181" width="26.2" height="15.0" fill="rgb(237,137,0)" rx="2" ry="2" />
+<text  x="275.22" y="191.5" >t..</text>
+</g>
+<g >
+<title>call_function_single_interrupt (4 samples, 8.89%)</title><rect x="10.0" y="997" width="104.9" height="15.0" fill="rgb(221,121,0)" rx="2" ry="2" />
+<text  x="13.00" y="1007.5" >call_functio..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_90:.call (3 samples, 6.67%)</title><rect x="508.2" y="725" width="78.7" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="511.22" y="735.5" >org/mozil..</text>
+</g>
+<g >
+<title>default_wake_function (1 samples, 2.22%)</title><rect x="272.2" y="69" width="26.2" height="15.0" fill="rgb(246,146,0)" rx="2" ry="2" />
+<text  x="275.22" y="79.5" >d..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_91:.call (4 samples, 8.89%)</title><rect x="613.1" y="757" width="104.9" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="616.11" y="767.5" >org/mozilla/..</text>
+</g>
+<g >
+<title>x86_64_start_reservations (1 samples, 2.22%)</title><rect x="1163.8" y="1109" width="26.2" height="15.0" fill="rgb(248,148,0)" rx="2" ry="2" />
+<text  x="1166.78" y="1119.5" >x..</text>
+</g>
+<g >
+<title>__write_nocancel (7 samples, 15.56%)</title><rect x="10.0" y="1109" width="183.6" height="15.0" fill="rgb(228,91,91)" rx="2" ry="2" />
+<text  x="13.00" y="1119.5" >__write_nocancel</text>
+</g>
+<g >
+<title>group_sched_in (4 samples, 8.89%)</title><rect x="10.0" y="917" width="104.9" height="15.0" fill="rgb(239,139,0)" rx="2" ry="2" />
+<text  x="13.00" y="927.5" >group_sched_in</text>
+</g>
+<g >
+<title>__perf_event_enable (4 samples, 8.89%)</title><rect x="1032.7" y="901" width="104.9" height="15.0" fill="rgb(230,130,0)" rx="2" ry="2" />
+<text  x="1035.67" y="911.5" >__perf_event..</text>
+</g>
+<g >
+<title>pthread_self (1 samples, 2.22%)</title><rect x="246.0" y="677" width="26.2" height="15.0" fill="rgb(237,104,104)" rx="2" ry="2" />
+<text  x="249.00" y="687.5" >p..</text>
+</g>
+<g >
+<title>ab (7 samples, 15.56%)</title><rect x="10.0" y="1141" width="183.6" height="15.0" fill="rgb(224,86,86)" rx="2" ry="2" />
+<text  x="13.00" y="1151.5" >ab</text>
+</g>
+<g >
+<title>org/mozilla/javascript/IdScriptableObject:.has (1 samples, 2.22%)</title><rect x="770.4" y="677" width="26.3" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="773.44" y="687.5" >o..</text>
+</g>
+<g >
+<title>system_call_fastpath (7 samples, 15.56%)</title><rect x="10.0" y="1093" width="183.6" height="15.0" fill="rgb(237,137,0)" rx="2" ry="2" />
+<text  x="13.00" y="1103.5" >system_call_fastpath</text>
+</g>
+<g >
+<title>x86_64_start_kernel (1 samples, 2.22%)</title><rect x="1163.8" y="1125" width="26.2" height="15.0" fill="rgb(248,148,0)" rx="2" ry="2" />
+<text  x="1166.78" y="1135.5" >x..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/ScriptRuntime:.setObjectProp (1 samples, 2.22%)</title><rect x="482.0" y="613" width="26.2" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="485.00" y="623.5" >o..</text>
+</g>
+<g >
+<title>x86_pmu_enable (4 samples, 8.89%)</title><rect x="796.7" y="517" width="104.9" height="15.0" fill="rgb(248,148,0)" rx="2" ry="2" />
+<text  x="799.67" y="527.5" >x86_pmu_enable</text>
+</g>
+<g >
+<title>generic_smp_call_function_single_interrupt (4 samples, 8.89%)</title><rect x="10.0" y="965" width="104.9" height="15.0" fill="rgb(243,143,0)" rx="2" ry="2" />
+<text  x="13.00" y="975.5" >generic_smp_..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_80:.call (1 samples, 2.22%)</title><rect x="482.0" y="725" width="26.2" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="485.00" y="735.5" >o..</text>
+</g>
+<g >
+<title>org/vertx/java/core/http/impl/ServerConnection:.handleMessage (23 samples, 51.11%)</title><rect x="350.9" y="789" width="603.1" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="353.89" y="799.5" >org/vertx/java/core/http/impl/ServerConnection:.handleMessage</text>
+</g>
+<g >
+<title>tcp_transmit_skb (2 samples, 4.44%)</title><rect x="272.2" y="501" width="52.5" height="15.0" fill="rgb(237,137,0)" rx="2" ry="2" />
+<text  x="275.22" y="511.5" >tcp_t..</text>
+</g>
+<g >
+<title>intel_pmu_enable_all (4 samples, 8.89%)</title><rect x="10.0" y="853" width="104.9" height="15.0" fill="rgb(236,136,0)" rx="2" ry="2" />
+<text  x="13.00" y="863.5" >intel_pmu_en..</text>
+</g>
+<g >
+<title>__wake_up_locked (1 samples, 2.22%)</title><rect x="272.2" y="101" width="26.2" height="15.0" fill="rgb(223,123,0)" rx="2" ry="2" />
+<text  x="275.22" y="111.5" >_..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/NativeFunction:.initScriptFunction (4 samples, 8.89%)</title><rect x="796.7" y="677" width="104.9" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="799.67" y="687.5" >org/mozilla/..</text>
+</g>
+<g >
+<title>__do_softirq (1 samples, 2.22%)</title><rect x="114.9" y="821" width="26.2" height="15.0" fill="rgb(230,130,0)" rx="2" ry="2" />
+<text  x="117.89" y="831.5" >_..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/ScriptableObject:.getSlot (1 samples, 2.22%)</title><rect x="534.4" y="661" width="26.3" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="537.44" y="671.5" >o..</text>
+</g>
+<g >
+<title>_raw_spin_unlock_irqrestore (1 samples, 2.22%)</title><rect x="272.2" y="37" width="26.2" height="15.0" fill="rgb(237,137,0)" rx="2" ry="2" />
+<text  x="275.22" y="47.5" >_..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/optimizer/OptRuntime:.call2 (1 samples, 2.22%)</title><rect x="613.1" y="613" width="26.2" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="616.11" y="623.5" >o..</text>
+</g>
+<g >
+<title>perf_event_for_each_child (4 samples, 8.89%)</title><rect x="1032.7" y="981" width="104.9" height="15.0" fill="rgb(242,142,0)" rx="2" ry="2" />
+<text  x="1035.67" y="991.5" >perf_event_f..</text>
+</g>
+<g >
+<title>x86_pmu_enable (4 samples, 8.89%)</title><rect x="377.1" y="629" width="104.9" height="15.0" fill="rgb(248,148,0)" rx="2" ry="2" />
+<text  x="380.11" y="639.5" >x86_pmu_enable</text>
+</g>
+<g >
+<title>io/netty/channel/DefaultChannelHandlerContext:.fireChannelRead (26 samples, 57.78%)</title><rect x="324.7" y="885" width="681.7" height="15.0" fill="rgb(89,235,89)" rx="2" ry="2" />
+<text  x="327.67" y="895.5" >io/netty/channel/DefaultChannelHandlerContext:.fireChannelRead</text>
+</g>
+<g >
+<title>group_sched_in (4 samples, 8.89%)</title><rect x="796.7" y="565" width="104.9" height="15.0" fill="rgb(239,139,0)" rx="2" ry="2" />
+<text  x="799.67" y="575.5" >group_sched_in</text>
+</g>
+<g >
+<title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_90:.call (4 samples, 8.89%)</title><rect x="508.2" y="773" width="104.9" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="511.22" y="783.5" >org/mozilla/..</text>
+</g>
+<g >
+<title>JavaThread::run (32 samples, 71.11%)</title><rect x="193.6" y="1093" width="839.1" height="15.0" fill="rgb(203,203,60)" rx="2" ry="2" />
+<text  x="196.56" y="1103.5" >JavaThread::run</text>
+</g>
+<g >
+<title>__netif_receive_skb (1 samples, 2.22%)</title><rect x="272.2" y="325" width="26.2" height="15.0" fill="rgb(231,131,0)" rx="2" ry="2" />
+<text  x="275.22" y="335.5" >_..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_streams_js_31:.call (1 samples, 2.22%)</title><rect x="482.0" y="629" width="26.2" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="485.00" y="639.5" >o..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_93:.call (8 samples, 17.78%)</title><rect x="744.2" y="725" width="209.8" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="747.22" y="735.5" >org/mozilla/javascript/gen/..</text>
+</g>
+<g >
+<title>process_backlog (1 samples, 2.22%)</title><rect x="114.9" y="789" width="26.2" height="15.0" fill="rgb(242,142,0)" rx="2" ry="2" />
+<text  x="117.89" y="799.5" >p..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/BaseFunction:.construct (1 samples, 2.22%)</title><rect x="744.2" y="693" width="26.2" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="747.22" y="703.5" >o..</text>
+</g>
+<g >
+<title>ep_poll_callback (1 samples, 2.22%)</title><rect x="272.2" y="117" width="26.2" height="15.0" fill="rgb(239,139,0)" rx="2" ry="2" />
+<text  x="275.22" y="127.5" >e..</text>
+</g>
+<g >
+<title>__GI___ioctl (4 samples, 8.89%)</title><rect x="1032.7" y="1061" width="104.9" height="15.0" fill="rgb(228,91,91)" rx="2" ry="2" />
+<text  x="1035.67" y="1071.5" >__GI___ioctl</text>
+</g>
+<g >
+<title>io/netty/channel/DefaultChannelHandlerContext:.fireChannelRead (24 samples, 53.33%)</title><rect x="324.7" y="853" width="629.3" height="15.0" fill="rgb(89,235,89)" rx="2" ry="2" />
+<text  x="327.67" y="863.5" >io/netty/channel/DefaultChannelHandlerContext:.fireChannelRead</text>
+</g>
+<g >
+<title>io/netty/channel/ChannelDuplexHandler:.flush (3 samples, 6.67%)</title><rect x="246.0" y="805" width="78.7" height="15.0" fill="rgb(89,235,89)" rx="2" ry="2" />
+<text  x="249.00" y="815.5" >io/netty/..</text>
+</g>
+<g >
+<title>__libc_start_main (5 samples, 11.11%)</title><rect x="1032.7" y="1125" width="131.1" height="15.0" fill="rgb(236,103,103)" rx="2" ry="2" />
+<text  x="1035.67" y="1135.5" >__libc_start_main</text>
+</g>
+<g >
+<title>io/netty/handler/codec/ByteToMessageDecoder:.channelReadComplete (3 samples, 6.67%)</title><rect x="246.0" y="869" width="78.7" height="15.0" fill="rgb(89,235,89)" rx="2" ry="2" />
+<text  x="249.00" y="879.5" >io/netty/..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_streams_js_49:.call (1 samples, 2.22%)</title><rect x="613.1" y="597" width="26.2" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="616.11" y="607.5" >o..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/IdScriptableObject:.has (1 samples, 2.22%)</title><rect x="639.3" y="677" width="26.3" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="642.33" y="687.5" >o..</text>
+</g>
+<g >
+<title>[perf] (5 samples, 11.11%)</title><rect x="1032.7" y="1077" width="131.1" height="15.0" fill="rgb(246,118,118)" rx="2" ry="2" />
+<text  x="1035.67" y="1087.5" >[perf]</text>
+</g>
+<g >
+<title>process_backlog (1 samples, 2.22%)</title><rect x="272.2" y="341" width="26.2" height="15.0" fill="rgb(242,142,0)" rx="2" ry="2" />
+<text  x="275.22" y="351.5" >p..</text>
+</g>
+<g >
+<title>tcp_clean_rtx_queue (1 samples, 2.22%)</title><rect x="114.9" y="613" width="26.2" height="15.0" fill="rgb(237,137,0)" rx="2" ry="2" />
+<text  x="117.89" y="623.5" >t..</text>
+</g>
+<g >
+<title>ip_rcv (1 samples, 2.22%)</title><rect x="114.9" y="741" width="26.2" height="15.0" fill="rgb(230,130,0)" rx="2" ry="2" />
+<text  x="117.89" y="751.5" >i..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/ScriptableObject:.createSlot (1 samples, 2.22%)</title><rect x="665.6" y="645" width="26.2" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="668.56" y="655.5" >o..</text>
+</g>
+<g >
+<title>java (32 samples, 71.11%)</title><rect x="193.6" y="1141" width="839.1" height="15.0" fill="rgb(224,86,86)" rx="2" ry="2" />
+<text  x="196.56" y="1151.5" >java</text>
+</g>
+<g >
+<title>__kfree_skb (1 samples, 2.22%)</title><rect x="114.9" y="597" width="26.2" height="15.0" fill="rgb(223,123,0)" rx="2" ry="2" />
+<text  x="117.89" y="607.5" >_..</text>
+</g>
+<g >
+<title>io/netty/channel/nio/NioEventLoop:.select (1 samples, 2.22%)</title><rect x="1006.4" y="933" width="26.3" height="15.0" fill="rgb(89,235,89)" rx="2" ry="2" />
+<text  x="1009.44" y="943.5" >i..</text>
+</g>
+<g >
+<title>sk_stream_alloc_skb (1 samples, 2.22%)</title><rect x="141.1" y="981" width="26.2" height="15.0" fill="rgb(222,122,0)" rx="2" ry="2" />
+<text  x="144.11" y="991.5" >s..</text>
+</g>
+<g >
+<title>tcp_v4_md5_lookup (1 samples, 2.22%)</title><rect x="167.3" y="949" width="26.3" height="15.0" fill="rgb(237,137,0)" rx="2" ry="2" />
+<text  x="170.33" y="959.5" >t..</text>
+</g>
+<g >
+<title>intel_pmu_enable_all (4 samples, 8.89%)</title><rect x="796.7" y="501" width="104.9" height="15.0" fill="rgb(236,136,0)" rx="2" ry="2" />
+<text  x="799.67" y="511.5" >intel_pmu_en..</text>
+</g>
+<g >
+<title>sys_write (2 samples, 4.44%)</title><rect x="272.2" y="629" width="52.5" height="15.0" fill="rgb(237,137,0)" rx="2" ry="2" />
+<text  x="275.22" y="639.5" >sys_w..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/ScriptableObject:.createSlot (1 samples, 2.22%)</title><rect x="560.7" y="645" width="26.2" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="563.67" y="655.5" >o..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/MemberBox:.invoke (1 samples, 2.22%)</title><rect x="691.8" y="693" width="26.2" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="694.78" y="703.5" >o..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_93:._c_anonymous_3 (8 samples, 17.78%)</title><rect x="744.2" y="709" width="209.8" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="747.22" y="719.5" >org/mozilla/javascript/gen/..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_93:.&lt;init&gt; (4 samples, 8.89%)</title><rect x="796.7" y="693" width="104.9" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="799.67" y="703.5" >org/mozilla/..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_93:.getParamAndVarCount (1 samples, 2.22%)</title><rect x="744.2" y="645" width="26.2" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="747.22" y="655.5" >o..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/BaseFunction:.construct (3 samples, 6.67%)</title><rect x="613.1" y="741" width="78.7" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="616.11" y="751.5" >org/mozil..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/IdScriptableObject:.put (1 samples, 2.22%)</title><rect x="665.6" y="677" width="26.2" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="668.56" y="687.5" >o..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_93:.call (1 samples, 2.22%)</title><rect x="744.2" y="677" width="26.2" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="747.22" y="687.5" >o..</text>
+</g>
+<g >
+<title>perf_pmu_enable (4 samples, 8.89%)</title><rect x="10.0" y="885" width="104.9" height="15.0" fill="rgb(242,142,0)" rx="2" ry="2" />
+<text  x="13.00" y="895.5" >perf_pmu_ena..</text>
+</g>
+<g >
+<title>group_sched_in (4 samples, 8.89%)</title><rect x="377.1" y="677" width="104.9" height="15.0" fill="rgb(239,139,0)" rx="2" ry="2" />
+<text  x="380.11" y="687.5" >group_sched_in</text>
+</g>
+<g >
+<title>org/mozilla/javascript/TopLevel:.getBuiltinPrototype (4 samples, 8.89%)</title><rect x="796.7" y="661" width="104.9" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="799.67" y="671.5" >org/mozilla/..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/ScriptableObject:.getSlot (1 samples, 2.22%)</title><rect x="927.8" y="645" width="26.2" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="930.78" y="655.5" >o..</text>
+</g>
+<g >
+<title>tcp_v4_send_check (1 samples, 2.22%)</title><rect x="298.4" y="485" width="26.3" height="15.0" fill="rgb(237,137,0)" rx="2" ry="2" />
+<text  x="301.44" y="495.5" >t..</text>
+</g>
+<g >
+<title>io/netty/channel/DefaultChannelHandlerContext:.flush (3 samples, 6.67%)</title><rect x="246.0" y="821" width="78.7" height="15.0" fill="rgb(89,235,89)" rx="2" ry="2" />
+<text  x="249.00" y="831.5" >io/netty/..</text>
+</g>
+<g >
+<title>tcp_sendmsg (3 samples, 6.67%)</title><rect x="114.9" y="997" width="78.7" height="15.0" fill="rgb(237,137,0)" rx="2" ry="2" />
+<text  x="117.89" y="1007.5" >tcp_sendmsg</text>
+</g>
+<g >
+<title>perf_pmu_enable (4 samples, 8.89%)</title><rect x="796.7" y="533" width="104.9" height="15.0" fill="rgb(242,142,0)" rx="2" ry="2" />
+<text  x="799.67" y="543.5" >perf_pmu_ena..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_90:._c_anonymous_3 (3 samples, 6.67%)</title><rect x="508.2" y="709" width="78.7" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="511.22" y="719.5" >org/mozil..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/ScriptRuntime:.setObjectProp (2 samples, 4.44%)</title><rect x="639.3" y="693" width="52.5" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="642.33" y="703.5" >org/m..</text>
+</g>
+<g >
+<title>remote_function (4 samples, 8.89%)</title><rect x="377.1" y="709" width="104.9" height="15.0" fill="rgb(242,142,0)" rx="2" ry="2" />
+<text  x="380.11" y="719.5" >remote_funct..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/ScriptableObject:.getSlot (1 samples, 2.22%)</title><rect x="613.1" y="565" width="26.2" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="616.11" y="575.5" >o..</text>
+</g>
+<g >
+<title>x86_pmu_commit_txn (4 samples, 8.89%)</title><rect x="1032.7" y="869" width="104.9" height="15.0" fill="rgb(248,148,0)" rx="2" ry="2" />
+<text  x="1035.67" y="879.5" >x86_pmu_comm..</text>
+</g>
+<g >
+<title>JavaThread::thread_main_inner (32 samples, 71.11%)</title><rect x="193.6" y="1077" width="839.1" height="15.0" fill="rgb(203,203,60)" rx="2" ry="2" />
+<text  x="196.56" y="1087.5" >JavaThread::thread_main_inner</text>
+</g>
+<g >
+<title>ip_local_deliver_finish (1 samples, 2.22%)</title><rect x="114.9" y="693" width="26.2" height="15.0" fill="rgb(230,130,0)" rx="2" ry="2" />
+<text  x="117.89" y="703.5" >i..</text>
+</g>
+<g >
+<title>[libpthread-2.19.so] (2 samples, 4.44%)</title><rect x="272.2" y="661" width="52.5" height="15.0" fill="rgb(235,101,101)" rx="2" ry="2" />
+<text  x="275.22" y="671.5" >[libp..</text>
+</g>
+<g >
+<title>try_to_wake_up (1 samples, 2.22%)</title><rect x="272.2" y="53" width="26.2" height="15.0" fill="rgb(234,134,0)" rx="2" ry="2" />
+<text  x="275.22" y="63.5" >t..</text>
+</g>
+<g >
+<title>tcp_v4_do_rcv (1 samples, 2.22%)</title><rect x="272.2" y="213" width="26.2" height="15.0" fill="rgb(237,137,0)" rx="2" ry="2" />
+<text  x="275.22" y="223.5" >t..</text>
+</g>
+<g >
+<title>smp_call_function_single_interrupt (4 samples, 8.89%)</title><rect x="796.7" y="629" width="104.9" height="15.0" fill="rgb(225,125,0)" rx="2" ry="2" />
+<text  x="799.67" y="639.5" >smp_call_fun..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/gen/file__home_bgregg_bench_Server_js_js_4:.call (1 samples, 2.22%)</title><rect x="586.9" y="741" width="26.2" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="589.89" y="751.5" >o..</text>
+</g>
+<g >
+<title>__netif_receive_skb (1 samples, 2.22%)</title><rect x="114.9" y="773" width="26.2" height="15.0" fill="rgb(231,131,0)" rx="2" ry="2" />
+<text  x="117.89" y="783.5" >_..</text>
+</g>
+<g >
+<title>ip_rcv (1 samples, 2.22%)</title><rect x="272.2" y="293" width="26.2" height="15.0" fill="rgb(230,130,0)" rx="2" ry="2" />
+<text  x="275.22" y="303.5" >i..</text>
+</g>
+<g >
+<title>perf_pmu_enable (4 samples, 8.89%)</title><rect x="377.1" y="645" width="104.9" height="15.0" fill="rgb(242,142,0)" rx="2" ry="2" />
+<text  x="380.11" y="655.5" >perf_pmu_ena..</text>
+</g>
+<g >
+<title>remote_function (4 samples, 8.89%)</title><rect x="1032.7" y="917" width="104.9" height="15.0" fill="rgb(242,142,0)" rx="2" ry="2" />
+<text  x="1035.67" y="927.5" >remote_funct..</text>
+</g>
+<g >
+<title>__tcp_push_pending_frames (1 samples, 2.22%)</title><rect x="114.9" y="981" width="26.2" height="15.0" fill="rgb(226,126,0)" rx="2" ry="2" />
+<text  x="117.89" y="991.5" >_..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/MemberBox:.invoke (1 samples, 2.22%)</title><rect x="586.9" y="677" width="26.2" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="589.89" y="687.5" >o..</text>
+</g>
+<g >
+<title>ip_local_out (1 samples, 2.22%)</title><rect x="272.2" y="469" width="26.2" height="15.0" fill="rgb(230,130,0)" rx="2" ry="2" />
+<text  x="275.22" y="479.5" >i..</text>
+</g>
+<g >
+<title>io/netty/channel/nio/NioEventLoop:.processSelectedKeysOptimized (31 samples, 68.89%)</title><rect x="193.6" y="933" width="812.8" height="15.0" fill="rgb(89,235,89)" rx="2" ry="2" />
+<text  x="196.56" y="943.5" >io/netty/channel/nio/NioEventLoop:.processSelectedKeysOptimized</text>
+</g>
+<g >
+<title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_93:.call (9 samples, 20.00%)</title><rect x="718.0" y="773" width="236.0" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="721.00" y="783.5" >org/mozilla/javascript/gen/file..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/IdScriptableObject:.put (1 samples, 2.22%)</title><rect x="560.7" y="677" width="26.2" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="563.67" y="687.5" >o..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_91:._c_anonymous_21 (1 samples, 2.22%)</title><rect x="613.1" y="661" width="26.2" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="616.11" y="671.5" >o..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/BaseFunction:.construct (1 samples, 2.22%)</title><rect x="482.0" y="693" width="26.2" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="485.00" y="703.5" >o..</text>
+</g>
+<g >
+<title>rest_init (1 samples, 2.22%)</title><rect x="1163.8" y="1077" width="26.2" height="15.0" fill="rgb(236,136,0)" rx="2" ry="2" />
+<text  x="1166.78" y="1087.5" >r..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/gen/file__home_bgregg_bench_Server_js_js_2:.call (1 samples, 2.22%)</title><rect x="691.8" y="741" width="26.2" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="694.78" y="751.5" >o..</text>
+</g>
+<g >
+<title>native_write_msr_safe (4 samples, 8.89%)</title><rect x="10.0" y="837" width="104.9" height="15.0" fill="rgb(234,134,0)" rx="2" ry="2" />
+<text  x="13.00" y="847.5" >native_write..</text>
+</g>
+<g >
+<title>perf_event_enable (4 samples, 8.89%)</title><rect x="1032.7" y="965" width="104.9" height="15.0" fill="rgb(242,142,0)" rx="2" ry="2" />
+<text  x="1035.67" y="975.5" >perf_event_e..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/ScriptRuntime:.getPropFunctionAndThis (1 samples, 2.22%)</title><rect x="508.2" y="693" width="26.2" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="511.22" y="703.5" >o..</text>
+</g>
+<g >
+<title>all (45 samples, 100%)</title><rect x="10.0" y="1157" width="1180.0" height="15.0" fill="rgb(255,130,130)" rx="2" ry="2" />
+<text  x="13.00" y="1167.5" ></text>
+</g>
+<g >
+<title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_91:.call (4 samples, 8.89%)</title><rect x="613.1" y="773" width="104.9" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="616.11" y="783.5" >org/mozilla/..</text>
+</g>
+<g >
+<title>system_call_fastpath (2 samples, 4.44%)</title><rect x="272.2" y="645" width="52.5" height="15.0" fill="rgb(237,137,0)" rx="2" ry="2" />
+<text  x="275.22" y="655.5" >syste..</text>
+</g>
+<g >
+<title>sun/nio/ch/SocketChannelImpl:.write (3 samples, 6.67%)</title><rect x="246.0" y="693" width="78.7" height="15.0" fill="rgb(88,235,88)" rx="2" ry="2" />
+<text  x="249.00" y="703.5" >sun/nio/c..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/IdScriptableObject:.has (1 samples, 2.22%)</title><rect x="482.0" y="597" width="26.2" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="485.00" y="607.5" >o..</text>
+</g>
+<g >
+<title>io/netty/channel/DefaultChannelPipeline$HeadHandler:.flush (3 samples, 6.67%)</title><rect x="246.0" y="741" width="78.7" height="15.0" fill="rgb(89,235,89)" rx="2" ry="2" />
+<text  x="249.00" y="751.5" >io/netty/..</text>
+</g>
+<g >
+<title>intel_pmu_enable_all (4 samples, 8.89%)</title><rect x="1032.7" y="821" width="104.9" height="15.0" fill="rgb(236,136,0)" rx="2" ry="2" />
+<text  x="1035.67" y="831.5" >intel_pmu_en..</text>
+</g>
+<g >
+<title>sun/nio/ch/EPollSelectorImpl:.doSelect (1 samples, 2.22%)</title><rect x="1006.4" y="901" width="26.3" height="15.0" fill="rgb(88,235,88)" rx="2" ry="2" />
+<text  x="1009.44" y="911.5" >s..</text>
+</g>
+<g >
+<title>ip_local_deliver (1 samples, 2.22%)</title><rect x="114.9" y="709" width="26.2" height="15.0" fill="rgb(230,130,0)" rx="2" ry="2" />
+<text  x="117.89" y="719.5" >i..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_91:.call (3 samples, 6.67%)</title><rect x="613.1" y="725" width="78.7" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="616.11" y="735.5" >org/mozil..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/optimizer/OptRuntime:.call2 (1 samples, 2.22%)</title><rect x="482.0" y="645" width="26.2" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="485.00" y="655.5" >o..</text>
+</g>
+<g >
+<title>tcp_v4_rcv (1 samples, 2.22%)</title><rect x="114.9" y="677" width="26.2" height="15.0" fill="rgb(237,137,0)" rx="2" ry="2" />
+<text  x="117.89" y="687.5" >t..</text>
+</g>
+<g >
+<title>ip_local_deliver (1 samples, 2.22%)</title><rect x="272.2" y="261" width="26.2" height="15.0" fill="rgb(230,130,0)" rx="2" ry="2" />
+<text  x="275.22" y="271.5" >i..</text>
+</g>
+<g >
+<title>java/lang/reflect/Method:.invoke (1 samples, 2.22%)</title><rect x="691.8" y="677" width="26.2" height="15.0" fill="rgb(77,224,77)" rx="2" ry="2" />
+<text  x="694.78" y="687.5" >j..</text>
+</g>
+<g >
+<title>sock_aio_write (7 samples, 15.56%)</title><rect x="10.0" y="1029" width="183.6" height="15.0" fill="rgb(239,139,0)" rx="2" ry="2" />
+<text  x="13.00" y="1039.5" >sock_aio_write</text>
+</g>
+<g >
+<title>do_vfs_ioctl (4 samples, 8.89%)</title><rect x="1032.7" y="1013" width="104.9" height="15.0" fill="rgb(243,143,0)" rx="2" ry="2" />
+<text  x="1035.67" y="1023.5" >do_vfs_ioctl</text>
+</g>
+<g >
+<title>x86_pmu_commit_txn (4 samples, 8.89%)</title><rect x="796.7" y="549" width="104.9" height="15.0" fill="rgb(248,148,0)" rx="2" ry="2" />
+<text  x="799.67" y="559.5" >x86_pmu_comm..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_80:._c_anonymous_3 (1 samples, 2.22%)</title><rect x="482.0" y="709" width="26.2" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="485.00" y="719.5" >o..</text>
+</g>
+<g >
+<title>__perf_event_enable (4 samples, 8.89%)</title><rect x="377.1" y="693" width="104.9" height="15.0" fill="rgb(230,130,0)" rx="2" ry="2" />
+<text  x="380.11" y="703.5" >__perf_event..</text>
+</g>
+<g >
+<title>tcp_rcv_established (1 samples, 2.22%)</title><rect x="114.9" y="645" width="26.2" height="15.0" fill="rgb(237,137,0)" rx="2" ry="2" />
+<text  x="117.89" y="655.5" >t..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_streams_js_47:.call (1 samples, 2.22%)</title><rect x="927.8" y="677" width="26.2" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="930.78" y="687.5" >o..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_80:.call (1 samples, 2.22%)</title><rect x="482.0" y="677" width="26.2" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="485.00" y="687.5" >o..</text>
+</g>
+<g >
+<title>__wake_up_sync_key (1 samples, 2.22%)</title><rect x="272.2" y="149" width="26.2" height="15.0" fill="rgb(223,123,0)" rx="2" ry="2" />
+<text  x="275.22" y="159.5" >_..</text>
+</g>
+<g >
+<title>org/mozilla/javascript/NativeJavaMethod:.call (1 samples, 2.22%)</title><rect x="691.8" y="709" width="26.2" height="15.0" fill="rgb(96,242,96)" rx="2" ry="2" />
+<text  x="694.78" y="719.5" >o..</text>
+</g>
+<g >
+<title>sun/nio/ch/SocketChannelImpl:.read (2 samples, 4.44%)</title><rect x="193.6" y="869" width="52.4" height="15.0" fill="rgb(88,235,88)" rx="2" ry="2" />
+<text  x="196.56" y="879.5" >sun/n..</text>
+</g>
+<g >
+<title>JavaCalls::call_helper (32 samples, 71.11%)</title><rect x="193.6" y="1013" width="839.1" height="15.0" fill="rgb(203,203,60)" rx="2" ry="2" />
+<text  x="196.56" y="1023.5" >JavaCalls::call_helper</text>
+</g>
+<g >
+<title>__perf_event_enable (4 samples, 8.89%)</title><rect x="10.0" y="933" width="104.9" height="15.0" fill="rgb(230,130,0)" rx="2" ry="2" />
+<text  x="13.00" y="943.5" >__perf_event..</text>
+</g>
+</g>
+</svg>

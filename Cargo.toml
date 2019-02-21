@@ -32,6 +32,7 @@ num-format = { version = "0.4", default-features = false }
 str_stack = "0.1"
 addr2line = "0.8"
 indexmap = "1.0"
+rand = "0.6.5"
 
 [dev-dependencies]
 pretty_assertions = "0.5"

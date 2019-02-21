@@ -1,6 +1,4 @@
 mod attrs;
-mod merge;
-mod svg;
 
 pub use attrs::FuncFrameAttrsMap;
 
@@ -14,6 +12,13 @@ use quick_xml::{
 };
 use str_stack::StrStack;
 
+mod color;
+mod merge;
+mod svg;
+pub use color::BackgroundColor;
+pub use color::Palette;
+use svg::StyleOptions;
+
 const IMAGEWIDTH: usize = 1200; // max width, pixels
 const FRAMEHEIGHT: usize = 16; // max height is dynamic
 const FONTSIZE: usize = 12; // base text size
@@ -23,11 +28,14 @@ const YPAD1: usize = FONTSIZE * 3; // pad top, include title
 const YPAD2: usize = FONTSIZE * 2 + 10; // pad bottom, include labels
 const XPAD: usize = 10; // pad lefm and right
 const FRAMEPAD: usize = 1; // vertical padding for frames
-const BGCOLOR1: &str = "#eeeeee";
-const BGCOLOR2: &str = "#eeeeb0";
+const PALETTE_FILE: &str = "palette.map";
 
 #[derive(Debug, Default)]
 pub struct Options {
+    pub colors: color::Palette,
+    pub bgcolors: Option<color::BackgroundColor>,
+    pub hash: bool,
+    pub consistent_palette: bool,
     pub func_frameattrs: FuncFrameAttrsMap,
     pub direction: Direction,
     pub title: String,
@@ -45,11 +53,91 @@ macro_rules! args {
     }};
 }
 
+struct FrameAttributes<'a> {
+    title: &'a str,
+    class: &'a str,
+    onmouseover: &'a str,
+    onmouseout: &'a str,
+    onclick: &'a str,
+    style: Option<&'a str>,
+    g_extra: Option<&'a Vec<(String, String)>>,
+    href: Option<&'a str>,
+    target: &'a str,
+    a_extra: Option<&'a Vec<(String, String)>>,
+}
+
+fn override_or_add_attributes<'a>(
+    title: &'a str,
+    attributes: Option<&'a attrs::FrameAttrs>,
+) -> FrameAttributes<'a> {
+    let mut title = title;
+    let mut class = "func_g";
+    let mut onmouseover = "s(this)";
+    let mut onmouseout = "c()";
+    let mut onclick = "zoom(this)";
+    let mut style = None;
+    let mut g_extra = None;
+    let mut href = None;
+    let mut target = "_top";
+    let mut a_extra = None;
+
+    // Handle any overridden or extra attributes.
+    if let Some(attrs) = attributes {
+        if let Some(ref c) = attrs.g.class {
+            class = c.as_str();
+        }
+        if let Some(ref c) = attrs.g.style {
+            style = Some(c.as_str());
+        }
+        if let Some(ref o) = attrs.g.onmouseover {
+            onmouseover = o.as_str();
+        }
+        if let Some(ref o) = attrs.g.onmouseout {
+            onmouseout = o.as_str();
+        }
+        if let Some(ref o) = attrs.g.onclick {
+            onclick = o.as_str();
+        }
+        if let Some(ref t) = attrs.title {
+            title = t.as_str();
+        }
+        g_extra = Some(&attrs.g.extra);
+        if let Some(ref h) = attrs.a.href {
+            href = Some(h.as_str());
+        }
+        if let Some(ref t) = attrs.a.target {
+            target = t.as_str();
+        }
+        a_extra = Some(&attrs.a.extra);
+    }
+
+    FrameAttributes {
+        title,
+        class,
+        onmouseover,
+        onmouseout,
+        onclick,
+        style,
+        g_extra,
+        href,
+        target,
+        a_extra,
+    }
+}
+
 pub fn from_sorted_lines<'a, I, W>(opt: Options, lines: I, writer: W) -> quick_xml::Result<()>
 where
     I: IntoIterator<Item = &'a str>,
     W: Write,
 {
+    let mut palette_map = if opt.consistent_palette {
+        Some(color::PaletteMap::load(PALETTE_FILE)?)
+    } else {
+        None
+    };
+
+    let (bgcolor1, bgcolor2) = color::bgcolor_for(opt.bgcolors, opt.colors);
+
     let mut buffer = StrStack::new();
     let (mut frames, time, ignored) = merge::frames(lines);
     if ignored != 0 {
@@ -102,7 +190,18 @@ where
     // draw canvas, and embed interactive JavaScript program
     let imageheight = ((depthmax + 1) * FRAMEHEIGHT) + YPAD1 + YPAD2;
     svg::write_header(&mut svg, imageheight)?;
-    svg::write_prelude(&mut svg, imageheight, &opt)?;
+
+    let style_options = StyleOptions {
+        imageheight,
+        bgcolor1,
+        bgcolor2,
+    };
+    svg::write_prelude(&mut svg, &style_options, &opt)?;
+
+    // Used when picking color parameters at random, when no option determines how to pick these
+    // parameters. We instanciate it here because it may be called once for each iteration in the
+    // frames loop.
+    let mut thread_rng = rand::thread_rng();
 
     // struct to reuse accross loops to avoid allocations
     let mut event_start = Event::Start({ BytesStart::owned_name("g") });
@@ -146,66 +245,28 @@ where
             )
         };
 
-        let mut title = &buffer[info];
-        let mut class = "func_g";
-        let mut onmouseover = "s(this)";
-        let mut onmouseout = "c()";
-        let mut onclick = "zoom(this)";
-        let mut style = None;
-        let mut g_extra = None;
-        let mut href = None;
-        let mut target = "_top";
-        let mut a_extra = None;
-
-        // Handle any overridden or extra attributes.
-        if let Some(attrs) = opt
+        let frame_attributes = opt
             .func_frameattrs
-            .frameattrs_for_func(frame.location.function)
-        {
-            if let Some(ref c) = attrs.g.class {
-                class = c.as_str();
-            }
-            if let Some(ref c) = attrs.g.style {
-                style = Some(c.as_str());
-            }
-            if let Some(ref o) = attrs.g.onmouseover {
-                onmouseover = o.as_str();
-            }
-            if let Some(ref o) = attrs.g.onmouseout {
-                onmouseout = o.as_str();
-            }
-            if let Some(ref o) = attrs.g.onclick {
-                onclick = o.as_str();
-            }
-            if let Some(ref t) = attrs.title {
-                title = t.as_str();
-            }
-            g_extra = Some(&attrs.g.extra);
-            if let Some(ref h) = attrs.a.href {
-                href = Some(h.as_str());
-            }
-            if let Some(ref t) = attrs.a.target {
-                target = t.as_str();
-            }
-            a_extra = Some(&attrs.a.extra);
-        }
+            .frameattrs_for_func(frame.location.function);
+        let frame_attributes = override_or_add_attributes(&buffer[info], frame_attributes);
+        let href_is_some = frame_attributes.href.is_some();
 
         if let Event::Start(ref mut g) = event_start {
             // clear the BytesStart
             g.clear_attributes();
 
             g.extend_attributes(args!(
-                "class" => class,
-                "onmouseover" => onmouseover,
-                "onmouseout" => onmouseout,
-                "onclick" => onclick
+                "class" => frame_attributes.class,
+                "onmouseover" => frame_attributes.onmouseover,
+                "onmouseout" => frame_attributes.onmouseout,
+                "onclick" => frame_attributes.onclick
             ));
 
             // add optional attributes
-            if let Some(style) = style {
+            if let Some(style) = frame_attributes.style {
                 g.extend_attributes(std::iter::once(("style", style)));
             }
-            if let Some(extra) = g_extra {
+            if let Some(extra) = frame_attributes.g_extra {
                 g.extend_attributes(extra.iter().map(|(k, v)| (k.as_str(), v.as_str())));
             }
         }
@@ -213,36 +274,42 @@ where
         svg.write_event(&event_start)?;
 
         svg.write_event(Event::Start(BytesStart::borrowed_name(b"title")))?;
-        svg.write_event(Event::Text(BytesText::from_plain_str(title)))?;
+        svg.write_event(Event::Text(BytesText::from_plain_str(
+            frame_attributes.title,
+        )))?;
         svg.write_event(Event::End(BytesEnd::borrowed(b"title")))?;
 
-        if let Some(href) = href {
+        if let Some(href) = frame_attributes.href {
             svg.write_event(Event::Start({
                 let mut a = BytesStart::borrowed_name(b"a").with_attributes(args!(
                     "xlink:href" => href,
-                    "target" => target
+                    "target" => frame_attributes.target
                 ));
-                if let Some(extra) = a_extra {
+                if let Some(extra) = frame_attributes.a_extra {
                     a.extend_attributes(extra.iter().map(|(k, v)| (k.as_str(), v.as_str())));
                 }
                 a
             }))?;
         }
 
-        let color = "rgb(242,10,32)";
-        let x = write!(buffer, "{}", x1);
-        let y = write!(buffer, "{}", y1);
-        let width = write!(buffer, "{}", x2 - x1);
-        let height = write!(buffer, "{}", y2 - y1);
-        svg.write_event(Event::Empty(
-            BytesStart::borrowed_name(b"rect").with_attributes(args!(
-                "x" => &buffer[x],
-                "y" => &buffer[y],
-                "width" => &buffer[width],
-                "height" => &buffer[height],
-                "fill" => color
-            )),
-        ))?;
+        if frame.location.function == "--" {
+            filled_rectangle(&mut svg, &mut buffer, x1, x2, y1, y2, color::VDGREY)?;
+        } else if frame.location.function == "-" {
+            filled_rectangle(&mut svg, &mut buffer, x1, x2, y1, y2, color::DGREY)?;
+        } else if let Some(ref mut palette_map) = palette_map {
+            let color = palette_map.find_color_for(&frame.location.function, |name| {
+                color::color(opt.colors, opt.hash, name, &mut thread_rng)
+            });
+            filled_rectangle(&mut svg, &mut buffer, x1, x2, y1, y2, color)?;
+        } else {
+            let color = color::color(
+                opt.colors,
+                opt.hash,
+                frame.location.function,
+                &mut thread_rng,
+            );
+            filled_rectangle(&mut svg, &mut buffer, x1, x2, y1, y2, color)?;
+        };
 
         let fitchars = ((x2 - x1) as f64 / (FONTSIZE as f64 * FONTWIDTH)).trunc() as usize;
         let text: svg::TextArgument = if fitchars >= 3 {
@@ -283,7 +350,7 @@ where
         )?;
 
         buffer.clear();
-        if href.is_some() {
+        if href_is_some {
             svg.write_event(Event::End(BytesEnd::borrowed(b"a")))?;
         }
         svg.write_event(Event::End(BytesEnd::borrowed(b"g")))?;
@@ -291,6 +358,13 @@ where
 
     svg.write_event(Event::End(BytesEnd::borrowed(b"svg")))?;
     svg.write_event(Event::Eof)?;
+
+    if let Some(palette_map) = palette_map {
+        palette_map
+            .save(PALETTE_FILE)
+            .map_err(quick_xml::Error::Io)?;
+    }
+
     Ok(())
 }
 
@@ -334,6 +408,32 @@ fn deannotate(f: &str) -> &str {
         }
     }
     f
+}
+
+fn filled_rectangle<W: Write>(
+    svg: &mut Writer<W>,
+    buffer: &mut StrStack,
+    x1: usize,
+    x2: usize,
+    y1: usize,
+    y2: usize,
+    color: (u8, u8, u8),
+) -> quick_xml::Result<usize> {
+    let x = write!(buffer, "{}", x1);
+    let y = write!(buffer, "{}", y1);
+    let width = write!(buffer, "{}", x2 - x1);
+    let height = write!(buffer, "{}", y2 - y1);
+    let color = write!(buffer, "rgb({},{},{})", color.0, color.1, color.2);
+
+    svg.write_event(Event::Empty(
+        BytesStart::borrowed_name(b"rect").with_attributes(args!(
+                "x" => &buffer[x],
+                "y" => &buffer[y],
+                "width" => &buffer[width],
+                "height" => &buffer[height],
+                "fill" => &buffer[color]
+        )),
+    ))
 }
 
 impl Default for Direction {

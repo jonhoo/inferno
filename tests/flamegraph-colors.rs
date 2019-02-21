@@ -4,24 +4,13 @@ extern crate pretty_assertions;
 extern crate inferno;
 
 use inferno::flamegraph;
+use inferno::flamegraph::BackgroundColor;
+use inferno::flamegraph::Palette;
 use std::fs::{self, File};
 use std::io::{BufRead, BufReader, Cursor};
-use std::path::PathBuf;
+use std::str::FromStr;
 
-#[test]
-fn flamegraph_nameattr() {
-    let input_file = "./flamegraph/test/results/perf-cycles-instructions-01-collapsed-all.txt";
-    let expected_result_file = "./tests/data/nameattr/nameattr.svg";
-    let nameattr_file = "./tests/data/nameattr/nameattr.txt";
-
-    let options = flamegraph::Options {
-        hash: true,
-        func_frameattrs: flamegraph::FuncFrameAttrsMap::from_file(&PathBuf::from(nameattr_file))
-            .unwrap(),
-        title: "Flame Graph".to_string(),
-        ..Default::default()
-    };
-
+fn do_test(input_file: &str, expected_result_file: &str, options: flamegraph::Options) {
     let r = File::open(input_file).unwrap();
     let expected_len = fs::metadata(expected_result_file).unwrap().len() as usize;
     let mut result = Cursor::new(Vec::with_capacity(expected_len));
@@ -32,6 +21,7 @@ fn flamegraph_nameattr() {
 
     let mut buf = String::new();
     let mut line_num = 1;
+
     for line in result.lines() {
         if expected.read_line(&mut buf).unwrap() == 0 {
             panic!(
@@ -56,4 +46,36 @@ fn flamegraph_nameattr() {
             expected_result_file, line_num
         )
     }
+}
+
+#[test]
+fn flamegraph_colors_java() {
+    let input_file = "./flamegraph/test/results/perf-java-stacks-01-collapsed-all.txt";
+    let expected_result_file = "./tests/data/colors/java.svg";
+
+    let options = flamegraph::Options {
+        colors: Palette::from_str("java").unwrap(),
+        bgcolors: Some(BackgroundColor::from_str("blue").unwrap()),
+        hash: true,
+        title: "Flame Graph".to_string(),
+        ..Default::default()
+    };
+
+    do_test(input_file, expected_result_file, options)
+}
+
+#[test]
+fn flamegraph_colors_js() {
+    let input_file = "./flamegraph/test/results/perf-js-stacks-01-collapsed-all.txt";
+    let expected_result_file = "./tests/data/colors/js.svg";
+
+    let options = flamegraph::Options {
+        colors: Palette::from_str("js").unwrap(),
+        bgcolors: Some(BackgroundColor::from_str("green").unwrap()),
+        hash: true,
+        title: "Flame Graph".to_string(),
+        ..Default::default()
+    };
+
+    do_test(input_file, expected_result_file, options)
 }
