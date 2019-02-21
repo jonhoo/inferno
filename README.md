@@ -45,6 +45,10 @@ Transform perf output to svg
 $ perf script | ./target/release/inferno-collapse-perf | ./target/release/inferno-flamegraph > out.svg
 ```
 
+You'll end up with an image like this:
+
+[![colorized flamegraph output](tests/data/colors/java.svg?raw=true)](tests/data/colors/java.svg)
+
 # Comparison to the Perl implementation
 
 To compare performance, run `./compare.sh`. It requires [hyperfine](https://github.com/sharkdp/hyperfine).
