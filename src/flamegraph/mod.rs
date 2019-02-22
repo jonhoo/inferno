@@ -135,6 +135,9 @@ impl Rectangle {
     fn width(&self) -> usize {
         self.x2 - self.x1
     }
+    fn height(&self) -> usize {
+        self.y2 - self.y1
+    }
 }
 
 pub fn from_sorted_lines<'a, I, W>(opt: Options, lines: I, writer: W) -> quick_xml::Result<()>
@@ -443,8 +446,8 @@ fn filled_rectangle<W: Write>(
 ) -> quick_xml::Result<usize> {
     let x = write!(buffer, "{}", rect.x1);
     let y = write!(buffer, "{}", rect.y1);
-    let width = write!(buffer, "{}", rect.x2 - rect.x1);
-    let height = write!(buffer, "{}", rect.y2 - rect.y1);
+    let width = write!(buffer, "{}", rect.width());
+    let height = write!(buffer, "{}", rect.height());
     let color = write!(buffer, "rgb({},{},{})", color.0, color.1, color.2);
 
     if let Event::Empty(bytes_start) = cache_rect {
