@@ -154,9 +154,8 @@ fn consume_unsigned_integer(
 mod tests {
     use std::env;
     use std::fs::File;
-    use std::io::{self, Write};
+    use std::io::{self, Read, Write};
     use std::path::Path;
-    use std::process::{exit, Command};
 
     use super::*;
 
@@ -169,30 +168,15 @@ mod tests {
             .join("tests")
             .join("data")
             .join("bpftrace");
-        let perl = Path::new(&root_dir)
-            .join("flamegraph")
-            .join("stackcollapse-bpftrace.pl");
 
         for i in 1..NUMBER_OF_TEST_INPUTS + 1 {
             let input_path = data_dir.join(&format!("input{}.txt", i));
             let output_perl_path = data_dir.join(&format!("perl{}.txt", i));
             let output_rust_path = data_dir.join(&format!("rust{}.txt", i));
 
-            let output_perl = {
-                let output = Command::new(&perl)
-                    .arg(&input_path)
-                    .output()
-                    .unwrap_or_else(|_| {
-                        panic!("Failed to execute {:?}", perl);
-                    });
-                if !output.status.success() {
-                    eprintln!("{}", String::from_utf8_lossy(&output.stderr));
-                    exit(1);
-                }
-                let mut f = File::create(&output_perl_path).unwrap();
-                f.write_all(&output.stdout).unwrap();
-                output.stdout
-            };
+            let mut output_perl = Vec::new();
+            let mut f = File::open(&output_perl_path).unwrap();
+            f.read_to_end(&mut output_perl).unwrap();
 
             let output_rust = {
                 let f = File::open(&input_path).unwrap();
