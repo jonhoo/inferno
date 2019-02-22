@@ -1,0 +1,2 @@
+# Ensure git doesn't change the line-endings of our data files on Windows.
+tests/data/**/* binary

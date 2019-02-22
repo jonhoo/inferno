@@ -5,10 +5,13 @@ use std::fs::File;
 use std::io;
 use std::io::prelude::*;
 
+use super::Frontend;
+
 const TIDY_GENERIC: bool = true;
 const TIDY_JAVA: bool = true;
 
-#[derive(Debug, Default)]
+/// Settings one may pass during the construction of a `Perf` (via its `from_options` method).
+#[derive(Clone, Debug, Default)]
 pub struct Options {
     /// include PID with process names [1]
     pub include_pid: bool,
@@ -35,39 +38,22 @@ pub struct Options {
     pub event_filter: Option<String>,
 }
 
-pub fn handle_file<R: BufRead, W: Write>(opt: Options, mut reader: R, writer: W) -> io::Result<()> {
-    let mut line = String::new();
-    let mut state = PerfState::from(opt);
-    loop {
-        line.clear();
-
-        if reader.read_line(&mut line)? == 0 {
-            break;
-        }
-
-        if line.starts_with('#') {
-            continue;
-        }
-
-        let line = line.trim_end();
-        if line.is_empty() {
-            state.after_event();
-        } else {
-            state.on_line(line.trim_end());
-        }
-    }
-
-    state.finish(writer)
-}
-
-#[derive(Debug)]
+#[derive(Copy, Clone, Debug)]
 enum EventFilterState {
     None,
     Defaulted,
     Warned,
 }
 
-struct PerfState {
+impl Default for EventFilterState {
+    fn default() -> Self {
+        EventFilterState::None
+    }
+}
+
+/// The perf implementation of `Frontend`.
+#[derive(Default)]
+pub struct Perf {
     /// All lines until the next empty line are stack lines.
     in_event: bool,
 
@@ -88,15 +74,44 @@ struct PerfState {
     /// Called pname after original stackcollapse-perf source.
     pname: String,
 
-    /// The options for the current run.
-    opt: Options,
-
     event_filtering: EventFilterState,
+
+    opt: Options,
 }
 
-impl From<Options> for PerfState {
-    fn from(opt: Options) -> Self {
-        PerfState {
+impl Frontend for Perf {
+    fn collapse<R, W>(&mut self, mut reader: R, writer: W) -> io::Result<()>
+    where
+        R: BufRead,
+        W: Write,
+    {
+        let mut line = String::new();
+        loop {
+            line.clear();
+
+            if reader.read_line(&mut line)? == 0 {
+                break;
+            }
+
+            if line.starts_with('#') {
+                continue;
+            }
+
+            let line = line.trim_end();
+            if line.is_empty() {
+                self.after_event();
+            } else {
+                self.on_line(line.trim_end());
+            }
+        }
+        self.finish(writer)
+    }
+}
+
+impl Perf {
+    /// Constructs a `Perf` with the provided `Options`.
+    pub fn from_options(opt: Options) -> Self {
+        Self {
             in_event: false,
             skip_stack: false,
             stack: VecDeque::default(),
@@ -107,9 +122,7 @@ impl From<Options> for PerfState {
             opt,
         }
     }
-}
 
-impl PerfState {
     fn on_line(&mut self, line: &str) {
         if !self.in_event {
             self.on_event_line(line)

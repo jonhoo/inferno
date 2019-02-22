@@ -1,8 +1,9 @@
-use std::fs::File;
-use std::io::{self, BufReader};
+use std::io;
+use std::path::PathBuf;
 use structopt::StructOpt;
 
-use inferno::collapse::perf::{handle_file, Options};
+use inferno::collapse::perf::{Options, Perf};
+use inferno::collapse::Frontend;
 
 #[derive(Debug, StructOpt)]
 #[structopt(
@@ -53,39 +54,28 @@ struct Opt {
     event_filter: Option<String>,
 
     /// perf script output file, or STDIN if not specified
-    infile: Option<String>,
+    infile: Option<PathBuf>,
 }
 
-impl Into<Options> for Opt {
-    fn into(self) -> Options {
-        Options {
-            include_pid: self.include_pid,
-            include_tid: self.include_tid,
-            include_addrs: self.include_addrs,
-            annotate_jit: self.annotate_jit || self.annotate_all,
-            annotate_kernel: self.annotate_kernel || self.annotate_all,
-            show_inline: self.show_inline,
-            show_context: self.show_context,
-            event_filter: self.event_filter,
-        }
+impl Opt {
+    fn into_parts(self) -> (Option<PathBuf>, Options) {
+        (
+            self.infile,
+            Options {
+                include_pid: self.include_pid,
+                include_tid: self.include_tid,
+                include_addrs: self.include_addrs,
+                annotate_jit: self.annotate_jit || self.annotate_all,
+                annotate_kernel: self.annotate_kernel || self.annotate_all,
+                show_inline: self.show_inline,
+                show_context: self.show_context,
+                event_filter: self.event_filter,
+            },
+        )
     }
 }
 
 fn main() -> io::Result<()> {
-    let (infile, options) = {
-        let opt = Opt::from_args();
-        (opt.infile.clone(), opt.into())
-    };
-
-    match infile {
-        Some(ref f) => {
-            let r = BufReader::with_capacity(128 * 1024, File::open(f)?);
-            handle_file(options, r, io::stdout().lock())
-        }
-        None => {
-            let stdin = io::stdin();
-            let r = BufReader::with_capacity(128 * 1024, stdin.lock());
-            handle_file(options, r, io::stdout().lock())
-        }
-    }
+    let (infile, options) = Opt::from_args().into_parts();
+    Perf::from_options(options).collapse_file(infile.as_ref())
 }
