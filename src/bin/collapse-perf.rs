@@ -2,8 +2,7 @@ use std::io;
 use std::path::PathBuf;
 use structopt::StructOpt;
 
-use inferno::collapse::{Collapser, Frontend};
-use inferno::collapse::perf::Options;
+use inferno::collapse::{Frontend, Perf, PerfOptions};
 
 #[derive(Debug, StructOpt)]
 #[structopt(
@@ -57,24 +56,26 @@ struct Opt {
     infile: Option<PathBuf>,
 }
 
-impl Into<Options> for Opt {
-    fn into(self) -> Options {
-        Options {
-            include_pid: self.include_pid,
-            include_tid: self.include_tid,
-            include_addrs: self.include_addrs,
-            annotate_jit: self.annotate_jit || self.annotate_all,
-            annotate_kernel: self.annotate_kernel || self.annotate_all,
-            show_inline: self.show_inline,
-            show_context: self.show_context,
-            event_filter: self.event_filter,
-        }
+impl Opt {
+    fn into_parts(self) -> (Option<PathBuf>, PerfOptions) {
+        (
+            self.infile,
+            PerfOptions {
+                include_pid: self.include_pid,
+                include_tid: self.include_tid,
+                include_addrs: self.include_addrs,
+                annotate_jit: self.annotate_jit || self.annotate_all,
+                annotate_kernel: self.annotate_kernel || self.annotate_all,
+                show_inline: self.show_inline,
+                show_context: self.show_context,
+                event_filter: self.event_filter,
+            }
+        )
     }
 }
 
 fn main() -> io::Result<()> {
     let opt = Opt::from_args();
-    let infile = opt.infile.clone();
-    let options = opt.into();
-    Collapser::new(Frontend::Perf(options)).handle_file(infile.as_ref())
+    let (infile, options) = opt.into_parts();
+    Perf::new(options).collapse_with(infile.as_ref())
 }

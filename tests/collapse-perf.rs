@@ -3,7 +3,7 @@ extern crate pretty_assertions;
 
 extern crate inferno;
 
-use inferno::collapse::perf::{handle_file, Options};
+use inferno::collapse::{Frontend, Perf, PerfOptions};
 use std::fs::{self, File};
 use std::io::{self, BufRead, BufReader, Cursor};
 use std::path::Path;
@@ -154,11 +154,16 @@ collapse_perf_tests! {
     perf_inline_counter__inline_context
 }
 
-fn test_collapse_perf(test_file: &str, expected_file: &str, mut options: Options) -> io::Result<()> {
+fn test_collapse_perf(
+    test_file: &str,
+    expected_file: &str,
+    options: PerfOptions,
+) -> io::Result<()> {
     let r = BufReader::new(File::open(test_file)?);
     let expected_len = fs::metadata(expected_file)?.len() as usize;
     let mut result = Cursor::new(Vec::with_capacity(expected_len));
-    handle_file(&mut options, r, &mut result)?;
+    let mut perf = Perf::new(options);
+    perf.collapse(r, &mut result)?;
     let mut expected = BufReader::new(File::open(expected_file)?);
 
     result.set_position(0);
@@ -189,8 +194,8 @@ fn test_collapse_perf(test_file: &str, expected_file: &str, mut options: Options
     Ok(())
 }
 
-fn options_from_vec(opt_vec: Vec<&str>) -> Options {
-    let mut options = Options::default();
+fn options_from_vec(opt_vec: Vec<&str>) -> PerfOptions {
+    let mut options = PerfOptions::default();
     for option in opt_vec {
         match option {
             "pid" => options.include_pid = true,

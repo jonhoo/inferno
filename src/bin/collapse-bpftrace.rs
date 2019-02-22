@@ -2,7 +2,7 @@ use std::io;
 use std::path::PathBuf;
 use structopt::StructOpt;
 
-use inferno::collapse::{Collapser, Frontend};
+use inferno::collapse::{Bpftrace, Frontend};
 
 #[derive(Debug, StructOpt)]
 #[structopt(name = "inferno-collapse-bpftrace", author = "")]
@@ -13,5 +13,5 @@ struct Opt {
 
 fn main() -> io::Result<()> {
     let opt = Opt::from_args();
-    Collapser::new(Frontend::Bpftrace).handle_file(opt.infile.as_ref())
+    Bpftrace::default().collapse_with(opt.infile.as_ref())
 }
