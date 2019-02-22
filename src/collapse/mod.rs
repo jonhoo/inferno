@@ -1,10 +1,8 @@
-//! Tools for collapsing the output of various profilers (e.g. [bpftrace], [perf]) into the
+//! Tools for collapsing the output of various profilers (e.g. [perf]) into the
 //! format expected by flamegraph.
 //!
-//! [bpftrace]: https://github.com/iovisor/bpftrace
 //! [perf]: https://en.wikipedia.org/wiki/Perf_(Linux)
 
-pub mod bpftrace;
 pub mod perf;
 
 use std::fs::File;
@@ -13,10 +11,9 @@ use std::path::Path;
 
 const READER_CAPACITY: usize = 128 * 1024;
 
-/// Trait representing the ability to collapse the output of various profilers, such as [bpftrace]
-/// and [perf], into the format expected by flamegraph.
+/// This trait represents the ability to collapse the output of various profilers, such as
+/// [perf], into the format expected by flamegraph.
 ///
-/// [bpftrace]: https://github.com/iovisor/bpftrace
 /// [perf]: https://en.wikipedia.org/wiki/Perf_(Linux)
 pub trait Frontend {
     /// Collapses the contents of the provided `reader` into the format expected by flamegraph.

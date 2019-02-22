@@ -1,5 +1,3 @@
-//! Module containting the **perf** implementation of `Frontend`.
-
 use smallvec::SmallVec;
 use std::borrow::Cow;
 use std::collections::{HashMap, VecDeque};
