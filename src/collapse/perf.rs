@@ -35,7 +35,7 @@ pub struct Options {
     pub event_filter: Option<String>,
 }
 
-pub fn handle_file<R: BufRead, W: Write>(opt: Options, mut reader: R, writer: W) -> io::Result<()> {
+pub fn handle_file<R: BufRead, W: Write>(opt: &mut Options, mut reader: R, writer: W) -> io::Result<()> {
     let mut line = String::new();
     let mut state = PerfState::from(opt);
     loop {
@@ -67,7 +67,7 @@ enum EventFilterState {
     Warned,
 }
 
-struct PerfState {
+struct PerfState<'a> {
     /// All lines until the next empty line are stack lines.
     in_event: bool,
 
@@ -89,13 +89,13 @@ struct PerfState {
     pname: String,
 
     /// The options for the current run.
-    opt: Options,
+    opt: &'a mut Options,
 
     event_filtering: EventFilterState,
 }
 
-impl From<Options> for PerfState {
-    fn from(opt: Options) -> Self {
+impl<'a> From<&'a mut Options> for PerfState<'a> {
+    fn from(opt: &'a mut Options) -> Self {
         PerfState {
             in_event: false,
             skip_stack: false,
@@ -109,7 +109,7 @@ impl From<Options> for PerfState {
     }
 }
 
-impl PerfState {
+impl<'a> PerfState<'a> {
     fn on_line(&mut self, line: &str) {
         if !self.in_event {
             self.on_event_line(line)

@@ -1,8 +1,9 @@
-use std::fs::File;
-use std::io::{self, BufReader};
+use std::io;
+use std::path::PathBuf;
 use structopt::StructOpt;
 
-use inferno::collapse::perf::{handle_file, Options};
+use inferno::collapse::{Collapser, Frontend};
+use inferno::collapse::perf::Options;
 
 #[derive(Debug, StructOpt)]
 #[structopt(
@@ -53,7 +54,7 @@ struct Opt {
     event_filter: Option<String>,
 
     /// perf script output file, or STDIN if not specified
-    infile: Option<String>,
+    infile: Option<PathBuf>,
 }
 
 impl Into<Options> for Opt {
@@ -72,20 +73,8 @@ impl Into<Options> for Opt {
 }
 
 fn main() -> io::Result<()> {
-    let (infile, options) = {
-        let opt = Opt::from_args();
-        (opt.infile.clone(), opt.into())
-    };
-
-    match infile {
-        Some(ref f) => {
-            let r = BufReader::with_capacity(128 * 1024, File::open(f)?);
-            handle_file(options, r, io::stdout().lock())
-        }
-        None => {
-            let stdin = io::stdin();
-            let r = BufReader::with_capacity(128 * 1024, stdin.lock());
-            handle_file(options, r, io::stdout().lock())
-        }
-    }
+    let opt = Opt::from_args();
+    let infile = opt.infile.clone();
+    let options = opt.into();
+    Collapser::new(Frontend::Perf(options)).handle_file(infile.as_ref())
 }

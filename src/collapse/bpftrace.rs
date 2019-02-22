@@ -152,14 +152,13 @@ fn consume_unsigned_integer(
 
 #[cfg(test)]
 mod tests {
+    use std::collections::{HashMap, HashSet};
     use std::env;
-    use std::fs::File;
+    use std::fs::{self, File};
     use std::io::{self, Read, Write};
     use std::path::Path;
 
     use super::*;
-
-    const NUMBER_OF_TEST_INPUTS: usize = 3;
 
     #[test]
     fn test_bpftrace() {
@@ -169,7 +168,26 @@ mod tests {
             .join("data")
             .join("bpftrace");
 
-        for i in 1..NUMBER_OF_TEST_INPUTS + 1 {
+        let filename_prefixes = ["input", "perl"];
+        let mut map: HashMap<&str, HashSet<u32>> = HashMap::new();
+        for entry in fs::read_dir(&data_dir).unwrap() {
+            let path = entry.unwrap().path();
+            if path.is_file() {
+                let stem = path.file_stem().unwrap().to_str().unwrap();
+                for prefix in &filename_prefixes {
+                    if stem.starts_with(prefix) {
+                        let number_str = &stem[prefix.len()..stem.len()];
+                        let number = number_str.parse::<u32>().unwrap();
+                        let set = map.entry(prefix).or_insert(HashSet::new());
+                        set.insert(number);
+                    }
+                }
+            }
+        }
+        // Ensure that for every input{n} we have a perl{n} that matches.
+        assert_eq!(map["input"], map["perl"]);
+
+        for i in map.get("input").unwrap() {
             let input_path = data_dir.join(&format!("input{}.txt", i));
             let output_perl_path = data_dir.join(&format!("perl{}.txt", i));
             let output_rust_path = data_dir.join(&format!("rust{}.txt", i));
