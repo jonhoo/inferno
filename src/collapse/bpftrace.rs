@@ -1,18 +1,19 @@
+//! Module containting the **bpftrace** implementation of [`Frontend`].
+//!
+//! [`Frontend`]: trait.Frontend.html
+
 use std::io;
 use std::iter::Peekable;
 use std::mem;
 
-use crate::collapse::Frontend;
+use super::Frontend;
 
+/// The bpftrace implementation of [`Frontend`].
+///
+/// [`Frontend`]: trait.Frontend.html
 #[derive(Clone, Debug, Default, Eq, PartialEq, Hash)]
 pub struct Bpftrace {
     state: State,
-}
-
-impl Bpftrace {
-    pub fn new() -> Self {
-        Self::default()
-    }
 }
 
 impl Frontend for Bpftrace {

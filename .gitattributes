@@ -1,2 +1,2 @@
-# Denote all files that are truly binary and should not be modified.
-tests/data/bpftrace/* binary
+# Ensure git doesn't change the line-endings of our data files on Windows.
+tests/data/**/* binary

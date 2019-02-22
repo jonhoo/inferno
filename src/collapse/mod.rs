@@ -1,8 +1,11 @@
-mod bpftrace;
-mod perf;
+//! Tools for collapsing the output of various profilers (e.g. [bpftrace], [perf]) into the
+//! format expected by flamegraph.
+//!
+//! [bpftrace]: https://github.com/iovisor/bpftrace
+//! [perf]: https://en.wikipedia.org/wiki/Perf_(Linux)
 
-pub use bpftrace::Bpftrace;
-pub use perf::{Perf, PerfOptions};
+pub mod bpftrace;
+pub mod perf;
 
 use std::fs::File;
 use std::io;
@@ -10,13 +13,34 @@ use std::path::Path;
 
 const READER_CAPACITY: usize = 128 * 1024;
 
+/// Trait representing the ability to collapse the output of various profilers, such as [bpftrace]
+/// and [perf], into the format expected by flamegraph.
+///
+/// [bpftrace]: https://github.com/iovisor/bpftrace
+/// [perf]: https://en.wikipedia.org/wiki/Perf_(Linux)
 pub trait Frontend {
+    /// Collapses the contents of the provided `reader` into the format expected by flamegraph.
+    /// Writes the output to the provided `writer`.
+    ///
+    /// # Errors
+    ///
+    /// Return an [`io::Error`] if unsuccessful.
+    ///
+    /// [`io::Error`]: https://doc.rust-lang.org/std/io/struct.Error.html
     fn collapse<R, W>(&mut self, reader: R, writer: W) -> io::Result<()>
     where
         R: io::BufRead,
         W: io::Write;
 
-    fn collapse_with<P>(&mut self, infile: Option<P>) -> io::Result<()>
+    /// Collapses the contents of a file (or of STDIN if `infile` is `None`) into the
+    /// format expected by flamegraph. Writes the output to STDOUT.
+    ///
+    /// # Errors
+    ///
+    /// Return an [`io::Error`] if unsuccessful.
+    ///
+    /// [`io::Error`]: https://doc.rust-lang.org/std/io/struct.Error.html
+    fn collapse_file<P>(&mut self, infile: Option<P>) -> io::Result<()>
     where
         P: AsRef<Path>,
     {

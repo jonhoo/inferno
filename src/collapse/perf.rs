@@ -1,3 +1,7 @@
+//! Module containting the **perf** implementation of [`Frontend`].
+//!
+//! [`Frontend`]: trait.Frontend.html
+
 use smallvec::SmallVec;
 use std::borrow::Cow;
 use std::collections::{HashMap, VecDeque};
@@ -5,13 +9,17 @@ use std::fs::File;
 use std::io;
 use std::io::prelude::*;
 
-use crate::collapse::Frontend;
+use super::Frontend;
 
 const TIDY_GENERIC: bool = true;
 const TIDY_JAVA: bool = true;
 
+/// Settings one may pass during the construction of a [`Perf`] (via its [`from_options`] method).
+///
+/// [`from_options`]: struct.Perf.html#method.from_options
+/// [`Perf`]: struct.Perf.html
 #[derive(Clone, Debug, Default)]
-pub struct PerfOptions {
+pub struct Options {
     /// include PID with process names [1]
     pub include_pid: bool,
 
@@ -50,6 +58,9 @@ impl Default for EventFilterState {
     }
 }
 
+/// The perf implementation of [`Frontend`].
+///
+/// [`Frontend`]: trait.Frontend.html
 #[derive(Default)]
 pub struct Perf {
     /// All lines until the next empty line are stack lines.
@@ -74,7 +85,7 @@ pub struct Perf {
 
     event_filtering: EventFilterState,
 
-    opt: PerfOptions,
+    opt: Options,
 }
 
 impl Frontend for Perf {
@@ -107,7 +118,11 @@ impl Frontend for Perf {
 }
 
 impl Perf {
-    pub fn new(options: PerfOptions) -> Self {
+    /// Constructs a [`Perf`] with the provided [`Options`].
+    ///
+    /// [`Options`]: struct.Options.html
+    /// [`Perf`]: struct.Perf.html
+    pub fn from_options(opt: Options) -> Self {
         Self {
             in_event: false,
             skip_stack: false,
@@ -116,7 +131,7 @@ impl Perf {
             addr2line_contexts: HashMap::default(),
             pname: String::new(),
             event_filtering: EventFilterState::None,
-            opt: options,
+            opt,
         }
     }
 

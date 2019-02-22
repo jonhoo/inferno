@@ -1,3 +1,5 @@
+//! Flamegraph plotting tools.
+
 mod attrs;
 
 pub use attrs::FuncFrameAttrsMap;

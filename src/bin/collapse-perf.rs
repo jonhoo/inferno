@@ -2,7 +2,8 @@ use std::io;
 use std::path::PathBuf;
 use structopt::StructOpt;
 
-use inferno::collapse::{Frontend, Perf, PerfOptions};
+use inferno::collapse::perf::{Options, Perf};
+use inferno::collapse::Frontend;
 
 #[derive(Debug, StructOpt)]
 #[structopt(
@@ -57,10 +58,10 @@ struct Opt {
 }
 
 impl Opt {
-    fn into_parts(self) -> (Option<PathBuf>, PerfOptions) {
+    fn into_parts(self) -> (Option<PathBuf>, Options) {
         (
             self.infile,
-            PerfOptions {
+            Options {
                 include_pid: self.include_pid,
                 include_tid: self.include_tid,
                 include_addrs: self.include_addrs,
@@ -69,13 +70,12 @@ impl Opt {
                 show_inline: self.show_inline,
                 show_context: self.show_context,
                 event_filter: self.event_filter,
-            }
+            },
         )
     }
 }
 
 fn main() -> io::Result<()> {
-    let opt = Opt::from_args();
-    let (infile, options) = opt.into_parts();
-    Perf::new(options).collapse_with(infile.as_ref())
+    let (infile, options) = Opt::from_args().into_parts();
+    Perf::from_options(options).collapse_file(infile.as_ref())
 }
