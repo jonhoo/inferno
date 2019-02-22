@@ -1,6 +1,4 @@
-//! Module containting the **bpftrace** implementation of [`Frontend`].
-//!
-//! [`Frontend`]: trait.Frontend.html
+//! Module containting the **bpftrace** implementation of `Frontend`.
 
 use std::io;
 use std::iter::Peekable;
@@ -8,9 +6,7 @@ use std::mem;
 
 use super::Frontend;
 
-/// The bpftrace implementation of [`Frontend`].
-///
-/// [`Frontend`]: trait.Frontend.html
+/// The bpftrace implementation of `Frontend`.
 #[derive(Clone, Debug, Default, Eq, PartialEq, Hash)]
 pub struct Bpftrace {
     state: State,
@@ -125,10 +121,10 @@ impl Default for State {
 /// Consumes all whitespace, if any, until the beginning of a series of digits. Then consumes
 /// the series of digits, writing their ascii representation into the provided buffer. Returns
 /// the number of bytes written.
-fn consume_unsigned_integer(
-    buf: &mut [u8],
-    chars: &mut Peekable<impl Iterator<Item = char>>,
-) -> Result<usize, io::Error> {
+fn consume_unsigned_integer<I>(buf: &mut [u8], chars: &mut Peekable<I>) -> Result<usize, io::Error>
+where
+    I: Iterator<Item = char>,
+{
     // We're expecting a number; so if we run out of characters, something went wrong.
     let mut next = match chars.peek() {
         Some(next) => next,
