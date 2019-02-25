@@ -18,17 +18,19 @@ macro_rules! unwrap_or_continue {
 pub struct FuncFrameAttrsMap(HashMap<String, FrameAttrs>);
 
 impl FuncFrameAttrsMap {
-    /// Parse a FuncFrameAttrsMap from a file.
-    /// Each line should be a function name followed by a tab,
-    /// then a sequence of tab separated name=value pairs.
+    /// Parse frame attribtues from a file.
+    ///
+    /// Each line should consist of a function name, a tab (`\t`), and then a sequence of
+    /// tab-separated `name=value` pairs.
     pub fn from_file(path: &PathBuf) -> io::Result<FuncFrameAttrsMap> {
         let file = BufReader::new(File::open(path)?);
         FuncFrameAttrsMap::from_reader(file)
     }
 
-    /// Parse a FuncFrameAttrsMap from a reader.
-    /// Each line should be a function name followed by a tab,
-    /// then a sequence of tab separated name=value pairs.
+    /// Parse frame attribtues from a `BufRead`.
+    ///
+    /// Each line should consist of a function name, a tab (`\t`), and then a sequence of
+    /// tab-separated `name=value` pairs.
     pub fn from_reader<R: BufRead>(mut reader: R) -> io::Result<FuncFrameAttrsMap> {
         let mut funcattr_map = FuncFrameAttrsMap::default();
         let mut line = String::new();
@@ -77,56 +79,56 @@ impl FuncFrameAttrsMap {
     }
 
     /// Return FrameAttrs for the given function name if it exists
-    pub fn frameattrs_for_func(&self, func: &str) -> Option<&FrameAttrs> {
+    pub(super) fn frameattrs_for_func(&self, func: &str) -> Option<&FrameAttrs> {
         self.0.get(func)
     }
 }
 
 /// Attributes to set on the SVG elements of a frame
 #[derive(PartialEq, Eq, Debug, Default)]
-pub struct FrameAttrs {
+pub(super) struct FrameAttrs {
     /// The text to include in the `title` element.
     /// If set to None, the title is dynamically generated based on the function name.
-    pub title: Option<String>,
+    pub(super) title: Option<String>,
 
-    pub g: GElementAttrs,
-    pub a: AElementAttrs,
+    pub(super) g: GElementAttrs,
+    pub(super) a: AElementAttrs,
 }
 
 /// Attributes to set on the SVG `g` element.
 /// Any of them set to `None` will get the default value.
 #[derive(PartialEq, Eq, Debug, Default)]
-pub struct GElementAttrs {
+pub(super) struct GElementAttrs {
     /// Defaults to "func_g"
-    pub class: Option<String>,
+    pub(super) class: Option<String>,
 
     /// Will not be included if None
-    pub style: Option<String>,
+    pub(super) style: Option<String>,
 
     /// Defaults to "s(this)"
-    pub onmouseover: Option<String>,
+    pub(super) onmouseover: Option<String>,
 
     /// Defaults to "c()"
-    pub onmouseout: Option<String>,
+    pub(super) onmouseout: Option<String>,
 
     /// Defaults to "zoom(this)"
-    pub onclick: Option<String>,
+    pub(super) onclick: Option<String>,
 
     /// Extra attributes to include
-    pub extra: Vec<(String, String)>,
+    pub(super) extra: Vec<(String, String)>,
 }
 
 /// Attributes to set on the SVG `a` element
 #[derive(PartialEq, Eq, Debug, Default)]
-pub struct AElementAttrs {
+pub(super) struct AElementAttrs {
     /// If set to None the `a` tag will not be added
-    pub href: Option<String>,
+    pub(super) href: Option<String>,
 
     /// Defaults to "_top"
-    pub target: Option<String>,
+    pub(super) target: Option<String>,
 
     /// Extra attributes to include
-    pub extra: Vec<(String, String)>,
+    pub(super) extra: Vec<(String, String)>,
 }
 
 fn parse_extra_attrs(attrs: &mut Vec<(String, String)>, s: &str) {

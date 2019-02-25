@@ -1,24 +1,20 @@
-//! Flamegraph plotting tools.
-
 mod attrs;
+mod color;
+mod merge;
+mod svg;
 
 pub use attrs::FuncFrameAttrsMap;
-
-use std::io;
-use std::io::prelude::*;
+pub use color::BackgroundColor;
+pub use color::Palette;
 
 use num_format::Locale;
 use quick_xml::{
     events::{BytesEnd, BytesStart, BytesText, Event},
     Writer,
 };
+use std::io;
+use std::io::prelude::*;
 use str_stack::StrStack;
-
-mod color;
-mod merge;
-mod svg;
-pub use color::BackgroundColor;
-pub use color::Palette;
 use svg::StyleOptions;
 
 const IMAGEWIDTH: usize = 1200; // max width, pixels
@@ -32,21 +28,65 @@ const XPAD: usize = 10; // pad lefm and right
 const FRAMEPAD: usize = 1; // vertical padding for frames
 const PALETTE_FILE: &str = "palette.map";
 
+/// Configure the flame graph.
 #[derive(Debug, Default)]
 pub struct Options {
+    /// The color palette to use when plotting.
     pub colors: color::Palette,
+
+    /// The background color for the plot.
+    ///
+    /// If `None`, the background color will be selected based on the value of `colors`.
     pub bgcolors: Option<color::BackgroundColor>,
+
+    /// Choose names based on the hashes of function names.
+    ///
+    /// This will cause similar functions to be colored similarly.
     pub hash: bool,
+
+    /// Store the choice of color for each function so that later invocations use the same colors.
+    ///
+    /// With this option enabled, a file called `palette.map` will be created the first time a
+    /// flame graph is generated, and the (random) color chosen for each function will be written
+    /// into it. On subsequent invocations, functions that already have a colored registered in
+    /// that file will be given the stored color rather than be assigned a new one. New functions
+    /// will have their colors persisted for future runs.
+    ///
+    /// This feature was first implemented [by Shawn
+    /// Sterling](https://github.com/brendangregg/FlameGraph/pull/25).
     pub consistent_palette: bool,
+
+    /// Assign extra attributes to particular functions.
+    ///
+    /// In particular, if a function appears in the given map, it will have extra attributes set in
+    /// the resulting SVG based on its value in the map.
     pub func_frameattrs: FuncFrameAttrsMap,
+
+    /// Whether to plot a plot that grows top-to-bottom or bottom-up (the default).
     pub direction: Direction,
+
+    /// The title for the flame chart.
     pub title: String,
 }
 
+/// The direction the plot should grow.
 #[derive(Debug, Clone, Copy, Eq, PartialEq)]
 pub enum Direction {
+    /// Stacks grow from the bottom to the top.
+    ///
+    /// `main` will be at the bottom.
     Straight,
+
+    /// Stacks grow from the top to the bottom.
+    ///
+    /// `main` will be at the top.
     Inverted,
+}
+
+impl Default for Direction {
+    fn default() -> Self {
+        Direction::Straight
+    }
 }
 
 macro_rules! args {
@@ -142,6 +182,14 @@ impl Rectangle {
     }
 }
 
+/// Produce a flame graph from a sorted iterator over folded stack lines.
+///
+/// This function expects each folded stack to contain the following whitespace-separated fields:
+///
+///  - A semicolon-separated list of frame names (e.g., `main;foo;bar;baz`).
+///  - A sample count for the given stack.
+///
+/// The resulting flame graph will be written out to `writer` in SVG format.
 pub fn from_sorted_lines<'a, I, W>(opt: Options, lines: I, writer: W) -> quick_xml::Result<()>
 where
     I: IntoIterator<Item = &'a str>,
@@ -397,6 +445,11 @@ where
     Ok(())
 }
 
+/// Produce a flame graph from a reader that contains a sorted sequence of folded stack lines.
+///
+/// See [`from_sorted_lines`] for the expected format of each line.
+///
+/// The resulting flame graph will be written out to `writer` in SVG format.
 pub fn from_reader<R, W>(opt: Options, mut reader: R, writer: W) -> quick_xml::Result<()>
 where
     R: Read,
@@ -410,6 +463,12 @@ where
     from_sorted_lines(opt, input.lines(), writer)
 }
 
+/// Produce a flame graph from a set of reader that contain folded stack lines.
+///
+/// This function sorts all the read lines before processing them.
+/// See [`from_sorted_lines`] for the expected format of each line.
+///
+/// The resulting flame graph will be written out to `writer` in SVG format.
 pub fn from_readers<R, W>(opt: Options, readers: R, writer: W) -> quick_xml::Result<()>
 where
     R: IntoIterator,
@@ -466,10 +525,4 @@ fn filled_rectangle<W: Write>(
         unreachable!("cache wrapper was of wrong type: {:?}", cache_rect);
     }
     svg.write_event(&cache_rect)
-}
-
-impl Default for Direction {
-    fn default() -> Self {
-        Direction::Straight
-    }
 }

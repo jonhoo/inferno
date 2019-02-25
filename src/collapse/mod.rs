@@ -1,8 +1,8 @@
-//! Tools for collapsing the output of various profilers (e.g. [perf]) into the
-//! format expected by flamegraph.
-//!
-//! [perf]: https://en.wikipedia.org/wiki/Perf_(Linux)
-
+/// Stack collapsing for the output of [`perf script`](https://linux.die.net/man/1/perf-script).
+///
+/// See the [crate-level documentation] for details.
+///
+///   [crate-level documentation]: ../../index.html
 pub mod perf;
 
 use std::fs::File;
@@ -11,32 +11,27 @@ use std::path::Path;
 
 const READER_CAPACITY: usize = 128 * 1024;
 
-/// This trait represents the ability to collapse the output of various profilers, such as
-/// [perf], into the format expected by flamegraph.
+/// The abstract behavior of stack collapsing.
 ///
-/// [perf]: https://en.wikipedia.org/wiki/Perf_(Linux)
-pub trait Frontend {
-    /// Collapses the contents of the provided `reader` into the format expected by flamegraph.
-    /// Writes the output to the provided `writer`.
-    ///
-    /// # Errors
-    ///
-    /// Return an [`io::Error`] if unsuccessful.
-    ///
-    /// [`io::Error`]: https://doc.rust-lang.org/std/io/struct.Error.html
+/// Implementors of this trait are providing a way to take the stack traces produced by a
+/// particular profiler's output (like `perf script`) and produce lines in the folded stack format
+/// expected by [`crate::flamegraph::from_sorted_lines`].
+///
+/// See also the [crate-level documentation] for details.
+///
+///   [crate-level documentation]: ../index.html
+// https://github.com/rust-lang/rust/issues/45040
+// #[doc(spotlight)]
+pub trait Collapse {
+    /// Collapses the contents of the provided `reader` and writes folded stack lines to the
+    /// provided `writer`.
     fn collapse<R, W>(&mut self, reader: R, writer: W) -> io::Result<()>
     where
         R: io::BufRead,
         W: io::Write;
 
-    /// Collapses the contents of a file (or of STDIN if `infile` is `None`) into the
-    /// format expected by flamegraph. Writes the output to STDOUT.
-    ///
-    /// # Errors
-    ///
-    /// Return an [`io::Error`] if unsuccessful.
-    ///
-    /// [`io::Error`]: https://doc.rust-lang.org/std/io/struct.Error.html
+    /// Collapses the contents of a file (or of STDIN if `infile` is `None`) and writes folded
+    /// stack lines to `STDOUT`.
     fn collapse_file<P>(&mut self, infile: Option<P>) -> io::Result<()>
     where
         P: AsRef<Path>,

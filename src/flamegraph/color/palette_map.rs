@@ -9,7 +9,7 @@ use std::io::Write;
 use std::path::Path;
 use std::str::FromStr;
 
-pub struct PaletteMap<'a>(HashMap<Cow<'a, str>, (u8, u8, u8)>);
+pub(crate) struct PaletteMap<'a>(HashMap<Cow<'a, str>, (u8, u8, u8)>);
 
 impl<'a> PaletteMap<'a> {
     pub fn load(file: &str) -> quick_xml::Result<Self> {

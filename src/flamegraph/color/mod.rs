@@ -16,47 +16,86 @@ const BLUE_GRADIENT: (&str, &str) = ("#eeeeee", "#e0e0ff");
 const GREEN_GRADIENT: (&str, &str) = ("#eef2ee", "#e0ffe0");
 const GRAY_GRADIENT: (&str, &str) = ("#f8f8f8", "#e8e8e8");
 
+/// A flame graph background color.
+///
+/// Defaults to yellow.
 #[derive(Clone, Copy, Debug)]
 pub enum BackgroundColor {
+    /// A yellow gradient from `#EEEEEE` to `#EEEEB0`.
     Yellow,
+    /// A blue gradient from `#EEEEEE` to `#E0E0FF`.
     Blue,
+    /// A green gradient from `#EEF2EE` to `#E0FFE0`.
     Green,
+    /// A grey gradient from `#F8F8F8` to `#E8E8E8`.
     Grey,
+    /// A flag background color with the given RGB components.
+    ///
+    /// Expressed in string form as `#RRGGBB` where each component is written in hexadecimal.
     Flat(u8, u8, u8),
-}
-
-#[derive(Clone, Copy, Debug, PartialEq)]
-pub enum Palette {
-    Basic(BasicPalette),
-    Multi(MultiPalette),
-}
-
-#[derive(Clone, Copy, Debug, PartialEq)]
-pub enum BasicPalette {
-    Hot,
-    Mem,
-    Io,
-    Red,
-    Green,
-    Blue,
-    Aqua,
-    Yellow,
-    Purple,
-    Orange,
-}
-
-#[derive(Clone, Copy, Debug, PartialEq)]
-pub enum MultiPalette {
-    Java,
-    Js,
-    Perl,
-    Wakeup,
 }
 
 impl Default for BackgroundColor {
     fn default() -> Self {
         BackgroundColor::Yellow
     }
+}
+
+/// A flame graph color palette.
+///
+/// Defaults to [`BasicPalette::Hot`].
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum Palette {
+    /// A plain color palette in which the color is independent of the function name.
+    Basic(BasicPalette),
+    /// A semantic color palette in which different hues are used to signifiy semantic aspects of
+    /// different function names (kernel functions, JIT functions, etc.).
+    Multi(MultiPalette),
+}
+
+impl Default for Palette {
+    fn default() -> Self {
+        Palette::Basic(BasicPalette::Hot)
+    }
+}
+
+/// A plain color palette in which the color is independent of the function name.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum BasicPalette {
+    /// A palette in which colors are chosen randomly from a red-yellow spectrum.
+    Hot,
+    /// A palette in which colors are chosen randomly from a green-blue spectrum.
+    Mem,
+    /// A palette in which colors are chosen randomly from a wide blue spectrum.
+    Io,
+    /// A palette in which colors are chosen randomly from a red spectrum.
+    Red,
+    /// A palette in which colors are chosen randomly from a green spectrum.
+    Green,
+    /// A palette in which colors are chosen randomly from a blue spectrum.
+    Blue,
+    /// A palette in which colors are chosen randomly from an aqua-tinted spectrum.
+    Aqua,
+    /// A palette in which colors are chosen randomly from a yellow spectrum.
+    Yellow,
+    /// A palette in which colors are chosen randomly from a purple spectrum.
+    Purple,
+    /// A palette in which colors are chosen randomly from a orange spectrum.
+    Orange,
+}
+
+/// A semantic color palette in which different hues are used to signifiy semantic aspects of
+/// different function names (kernel functions, JIT functions, etc.).
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum MultiPalette {
+    /// Use Java semantics to color frames.
+    Java,
+    /// Use JavaScript semantics to color frames.
+    Js,
+    /// Use Perl semantics to color frames.
+    Perl,
+    /// TODO: this seems to just be [`BasicPalette::Aqua`]?
+    Wakeup,
 }
 
 impl FromStr for BackgroundColor {
@@ -92,12 +131,6 @@ fn parse_flat_bgcolor(s: &str) -> Option<(u8, u8, u8)> {
         let b = u8_from_hex_iter!(s);
 
         Some((r, g, b))
-    }
-}
-
-impl Default for Palette {
-    fn default() -> Self {
-        Palette::Basic(BasicPalette::Hot)
     }
 }
 
@@ -318,7 +351,7 @@ mod tests {
 
     macro_rules! test_hash {
         ($name:expr, $expected:expr) => {
-            assert_eq!(namehash($name.bytes()), $expected)
+            assert!((dbg!(namehash($name.bytes())) - $expected).abs() < std::f32::EPSILON);
         };
     }
 
@@ -326,18 +359,18 @@ mod tests {
     fn namehash_test() {
         test_hash!(
             "org/mozilla/javascript/NativeFunction:.initScriptFunction_[j]",
-            0.77964604
+            0.779_646_04
         );
         test_hash!(
             "]j[_noitcnuFtpircStini.:noitcnuFevitaN/tpircsavaj/allizom/gro",
-            0.64415313
+            0.644_153_1
         );
-        test_hash!("genunix`kmem_cache_free", 0.46692634);
-        test_hash!("eerf_ehcac_memk`xinuneg", 0.84041037);
-        test_hash!("unix`0xfffffffffb8001d6", 0.41813117);
-        test_hash!("6d1008bfffffffffx0`xinu", 0.84041037);
-        test_hash!("un`0xfffffffffb8001d6", 0.41813117);
-        test_hash!("``0xfffffffffb8001d6", 0.41813117);
+        test_hash!("genunix`kmem_cache_free", 0.466_926_34);
+        test_hash!("eerf_ehcac_memk`xinuneg", 0.840_410_3);
+        test_hash!("unix`0xfffffffffb8001d6", 0.418_131_17);
+        test_hash!("6d1008bfffffffffx0`xinu", 0.840_410_3);
+        test_hash!("un`0xfffffffffb8001d6", 0.418_131_17);
+        test_hash!("``0xfffffffffb8001d6", 0.418_131_17);
         test_hash!("", 1.0);
     }
 }
