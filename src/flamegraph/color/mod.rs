@@ -54,7 +54,9 @@ impl Default for BackgroundColor {
 /// Defaults to [`BasicPalette::Hot`].
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Palette {
-    /// A plain color palette in which the color is independent of the function name.
+    /// A plain color palette in which the color is not chosen based on function semantics.
+    ///
+    /// See [`BasicPalette`] for details.
     Basic(BasicPalette),
     /// A semantic color palette in which different hues are used to signifiy semantic aspects of
     /// different function names (kernel functions, JIT functions, etc.).
@@ -67,28 +69,33 @@ impl Default for Palette {
     }
 }
 
-/// A plain color palette in which the color is independent of the function name.
+/// A plain color palette in which the color is not chosen based on function semantics.
+///
+/// Exactly how the color is chosen depends on a number of other configuration options like
+/// [`super::Options.consistent_palette`] and [`super::Options.hash`]. In the absence of options
+/// like that, these palettes all choose colors randomly from the indicated spectrum, and does not
+/// consider the name of the frame's function when doing so.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum BasicPalette {
-    /// A palette in which colors are chosen randomly from a red-yellow spectrum.
+    /// A palette in which colors are chosen from a red-yellow spectrum.
     Hot,
-    /// A palette in which colors are chosen randomly from a green-blue spectrum.
+    /// A palette in which colors are chosen from a green-blue spectrum.
     Mem,
-    /// A palette in which colors are chosen randomly from a wide blue spectrum.
+    /// A palette in which colors are chosen from a wide blue spectrum.
     Io,
-    /// A palette in which colors are chosen randomly from a red spectrum.
+    /// A palette in which colors are chosen from a red spectrum.
     Red,
-    /// A palette in which colors are chosen randomly from a green spectrum.
+    /// A palette in which colors are chosen from a green spectrum.
     Green,
-    /// A palette in which colors are chosen randomly from a blue spectrum.
+    /// A palette in which colors are chosen from a blue spectrum.
     Blue,
-    /// A palette in which colors are chosen randomly from an aqua-tinted spectrum.
+    /// A palette in which colors are chosen from an aqua-tinted spectrum.
     Aqua,
-    /// A palette in which colors are chosen randomly from a yellow spectrum.
+    /// A palette in which colors are chosen from a yellow spectrum.
     Yellow,
-    /// A palette in which colors are chosen randomly from a purple spectrum.
+    /// A palette in which colors are chosen from a purple spectrum.
     Purple,
-    /// A palette in which colors are chosen randomly from a orange spectrum.
+    /// A palette in which colors are chosen from a orange spectrum.
     Orange,
 }
 
