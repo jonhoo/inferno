@@ -66,6 +66,8 @@ pub struct Options {
     pub direction: Direction,
 
     /// The title for the flame chart.
+    ///
+    /// Defaults to "Flame Graph".
     pub title: String,
 
     /// By default, if [differential] samples are included in the provided stacks, the resulting
