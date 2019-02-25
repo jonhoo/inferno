@@ -118,22 +118,21 @@ where
             continue;
         }
 
+        // Parse the number of samples for the purpose of computing overall time passed.
         // Usually there will only be one samples column at the end of a line,
-        // but for differentials there will be two. In the case there are two
-        // we compute the delta between them and use the second one as as the
-        // number of samples for this frame.
-        let nsamples = match (parse_nsamples(&mut line), parse_nsamples(&mut line)) {
-            (Some(s2), nsamples1) => {
-                delta = nsamples1.and_then(|s1| Some(s2 as isize - s1 as isize));
-                if let Some(delta) = delta {
-                    delta_max = std::cmp::max(delta.abs() as usize, delta_max);
-                }
-                s2
+        // but for differentials there will be two. When there are two we compute the
+        // delta between them and use the second one.
+        let nsamples = if let Some(s2) = parse_nsamples(&mut line) {
+            // See if there's also a differential column present
+            let nsamples1 = parse_nsamples(&mut line);
+            delta = nsamples1.and_then(|s1| Some(s2 as isize - s1 as isize));
+            if let Some(delta) = delta {
+                delta_max = std::cmp::max(delta.abs() as usize, delta_max);
             }
-            _ => {
-                ignored += 1;
-                continue;
-            }
+            s2
+        } else {
+            ignored += 1;
+            continue;
         };
 
         if line.is_empty() {
