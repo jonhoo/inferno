@@ -185,6 +185,7 @@ fn parse_nsamples(line: &mut &str) -> Option<usize> {
         let mut samples = &line[(samplesi + 1)..];
         // strip fractional part (if any);
         // foobar 1.klwdjlakdj
+        // TODO: Properly handle fractional samples (see issue #43)
         if let Some(doti) = samples.find('.') {
             samples = &samples[..doti];
         }
