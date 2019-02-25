@@ -67,6 +67,12 @@ pub struct Options {
 
     /// The title for the flame chart.
     pub title: String,
+
+    /// By default, if [differential] samples are included in the provided stacks, the resulting
+    /// flame graph will compute and show differentials as `sample#2 - sample#1`. If this option is
+    /// set, the differential is instead computed using `sample#1 - sample#2`.
+    ///
+    /// [differential]: http://www.brendangregg.com/blog/2014-11-09/differential-flame-graphs.html
     pub negate_differentials: bool,
 }
 
@@ -204,8 +210,15 @@ impl Rectangle {
 ///
 ///  - A semicolon-separated list of frame names (e.g., `main;foo;bar;baz`).
 ///  - A sample count for the given stack.
+///  - An optional second sample count.
+///
+/// If two sample counts are provided, a [differential flame graph] is produced. In this mode, the
+/// flame graph uses the difference between the two sample counts to show how the sample counts for
+/// each stack has changed between the first and second profiling.
 ///
 /// The resulting flame graph will be written out to `writer` in SVG format.
+///
+/// [differential flame graph]: http://www.brendangregg.com/blog/2014-11-09/differential-flame-graphs.html
 #[allow(clippy::cyclomatic_complexity)]
 pub fn from_sorted_lines<'a, I, W>(opt: Options, lines: I, writer: W) -> quick_xml::Result<()>
 where
