@@ -47,13 +47,13 @@ pub struct Options {
 impl Default for Options {
     fn default() -> Self {
         Options {
+            title: "Flame Graph".to_string(),
             colors: Default::default(),
             bgcolors: Default::default(),
             hash: Default::default(),
             consistent_palette: Default::default(),
             func_frameattrs: Default::default(),
             direction: Default::default(),
-            title: "Flame Graph".to_string(),
             negate_differentials: Default::default(),
         }
     }
