@@ -158,6 +158,7 @@ impl Rectangle {
     }
 }
 
+#[allow(clippy::cyclomatic_complexity)]
 pub fn from_sorted_lines<'a, I, W>(opt: Options, lines: I, writer: W) -> quick_xml::Result<()>
 where
     I: IntoIterator<Item = &'a str>,
