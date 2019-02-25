@@ -124,14 +124,13 @@ where
         // Usually there will only be one samples column at the end of a line,
         // but for differentials there will be two. When there are two we compute the
         // delta between them and use the second one.
-        let nsamples = if let Some(s2) = parse_nsamples(&mut line) {
+        let nsamples = if let Some(samples) = parse_nsamples(&mut line) {
             // See if there's also a differential column present
-            let nsamples1 = parse_nsamples(&mut line);
-            if let Some(s1) = nsamples1 {
-                delta = Some(s2 as isize - s1 as isize);
+            if let Some(original_samples) = parse_nsamples(&mut line) {
+                delta = Some(samples as isize - original_samples as isize);
                 delta_max = std::cmp::max(delta.unwrap().abs() as usize, delta_max);
             }
-            s2
+            samples
         } else {
             ignored += 1;
             continue;
@@ -184,6 +183,7 @@ where
 fn parse_nsamples(line: &mut &str) -> Option<usize> {
     let samplesi = line.rfind(' ')?;
     let mut samples = &line[(samplesi + 1)..];
+
     // strip fractional part (if any);
     // foobar 1.klwdjlakdj
     // TODO: Properly handle fractional samples (see issue #43)
