@@ -228,10 +228,6 @@ impl Folder {
                         self.opt.event_filter = Some(event.to_string());
                         self.event_filtering = EventFilterState::Defaulted;
                     }
-                    // TODO: filter by event
-                    if false {
-                        self.skip_stack = true;
-                    }
                 }
             }
 
