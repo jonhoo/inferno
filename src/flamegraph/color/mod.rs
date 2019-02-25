@@ -16,47 +16,101 @@ const BLUE_GRADIENT: (&str, &str) = ("#eeeeee", "#e0e0ff");
 const GREEN_GRADIENT: (&str, &str) = ("#eef2ee", "#e0ffe0");
 const GRAY_GRADIENT: (&str, &str) = ("#f8f8f8", "#e8e8e8");
 
+/// A flame graph background color.
+///
+/// The default background color usually depends on the color scheme:
+///
+///  - [`BasicPalette::Mem`] defaults to [`BackgroundColor::Green`].
+///  - [`BasicPalette::Io`] and [`MultiPalette::Wakeup`] default to [`BackgroundColor::Blue`].
+///  - [`BasicPalette::Hot`] defaults to [`BackgroundColor::Yellow`].
+///  - All other [`BasicPalette`] variants default to [`BackgroundColor::Grey`].
+///  - All other [`MultiPalette`] variants default to [`BackgroundColor::Yellow`].
+///
+/// `BackgroundColor::default()` is `Yellow`.
 #[derive(Clone, Copy, Debug)]
 pub enum BackgroundColor {
+    /// A yellow gradient from `#EEEEEE` to `#EEEEB0`.
     Yellow,
+    /// A blue gradient from `#EEEEEE` to `#E0E0FF`.
     Blue,
+    /// A green gradient from `#EEF2EE` to `#E0FFE0`.
     Green,
+    /// A grey gradient from `#F8F8F8` to `#E8E8E8`.
     Grey,
+    /// A flag background color with the given RGB components.
+    ///
+    /// Expressed in string form as `#RRGGBB` where each component is written in hexadecimal.
     Flat(u8, u8, u8),
-}
-
-#[derive(Clone, Copy, Debug, PartialEq)]
-pub enum Palette {
-    Basic(BasicPalette),
-    Multi(MultiPalette),
-}
-
-#[derive(Clone, Copy, Debug, PartialEq)]
-pub enum BasicPalette {
-    Hot,
-    Mem,
-    Io,
-    Red,
-    Green,
-    Blue,
-    Aqua,
-    Yellow,
-    Purple,
-    Orange,
-}
-
-#[derive(Clone, Copy, Debug, PartialEq)]
-pub enum MultiPalette {
-    Java,
-    Js,
-    Perl,
-    Wakeup,
 }
 
 impl Default for BackgroundColor {
     fn default() -> Self {
         BackgroundColor::Yellow
     }
+}
+
+/// A flame graph color palette.
+///
+/// Defaults to [`BasicPalette::Hot`].
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum Palette {
+    /// A plain color palette in which the color is not chosen based on function semantics.
+    ///
+    /// See [`BasicPalette`] for details.
+    Basic(BasicPalette),
+    /// A semantic color palette in which different hues are used to signifiy semantic aspects of
+    /// different function names (kernel functions, JIT functions, etc.).
+    Multi(MultiPalette),
+}
+
+impl Default for Palette {
+    fn default() -> Self {
+        Palette::Basic(BasicPalette::Hot)
+    }
+}
+
+/// A plain color palette in which the color is not chosen based on function semantics.
+///
+/// Exactly how the color is chosen depends on a number of other configuration options like
+/// [`super::Options.consistent_palette`] and [`super::Options.hash`]. In the absence of options
+/// like that, these palettes all choose colors randomly from the indicated spectrum, and does not
+/// consider the name of the frame's function when doing so.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum BasicPalette {
+    /// A palette in which colors are chosen from a red-yellow spectrum.
+    Hot,
+    /// A palette in which colors are chosen from a green-blue spectrum.
+    Mem,
+    /// A palette in which colors are chosen from a wide blue spectrum.
+    Io,
+    /// A palette in which colors are chosen from a red spectrum.
+    Red,
+    /// A palette in which colors are chosen from a green spectrum.
+    Green,
+    /// A palette in which colors are chosen from a blue spectrum.
+    Blue,
+    /// A palette in which colors are chosen from an aqua-tinted spectrum.
+    Aqua,
+    /// A palette in which colors are chosen from a yellow spectrum.
+    Yellow,
+    /// A palette in which colors are chosen from a purple spectrum.
+    Purple,
+    /// A palette in which colors are chosen from a orange spectrum.
+    Orange,
+}
+
+/// A semantic color palette in which different hues are used to signifiy semantic aspects of
+/// different function names (kernel functions, JIT functions, etc.).
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum MultiPalette {
+    /// Use Java semantics to color frames.
+    Java,
+    /// Use JavaScript semantics to color frames.
+    Js,
+    /// Use Perl semantics to color frames.
+    Perl,
+    /// Equivalent to [`BasicPalette::Aqua`] with [`BackgroundColor::Blue`].
+    Wakeup,
 }
 
 impl FromStr for BackgroundColor {
@@ -92,12 +146,6 @@ fn parse_flat_bgcolor(s: &str) -> Option<(u8, u8, u8)> {
         let b = u8_from_hex_iter!(s);
 
         Some((r, g, b))
-    }
-}
-
-impl Default for Palette {
-    fn default() -> Self {
-        Palette::Basic(BasicPalette::Hot)
     }
 }
 
@@ -334,7 +382,7 @@ mod tests {
 
     macro_rules! test_hash {
         ($name:expr, $expected:expr) => {
-            assert_eq!(namehash($name.bytes()), $expected)
+            assert!((dbg!(namehash($name.bytes())) - $expected).abs() < std::f32::EPSILON);
         };
     }
 
@@ -342,18 +390,18 @@ mod tests {
     fn namehash_test() {
         test_hash!(
             "org/mozilla/javascript/NativeFunction:.initScriptFunction_[j]",
-            0.77964604
+            0.779_646_04
         );
         test_hash!(
             "]j[_noitcnuFtpircStini.:noitcnuFevitaN/tpircsavaj/allizom/gro",
-            0.64415313
+            0.644_153_1
         );
-        test_hash!("genunix`kmem_cache_free", 0.46692634);
-        test_hash!("eerf_ehcac_memk`xinuneg", 0.84041037);
-        test_hash!("unix`0xfffffffffb8001d6", 0.41813117);
-        test_hash!("6d1008bfffffffffx0`xinu", 0.84041037);
-        test_hash!("un`0xfffffffffb8001d6", 0.41813117);
-        test_hash!("``0xfffffffffb8001d6", 0.41813117);
+        test_hash!("genunix`kmem_cache_free", 0.466_926_34);
+        test_hash!("eerf_ehcac_memk`xinuneg", 0.840_410_3);
+        test_hash!("unix`0xfffffffffb8001d6", 0.418_131_17);
+        test_hash!("6d1008bfffffffffx0`xinu", 0.840_410_3);
+        test_hash!("un`0xfffffffffb8001d6", 0.418_131_17);
+        test_hash!("``0xfffffffffb8001d6", 0.418_131_17);
         test_hash!("", 1.0);
     }
 }

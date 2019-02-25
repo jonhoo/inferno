@@ -1,3 +1,4 @@
+use super::Collapse;
 use smallvec::SmallVec;
 use std::borrow::Cow;
 use std::collections::{HashMap, VecDeque};
@@ -5,36 +6,53 @@ use std::fs::File;
 use std::io;
 use std::io::prelude::*;
 
-use super::Frontend;
-
 const TIDY_GENERIC: bool = true;
 const TIDY_JAVA: bool = true;
 
-/// Settings one may pass during the construction of a `Perf` (via its `from_options` method).
+/// Settings that change how frames are named from the incoming stack traces.
+///
+/// All options default to off.
 #[derive(Clone, Debug, Default)]
 pub struct Options {
-    /// include PID with process names [1]
+    /// Include PID in the root frame.
+    ///
+    /// If disabled, the root frame is given the name of the profiled process.
     pub include_pid: bool,
 
-    /// include TID and PID with process names [1]
+    /// Include TID and PID in the root frame.
+    ///
+    /// Implies `include_pid`.
     pub include_tid: bool,
 
-    /// include raw addresses where symbols can't be found
+    /// Include raw addresses (e.g., `0xbfff0836`) where symbols can't be found.
     pub include_addrs: bool,
 
-    /// annotate jit functions with a _[j]
+    /// Annotate JIT functions with a `_[j]` suffix.
     pub annotate_jit: bool,
 
-    /// annotate kernel functions with a _[k]
+    /// Annotate kernel functions with a `_[k]` suffix.
     pub annotate_kernel: bool,
 
-    /// un-inline using addr2line
+    /// Resolve function names (including inlined ones) using `addr2line`.
+    ///
+    /// When this option is disabled, only the function name observed by `perf` is included, which
+    /// may not include inlined functions in the call stack.
+    ///
+    /// When this option is enabled, the function names observed by `perf` are ignored, and each
+    /// observed function address is instead resolved using
+    /// [`addr2line`](https://docs.rs/addr2line/). This is slower, but will use binary debug info
+    /// to resolve even inline call-chains.
     pub show_inline: bool,
 
-    /// adds source context to inline
+    /// If enabled, each frame name is also annoted with the file name and line number of the
+    /// sampled source line.
+    ///
+    /// Implies `show_inline`.
     pub show_context: bool,
 
-    /// event type filter, defaults to first encountered event
+    /// Only consider samples of the given event type (see `perf list`).
+    ///
+    /// If this option is set to `None`, it will be set to the first encountered event type.
     pub event_filter: Option<String>,
 }
 
@@ -51,9 +69,12 @@ impl Default for EventFilterState {
     }
 }
 
-/// The perf implementation of `Frontend`.
+/// A stack collapser for the output of `perf script`.
+///
+/// To construct one, either use `perf::Folder::default()` or create an [`Options`] and use
+/// `perf::Folder::from(options)`.
 #[derive(Default)]
-pub struct Perf {
+pub struct Folder {
     /// All lines until the next empty line are stack lines.
     in_event: bool,
 
@@ -79,7 +100,7 @@ pub struct Perf {
     opt: Options,
 }
 
-impl Frontend for Perf {
+impl Collapse for Folder {
     fn collapse<R, W>(&mut self, mut reader: R, writer: W) -> io::Result<()>
     where
         R: BufRead,
@@ -108,9 +129,10 @@ impl Frontend for Perf {
     }
 }
 
-impl Perf {
-    /// Constructs a `Perf` with the provided `Options`.
-    pub fn from_options(opt: Options) -> Self {
+impl From<Options> for Folder {
+    fn from(mut opt: Options) -> Self {
+        opt.include_pid = opt.include_pid || opt.include_tid;
+        opt.show_inline = opt.show_inline || opt.show_context;
         Self {
             in_event: false,
             skip_stack: false,
@@ -122,7 +144,9 @@ impl Perf {
             opt,
         }
     }
+}
 
+impl Folder {
     fn on_line(&mut self, line: &str) {
         if !self.in_event {
             self.on_event_line(line)

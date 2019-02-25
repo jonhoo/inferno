@@ -2,8 +2,8 @@ use std::io;
 use std::path::PathBuf;
 use structopt::StructOpt;
 
-use inferno::collapse::perf::{Options, Perf};
-use inferno::collapse::Frontend;
+use inferno::collapse::perf::{Folder, Options};
+use inferno::collapse::Collapse;
 
 #[derive(Debug, StructOpt)]
 #[structopt(
@@ -77,5 +77,5 @@ impl Opt {
 
 fn main() -> io::Result<()> {
     let (infile, options) = Opt::from_args().into_parts();
-    Perf::from_options(options).collapse_file(infile.as_ref())
+    Folder::from(options).collapse_file(infile.as_ref())
 }

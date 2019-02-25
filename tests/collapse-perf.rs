@@ -3,8 +3,8 @@ extern crate pretty_assertions;
 
 extern crate inferno;
 
-use inferno::collapse::perf::{Options, Perf};
-use inferno::collapse::Frontend;
+use inferno::collapse::perf::{Folder, Options};
+use inferno::collapse::Collapse;
 use std::fs::{self, File};
 use std::io::{self, BufRead, BufReader, Cursor};
 use std::path::Path;
@@ -159,7 +159,7 @@ fn test_collapse_perf(test_file: &str, expected_file: &str, options: Options) ->
     let r = BufReader::new(File::open(test_file)?);
     let expected_len = fs::metadata(expected_file)?.len() as usize;
     let mut result = Cursor::new(Vec::with_capacity(expected_len));
-    let mut perf = Perf::from_options(options);
+    let mut perf = Folder::from(options);
     perf.collapse(r, &mut result)?;
     let mut expected = BufReader::new(File::open(expected_file)?);
 
