@@ -259,9 +259,13 @@ pub(super) fn color_scale(value: isize, max: usize) -> (u8, u8, u8) {
     if value == 0 {
         (255, 255, 255)
     } else if value > 0 {
+        // A positive value indicates _more_ samples,
+        // and hence more time spent, so we give it a red hue.
         let c = (210 * (max as isize - value) / max as isize) as u8;
         (255, c, c)
     } else {
+        // A negative value indicates _fewer_ samples,
+        // or a speed-up, so we give it a green hue.
         let c = (210 * (max as isize + value) / max as isize) as u8;
         (c, c, 255)
     }
