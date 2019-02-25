@@ -124,7 +124,7 @@ where
         // number of samples for this frame.
         let nsamples = match (parse_nsamples(&mut line), parse_nsamples(&mut line)) {
             (Some(s2), nsamples1) => {
-                delta = nsamples1.map_or(None, |s1| Some(s2 as isize - s1 as isize));
+                delta = nsamples1.and_then(|s1| Some(s2 as isize - s1 as isize));
                 if let Some(delta) = delta {
                     delta_max = std::cmp::max(delta.abs() as usize, delta_max);
                 }
