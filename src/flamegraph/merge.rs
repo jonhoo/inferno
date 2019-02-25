@@ -12,14 +12,22 @@ pub(super) struct TimedFrame<'a> {
     pub(super) location: Frame<'a>,
     pub(super) start_time: usize,
     pub(super) end_time: usize,
+    pub(super) delta: Option<isize>,
+}
+
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+pub(super) struct FrameTime {
+    pub(super) start_time: usize,
+    pub(super) delta: Option<isize>,
 }
 
 fn flow<'a, LI, TI>(
-    tmp: &mut HashMap<Frame<'a>, usize>,
+    tmp: &mut HashMap<Frame<'a>, FrameTime>,
     frames: &mut Vec<TimedFrame<'a>>,
     last: LI,
     this: TI,
     time: usize,
+    delta: Option<isize>,
 ) where
     LI: IntoIterator<Item = &'a str>,
     TI: IntoIterator<Item = &'a str>,
@@ -50,31 +58,50 @@ fn flow<'a, LI, TI>(
         };
 
         //eprintln!("at {} ending frame {:?}", time, key);
-        let start_time = tmp.remove(&key).unwrap_or_else(|| {
+        let frame_time = tmp.remove(&key).unwrap_or_else(|| {
             unreachable!("did not have start time for {:?}", key);
         });
 
-        let key = TimedFrame {
+        let frame = TimedFrame {
             location: key,
-            start_time,
+            start_time: frame_time.start_time,
             end_time: time,
+            delta: frame_time.delta,
         };
-        frames.push(key);
+        frames.push(frame);
     }
 
-    for (i, func) in this.enumerate() {
+    let mut i = 0;
+    while this.peek().is_some() {
+        let func = this.next().unwrap();
         let key = Frame {
             function: func,
             depth: shared_depth + i,
         };
+
+        let is_last = this.peek().is_none();
+        let delta = match delta {
+            Some(_) if !is_last => Some(0),
+            d => d,
+        };
+        let frame_time = FrameTime {
+            start_time: time,
+            delta,
+        };
+
         //eprintln!("stored tmp for time {}: {:?}", time, key);
-        if let Some(start_time) = tmp.insert(key, time) {
-            unreachable!("start time {} already registered for frame", start_time);
+        if let Some(frame_time) = tmp.insert(key, frame_time) {
+            unreachable!(
+                "start time {} already registered for frame",
+                frame_time.start_time
+            );
         }
+
+        i += 1;
     }
 }
 
-pub(super) fn frames<'a, I>(lines: I) -> (Vec<TimedFrame<'a>>, usize, usize)
+pub(super) fn frames<'a, I>(lines: I) -> (Vec<TimedFrame<'a>>, usize, usize, usize)
 where
     I: IntoIterator<Item = &'a str>,
 {
@@ -83,34 +110,30 @@ where
     let mut last = "";
     let mut tmp = Default::default();
     let mut frames = Default::default();
+    let mut delta = None;
+    let mut delta_max = 1;
     for line in lines {
         let mut line = line.trim();
         if line.is_empty() {
             continue;
         }
 
-        let nsamples = if let Some(samplesi) = line.rfind(' ') {
-            let mut samples = &line[(samplesi + 1)..];
-            // strip fractional part (if any);
-            // foobar 1.klwdjlakdj
-            if let Some(doti) = samples.find('.') {
-                samples = &samples[..doti];
-            }
-            match samples.parse::<usize>() {
-                Ok(nsamples) => {
-                    // remove nsamples part we just parsed from line
-                    line = line[..samplesi].trim_end();
-                    // give out the sample count
-                    nsamples
+        // Usually there will only be one samples column at the end of a line,
+        // but for differentials there will be two. In the case there are two
+        // we compute the delta between them and use the second one as as the
+        // number of samples for this frame.
+        let nsamples = match (parse_nsamples(&mut line), parse_nsamples(&mut line)) {
+            (Some(s2), nsamples1) => {
+                delta = nsamples1.map_or(None, |s1| Some(s2 as isize - s1 as isize));
+                if let Some(delta) = delta {
+                    delta_max = std::cmp::max(delta.abs() as usize, delta_max);
                 }
-                Err(_) => {
-                    ignored += 1;
-                    continue;
-                }
+                s2
             }
-        } else {
-            ignored += 1;
-            continue;
+            _ => {
+                ignored += 1;
+                continue;
+            }
         };
 
         if line.is_empty() {
@@ -124,7 +147,7 @@ where
         if last.is_empty() {
             // need to special-case this, because otherwise iter("") + "".split(';') == ["", ""]
             //eprintln!("flow(_, {}, {})", stack, time);
-            flow(&mut tmp, &mut frames, None, this, time);
+            flow(&mut tmp, &mut frames, None, this, time, delta);
         } else {
             //eprintln!("flow({}, {}, {})", last, stack, time);
             flow(
@@ -133,6 +156,7 @@ where
                 iter::once("").chain(last.split(';')),
                 this,
                 time,
+                delta,
             );
         }
 
@@ -148,8 +172,29 @@ where
             iter::once("").chain(last.split(';')),
             None,
             time,
+            delta,
         );
     }
 
-    (frames, time, ignored)
+    (frames, time, ignored, delta_max)
+}
+
+// Parse and remove the number of samples from the end of a line.
+fn parse_nsamples(line: &mut &str) -> Option<usize> {
+    if let Some(samplesi) = line.rfind(' ') {
+        let mut samples = &line[(samplesi + 1)..];
+        // strip fractional part (if any);
+        // foobar 1.klwdjlakdj
+        if let Some(doti) = samples.find('.') {
+            samples = &samples[..doti];
+        }
+        if let Ok(nsamples) = samples.parse::<usize>() {
+            // remove nsamples part we just parsed from line
+            *line = line[..samplesi].trim_end();
+            // give out the sample count
+            return Some(nsamples);
+        }
+    }
+
+    None
 }

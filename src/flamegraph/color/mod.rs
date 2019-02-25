@@ -255,6 +255,18 @@ pub(super) fn color(
     rgb_components_for_palette(palette, name, v1, v2, v3)
 }
 
+pub(super) fn color_scale(value: isize, max: usize) -> (u8, u8, u8) {
+    if value == 0 {
+        (255, 255, 255)
+    } else if value > 0 {
+        let c = (210 * (max as isize - value) / max as isize) as u8;
+        (255, c, c)
+    } else {
+        let c = (210 * (max as isize + value) / max as isize) as u8;
+        (c, c, 255)
+    }
+}
+
 fn default_bg_color_for(palette: Palette) -> BackgroundColor {
     match palette {
         Palette::Basic(BasicPalette::Mem) => BackgroundColor::Green,

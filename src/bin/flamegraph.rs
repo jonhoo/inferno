@@ -40,36 +40,33 @@ struct Opt {
     /// use consistent palette (palette.map)
     #[structopt(long = "cp")]
     cp: bool,
+
+    /// switch differential hues (green<->red)
+    #[structopt(long = "negate")]
+    negate: bool,
 }
 
 impl Into<Options> for Opt {
     fn into(self) -> Options {
-        let func_frameattrs = match self.nameattr_file {
-            Some(file) => match FuncFrameAttrsMap::from_file(&file) {
-                Ok(n) => n,
+        let mut options = Options::default();
+        options.colors = self.colors;
+        options.bgcolors = self.bgcolors;
+        options.hash = self.hash;
+        options.consistent_palette = self.cp;
+        if let Some(file) = self.nameattr_file {
+            match FuncFrameAttrsMap::from_file(&file) {
+                Ok(m) => {
+                    options.func_frameattrs = m;
+                }
                 Err(e) => panic!("Error reading {}: {:?}", file.display(), e),
-            },
-            None => FuncFrameAttrsMap::default(),
+            }
         };
-        let direction = if self.inverted {
-            Direction::Inverted
-        } else {
-            Direction::Straight
-        };
-        let title = if self.inverted {
-            "Icicle Graph".to_string()
-        } else {
-            "Flame Graph".to_string()
-        };
-        Options {
-            colors: self.colors,
-            bgcolors: self.bgcolors,
-            hash: self.hash,
-            consistent_palette: self.cp,
-            func_frameattrs,
-            direction,
-            title,
+        if self.inverted {
+            options.direction = Direction::Inverted;
+            options.title = "Icicle Graph".to_string();
         }
+        options.negate_differentials = self.negate;
+        options
     }
 }
 

@@ -32,7 +32,7 @@ const XPAD: usize = 10; // pad lefm and right
 const FRAMEPAD: usize = 1; // vertical padding for frames
 const PALETTE_FILE: &str = "palette.map";
 
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct Options {
     pub colors: color::Palette,
     pub bgcolors: Option<color::BackgroundColor>,
@@ -41,6 +41,22 @@ pub struct Options {
     pub func_frameattrs: FuncFrameAttrsMap,
     pub direction: Direction,
     pub title: String,
+    pub negate_differentials: bool,
+}
+
+impl Default for Options {
+    fn default() -> Self {
+        Options {
+            colors: Default::default(),
+            bgcolors: Default::default(),
+            hash: Default::default(),
+            consistent_palette: Default::default(),
+            func_frameattrs: Default::default(),
+            direction: Default::default(),
+            title: "Flame Graph".to_string(),
+            negate_differentials: Default::default(),
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq)]
@@ -156,7 +172,7 @@ where
     let (bgcolor1, bgcolor2) = color::bgcolor_for(opt.bgcolors, opt.colors);
 
     let mut buffer = StrStack::new();
-    let (mut frames, time, ignored) = merge::frames(lines);
+    let (mut frames, time, ignored, delta_max) = merge::frames(lines);
     if ignored != 0 {
         warn!("Ignored {} lines with invalid format", ignored);
     }
@@ -254,15 +270,37 @@ where
             write!(buffer, "all ({} samples, 100%)", samples_txt)
         } else {
             let pct = (100 * samples) as f64 / timemax as f64;
-
-            // strip any annotation
-            write!(
-                buffer,
-                "{} ({} samples, {:.2}%)",
-                deannotate(&frame.location.function),
-                samples_txt,
-                pct
-            )
+            match frame.delta {
+                None => write!(
+                    buffer,
+                    "{} ({} samples, {:.2}%)",
+                    deannotate(&frame.location.function),
+                    samples_txt,
+                    pct
+                ),
+                // Special case delta == 0 so we don't format percentage with a + sign.
+                Some(delta) if delta == 0 => write!(
+                    buffer,
+                    "{} ({} samples, {:.2}%; 0.00%)",
+                    deannotate(&frame.location.function),
+                    samples_txt,
+                    pct,
+                ),
+                Some(mut delta) => {
+                    if opt.negate_differentials {
+                        delta = -delta;
+                    }
+                    let delta_pct = (100 * delta) as f64 / timemax as f64;
+                    write!(
+                        buffer,
+                        "{} ({} samples, {:.2}%; {:+.2}%)",
+                        deannotate(&frame.location.function),
+                        samples_txt,
+                        pct,
+                        delta_pct
+                    )
+                }
+            }
         };
 
         let frame_attributes = opt
@@ -325,6 +363,11 @@ where
             color::VDGREY
         } else if frame.location.function == "-" {
             color::DGREY
+        } else if let Some(mut delta) = frame.delta {
+            if opt.negate_differentials {
+                delta = -delta;
+            }
+            color::color_scale(delta, delta_max)
         } else if let Some(ref mut palette_map) = palette_map {
             palette_map.find_color_for(&frame.location.function, |name| {
                 color::color(opt.colors, opt.hash, name, &mut thread_rng)
