@@ -86,6 +86,8 @@ fn flow<'a, LI, TI>(
         };
         let frame_time = FrameTime {
             start_time: time,
+            // For some reason the Perl version does a `+=` for `delta`, but I can't figure out why.
+            // See https://github.com/brendangregg/FlameGraph/blob/1b1c6deede9c33c5134c920bdb7a44cc5528e9a7/flamegraph.pl#L588
             delta,
         };
 
