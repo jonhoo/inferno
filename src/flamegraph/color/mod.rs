@@ -18,7 +18,15 @@ const GRAY_GRADIENT: (&str, &str) = ("#f8f8f8", "#e8e8e8");
 
 /// A flame graph background color.
 ///
-/// Defaults to yellow.
+/// The default background color usually depends on the color scheme:
+///
+///  - [`BasicPalette::Mem`] defaults to [`BackgroundColor::Green`].
+///  - [`BasicPalette::Io`] and [`MultiPalette::Wakeup`] default to [`BackgroundColor::Blue`].
+///  - [`BasicPalette::Hot`] defaults to [`BackgroundColor::Yellow`].
+///  - All other [`BasicPalette`] variants default to [`BackgroundColor::Grey`].
+///  - All other [`MultiPalette`] variants default to [`BackgroundColor::Yellow`].
+///
+/// `BackgroundColor::default()` is `Yellow`.
 #[derive(Clone, Copy, Debug)]
 pub enum BackgroundColor {
     /// A yellow gradient from `#EEEEEE` to `#EEEEB0`.
@@ -65,6 +73,8 @@ pub enum BasicPalette {
     /// A palette in which colors are chosen randomly from a red-yellow spectrum.
     Hot,
     /// A palette in which colors are chosen randomly from a green-blue spectrum.
+    ///
+    /// Defaults to
     Mem,
     /// A palette in which colors are chosen randomly from a wide blue spectrum.
     Io,
@@ -94,7 +104,7 @@ pub enum MultiPalette {
     Js,
     /// Use Perl semantics to color frames.
     Perl,
-    /// TODO: this seems to just be [`BasicPalette::Aqua`]?
+    /// Equivalent to [`BasicPalette::Aqua`] with [`BackgroundColor::Blue`].
     Wakeup,
 }
 

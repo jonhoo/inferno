@@ -47,10 +47,10 @@ pub struct Options {
     /// Store the choice of color for each function so that later invocations use the same colors.
     ///
     /// With this option enabled, a file called `palette.map` will be created the first time a
-    /// flame graph is generated, and the (random) color chosen for each function will be written
-    /// into it. On subsequent invocations, functions that already have a color registered in that
-    /// file will be given the stored color rather than be assigned a new one. New functions will
-    /// have their colors persisted for future runs.
+    /// flame graph is generated, and the color chosen for each function will be written into it.
+    /// On subsequent invocations, functions that already have a color registered in that file will
+    /// be given the stored color rather than be assigned a new one. New functions will have their
+    /// colors persisted for future runs.
     ///
     /// This feature was first implemented [by Shawn
     /// Sterling](https://github.com/brendangregg/FlameGraph/pull/25).
@@ -74,12 +74,12 @@ pub struct Options {
 pub enum Direction {
     /// Stacks grow from the bottom to the top.
     ///
-    /// `main` will be at the bottom.
+    /// The `(all)` meta frame will be at the bottom.
     Straight,
 
     /// Stacks grow from the top to the bottom.
     ///
-    /// `main` will be at the top.
+    /// The `(all)` meta frame will be at the top.
     Inverted,
 }
 
