@@ -181,21 +181,17 @@ where
 
 // Parse and remove the number of samples from the end of a line.
 fn parse_nsamples(line: &mut &str) -> Option<usize> {
-    if let Some(samplesi) = line.rfind(' ') {
-        let mut samples = &line[(samplesi + 1)..];
-        // strip fractional part (if any);
-        // foobar 1.klwdjlakdj
-        // TODO: Properly handle fractional samples (see issue #43)
-        if let Some(doti) = samples.find('.') {
-            samples = &samples[..doti];
-        }
-        if let Ok(nsamples) = samples.parse::<usize>() {
-            // remove nsamples part we just parsed from line
-            *line = line[..samplesi].trim_end();
-            // give out the sample count
-            return Some(nsamples);
-        }
+    let samplesi = line.rfind(' ')?;
+    let mut samples = &line[(samplesi + 1)..];
+    // strip fractional part (if any);
+    // foobar 1.klwdjlakdj
+    // TODO: Properly handle fractional samples (see issue #43)
+    if let Some(doti) = samples.find('.') {
+        samples = &samples[..doti];
     }
 
-    None
+    let nsamples = samples.parse::<usize>().ok()?;
+    // remove nsamples part we just parsed from line
+    *line = line[..samplesi].trim_end();
+    Some(nsamples)
 }
