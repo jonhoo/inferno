@@ -125,9 +125,9 @@ where
         let nsamples = if let Some(s2) = parse_nsamples(&mut line) {
             // See if there's also a differential column present
             let nsamples1 = parse_nsamples(&mut line);
-            delta = nsamples1.and_then(|s1| Some(s2 as isize - s1 as isize));
-            if let Some(delta) = delta {
-                delta_max = std::cmp::max(delta.abs() as usize, delta_max);
+            if let Some(s1) = nsamples1 {
+                delta = Some(s2 as isize - s1 as isize);
+                delta_max = std::cmp::max(delta.unwrap().abs() as usize, delta_max);
             }
             s2
         } else {
