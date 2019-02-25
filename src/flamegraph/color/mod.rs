@@ -73,8 +73,6 @@ pub enum BasicPalette {
     /// A palette in which colors are chosen randomly from a red-yellow spectrum.
     Hot,
     /// A palette in which colors are chosen randomly from a green-blue spectrum.
-    ///
-    /// Defaults to
     Mem,
     /// A palette in which colors are chosen randomly from a wide blue spectrum.
     Io,
