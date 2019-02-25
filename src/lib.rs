@@ -29,7 +29,7 @@
 //! Since profiling tools produce stack traces in a myriad of different formats, and the flame
 //! graph plotter expects input in a particular folded stack trace format, each profiler needs a
 //! separate collapse implementation. While the original Perl implementation supports _lots_ of
-//! profilers, Inferno currenly only supports one: the widely used [`perf`] tool (specifically the
+//! profilers, Inferno currently only supports one: the widely used [`perf`] tool (specifically the
 //! output from `perf script`). Support for xdebug is [hopefully coming soon], and [`bpftrace`]
 //! should get [native support] before too long.
 //!

@@ -48,9 +48,9 @@ pub struct Options {
     ///
     /// With this option enabled, a file called `palette.map` will be created the first time a
     /// flame graph is generated, and the (random) color chosen for each function will be written
-    /// into it. On subsequent invocations, functions that already have a colored registered in
-    /// that file will be given the stored color rather than be assigned a new one. New functions
-    /// will have their colors persisted for future runs.
+    /// into it. On subsequent invocations, functions that already have a color registered in that
+    /// file will be given the stored color rather than be assigned a new one. New functions will
+    /// have their colors persisted for future runs.
     ///
     /// This feature was first implemented [by Shawn
     /// Sterling](https://github.com/brendangregg/FlameGraph/pull/25).
@@ -463,7 +463,7 @@ where
     from_sorted_lines(opt, input.lines(), writer)
 }
 
-/// Produce a flame graph from a set of reader that contain folded stack lines.
+/// Produce a flame graph from a set of readers that contain folded stack lines.
 ///
 /// This function sorts all the read lines before processing them.
 /// See [`from_sorted_lines`] for the expected format of each line.

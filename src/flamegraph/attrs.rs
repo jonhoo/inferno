@@ -18,7 +18,7 @@ macro_rules! unwrap_or_continue {
 pub struct FuncFrameAttrsMap(HashMap<String, FrameAttrs>);
 
 impl FuncFrameAttrsMap {
-    /// Parse frame attribtues from a file.
+    /// Parse frame attributes from a file.
     ///
     /// Each line should consist of a function name, a tab (`\t`), and then a sequence of
     /// tab-separated `name=value` pairs.
@@ -27,7 +27,7 @@ impl FuncFrameAttrsMap {
         FuncFrameAttrsMap::from_reader(file)
     }
 
-    /// Parse frame attribtues from a `BufRead`.
+    /// Parse frame attributes from a `BufRead`.
     ///
     /// Each line should consist of a function name, a tab (`\t`), and then a sequence of
     /// tab-separated `name=value` pairs.
