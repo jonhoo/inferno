@@ -270,21 +270,18 @@ where
             write!(buffer, "all ({} samples, 100%)", samples_txt)
         } else {
             let pct = (100 * samples) as f64 / timemax as f64;
+            let function = deannotate(&frame.location.function);
             match frame.delta {
                 None => write!(
                     buffer,
                     "{} ({} samples, {:.2}%)",
-                    deannotate(&frame.location.function),
-                    samples_txt,
-                    pct
+                    function, samples_txt, pct
                 ),
                 // Special case delta == 0 so we don't format percentage with a + sign.
                 Some(delta) if delta == 0 => write!(
                     buffer,
                     "{} ({} samples, {:.2}%; 0.00%)",
-                    deannotate(&frame.location.function),
-                    samples_txt,
-                    pct,
+                    function, samples_txt, pct,
                 ),
                 Some(mut delta) => {
                     if opt.negate_differentials {
@@ -294,10 +291,7 @@ where
                     write!(
                         buffer,
                         "{} ({} samples, {:.2}%; {:+.2}%)",
-                        deannotate(&frame.location.function),
-                        samples_txt,
-                        pct,
-                        delta_pct
+                        function, samples_txt, pct, delta_pct
                     )
                 }
             }
