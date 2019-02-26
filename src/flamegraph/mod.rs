@@ -243,7 +243,7 @@ where
 
     // let's start writing the svg!
     let mut svg = Writer::new(writer);
-    if time == 0 {
+    if time == 0.0 {
         error!("No stack counts found");
         // emit an error message SVG, for tools automating flamegraph use
         let imageheight = FONTSIZE * 5;
@@ -326,14 +326,14 @@ where
 
         let samples = frame.end_time - frame.start_time;
 
-        // add thousands separators to `samples`
-        let _ = samples_txt_buffer.write_formatted(&samples, &Locale::en);
+        // round and add thousands separators to `samples`
+        let _ = samples_txt_buffer.write_formatted(&(samples.round() as usize), &Locale::en);
         let samples_txt = samples_txt_buffer.as_str();
 
         let info = if frame.location.function.is_empty() && frame.location.depth == 0 {
             write!(buffer, "all ({} samples, 100%)", samples_txt)
         } else {
-            let pct = (100 * samples) as f64 / timemax as f64;
+            let pct = 100.0 * samples / timemax;
             let function = deannotate(&frame.location.function);
             match frame.delta {
                 None => write!(
@@ -341,8 +341,8 @@ where
                     "{} ({} samples, {:.2}%)",
                     function, samples_txt, pct
                 ),
-                // Special case delta == 0 so we don't format percentage with a + sign.
-                Some(delta) if delta == 0 => write!(
+                // Special case so we get "0.00%" and not "+0.00%" for delta
+                Some(delta) if delta.abs() < 0.005 => write!(
                     buffer,
                     "{} ({} samples, {:.2}%; 0.00%)",
                     function, samples_txt, pct,
@@ -351,7 +351,7 @@ where
                     if opt.negate_differentials {
                         delta = -delta;
                     }
-                    let delta_pct = (100 * delta) as f64 / timemax as f64;
+                    let delta_pct = 100.0 * delta / timemax;
                     write!(
                         buffer,
                         "{} ({} samples, {:.2}%; {:+.2}%)",

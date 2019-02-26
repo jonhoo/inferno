@@ -303,19 +303,19 @@ pub(super) fn color(
     rgb_components_for_palette(palette, name, v1, v2, v3)
 }
 
-pub(super) fn color_scale(value: isize, max: usize) -> (u8, u8, u8) {
-    if value == 0 {
-        (255, 255, 255)
-    } else if value > 0 {
+pub(super) fn color_scale(value: f64, max: f64) -> (u8, u8, u8) {
+    if value > 0.0 {
         // A positive value indicates _more_ samples,
         // and hence more time spent, so we give it a red hue.
-        let c = (210 * (max as isize - value) / max as isize) as u8;
+        let c = (210.0 * (max - value) / max) as u8;
         (255, c, c)
-    } else {
+    } else if value < 0.0 {
         // A negative value indicates _fewer_ samples,
         // or a speed-up, so we give it a green hue.
-        let c = (210 * (max as isize + value) / max as isize) as u8;
+        let c = (210.0 * (max + value) / max) as u8;
         (c, c, 255)
+    } else {
+        (255, 255, 255)
     }
 }
 

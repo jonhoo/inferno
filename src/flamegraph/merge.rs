@@ -7,18 +7,18 @@ pub(super) struct Frame<'a> {
     pub(super) depth: usize,
 }
 
-#[derive(Debug, PartialEq, Eq, Hash)]
+#[derive(Debug, PartialEq)]
 pub(super) struct TimedFrame<'a> {
     pub(super) location: Frame<'a>,
-    pub(super) start_time: usize,
-    pub(super) end_time: usize,
-    pub(super) delta: Option<isize>,
+    pub(super) start_time: f64,
+    pub(super) end_time: f64,
+    pub(super) delta: Option<f64>,
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub(super) struct FrameTime {
-    pub(super) start_time: usize,
-    pub(super) delta: Option<isize>,
+    pub(super) start_time: f64,
+    pub(super) delta: Option<f64>,
 }
 
 fn flow<'a, LI, TI>(
@@ -26,8 +26,8 @@ fn flow<'a, LI, TI>(
     frames: &mut Vec<TimedFrame<'a>>,
     last: LI,
     this: TI,
-    time: usize,
-    delta: Option<isize>,
+    time: f64,
+    delta: Option<f64>,
 ) where
     LI: IntoIterator<Item = &'a str>,
     TI: IntoIterator<Item = &'a str>,
@@ -81,7 +81,7 @@ fn flow<'a, LI, TI>(
 
         let is_last = this.peek().is_none();
         let delta = match delta {
-            Some(_) if !is_last => Some(0),
+            Some(_) if !is_last => Some(0.0),
             d => d,
         };
         let frame_time = FrameTime {
@@ -103,17 +103,17 @@ fn flow<'a, LI, TI>(
     }
 }
 
-pub(super) fn frames<'a, I>(lines: I) -> (Vec<TimedFrame<'a>>, usize, usize, usize)
+pub(super) fn frames<'a, I>(lines: I) -> (Vec<TimedFrame<'a>>, f64, usize, f64)
 where
     I: IntoIterator<Item = &'a str>,
 {
-    let mut time = 0;
+    let mut time = 0.0;
     let mut ignored = 0;
     let mut last = "";
     let mut tmp = Default::default();
     let mut frames = Default::default();
     let mut delta = None;
-    let mut delta_max = 1;
+    let mut delta_max = 1.0;
     for line in lines {
         let mut line = line.trim();
         if line.is_empty() {
@@ -127,8 +127,8 @@ where
         let nsamples = if let Some(samples) = parse_nsamples(&mut line) {
             // See if there's also a differential column present
             if let Some(original_samples) = parse_nsamples(&mut line) {
-                delta = Some(samples as isize - original_samples as isize);
-                delta_max = std::cmp::max(delta.unwrap().abs() as usize, delta_max);
+                delta = Some(samples - original_samples);
+                delta_max = delta.unwrap().abs().max(delta_max);
             }
             samples
         } else {
@@ -180,18 +180,10 @@ where
 }
 
 // Parse and remove the number of samples from the end of a line.
-fn parse_nsamples(line: &mut &str) -> Option<usize> {
+fn parse_nsamples(line: &mut &str) -> Option<f64> {
     let samplesi = line.rfind(' ')?;
-    let mut samples = &line[(samplesi + 1)..];
-
-    // strip fractional part (if any);
-    // foobar 1.klwdjlakdj
-    // TODO: Properly handle fractional samples (see issue #43)
-    if let Some(doti) = samples.find('.') {
-        samples = &samples[..doti];
-    }
-
-    let nsamples = samples.parse::<usize>().ok()?;
+    let samples = &line[(samplesi + 1)..];
+    let nsamples = samples.parse::<f64>().ok()?;
     // remove nsamples part we just parsed from line
     *line = line[..samplesi].trim_end();
     Some(nsamples)
