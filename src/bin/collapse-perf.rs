@@ -1,3 +1,4 @@
+use env_logger::Env;
 use std::io;
 use std::path::PathBuf;
 use structopt::StructOpt;
@@ -77,5 +78,8 @@ impl Opt {
 
 fn main() -> io::Result<()> {
     let (infile, options) = Opt::from_args().into_parts();
+    env_logger::Builder::from_env(Env::default().default_filter_or("warn"))
+        .default_format_timestamp(false)
+        .init();
     Folder::from(options).collapse_file(infile.as_ref())
 }

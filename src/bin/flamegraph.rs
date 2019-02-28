@@ -1,3 +1,4 @@
+use env_logger::Env;
 use std::fs::File;
 use std::io::{self, BufReader, Read};
 use std::path::PathBuf;
@@ -77,6 +78,9 @@ impl Into<Options> for Opt {
 
 fn main() -> quick_xml::Result<()> {
     let opt = Opt::from_args();
+    env_logger::Builder::from_env(Env::default().default_filter_or("warn"))
+        .default_format_timestamp(false)
+        .init();
 
     if opt.infiles.is_empty() || opt.infiles.len() == 1 && opt.infiles[0].to_str() == Some("-") {
         let stdin = io::stdin();
