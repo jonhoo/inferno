@@ -114,6 +114,7 @@ where
     let mut frames = Default::default();
     let mut delta = None;
     let mut delta_max = 1;
+    let mut stripped_fractional_samples = false;
     for line in lines {
         let mut line = line.trim();
         if line.is_empty() {
@@ -124,17 +125,20 @@ where
         // Usually there will only be one samples column at the end of a line,
         // but for differentials there will be two. When there are two we compute the
         // delta between them and use the second one.
-        let nsamples = if let Some(samples) = parse_nsamples(&mut line) {
-            // See if there's also a differential column present
-            if let Some(original_samples) = parse_nsamples(&mut line) {
-                delta = Some(samples as isize - original_samples as isize);
-                delta_max = std::cmp::max(delta.unwrap().abs() as usize, delta_max);
-            }
-            samples
-        } else {
-            ignored += 1;
-            continue;
-        };
+        let nsamples =
+            if let Some(samples) = parse_nsamples(&mut line, &mut stripped_fractional_samples) {
+                // See if there's also a differential column present
+                if let Some(original_samples) =
+                    parse_nsamples(&mut line, &mut stripped_fractional_samples)
+                {
+                    delta = Some(samples as isize - original_samples as isize);
+                    delta_max = std::cmp::max(delta.unwrap().abs() as usize, delta_max);
+                }
+                samples
+            } else {
+                ignored += 1;
+                continue;
+            };
 
         if line.is_empty() {
             ignored += 1;
@@ -176,11 +180,15 @@ where
         );
     }
 
+    if stripped_fractional_samples {
+        warn!("The fractional parts of sample counts have been stripped. If you need to retain the extra precision you can scale up the sample data and use the --factor option to scale it back down.");
+    }
+
     (frames, time, ignored, delta_max)
 }
 
 // Parse and remove the number of samples from the end of a line.
-fn parse_nsamples(line: &mut &str) -> Option<usize> {
+fn parse_nsamples(line: &mut &str, stripped_fractional_samples: &mut bool) -> Option<usize> {
     let samplesi = line.rfind(' ')?;
     let mut samples = &line[(samplesi + 1)..];
 
@@ -193,7 +201,7 @@ fn parse_nsamples(line: &mut &str) -> Option<usize> {
     if let Some(doti) = samples.find('.') {
         // Warn if we're stripping a non-zero fractional part.
         if !samples[doti + 1..].chars().all(|c| c == '0') {
-            warn!("Fractional part of {} stripped. If you need to retain the extra precision you can scale up the sample data and use the --factor option to scale it back down.", samples);
+            *stripped_fractional_samples = true;
         }
         samples = &samples[..doti];
     }
