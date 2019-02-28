@@ -337,6 +337,12 @@ where
         };
         let rect = Rectangle { x1, y1, x2, y2 };
 
+        // The rounding here can differ from the Perl version when the fractional part is `0.5`.
+        // The Perl version does `my $samples = sprintf "%.0f", ($etime - $stime) * $factor;`,
+        // but this can format in strange ways as shown in these examples:
+        //     `sprintf "%.0f", 1.5` produces "2"
+        //     `sprintf "%.0f", 2.5` produces "2"
+        //     `sprintf "%.0f", 3.5` produces "4"
         let samples = ((frame.end_time - frame.start_time) as f64 * opt.factor).round() as usize;
 
         // add thousands separators to `samples`
