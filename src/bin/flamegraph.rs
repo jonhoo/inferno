@@ -44,6 +44,10 @@ struct Opt {
     /// switch differential hues (green<->red)
     #[structopt(long = "negate")]
     negate: bool,
+
+    /// factor to scale sample counts by
+    #[structopt(long = "factor")]
+    factor: Option<f64>,
 }
 
 impl Into<Options> for Opt {
@@ -66,6 +70,9 @@ impl Into<Options> for Opt {
             options.title = "Icicle Graph".to_string();
         }
         options.negate_differentials = self.negate;
+        if let Some(factor) = self.factor {
+            options.factor = factor;
+        }
         options
     }
 }

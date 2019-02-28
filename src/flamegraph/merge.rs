@@ -7,7 +7,7 @@ pub(super) struct Frame<'a> {
     pub(super) depth: usize,
 }
 
-#[derive(Debug, PartialEq, Eq, Hash)]
+#[derive(Debug, PartialEq)]
 pub(super) struct TimedFrame<'a> {
     pub(super) location: Frame<'a>,
     pub(super) start_time: usize,
@@ -15,7 +15,7 @@ pub(super) struct TimedFrame<'a> {
     pub(super) delta: Option<isize>,
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub(super) struct FrameTime {
     pub(super) start_time: usize,
     pub(super) delta: Option<isize>,
@@ -184,10 +184,17 @@ fn parse_nsamples(line: &mut &str) -> Option<usize> {
     let samplesi = line.rfind(' ')?;
     let mut samples = &line[(samplesi + 1)..];
 
-    // strip fractional part (if any);
+    // Strip fractional part (if any);
     // foobar 1.klwdjlakdj
-    // TODO: Properly handle fractional samples (see issue #43)
+    //
+    // The Perl version keeps the fractional part but this can be problematic
+    // because of cumulative floating point errors. Instead we recommend to
+    // use the --factor option. See https://github.com/brendangregg/FlameGraph/pull/18
     if let Some(doti) = samples.find('.') {
+        // Warn if we're stripping a non-zero fractional part.
+        if !samples[doti + 1..].chars().all(|c| c == '0') {
+            warn!("Fractional part of {} stripped. If you need to retain the extra precision you can scale up the sample data and use the --factor option to scale it back down.", samples);
+        }
         samples = &samples[..doti];
     }
 
