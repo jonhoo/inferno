@@ -76,12 +76,25 @@ pub struct Options {
     ///
     /// [differential]: http://www.brendangregg.com/blog/2014-11-09/differential-flame-graphs.html
     pub negate_differentials: bool,
+
+    /// Factor to scale sample counts by in the flame graph.
+    ///
+    /// This option can be useful if the sample data has fractional sample counts since the fractional
+    /// parts are stripped off when creating the flame graph. To work around this you can scale up the
+    /// sample counts to be integers, then scale them back down in the graph with the `factor` option.
+    ///
+    /// For example, if you have `23.4` as a sample count you can upscale it to `234`, then set `factor`
+    /// to `0.1`.
+    ///
+    /// Defaults to 1.0.
+    pub factor: f64,
 }
 
 impl Default for Options {
     fn default() -> Self {
         Options {
             title: "Flame Graph".to_string(),
+            factor: 1.0,
             colors: Default::default(),
             bgcolors: Default::default(),
             hash: Default::default(),
@@ -324,7 +337,13 @@ where
         };
         let rect = Rectangle { x1, y1, x2, y2 };
 
-        let samples = frame.end_time - frame.start_time;
+        // The rounding here can differ from the Perl version when the fractional part is `0.5`.
+        // The Perl version does `my $samples = sprintf "%.0f", ($etime - $stime) * $factor;`,
+        // but this can format in strange ways as shown in these examples:
+        //     `sprintf "%.0f", 1.5` produces "2"
+        //     `sprintf "%.0f", 2.5` produces "2"
+        //     `sprintf "%.0f", 3.5` produces "4"
+        let samples = ((frame.end_time - frame.start_time) as f64 * opt.factor).round() as usize;
 
         // add thousands separators to `samples`
         let _ = samples_txt_buffer.write_formatted(&samples, &Locale::en);
@@ -333,7 +352,7 @@ where
         let info = if frame.location.function.is_empty() && frame.location.depth == 0 {
             write!(buffer, "all ({} samples, 100%)", samples_txt)
         } else {
-            let pct = (100 * samples) as f64 / timemax as f64;
+            let pct = (100 * samples) as f64 / (timemax as f64 * opt.factor);
             let function = deannotate(&frame.location.function);
             match frame.delta {
                 None => write!(
@@ -351,7 +370,7 @@ where
                     if opt.negate_differentials {
                         delta = -delta;
                     }
-                    let delta_pct = (100 * delta) as f64 / timemax as f64;
+                    let delta_pct = (100 * delta) as f64 / (timemax as f64 * opt.factor);
                     write!(
                         buffer,
                         "{} ({} samples, {:.2}%; {:+.2}%)",

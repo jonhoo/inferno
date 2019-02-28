@@ -1,16 +1,12 @@
-#[macro_use]
-extern crate pretty_assertions;
-
 extern crate inferno;
 
-use inferno::flamegraph;
-use inferno::flamegraph::BackgroundColor;
-use inferno::flamegraph::Palette;
+use inferno::flamegraph::{self, BackgroundColor, Options, Palette};
 use std::fs::{self, File};
 use std::io::{BufRead, BufReader, Cursor};
+use std::path::PathBuf;
 use std::str::FromStr;
 
-fn do_test(input_file: &str, expected_result_file: &str, options: flamegraph::Options) {
+fn test_flamegraph(input_file: &str, expected_result_file: &str, options: Options) {
     let r = File::open(input_file).unwrap();
     let expected_len = fs::metadata(expected_result_file).unwrap().len() as usize;
     let mut result = Cursor::new(Vec::with_capacity(expected_len));
@@ -21,7 +17,6 @@ fn do_test(input_file: &str, expected_result_file: &str, options: flamegraph::Op
 
     let mut buf = String::new();
     let mut line_num = 1;
-
     for line in result.lines() {
         if expected.read_line(&mut buf).unwrap() == 0 {
             panic!(
@@ -61,7 +56,7 @@ fn flamegraph_colors_java() {
         ..Default::default()
     };
 
-    do_test(input_file, expected_result_file, options)
+    test_flamegraph(input_file, expected_result_file, options)
 }
 
 #[test]
@@ -77,5 +72,53 @@ fn flamegraph_colors_js() {
         ..Default::default()
     };
 
-    do_test(input_file, expected_result_file, options)
+    test_flamegraph(input_file, expected_result_file, options)
+}
+
+#[test]
+fn flamegraph_differential() {
+    let input_file = "./tests/data/differential/perf-cycles-instructions-01-collapsed-all-diff.txt";
+    let expected_result_file = "./tests/data/differential/diff.svg";
+    let options = Default::default();
+    test_flamegraph(input_file, expected_result_file, options);
+}
+
+#[test]
+fn flamegraph_differential_negated() {
+    let input_file = "./tests/data/differential/perf-cycles-instructions-01-collapsed-all-diff.txt";
+    let expected_result_file = "./tests/data/differential/diff_negated.svg";
+    let options = Options {
+        negate_differentials: true,
+        ..Default::default()
+    };
+    test_flamegraph(input_file, expected_result_file, options);
+}
+
+#[test]
+fn flamegraph_factor() {
+    let input_file = "./flamegraph/test/results/perf-vertx-stacks-01-collapsed-all.txt";
+    let expected_result_file = "./tests/data/factor/factor_2.5.svg";
+    let options = Options {
+        factor: 2.5,
+        hash: true,
+        ..Default::default()
+    };
+    test_flamegraph(input_file, expected_result_file, options);
+}
+
+#[test]
+fn flamegraph_nameattr() {
+    let input_file = "./flamegraph/test/results/perf-cycles-instructions-01-collapsed-all.txt";
+    let expected_result_file = "./tests/data/nameattr/nameattr.svg";
+    let nameattr_file = "./tests/data/nameattr/nameattr.txt";
+
+    let options = flamegraph::Options {
+        hash: true,
+        func_frameattrs: flamegraph::FuncFrameAttrsMap::from_file(&PathBuf::from(nameattr_file))
+            .unwrap(),
+        title: "Flame Graph".to_string(),
+        ..Default::default()
+    };
+
+    test_flamegraph(input_file, expected_result_file, options);
 }

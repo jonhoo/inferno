@@ -21,7 +21,7 @@ struct Opt {
     /// Collapsed perf output files. With no INFILE, or INFILE is -, read STDIN.
     #[structopt(name = "INFILE", parse(from_os_str))]
     infiles: Vec<PathBuf>,
-    /// set color palette
+    /// Set color palette
     #[structopt(
         short = "c",
         long = "colors",
@@ -31,19 +31,23 @@ struct Opt {
         )
     )]
     colors: Palette,
-    /// set background colors. Gradient choices are yellow (default), blue, green, grey; flat colors use "#rrggbb"
+    /// Set background colors. Gradient choices are yellow (default), blue, green, grey; flat colors use "#rrggbb"
     #[structopt(long = "bgcolors")]
     bgcolors: Option<BackgroundColor>,
-    /// colors are keyed by function name hash
+    /// Colors are keyed by function name hash
     #[structopt(long = "hash")]
     hash: bool,
-    /// use consistent palette (palette.map)
+    /// Use consistent palette (palette.map)
     #[structopt(long = "cp")]
     cp: bool,
 
-    /// switch differential hues (green<->red)
+    /// Switch differential hues (green<->red)
     #[structopt(long = "negate")]
     negate: bool,
+
+    /// Factor to scale sample counts by
+    #[structopt(long = "factor", default_value = "1.0")]
+    factor: f64,
 }
 
 impl Into<Options> for Opt {
@@ -66,6 +70,7 @@ impl Into<Options> for Opt {
             options.title = "Icicle Graph".to_string();
         }
         options.negate_differentials = self.negate;
+        options.factor = self.factor;
         options
     }
 }
