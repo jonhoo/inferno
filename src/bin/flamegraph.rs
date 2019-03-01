@@ -1,3 +1,4 @@
+use env_logger::Env;
 use std::fs::File;
 use std::io::{self, BufReader, Read};
 use std::path::PathBuf;
@@ -48,6 +49,14 @@ struct Opt {
     /// Factor to scale sample counts by
     #[structopt(long = "factor", default_value = "1.0")]
     factor: f64,
+
+    /// Silence all log output
+    #[structopt(short = "q", long = "quiet")]
+    quiet: bool,
+
+    /// Verbose logging mode (-v, -vv, -vvv)
+    #[structopt(short = "v", long = "verbose", parse(from_occurrences))]
+    verbose: usize,
 }
 
 impl Into<Options> for Opt {
@@ -77,6 +86,18 @@ impl Into<Options> for Opt {
 
 fn main() -> quick_xml::Result<()> {
     let opt = Opt::from_args();
+
+    // Initialize logger
+    if !opt.quiet {
+        env_logger::Builder::from_env(Env::default().default_filter_or(match opt.verbose {
+            0 => "warn",
+            1 => "info",
+            2 => "debug",
+            _ => "trace",
+        }))
+        .default_format_timestamp(false)
+        .init();
+    }
 
     if opt.infiles.is_empty() || opt.infiles.len() == 1 && opt.infiles[0].to_str() == Some("-") {
         let stdin = io::stdin();

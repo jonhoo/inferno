@@ -27,6 +27,7 @@ object = "0.11"
 gimli = "0.16"
 memmap = "0.7"
 log = "0.4"
+env_logger = "0.6.0"
 quick-xml = "0.13.3"
 num-format = { version = "0.4", default-features = false }
 str_stack = "0.1"
