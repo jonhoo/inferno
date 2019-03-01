@@ -78,11 +78,7 @@ fn test_flamegraph_logs<F>(input_file: &str, asserter: F)
 where
     F: Fn(&Vec<testing_logger::CapturedLog>),
 {
-    let options = flamegraph::Options {
-        hash: true,
-        ..Default::default()
-    };
-    test_flamegraph_logs_with_options(input_file, asserter, options);
+    test_flamegraph_logs_with_options(input_file, asserter, Default::default());
 }
 
 fn test_flamegraph_logs_with_options<F>(input_file: &str, asserter: F, options: flamegraph::Options)
