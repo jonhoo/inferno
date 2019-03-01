@@ -26,7 +26,6 @@ const YPAD1: usize = FONTSIZE * 3; // pad top, include title
 const YPAD2: usize = FONTSIZE * 2 + 10; // pad bottom, include labels
 const XPAD: usize = 10; // pad lefm and right
 const FRAMEPAD: usize = 1; // vertical padding for frames
-const PALETTE_FILE: &str = "palette.map";
 
 /// Configure the flame graph.
 #[derive(Debug)]
@@ -55,6 +54,11 @@ pub struct Options {
     /// This feature was first implemented [by Shawn
     /// Sterling](https://github.com/brendangregg/FlameGraph/pull/25).
     pub consistent_palette: bool,
+
+    /// If `consistent_palette` is set to `true` the palette will be stored in this file.
+    ///
+    /// Defaults to "palette.map"
+    pub palette_file: String,
 
     /// Assign extra attributes to particular functions.
     ///
@@ -94,6 +98,7 @@ impl Default for Options {
     fn default() -> Self {
         Options {
             title: "Flame Graph".to_string(),
+            palette_file: "palette.map".to_string(),
             factor: 1.0,
             colors: Default::default(),
             bgcolors: Default::default(),
@@ -241,7 +246,7 @@ where
     W: Write,
 {
     let mut palette_map = if opt.consistent_palette {
-        Some(color::PaletteMap::load(PALETTE_FILE)?)
+        Some(color::PaletteMap::load(&opt.palette_file)?)
     } else {
         None
     };
@@ -510,7 +515,7 @@ where
 
     if let Some(palette_map) = palette_map {
         palette_map
-            .save(PALETTE_FILE)
+            .save(&opt.palette_file)
             .map_err(quick_xml::Error::Io)?;
     }
 
