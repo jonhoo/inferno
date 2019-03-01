@@ -54,6 +54,14 @@ struct Opt {
     #[structopt(long = "event-filter", value_name = "EVENT")]
     event_filter: Option<String>,
 
+    /// Silence all log output
+    #[structopt(short = "q", long = "quiet")]
+    quiet: bool,
+
+    /// Verbose logging (output all log priorities)
+    #[structopt(short = "v", long = "verbose")]
+    log_verbose: bool,
+
     /// perf script output file, or STDIN if not specified
     infile: Option<PathBuf>,
 }
@@ -77,9 +85,19 @@ impl Opt {
 }
 
 fn main() -> io::Result<()> {
-    let (infile, options) = Opt::from_args().into_parts();
-    env_logger::Builder::from_env(Env::default().default_filter_or("warn"))
+    let opt = Opt::from_args();
+
+    // Initialize logger
+    if !opt.quiet {
+        env_logger::Builder::from_env(Env::default().default_filter_or(if opt.log_verbose {
+            "all"
+        } else {
+            "warn"
+        }))
         .default_format_timestamp(false)
         .init();
+    }
+
+    let (infile, options) = opt.into_parts();
     Folder::from(options).collapse_file(infile.as_ref())
 }
