@@ -178,9 +178,19 @@ fn flamegraph_should_warn_about_fractional_samples() {
     test_flamegraph_logs(
         "./tests/data/fractional-samples/fractional.txt",
         |captured_logs| {
-            assert_eq!(captured_logs.len(), 1);
-            assert!(captured_logs[0].body.contains("fractional sample"));
-            assert_eq!(captured_logs[0].level, Level::Warn);
+            let nwarnings = captured_logs
+                .into_iter()
+                .filter(|log| {
+                    log.body
+                        .starts_with("The input data has fractional sample counts")
+                        && log.level == Level::Warn
+                })
+                .count();
+            assert_eq!(
+                nwarnings, 1,
+                "fractional samples warning logged {} times, but should be logged exactly once",
+                nwarnings
+            );
         },
     );
 }
@@ -190,7 +200,18 @@ fn flamegraph_should_not_warn_about_zero_fractional_samples() {
     test_flamegraph_logs(
         "./tests/data/fractional-samples/zero-fractionals.txt",
         |captured_logs| {
-            assert!(captured_logs.is_empty());
+            let nwarnings = captured_logs
+                .into_iter()
+                .filter(|log| {
+                    log.body
+                        .starts_with("The input data has fractional sample counts")
+                        && log.level == Level::Warn
+                })
+                .count();
+            assert_eq!(
+                nwarnings, 0,
+                "warning about fractional samples not expected"
+            );
         },
     );
 }
@@ -213,18 +234,34 @@ fn flamegraph_palette_map() {
 #[test]
 fn flamegraph_should_warn_about_bad_input_lines() {
     test_flamegraph_logs("./tests/data/bad-lines/bad-lines.txt", |captured_logs| {
-        assert_eq!(captured_logs.len(), 1);
-        assert!(captured_logs[0].body.contains("invalid format"));
-        assert_eq!(captured_logs[0].level, Level::Warn);
+        let nwarnings = captured_logs
+            .into_iter()
+            .filter(|log| {
+                log.body.starts_with("Ignored")
+                    && log.body.ends_with(" lines with invalid format")
+                    && log.level == Level::Warn
+            })
+            .count();
+        assert_eq!(
+            nwarnings, 1,
+            "bad lines warning logged {} times, but should be logged exactly once",
+            nwarnings
+        );
     });
 }
 
 #[test]
 fn flamegraph_should_warn_about_empty_input() {
     test_flamegraph_logs("./tests/data/empty/empty.txt", |captured_logs| {
-        assert_eq!(captured_logs.len(), 1);
-        assert_eq!(captured_logs[0].body, "No stack counts found");
-        assert_eq!(captured_logs[0].level, Level::Error);
+        let nwarnings = captured_logs
+            .into_iter()
+            .filter(|log| log.body == "No stack counts found" && log.level == Level::Error)
+            .count();
+        assert_eq!(
+            nwarnings, 1,
+            "no stack counts error logged {} times, but should be logged exactly once",
+            nwarnings
+        );
     });
 }
 
