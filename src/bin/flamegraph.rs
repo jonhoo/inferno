@@ -22,6 +22,7 @@ struct Opt {
     /// Collapsed perf output files. With no INFILE, or INFILE is -, read STDIN.
     #[structopt(name = "INFILE", parse(from_os_str))]
     infiles: Vec<PathBuf>,
+
     /// Set color palette
     #[structopt(
         short = "c",
@@ -32,12 +33,15 @@ struct Opt {
         )
     )]
     colors: Palette,
+
     /// Set background colors. Gradient choices are yellow (default), blue, green, grey; flat colors use "#rrggbb"
     #[structopt(long = "bgcolors")]
     bgcolors: Option<BackgroundColor>,
+
     /// Colors are keyed by function name hash
     #[structopt(long = "hash")]
     hash: bool,
+
     /// Use consistent palette (palette.map)
     #[structopt(long = "cp")]
     cp: bool,
