@@ -58,9 +58,9 @@ struct Opt {
     #[structopt(short = "q", long = "quiet")]
     quiet: bool,
 
-    /// Verbose logging (output all log priorities)
-    #[structopt(short = "v", long = "verbose")]
-    log_verbose: bool,
+    /// Verbose logging mode (-v, -vv, -vvv)
+    #[structopt(short = "v", long = "verbose", parse(from_occurrences))]
+    verbose: usize,
 
     /// perf script output file, or STDIN if not specified
     infile: Option<PathBuf>,
@@ -89,10 +89,11 @@ fn main() -> io::Result<()> {
 
     // Initialize logger
     if !opt.quiet {
-        env_logger::Builder::from_env(Env::default().default_filter_or(if opt.log_verbose {
-            "all"
-        } else {
-            "warn"
+        env_logger::Builder::from_env(Env::default().default_filter_or(match opt.verbose {
+            0 => "warn",
+            1 => "info",
+            2 => "debug",
+            _ => "trace",
         }))
         .default_format_timestamp(false)
         .init();
