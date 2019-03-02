@@ -195,11 +195,15 @@ fn parse_nsamples(line: &mut &str, stripped_fractional_samples: &mut bool) -> Op
     // because of cumulative floating point errors. Instead we recommend to
     // use the --factor option. See https://github.com/brendangregg/FlameGraph/pull/18
     if let Some(doti) = samples.find('.') {
-        // Warn if we're stripping a non-zero fractional part, but only the first time.
-        if !*stripped_fractional_samples
-            && samples[..doti].chars().all(|c| c.is_digit(10))
-            && !samples[doti + 1..].chars().all(|c| c == '0')
+        if !samples[..doti]
+            .chars()
+            .chain(samples[doti + 1..].chars())
+            .all(|c| c.is_digit(10))
         {
+            return None;
+        }
+        // Warn if we're stripping a non-zero fractional part, but only the first time.
+        if !*stripped_fractional_samples && !samples[doti + 1..].chars().all(|c| c == '0') {
             *stripped_fractional_samples = true;
             warn!("The input data has fractional sample counts that will be truncated to integers. If you need to retain the extra precision you can scale up the sample data and use the --factor option to scale it back down.");
         }
