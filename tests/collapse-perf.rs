@@ -5,6 +5,7 @@ extern crate inferno;
 
 use inferno::collapse::perf::{Folder, Options};
 use inferno::collapse::Collapse;
+use log::Level;
 use std::fs::{self, File};
 use std::io::{self, BufRead, BufReader, Cursor};
 use std::path::Path;
@@ -210,4 +211,58 @@ fn options_from_vec(opt_vec: Vec<&str>) -> Options {
         }
     }
     options
+}
+
+fn test_collapse_perf_logs<F>(input_file: &str, asserter: F)
+where
+    F: Fn(&Vec<testing_logger::CapturedLog>),
+{
+    test_collapse_perf_logs_with_options(input_file, asserter, Options::default());
+}
+
+fn test_collapse_perf_logs_with_options<F>(input_file: &str, asserter: F, options: Options)
+where
+    F: Fn(&Vec<testing_logger::CapturedLog>),
+{
+    testing_logger::setup();
+    let r = BufReader::new(File::open(input_file).unwrap());
+    let mut result = Cursor::new(vec![]);
+    let mut perf = Folder::from(options);
+    perf.collapse(r, &mut result).unwrap();
+    testing_logger::validate(asserter);
+}
+
+#[test]
+fn flamegraph_should_warn_about_empty_input_lines() {
+    test_collapse_perf_logs("./tests/data/empty-line/empty-line.txt", |captured_logs| {
+        let nwarnings = captured_logs
+            .into_iter()
+            .filter(|log| log.body.starts_with("weird event line: ") && log.level == Level::Warn)
+            .count();
+        assert_eq!(
+            nwarnings, 1,
+            "bad lines warning logged {} times, but should be logged exactly once",
+            nwarnings
+        );
+    });
+}
+
+#[test]
+fn flamegraph_should_warn_about_weird_input_lines() {
+    test_collapse_perf_logs(
+        "./tests/data/weird-stack-line/weird-stack-line.txt",
+        |captured_logs| {
+            let nwarnings = captured_logs
+                .into_iter()
+                .filter(|log| {
+                    log.body.starts_with("weird stack line: ") && log.level == Level::Warn
+                })
+                .count();
+            assert_eq!(
+                nwarnings, 1,
+                "bad lines warning logged {} times, but should be logged exactly once",
+                nwarnings
+            );
+        },
+    );
 }
