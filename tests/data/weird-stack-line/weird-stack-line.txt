@@ -1,0 +1,5 @@
+inline-counter 26037  8801.193547:     250000 cpu-clock:uhH:
+	          401b97 main+0x1f (./tests/data/inline-counter/inline-counter)
+
+inline-counter 26037  8801.194312:     250000 cpu-clock:uhH:
+	          THIS_IS_A_WEIRD_LINE
