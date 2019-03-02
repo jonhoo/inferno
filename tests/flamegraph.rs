@@ -213,6 +213,27 @@ fn flamegraph_should_not_warn_about_zero_fractional_samples() {
 }
 
 #[test]
+fn flamegraph_should_not_warn_about_fractional_sample_with_tricky_stack() {
+    test_flamegraph_logs(
+        "./tests/data/fractional-samples/tricky-stack.txt",
+        |captured_logs| {
+            let nwarnings = captured_logs
+                .into_iter()
+                .filter(|log| {
+                    log.body
+                        .starts_with("The input data has fractional sample counts")
+                        && log.level == Level::Warn
+                })
+                .count();
+            assert_eq!(
+                nwarnings, 0,
+                "warning about fractional samples not expected"
+            );
+        },
+    );
+}
+
+#[test]
 fn flamegraph_palette_map() {
     let input_file = "./flamegraph/test/results/perf-vertx-stacks-01-collapsed-all.txt";
     let expected_result_file = "./tests/data/palette-map/consistent-palette.svg";

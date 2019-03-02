@@ -1,0 +1,1 @@
+rustc;<alloc::vec::Vec<T> as alloc::vec::SpecExtend<T, I>>::from_iter;memcpy@GLIBC_2.2.5 3
