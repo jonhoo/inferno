@@ -1,3 +1,6 @@
+#[macro_use]
+extern crate pretty_assertions;
+
 extern crate inferno;
 
 use inferno::flamegraph::{self, BackgroundColor, Direction, Options, Palette};
@@ -10,8 +13,13 @@ use std::str::FromStr;
 fn test_flamegraph(
     input_file: &str,
     expected_result_file: &str,
-    options: Options,
+    mut options: Options,
 ) -> quick_xml::Result<()> {
+    // Always pretty print XML to make it easier to find differences when tests fail.
+    options.pretty_xml = true;
+    // Never include static JavaScript in tests so we don't have to have it duplicated
+    // in all of the test files.
+    options.no_javascript = true;
     let r = File::open(input_file).unwrap();
     let expected_len = fs::metadata(expected_result_file).unwrap().len() as usize;
     let mut result = Cursor::new(Vec::with_capacity(expected_len));
@@ -25,8 +33,13 @@ fn test_flamegraph(
 fn test_flamegraph_multiple_files(
     input_files: Vec<String>,
     expected_result_file: &str,
-    options: Options,
+    mut options: Options,
 ) -> quick_xml::Result<()> {
+    // Always pretty print XML to make it easier to find differences when tests fail.
+    options.pretty_xml = true;
+    // Never include static JavaScript in tests so we don't have to have it duplicated
+    // in all of the test files.
+    options.no_javascript = true;
     let mut readers: Vec<File> = Vec::with_capacity(input_files.len());
     for infile in input_files.iter() {
         let r = File::open(infile).map_err(quick_xml::Error::Io)?;
@@ -116,7 +129,6 @@ fn flamegraph_colors_js() {
         colors: Palette::from_str("js").unwrap(),
         bgcolors: Some(BackgroundColor::from_str("green").unwrap()),
         hash: true,
-        title: "Flame Graph".to_string(),
         ..Default::default()
     };
 
@@ -135,7 +147,7 @@ fn flamegraph_differential() {
 fn flamegraph_differential_negated() {
     let input_file =
         "./tests/data/flamegraph/differential/perf-cycles-instructions-01-collapsed-all-diff.txt";
-    let expected_result_file = "./tests/data/flamegraph/differential/diff_negated.svg";
+    let expected_result_file = "./tests/data/flamegraph/differential/diff-negated.svg";
     let options = Options {
         negate_differentials: true,
         ..Default::default()
@@ -146,7 +158,7 @@ fn flamegraph_differential_negated() {
 #[test]
 fn flamegraph_factor() {
     let input_file = "./flamegraph/test/results/perf-vertx-stacks-01-collapsed-all.txt";
-    let expected_result_file = "./tests/data/flamegraph/factor/factor_2.5.svg";
+    let expected_result_file = "./tests/data/flamegraph/factor/factor-2.5.svg";
     let options = Options {
         factor: 2.5,
         hash: true,
