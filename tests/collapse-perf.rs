@@ -223,36 +223,41 @@ collapse_perf_tests_upstream! {
     collapse_perf_vertx_stacks_01__addrs
 }
 
-macro_rules! collapse_perf_tests_inline_counter {
+macro_rules! collapse_perf_tests {
     ($($name:ident),*) => {
-        collapse_perf_tests_inner!($($name),*; "./tests/data/inline-counter"; "collapse_");
+        collapse_perf_tests_inner!($($name),*; "./tests/data/collapse-perf"; "collapse_perf_");
     }
 }
 
-collapse_perf_tests_inline_counter! {
+collapse_perf_tests! {
     collapse_perf_inline_counter__inline,
     collapse_perf_inline_counter__inline_context
 }
 
 #[test]
 fn collapse_perf_should_warn_about_empty_input_lines() {
-    test_collapse_perf_logs("./tests/data/empty-line/empty-line.txt", |captured_logs| {
-        let nwarnings = captured_logs
-            .into_iter()
-            .filter(|log| log.body.starts_with("weird event line: ") && log.level == Level::Warn)
-            .count();
-        assert_eq!(
-            nwarnings, 1,
-            "bad lines warning logged {} times, but should be logged exactly once",
-            nwarnings
-        );
-    });
+    test_collapse_perf_logs(
+        "./tests/data/collapse-perf/empty-line.txt",
+        |captured_logs| {
+            let nwarnings = captured_logs
+                .into_iter()
+                .filter(|log| {
+                    log.body.starts_with("weird event line: ") && log.level == Level::Warn
+                })
+                .count();
+            assert_eq!(
+                nwarnings, 1,
+                "bad lines warning logged {} times, but should be logged exactly once",
+                nwarnings
+            );
+        },
+    );
 }
 
 #[test]
 fn collapse_perf_should_warn_about_weird_input_lines() {
     test_collapse_perf_logs(
-        "./tests/data/weird-stack-line/weird-stack-line.txt",
+        "./tests/data/collapse-perf/weird-stack-line.txt",
         |captured_logs| {
             let nwarnings = captured_logs
                 .into_iter()

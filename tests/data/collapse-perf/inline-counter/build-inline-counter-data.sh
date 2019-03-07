@@ -4,10 +4,10 @@
 gcc -static -no-pie -g inline-counter.c -o inline-counter
 
 perf record --call-graph dwarf ./inline-counter
-perf script --no-inline > perf-inline-counter.txt
+perf script --no-inline > ../inline-counter.txt
 
 # Make the path to the binary relative to the project root.
-sed 's/(.*\/tests\/data\/inline-counter/(.\/tests\/data\/inline-counter/' perf-inline-counter.txt -i
+sed 's/(.*\/tests\/data\/collapse-perf\/inline-counter/(.\/tests\/data\/collapse-perf\/inline-counter/' ../inline-counter.txt -i
 
 # Cleanup
 rm perf.data
