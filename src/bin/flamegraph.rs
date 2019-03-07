@@ -61,6 +61,17 @@ struct Opt {
     /// Verbose logging mode (-v, -vv, -vvv)
     #[structopt(short = "v", long = "verbose", parse(from_occurrences))]
     verbose: usize,
+
+    /// Pretty print XML with newlines and indentation.
+    #[structopt(long = "pretty-xml")]
+    pretty_xml: bool,
+
+    /// Don't include static JavaScript in flame graph.
+    /// This flag is hidden since it's only meant to be used in
+    /// tests so we don't have to include the same static
+    /// JavaScript in all of the test files.
+    #[structopt(raw(hidden = "true"), long = "no-javascript")]
+    no_javascript: bool,
 }
 
 impl Into<Options> for Opt {
@@ -84,6 +95,8 @@ impl Into<Options> for Opt {
         }
         options.negate_differentials = self.negate;
         options.factor = self.factor;
+        options.pretty_xml = self.pretty_xml;
+        options.no_javascript = self.no_javascript;
         options
     }
 }
