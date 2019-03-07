@@ -129,9 +129,11 @@ var searchcolor = 'rgb(230,0,230)';",
         super::XPAD,
         opt.direction == Direction::Inverted,
     ))))?;
-    svg.write_event(Event::CData(BytesText::from_escaped_str(include_str!(
-        "flamegraph.js"
-    ))))?;
+    if !opt.no_javascript {
+        svg.write_event(Event::CData(BytesText::from_escaped_str(include_str!(
+            "flamegraph.js"
+        ))))?;
+    }
     svg.write_event(Event::End(BytesEnd::borrowed(b"script")))?;
 
     svg.write_event(Event::Empty(

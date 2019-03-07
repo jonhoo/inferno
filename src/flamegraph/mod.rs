@@ -92,6 +92,14 @@ pub struct Options {
     ///
     /// Defaults to 1.0.
     pub factor: f64,
+
+    /// Pretty print XML with newlines and indentation.
+    pub pretty_xml: bool,
+
+    /// Don't include static JavaScript in flame graph.
+    /// This is only meant to be used in tests.
+    #[doc(hidden)]
+    pub no_javascript: bool,
 }
 
 impl Default for Options {
@@ -107,6 +115,8 @@ impl Default for Options {
             func_frameattrs: Default::default(),
             direction: Default::default(),
             negate_differentials: Default::default(),
+            pretty_xml: Default::default(),
+            no_javascript: Default::default(),
         }
     }
 }
@@ -260,7 +270,12 @@ where
     }
 
     // let's start writing the svg!
-    let mut svg = Writer::new(writer);
+    let mut svg = if opt.pretty_xml {
+        Writer::new_with_indent(writer, ' ' as u8, 4)
+    } else {
+        Writer::new(writer)
+    };
+
     if time == 0 {
         error!("No stack counts found");
         // emit an error message SVG, for tools automating flamegraph use
