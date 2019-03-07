@@ -268,7 +268,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "inferno"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "addr2line 0.8.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "env_logger 0.6.0 (registry+https://github.com/rust-lang/crates.io-index)",
