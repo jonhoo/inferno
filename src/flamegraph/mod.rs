@@ -271,7 +271,7 @@ where
 
     // let's start writing the svg!
     let mut svg = if opt.pretty_xml {
-        Writer::new_with_indent(writer, ' ' as u8, 4)
+        Writer::new_with_indent(writer, b' ', 4)
     } else {
         Writer::new(writer)
     };
