@@ -95,7 +95,7 @@ where
 #[test]
 fn flamegraph_colors_java() {
     let input_file = "./flamegraph/test/results/perf-java-stacks-01-collapsed-all.txt";
-    let expected_result_file = "./tests/data/colors/java.svg";
+    let expected_result_file = "./tests/data/flamegraph/colors/java.svg";
 
     let options = flamegraph::Options {
         colors: Palette::from_str("java").unwrap(),
@@ -110,7 +110,7 @@ fn flamegraph_colors_java() {
 #[test]
 fn flamegraph_colors_js() {
     let input_file = "./flamegraph/test/results/perf-js-stacks-01-collapsed-all.txt";
-    let expected_result_file = "./tests/data/colors/js.svg";
+    let expected_result_file = "./tests/data/flamegraph/colors/js.svg";
 
     let options = flamegraph::Options {
         colors: Palette::from_str("js").unwrap(),
@@ -125,15 +125,17 @@ fn flamegraph_colors_js() {
 
 #[test]
 fn flamegraph_differential() {
-    let input_file = "./tests/data/differential/perf-cycles-instructions-01-collapsed-all-diff.txt";
-    let expected_result_file = "./tests/data/differential/diff.svg";
+    let input_file =
+        "./tests/data/flamegraph/differential/perf-cycles-instructions-01-collapsed-all-diff.txt";
+    let expected_result_file = "./tests/data/flamegraph/differential/diff.svg";
     test_flamegraph(input_file, expected_result_file, Default::default()).unwrap();
 }
 
 #[test]
 fn flamegraph_differential_negated() {
-    let input_file = "./tests/data/differential/perf-cycles-instructions-01-collapsed-all-diff.txt";
-    let expected_result_file = "./tests/data/differential/diff_negated.svg";
+    let input_file =
+        "./tests/data/flamegraph/differential/perf-cycles-instructions-01-collapsed-all-diff.txt";
+    let expected_result_file = "./tests/data/flamegraph/differential/diff_negated.svg";
     let options = Options {
         negate_differentials: true,
         ..Default::default()
@@ -144,7 +146,7 @@ fn flamegraph_differential_negated() {
 #[test]
 fn flamegraph_factor() {
     let input_file = "./flamegraph/test/results/perf-vertx-stacks-01-collapsed-all.txt";
-    let expected_result_file = "./tests/data/factor/factor_2.5.svg";
+    let expected_result_file = "./tests/data/flamegraph/factor/factor_2.5.svg";
     let options = Options {
         factor: 2.5,
         hash: true,
@@ -156,8 +158,8 @@ fn flamegraph_factor() {
 #[test]
 fn flamegraph_nameattr() {
     let input_file = "./flamegraph/test/results/perf-cycles-instructions-01-collapsed-all.txt";
-    let expected_result_file = "./tests/data/nameattr/nameattr.svg";
-    let nameattr_file = "./tests/data/nameattr/nameattr.txt";
+    let expected_result_file = "./tests/data/flamegraph/nameattr/nameattr.svg";
+    let nameattr_file = "./tests/data/flamegraph/nameattr/nameattr.txt";
 
     let options = flamegraph::Options {
         hash: true,
@@ -172,7 +174,7 @@ fn flamegraph_nameattr() {
 #[test]
 fn flamegraph_should_warn_about_fractional_samples() {
     test_flamegraph_logs(
-        "./tests/data/fractional-samples/fractional.txt",
+        "./tests/data/flamegraph/fractional-samples/fractional.txt",
         |captured_logs| {
             let nwarnings = captured_logs
                 .into_iter()
@@ -194,7 +196,7 @@ fn flamegraph_should_warn_about_fractional_samples() {
 #[test]
 fn flamegraph_should_not_warn_about_zero_fractional_samples() {
     test_flamegraph_logs(
-        "./tests/data/fractional-samples/zero-fractionals.txt",
+        "./tests/data/flamegraph/fractional-samples/zero-fractionals.txt",
         |captured_logs| {
             let nwarnings = captured_logs
                 .into_iter()
@@ -215,7 +217,7 @@ fn flamegraph_should_not_warn_about_zero_fractional_samples() {
 #[test]
 fn flamegraph_should_not_warn_about_fractional_sample_with_tricky_stack() {
     test_flamegraph_logs(
-        "./tests/data/fractional-samples/tricky-stack.txt",
+        "./tests/data/flamegraph/fractional-samples/tricky-stack.txt",
         |captured_logs| {
             let nwarnings = captured_logs
                 .into_iter()
@@ -236,8 +238,8 @@ fn flamegraph_should_not_warn_about_fractional_sample_with_tricky_stack() {
 #[test]
 fn flamegraph_palette_map() {
     let input_file = "./flamegraph/test/results/perf-vertx-stacks-01-collapsed-all.txt";
-    let expected_result_file = "./tests/data/palette-map/consistent-palette.svg";
-    let palette_file = "./tests/data/palette-map/palette.map".to_string();
+    let expected_result_file = "./tests/data/flamegraph/palette-map/consistent-palette.svg";
+    let palette_file = "./tests/data/flamegraph/palette-map/palette.map".to_string();
 
     let options = flamegraph::Options {
         consistent_palette: true,
@@ -250,26 +252,29 @@ fn flamegraph_palette_map() {
 
 #[test]
 fn flamegraph_should_warn_about_bad_input_lines() {
-    test_flamegraph_logs("./tests/data/bad-lines/bad-lines.txt", |captured_logs| {
-        let nwarnings = captured_logs
-            .into_iter()
-            .filter(|log| {
-                log.body.starts_with("Ignored")
-                    && log.body.ends_with(" lines with invalid format")
-                    && log.level == Level::Warn
-            })
-            .count();
-        assert_eq!(
-            nwarnings, 1,
-            "bad lines warning logged {} times, but should be logged exactly once",
-            nwarnings
-        );
-    });
+    test_flamegraph_logs(
+        "./tests/data/flamegraph/bad-lines/bad-lines.txt",
+        |captured_logs| {
+            let nwarnings = captured_logs
+                .into_iter()
+                .filter(|log| {
+                    log.body.starts_with("Ignored")
+                        && log.body.ends_with(" lines with invalid format")
+                        && log.level == Level::Warn
+                })
+                .count();
+            assert_eq!(
+                nwarnings, 1,
+                "bad lines warning logged {} times, but should be logged exactly once",
+                nwarnings
+            );
+        },
+    );
 }
 
 #[test]
 fn flamegraph_should_warn_about_empty_input() {
-    test_flamegraph_logs("./tests/data/empty/empty.txt", |captured_logs| {
+    test_flamegraph_logs("./tests/data/flamegraph/empty/empty.txt", |captured_logs| {
         let nwarnings = captured_logs
             .into_iter()
             .filter(|log| log.body == "No stack counts found" && log.level == Level::Error)
@@ -284,21 +289,21 @@ fn flamegraph_should_warn_about_empty_input() {
 
 #[test]
 fn flamegraph_empty_input() {
-    let input_file = "./tests/data/empty/empty.txt";
-    let expected_result_file = "./tests/data/empty/empty.svg";
+    let input_file = "./tests/data/flamegraph/empty/empty.txt";
+    let expected_result_file = "./tests/data/flamegraph/empty/empty.svg";
     assert!(test_flamegraph(input_file, expected_result_file, Default::default()).is_err());
 }
 
 #[test]
 fn flamegraph_unsorted_multiple_input_files() {
     let input_files = vec![
-        "./tests/data/multiple-inputs/perf-vertx-stacks-01-collapsed-all-unsorted-1.txt"
+        "./tests/data/flamegraph/multiple-inputs/perf-vertx-stacks-01-collapsed-all-unsorted-1.txt"
             .to_string(),
-        "./tests/data/multiple-inputs/perf-vertx-stacks-01-collapsed-all-unsorted-2.txt"
+        "./tests/data/flamegraph/multiple-inputs/perf-vertx-stacks-01-collapsed-all-unsorted-2.txt"
             .to_string(),
     ];
     let expected_result_file =
-        "./tests/data/multiple-inputs/perf-vertx-stacks-01-collapsed-all.svg";
+        "./tests/data/flamegraph/multiple-inputs/perf-vertx-stacks-01-collapsed-all.svg";
     let options = Options {
         hash: true,
         ..Default::default()
@@ -308,8 +313,8 @@ fn flamegraph_unsorted_multiple_input_files() {
 
 #[test]
 fn flamegraph_should_prune_narrow_blocks() {
-    let input_file = "./tests/data/narrow-blocks/narrow-blocks.txt";
-    let expected_result_file = "./tests/data/narrow-blocks/narrow-blocks.svg";
+    let input_file = "./tests/data/flamegraph/narrow-blocks/narrow-blocks.txt";
+    let expected_result_file = "./tests/data/flamegraph/narrow-blocks/narrow-blocks.svg";
 
     let options = flamegraph::Options {
         hash: true,
@@ -322,7 +327,7 @@ fn flamegraph_should_prune_narrow_blocks() {
 #[test]
 fn flamegraph_inverted() {
     let input_file = "./flamegraph/test/results/perf-vertx-stacks-01-collapsed-all.txt";
-    let expected_result_file = "./tests/data/inverted/inverted.svg";
+    let expected_result_file = "./tests/data/flamegraph/inverted/inverted.svg";
 
     let options = flamegraph::Options {
         hash: true,
@@ -336,8 +341,8 @@ fn flamegraph_inverted() {
 
 #[test]
 fn flamegraph_grey_frames() {
-    let input_file = "./tests/data/grey-frames/grey-frames.txt";
-    let expected_result_file = "./tests/data/grey-frames/grey-frames.svg";
+    let input_file = "./tests/data/flamegraph/grey-frames/grey-frames.txt";
+    let expected_result_file = "./tests/data/flamegraph/grey-frames/grey-frames.svg";
 
     let options = flamegraph::Options {
         hash: true,
