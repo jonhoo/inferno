@@ -1,8 +1,6 @@
 use super::Collapse;
 use smallvec::SmallVec;
-use std::borrow::Cow;
 use std::collections::{HashMap, VecDeque};
-use std::fs::File;
 use std::io;
 use std::io::prelude::*;
 
@@ -32,23 +30,6 @@ pub struct Options {
 
     /// Annotate kernel functions with a `_[k]` suffix.
     pub annotate_kernel: bool,
-
-    /// Resolve function names (including inlined ones) using `addr2line`.
-    ///
-    /// When this option is disabled, only the function name observed by `perf` is included, which
-    /// may not include inlined functions in the call stack.
-    ///
-    /// When this option is enabled, the function names observed by `perf` are ignored, and each
-    /// observed function address is instead resolved using
-    /// [`addr2line`](https://docs.rs/addr2line/). This is slower, but will use binary debug info
-    /// to resolve even inline call-chains.
-    pub show_inline: bool,
-
-    /// If enabled, each frame name is also annoted with the file name and line number of the
-    /// sampled source line.
-    ///
-    /// Implies `show_inline`.
-    pub show_context: bool,
 
     /// Only consider samples of the given event type (see `perf list`).
     ///
@@ -86,9 +67,6 @@ pub struct Folder {
 
     /// Number of times each call stack has been seen.
     occurrences: HashMap<String, usize>,
-
-    /// Cached Contexts by module name for un_inline() since constructing them is somewhat costly.
-    addr2line_contexts: HashMap<String, Option<addr2line::Context>>,
 
     /// Current comm name.
     ///
@@ -132,13 +110,11 @@ impl Collapse for Folder {
 impl From<Options> for Folder {
     fn from(mut opt: Options) -> Self {
         opt.include_pid = opt.include_pid || opt.include_tid;
-        opt.show_inline = opt.show_inline || opt.show_context;
         Self {
             in_event: false,
             skip_stack: false,
             stack: VecDeque::default(),
             occurrences: HashMap::default(),
-            addr2line_contexts: HashMap::default(),
             pname: String::new(),
             event_filtering: EventFilterState::None,
             opt,
@@ -290,12 +266,6 @@ impl Folder {
                 }
             }
 
-            // --inline flag
-            if self.opt.show_inline && can_un_inline(module) {
-                self.un_inline(pc, module);
-                return;
-            }
-
             // skip process names?
             // see https://github.com/brendangregg/FlameGraph/blob/f857ebc94bfe2a9bfdc4f1536ebacfb7466f69ba/stackcollapse-perf.pl#L269
             if rawfunc.starts_with('(') {
@@ -389,108 +359,6 @@ impl Folder {
         }
         Ok(())
     }
-
-    // Use addr2line to determine the symbol to use for each program counter address
-    // (as opposed to using the symbol names that perf script produces).
-    fn un_inline(&mut self, addr: &str, module: &str) {
-        let ctx = self
-            .addr2line_contexts
-            .entry(module.into())
-            .or_insert_with(|| {
-                let file = File::open(module)
-                    .map_err(|e| {
-                        warn!(
-                            "unable to open module file {} to resolve {}: {:?}",
-                            module, addr, e
-                        );
-                    })
-                    .ok()?;
-
-                // Using memmap is unsafe because the underlying file may be modified,
-                // which would cause undefined behavior. It's unlikely to be a problem in practice
-                // since we shouldn't run very long. The potential speed-up is worth it.
-                let map = unsafe {
-                    memmap::Mmap::map(&file)
-                        .map_err(|e| warn!("unable to memmap file {}: {:?}", module, e))
-                        .ok()?
-                };
-
-                let file = &object::File::parse(&*map)
-                    .map_err(|e| warn!("unable to parse file {}: {:?}", module, e))
-                    .ok()?;
-
-                addr2line::Context::new(file)
-                    .map_err(|e| {
-                        warn!(
-                            "could not parse debug symbols from module {}: {:?}",
-                            module, e
-                        );
-                    })
-                    .ok()
-            });
-        let ctx = if let Some(ctx) = ctx {
-            ctx
-        } else {
-            return;
-        };
-
-        let addr = match u64::from_str_radix(addr, 16) {
-            Ok(addr) => addr,
-            Err(e) => {
-                warn!("unable to parse {} as hex address: {:?}", addr, e);
-                return;
-            }
-        };
-
-        let mut frames = match ctx.find_frames(addr) {
-            Ok(frames) => frames,
-            Err(e) => {
-                warn!(
-                    "unable to parse frames from module {} at address {:#X}: {:?}",
-                    module, addr, e
-                );
-                return;
-            }
-        };
-
-        let mut funcs = SmallVec::<[String; 1]>::new();
-        while let Some(frame) = frames.next().unwrap() {
-            if let Some(func) = frame.function {
-                let name = func.raw_name().map(Cow::from);
-                let name = name.unwrap_or_else(|_| Cow::from("??"));
-                let name = remove_discriminator(name);
-                let name = addr2line::demangle_auto(name, func.language);
-                if self.opt.show_context {
-                    let (file, line) = match frame.location {
-                        Some(ref loc) => (
-                            loc.file
-                                .as_ref()
-                                .and_then(|f| f.rsplitn(2, std::path::MAIN_SEPARATOR).next()),
-                            loc.line,
-                        ),
-                        None => (None, None),
-                    };
-
-                    let name_with_location = match (file, line) {
-                        (Some(file), Some(line)) => format!("{}:{}:{}", name, file, line),
-                        (Some(file), None) => format!("{}:{}:?", name, file),
-                        (None, Some(line)) => format!("{}:??:{}", name, line),
-                        (None, None) => format!("{}:??:?", name),
-                    };
-
-                    funcs.push(name_with_location);
-                } else {
-                    funcs.push(name.into());
-                }
-            } else {
-                funcs.push("??".into());
-            };
-        }
-
-        for func in funcs {
-            self.stack.push_front(func);
-        }
-    }
 }
 
 // massage function name to be nicer
@@ -578,95 +446,4 @@ fn tidy_java(mut func: String) -> String {
     }
 
     func
-}
-
-// Removes discriminator markers.
-//
-// stackcollapse-perf does s/ \(discriminator \S+\)//
-// whereas we just remove " (discriminator " up through
-// the next closing parenthesis.
-fn remove_discriminator(s: Cow<str>) -> Cow<str> {
-    let disc = " (discriminator ";
-    if let Some(start) = s.find(disc) {
-        let rest = &s[start + disc.len()..];
-        if let Some(end) = rest.find(')') {
-            return Cow::from(format!(
-                "{}{}",
-                &s[0..start],
-                &s[start + disc.len() + end + 1..s.len()]
-            ));
-        }
-    }
-    s
-}
-
-// Returns whether the module can be un-inlined.
-//
-// Roughly equivalent to the following perl from stackcollapse-perf:
-//     $mod !~ m/(perf-\d+.map|kernel\.|\[[^\]]+\])/;
-fn can_un_inline(module: &str) -> bool {
-    // /perf-\d+.map/
-    if let Some(perf) = module.find("perf-") {
-        let rest = &module[perf + 5..];
-        if let Some(map) = rest.find(".map") {
-            if rest[..map].chars().all(|c| c.is_ascii_digit()) {
-                return false;
-            }
-        }
-    }
-
-    // /kernel\./
-    if module.contains("kernel.") {
-        return false;
-    }
-
-    // Reject names enclosed in [], such as [unknown] and [vdso].
-    // This differs from the Perl version, which uses this regex: /\[[^\]]+\]/
-    if module.starts_with('[') && module.ends_with(']') {
-        return false;
-    }
-
-    true
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_remove_discriminator() {
-        assert_eq!(
-            remove_discriminator(Cow::from("123 (discriminator 456)")),
-            Cow::from("123")
-        );
-        assert_eq!(
-            remove_discriminator(Cow::from("foo:86 (discriminator 98765)")),
-            Cow::from("foo:86")
-        );
-        assert_eq!(
-            // No close paren
-            remove_discriminator(Cow::from("foo:86 (discriminator ")),
-            Cow::from("foo:86 (discriminator ")
-        );
-        assert_eq!(
-            // No open paren
-            remove_discriminator(Cow::from("foo:86 discriminator 456)")),
-            Cow::from("foo:86 discriminator 456)")
-        );
-    }
-
-    #[test]
-    fn test_can_un_iline() {
-        assert!(can_un_inline("/usr/lib/libc-2.24.so"));
-        assert!(can_un_inline("/lib/x86_64-linux-gnu/libpthread-2.15.so"));
-        assert!(can_un_inline(
-            "/mnt/openjdk8/build/linux-x86_64-normal-server-release/jdk/lib/amd64/server/libjvm.so"
-        ));
-        assert!(can_un_inline("/lib/x86_64-linux-gnu/libc-2.19.so"));
-        assert!(!can_un_inline("/tmp/perf-10939.map"));
-        assert!(!can_un_inline("/tmp/perf-31912.map"));
-        assert!(!can_un_inline("[kernel.kallsyms]"));
-        assert!(!can_un_inline("[unknown]"));
-        assert!(!can_un_inline("[vdso]"));
-    }
 }

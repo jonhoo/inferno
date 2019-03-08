@@ -58,8 +58,6 @@ fn options_from_vec(opt_vec: Vec<&str>) -> Options {
                 options.annotate_jit = true;
                 options.annotate_kernel = true;
             }
-            "inline" => options.show_inline = true,
-            "context" => options.show_context = true,
             opt => panic!("invalid option: {}", opt),
         }
     }
@@ -221,17 +219,6 @@ collapse_perf_tests_upstream! {
     collapse_perf_vertx_stacks_01__jit,
     collapse_perf_vertx_stacks_01__all,
     collapse_perf_vertx_stacks_01__addrs
-}
-
-macro_rules! collapse_perf_tests {
-    ($($name:ident),*) => {
-        collapse_perf_tests_inner!($($name),*; "./tests/data/collapse-perf"; "collapse_perf_");
-    }
-}
-
-collapse_perf_tests! {
-    collapse_perf_inline_counter__inline,
-    collapse_perf_inline_counter__inline_context
 }
 
 #[test]
