@@ -86,6 +86,9 @@
 //!   [a series of live coding sessions]: https://www.youtube.com/watch?v=jTpK-bNZiA4&list=PLqbS7AVVErFimAvMW-kIJUwxpPvcPBCsz
 
 #![deny(missing_docs)]
+#![feature(asm)]
+#[no_link]
+extern crate probe;
 
 #[cfg(test)]
 #[macro_use]

@@ -34,6 +34,9 @@ addr2line = "0.8"
 indexmap = "1.0"
 rand = "0.6.5"
 
+[dependencies.probe]
+git = "https://github.com/cuviper/rust-libprobe.git"
+
 [dev-dependencies]
 pretty_assertions = "0.6"
 testing_logger = "0.1.1"

@@ -6,6 +6,8 @@ use std::fs::File;
 use std::io;
 use std::io::prelude::*;
 
+use probe::{_sdt_asm, platform_probe, probe, sdt_asm};
+
 const TIDY_GENERIC: bool = true;
 const TIDY_JAVA: bool = true;
 
@@ -120,8 +122,14 @@ impl Collapse for Folder {
 
             let line = line.trim_end();
             if line.is_empty() {
+                probe!(
+                    inferno_collapse_perf,
+                    post_stack,
+                    line.as_ptr() as usize as i64
+                );
                 self.after_event();
             } else {
+                probe!(inferno_collapse_perf, in_stack);
                 self.on_line(line.trim_end());
             }
         }
