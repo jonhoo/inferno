@@ -19,16 +19,20 @@ exclude = ["/tests/**", "/flamegraph/**", "/*.perf"]
 travis-ci = { repository = "jonhoo/inferno" }
 codecov = { repository = "jonhoo/inferno", branch = "master", service = "github" }
 
+[features]
+default = ["cli"]
+cli = ["structopt", "env_logger"]
+
 [dependencies]
-structopt = "0.2"
 smallvec = "0.6"
 log = "0.4"
-env_logger = "0.6.0"
 quick-xml = "0.13.3"
 num-format = { version = "0.4", default-features = false }
 str_stack = "0.1"
 indexmap = "1.0"
 rand = "0.6.5"
+structopt = { version = "0.2", optional = true }
+env_logger = { version = "0.6.0", optional = true }
 
 [dev-dependencies]
 pretty_assertions = "0.6"
@@ -43,7 +47,9 @@ name = "inferno"
 [[bin]]
 name = "inferno-collapse-perf"
 path = "src/bin/collapse-perf.rs"
+required-features = ["cli"]
 
 [[bin]]
 name = "inferno-flamegraph"
 path = "src/bin/flamegraph.rs"
+required-features = ["cli"]
