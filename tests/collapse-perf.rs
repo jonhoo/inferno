@@ -101,13 +101,20 @@ macro_rules! collapse_perf_tests_inner {
             if test_name.starts_with($strip_prefix) {
                 test_name = &test_name[$strip_prefix.len()..];
             }
-
             let mut split_name = test_name.split("__");
             let test_file_stem = split_name.next().unwrap().replace("_", "-");
             let options: Vec<_> = split_name.next().map(|s| s.split('_').collect()).unwrap_or_default();
 
             let test_file = format!("{}.txt", test_file_stem);
-            let result_file = format!("{}-collapsed-{}.txt", test_file_stem, options.join("+"));
+            let result_file = format!(
+                "{}-collapsed{}.txt",
+                test_file_stem,
+                if options.is_empty() {
+                    "".to_string()
+                } else {
+                    format!("-{}", options.join("+"))
+                }
+            );
 
             let test_path = Path::new($dir);
             let results_path = test_path.join("results");
@@ -116,7 +123,9 @@ macro_rules! collapse_perf_tests_inner {
                 test_path.join(test_file).to_str().unwrap(),
                 results_path.join(result_file).to_str().unwrap(),
                 options_from_vec(options),
-            ).unwrap()
+            )
+
+                .unwrap()
         }
     )*
     }
@@ -219,6 +228,16 @@ collapse_perf_tests_upstream! {
     collapse_perf_vertx_stacks_01__jit,
     collapse_perf_vertx_stacks_01__all,
     collapse_perf_vertx_stacks_01__addrs
+}
+
+macro_rules! collapse_perf_tests {
+    ($($name:ident),*) => {
+        collapse_perf_tests_inner!($($name),*; "./tests/data/collapse-perf"; "collapse_perf_");
+    }
+}
+
+collapse_perf_tests! {
+    collapse_perf_go_stacks
 }
 
 #[test]
