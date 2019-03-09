@@ -1,0 +1,9 @@
+CPU     ID                    FUNCTION:NAME
+  0  64091                        :tick-60s 
+
+
+              genunix`segvn_fault
+              unix`pagefault+0x96
+              unix`trap+0x2c7
+              unix`0xfffffffffb8001d6
+                1

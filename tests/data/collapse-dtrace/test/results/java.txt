@@ -1,0 +1,1 @@
+main;foo;bar_[i];baz 1

@@ -51,6 +51,11 @@ path = "src/bin/collapse-perf.rs"
 required-features = ["cli"]
 
 [[bin]]
+name = "inferno-collapse-dtrace"
+path = "src/bin/collapse-dtrace.rs"
+required-features = ["cli"]
+
+[[bin]]
 name = "inferno-flamegraph"
 path = "src/bin/flamegraph.rs"
 required-features = ["cli"]

@@ -1,3 +1,10 @@
+/// Stack collapsing for the output of [`dtrace`](https://www.joyent.com/dtrace).
+///
+/// See the [crate-level documentation] for details.
+///
+///   [crate-level documentation]: ../../index.html
+pub mod dtrace;
+
 /// Stack collapsing for the output of [`perf script`](https://linux.die.net/man/1/perf-script).
 ///
 /// See the [crate-level documentation] for details.
