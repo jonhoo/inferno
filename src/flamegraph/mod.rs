@@ -596,7 +596,7 @@ fn fetch_consistent_palette_if_needed<'a>(
 ) -> io::Result<Option<color::PaletteMap<'a>>> {
     let palette_map = if use_consistent_palette {
         let path = Path::new(palette_file);
-        Some(color::PaletteMap::load_from_file(&path)?)
+        Some(color::PaletteMap::load_from_file_or_empty(&path)?)
     } else {
         None
     };
