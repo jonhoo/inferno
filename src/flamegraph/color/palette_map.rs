@@ -45,27 +45,8 @@ impl<'a> PaletteMap<'a> {
 
         for line in reader.lines() {
             let line = line?;
-
-            // A line is formatted like this: NAME -> rbg(RED, GREEN, BLUE)
-            let mut words = line.split("->");
-
-            let name = match words.next() {
-                Some(name) => name,
-                None => return Err(io::Error::from(io::ErrorKind::InvalidInput)),
-            };
-
-            let color = match words.next() {
-                Some(name) => name,
-                None => return Err(io::Error::from(io::ErrorKind::InvalidInput)),
-            };
-
-            if words.next().is_some() {
-                return Err(io::Error::from(io::ErrorKind::InvalidInput));
-            }
-
-            let rgb_color = parse_rgb_string(color)
-                .ok_or_else(|| io::Error::from(io::ErrorKind::InvalidData))?;
-            map.insert(Cow::from(name.to_string()), rgb_color);
+            let (name, color) = parse_line(&line)?;
+            map.insert(Cow::from(name.to_string()), color);
         }
 
         Ok(PaletteMap(map))
@@ -124,6 +105,30 @@ impl<'a> PaletteMap<'a> {
             .entry(Cow::from(name))
             .or_insert_with(|| compute_color(name))
     }
+}
+
+fn parse_line(line: &str) -> io::Result<(&str, (u8, u8, u8))> {
+    // A line is formatted like this: NAME -> rbg(RED, GREEN, BLUE)
+    let mut words = line.split("->");
+
+    let name = match words.next() {
+        Some(name) => name,
+        None => return Err(io::Error::from(io::ErrorKind::InvalidInput)),
+    };
+
+    let color = match words.next() {
+        Some(name) => name,
+        None => return Err(io::Error::from(io::ErrorKind::InvalidInput)),
+    };
+
+    if words.next().is_some() {
+        return Err(io::Error::from(io::ErrorKind::InvalidInput));
+    }
+
+    let rgb_color =
+        parse_rgb_string(color).ok_or_else(|| io::Error::from(io::ErrorKind::InvalidData))?;
+
+    Ok((name, rgb_color))
 }
 
 fn parse_rgb_string(s: &str) -> Option<(u8, u8, u8)> {
