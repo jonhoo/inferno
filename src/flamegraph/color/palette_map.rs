@@ -8,26 +8,37 @@ use std::io::BufReader;
 use std::path::Path;
 use std::str::FromStr;
 
+/// Mapping of the association between a function name and the color used when drawing information
+/// from this function.
 #[derive(Default)]
 pub struct PaletteMap<'a>(HashMap<Cow<'a, str>, (u8, u8, u8)>);
 
 impl<'a> PaletteMap<'a> {
-    pub fn new() -> Self {
-        Default::default()
-    }
-
+    /// Returns the color value corresponding to the given function name.
     pub fn get(&self, func: &str) -> Option<(u8, u8, u8)> {
         self.0.get(func).cloned()
     }
 
+    /// Inserts a function name/color pair in the map.
     pub fn insert(&mut self, func: &'a str, color: (u8, u8, u8)) -> Option<(u8, u8, u8)> {
         self.0.insert(Cow::from(func), color)
     }
 
+    /// Provides an iterator over the elements of the map.
     pub fn iter(&self) -> impl Iterator<Item = (&str, (u8, u8, u8))> {
         self.0.iter().map(|(func, color)| (func.as_ref(), *color))
     }
 
+    /// Builds a mapping based on the inputs given by the reader.
+    ///
+    /// The reader should provide name/color pairs as text input, each pair separated by a line
+    /// separator.
+    ///
+    /// Each line should follow the format: NAME->rgb(RED, GREEN, BLUE)
+    /// where NAME is the function name, and RED, GREEN, BLUE integer values between 0 and 255
+    /// included.
+    ///
+    /// This function will return an [`std::io::Error`] if the input is not correctly formatted.
     pub fn from_stream(reader: &mut dyn io::Read) -> io::Result<Self> {
         let mut map = HashMap::default();
         let reader = BufReader::new(reader);
@@ -60,6 +71,9 @@ impl<'a> PaletteMap<'a> {
         Ok(PaletteMap(map))
     }
 
+    /// Writes the palette map using the given writer.
+    /// The output content will follow the same format described in [from_stream()]
+    /// The name/color pairs will be sorted, based on the name lexicographic order.
     pub fn to_stream(&self, writer: &mut dyn io::Write) -> io::Result<()> {
         let mut entries = self.0.iter().collect::<Vec<_>>();
         // We sort the palette because the Perl implementation does.
@@ -74,6 +88,11 @@ impl<'a> PaletteMap<'a> {
         Ok(())
     }
 
+    /// Utility function to load a palette map from a file.
+    ///
+    /// The file content should follow the format described in [from_stream()].
+    ///
+    /// If the file does not exist, and empty palette map is returned.
     pub fn load_from_file(path: &dyn AsRef<Path>) -> io::Result<Self> {
         // If the file does not exist, it is probably the first call to flamegraph with a consistent
         // palette: there is nothing to load.
@@ -85,11 +104,16 @@ impl<'a> PaletteMap<'a> {
         }
     }
 
+    /// Utility function to save a palette map to a file.
+    ///
+    /// The file content will follow the format described in [from_stream()].
     pub fn save_to_file(&self, path: &dyn AsRef<Path>) -> io::Result<()> {
         let mut file = OpenOptions::new().write(true).create(true).open(path)?;
         self.to_stream(&mut file)
     }
 
+    /// Returns the color value corresponding to the given function name if it is present.
+    /// Otherwise compute the color, and insert the new function name/color in the map.
     pub fn find_color_for<F: FnMut(&'a str) -> (u8, u8, u8)>(
         &mut self,
         name: &'a str,
