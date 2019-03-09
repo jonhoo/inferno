@@ -46,7 +46,7 @@ $ perf script | ./target/release/inferno-collapse-perf | ./target/release/infern
 
 You'll end up with an image like this:
 
-[![colorized flamegraph output](tests/data/colors/java.svg)](tests/data/colors/java.svg)
+[![colorized flamegraph output](tests/data/flamegraph/example-perf-stacks/example-perf-stacks.svg)](tests/data/flamegraph/example-perf-stacks/example-perf-stacks.svg)
 
 # Comparison to the Perl implementation
 

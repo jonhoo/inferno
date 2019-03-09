@@ -363,3 +363,19 @@ fn flamegraph_grey_frames() {
 
     test_flamegraph(input_file, expected_result_file, options).unwrap();
 }
+
+#[test]
+fn flamegraph_example_perf_stacks() {
+    let input_file = "./tests/data/collapse-perf/results/example-perf-stacks-collapsed.txt";
+    let expected_result_file =
+        "./tests/data/flamegraph/example-perf-stacks/example-perf-stacks.svg";
+    let palette_file = "./tests/data/flamegraph/example-perf-stacks/palette.map".to_string();
+
+    let options = flamegraph::Options {
+        consistent_palette: true,
+        palette_file,
+        ..Default::default()
+    };
+
+    test_flamegraph(input_file, expected_result_file, options).unwrap();
+}
