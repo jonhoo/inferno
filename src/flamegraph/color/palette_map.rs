@@ -73,8 +73,8 @@ impl<'a> PaletteMap<'a> {
     ///
     /// The file content should follow the format described in [from_stream()].
     ///
-    /// If the file does not exist, and empty palette map is returned.
-    pub fn load_from_file(path: &dyn AsRef<Path>) -> io::Result<Self> {
+    /// If the file does not exist, an empty palette map is returned.
+    pub fn load_from_file_or_empty(path: &dyn AsRef<Path>) -> io::Result<Self> {
         // If the file does not exist, it is probably the first call to flamegraph with a consistent
         // palette: there is nothing to load.
         if path.as_ref().exists() {
