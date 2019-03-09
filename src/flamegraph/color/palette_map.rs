@@ -157,6 +157,7 @@ fn parse_rgb_string(s: &str) -> Option<(u8, u8, u8)> {
 #[cfg(test)]
 mod tests {
     use crate::flamegraph::color::palette_map::{parse_line, PaletteMap};
+    use std::io::Cursor;
 
     #[test]
     fn palette_map_test() {
@@ -172,6 +173,21 @@ mod tests {
         assert_eq!(palette.get("bar"), Some((50, 0, 60)));
         assert_eq!(palette.get("foo"), Some((128, 128, 128)));
         assert_eq!(palette.get("baz"), Some((255, 0, 255)));
+
+        let mut vec = palette.iter().collect::<Vec<_>>();
+        vec.sort_unstable();
+        let mut iter = vec.iter();
+
+        assert_eq!(iter.next(), Some(&("bar", (50, 0, 60))));
+        assert_eq!(iter.next(), Some(&("baz", (255, 0, 255))));
+        assert_eq!(iter.next(), Some(&("foo", (128, 128, 128))));
+        assert_eq!(iter.next(), None);
+
+        let mut buf = Cursor::new(Vec::new());
+
+        palette.to_stream(&mut buf).unwrap();
+        buf.set_position(0);
+        let palette = PaletteMap::from_stream(&mut buf).unwrap();
 
         let mut vec = palette.iter().collect::<Vec<_>>();
         vec.sort_unstable();
