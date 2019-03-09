@@ -54,7 +54,7 @@ impl<'a> PaletteMap<'a> {
 
     /// Writes the palette map using the given writer.
     /// The output content will follow the same format described in [from_stream()]
-    /// The name/color pairs will be sorted, based on the name lexicographic order.
+    /// The name/color pairs will be sorted by name in lexicographic order.
     pub fn to_stream(&self, writer: &mut dyn io::Write) -> io::Result<()> {
         let mut entries = self.0.iter().collect::<Vec<_>>();
         // We sort the palette because the Perl implementation does.
