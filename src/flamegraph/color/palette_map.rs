@@ -156,7 +156,7 @@ fn parse_rgb_string(s: &str) -> Option<(u8, u8, u8)> {
 
 #[cfg(test)]
 mod tests {
-    use crate::flamegraph::color::palette_map::PaletteMap;
+    use crate::flamegraph::color::palette_map::{parse_line, PaletteMap};
 
     #[test]
     fn palette_map_test() {
@@ -181,5 +181,25 @@ mod tests {
         assert_eq!(iter.next(), Some(&("baz", (255, 0, 255))));
         assert_eq!(iter.next(), Some(&("foo", (128, 128, 128))));
         assert_eq!(iter.next(), None);
+    }
+
+    #[test]
+    fn parse_line_test() {
+        assert_eq!(
+            parse_line("func->rgb(0, 0, 0)").unwrap(),
+            ("func", (0, 0, 0))
+        );
+        assert_eq!(
+            parse_line("->rgb(255, 255, 255)").unwrap(),
+            ("", (255, 255, 255))
+        );
+
+        assert!(parse_line("").is_err());
+        assert!(parse_line("func->(0, 0, 0)").is_err());
+        assert!(parse_line("func->").is_err());
+        assert!(parse_line("func->foo->rgb(0, 0, 0)").is_err());
+        assert!(parse_line("func->rgb(0, 0, 0)->foo").is_err());
+        assert!(parse_line("func->rgb(255, 255, 256)").is_err());
+        assert!(parse_line("func->rgb(-1, 255, 255)").is_err());
     }
 }
