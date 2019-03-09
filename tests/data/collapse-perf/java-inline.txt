@@ -1,0 +1,200 @@
+java 10488  9962.502413:   10101010 cpu-clock: 
+	ffffffffaee8017b fput+0xb ([kernel.kallsyms])
+	ffffffffaee7f61c ksys_write+0x9c ([kernel.kallsyms])
+	ffffffffaec041cb do_syscall_64+0x5b ([kernel.kallsyms])
+	ffffffffaf60008c entry_SYSCALL_64_after_hwframe+0x44 ([kernel.kallsyms])
+	    7f89e341d84f __GI___libc_write+0x4f (/usr/lib/libc-2.28.so)
+	5966605dd52f8e00 [unknown] ([unknown])
+
+java 10488  9962.513682:   10101010 cpu-clock: 
+	    7f89e341d84f __GI___libc_write+0x4f (/usr/lib/libc-2.28.so)
+	5966605dd52f8e00 [unknown] ([unknown])
+
+java 10488  9962.523711:   10101010 cpu-clock: 
+	    7f89cc45c5c3 Ljava/io/BufferedWriter;::flushBuffer->Ljava/io/OutputStreamWriter;::write->Lsun/nio/cs/StreamEncoder;::write->Lsun/nio/cs/StreamEncoder;::implWrite->Lsun/nio/cs/StreamEncoder;::implWrite->Ljava/nio/charset/CharsetEncoder;::encode->Lsun/nio/cs/UTF_8$Encoder;::encodeLoop+0x4b (/tmp/perf-10487.map)
+	    7f89cc467bf0 Ljava/io/PrintStream;::println->Ljava/io/PrintStream;::print->Ljava/io/PrintStream;::write+0x0 (/tmp/perf-10487.map)
+	    7f89cc46a890 LCounter;::countTo+0x50 (/tmp/perf-10487.map)
+	    7f89c4991c43 Interpreter+0x1743 (/tmp/perf-10487.map)
+	    7f89c4991c43 Interpreter+0x1743 (/tmp/perf-10487.map)
+	    7f89c4988849 call_stub+0x8a (/tmp/perf-10487.map)
+	    7f89e278d702 [unknown] (/usr/lib/jvm/java-11-openjdk/lib/server/libjvm.so)
+	    7f89e2808c50 [unknown] (/usr/lib/jvm/java-11-openjdk/lib/server/libjvm.so)
+	    7f89e280b18c [unknown] (/usr/lib/jvm/java-11-openjdk/lib/server/libjvm.so)
+	    7f89e350b0c0 [unknown] (/usr/lib/jvm/java-11-openjdk/lib/jli/libjli.so)
+	    7f89e30fba9d start_thread+0xfd (/usr/lib/libpthread-2.28.so)
+
+java 10488  9962.533816:   10101010 cpu-clock: 
+	ffffffffaf14e6b8 tty_write_unlock+0x28 ([kernel.kallsyms])
+	ffffffffaf14f3f8 tty_write+0x1c8 ([kernel.kallsyms])
+	ffffffffaee7f046 __vfs_write+0x36 ([kernel.kallsyms])
+	ffffffffaee7f359 vfs_write+0xa9 ([kernel.kallsyms])
+	ffffffffaee7f5cf ksys_write+0x4f ([kernel.kallsyms])
+	ffffffffaec041cb do_syscall_64+0x5b ([kernel.kallsyms])
+	ffffffffaf60008c entry_SYSCALL_64_after_hwframe+0x44 ([kernel.kallsyms])
+	    7f89e341d84f __GI___libc_write+0x4f (/usr/lib/libc-2.28.so)
+	5966605dd52f8e00 [unknown] ([unknown])
+
+java 10488  9962.545208:   10101010 cpu-clock: 
+	ffffffffaf44bd51 _raw_spin_unlock_irqrestore+0x11 ([kernel.kallsyms])
+	ffffffffaf15a6f8 pty_write+0x78 ([kernel.kallsyms])
+	ffffffffaf1536dd n_tty_write+0x1ad ([kernel.kallsyms])
+	ffffffffaf14f382 tty_write+0x152 ([kernel.kallsyms])
+	ffffffffaee7f046 __vfs_write+0x36 ([kernel.kallsyms])
+	ffffffffaee7f359 vfs_write+0xa9 ([kernel.kallsyms])
+	ffffffffaee7f5cf ksys_write+0x4f ([kernel.kallsyms])
+	ffffffffaec041cb do_syscall_64+0x5b ([kernel.kallsyms])
+	ffffffffaf60008c entry_SYSCALL_64_after_hwframe+0x44 ([kernel.kallsyms])
+	    7f89e341d84f __GI___libc_write+0x4f (/usr/lib/libc-2.28.so)
+	5966605dd52f8e00 [unknown] ([unknown])
+
+java 10488  9962.555192:   10101010 cpu-clock: 
+	ffffffffaec0418e do_syscall_64+0x1e ([kernel.kallsyms])
+	ffffffffaf60008c entry_SYSCALL_64_after_hwframe+0x44 ([kernel.kallsyms])
+	    7f89e341d84f __GI___libc_write+0x4f (/usr/lib/libc-2.28.so)
+	5966605dd52f8e00 [unknown] ([unknown])
+
+java 10488  9962.565739:   10101010 cpu-clock: 
+	    7f89e341d84f __GI___libc_write+0x4f (/usr/lib/libc-2.28.so)
+	5966605dd52f8e00 [unknown] ([unknown])
+
+java 10488  9962.576637:   10101010 cpu-clock: 
+	ffffffffaf44bd51 _raw_spin_unlock_irqrestore+0x11 ([kernel.kallsyms])
+	ffffffffaf1535ec n_tty_write+0xbc ([kernel.kallsyms])
+	ffffffffaf14f382 tty_write+0x152 ([kernel.kallsyms])
+	ffffffffaee7f046 __vfs_write+0x36 ([kernel.kallsyms])
+	ffffffffaee7f359 vfs_write+0xa9 ([kernel.kallsyms])
+	ffffffffaee7f5cf ksys_write+0x4f ([kernel.kallsyms])
+	ffffffffaec041cb do_syscall_64+0x5b ([kernel.kallsyms])
+	ffffffffaf60008c entry_SYSCALL_64_after_hwframe+0x44 ([kernel.kallsyms])
+	    7f89e341d84f __GI___libc_write+0x4f (/usr/lib/libc-2.28.so)
+	5966605dd52f8e00 [unknown] ([unknown])
+
+java 10488  9962.587810:   10101010 cpu-clock: 
+	ffffffffaf44bd51 _raw_spin_unlock_irqrestore+0x11 ([kernel.kallsyms])
+	ffffffffaf15a6f8 pty_write+0x78 ([kernel.kallsyms])
+	ffffffffaf1536dd n_tty_write+0x1ad ([kernel.kallsyms])
+	ffffffffaf14f382 tty_write+0x152 ([kernel.kallsyms])
+	ffffffffaee7f046 __vfs_write+0x36 ([kernel.kallsyms])
+	ffffffffaee7f359 vfs_write+0xa9 ([kernel.kallsyms])
+	ffffffffaee7f5cf ksys_write+0x4f ([kernel.kallsyms])
+	ffffffffaec041cb do_syscall_64+0x5b ([kernel.kallsyms])
+	ffffffffaf60008c entry_SYSCALL_64_after_hwframe+0x44 ([kernel.kallsyms])
+	    7f89e341d84f __GI___libc_write+0x4f (/usr/lib/libc-2.28.so)
+	5966605dd52f8e00 [unknown] ([unknown])
+
+java 10488  9962.598178:   10101010 cpu-clock: 
+	    7f89e341d84f __GI___libc_write+0x4f (/usr/lib/libc-2.28.so)
+	5966605dd52f8e00 [unknown] ([unknown])
+
+java 10488  9962.608295:   10101010 cpu-clock: 
+	    7f89cc45f847 Lsun/nio/cs/StreamEncoder;::flushBuffer->Lsun/nio/cs/StreamEncoder;::implFlushBuffer->Lsun/nio/cs/StreamEncoder;::writeBytes->Ljava/io/PrintStream;::write->Ljava/io/BufferedOutputStream;::flush->Ljava/io/BufferedOutputStream;::flushBuffer->Ljava/io/FileOutputStream;::write+0xbf (/tmp/perf-10487.map)
+	    7f89cc467c14 Ljava/io/PrintStream;::println->Ljava/io/PrintStream;::print->Ljava/io/PrintStream;::write->Ljava/io/OutputStreamWriter;::flushBuffer+0x0 (/tmp/perf-10487.map)
+	    7f89cc46a890 LCounter;::countTo+0x50 (/tmp/perf-10487.map)
+	    7f89c4991c43 Interpreter+0x1743 (/tmp/perf-10487.map)
+	    7f89c4991c43 Interpreter+0x1743 (/tmp/perf-10487.map)
+	    7f89c4988849 call_stub+0x8a (/tmp/perf-10487.map)
+	    7f89e278d702 [unknown] (/usr/lib/jvm/java-11-openjdk/lib/server/libjvm.so)
+	    7f89e2808c50 [unknown] (/usr/lib/jvm/java-11-openjdk/lib/server/libjvm.so)
+	    7f89e280b18c [unknown] (/usr/lib/jvm/java-11-openjdk/lib/server/libjvm.so)
+	    7f89e350b0c0 [unknown] (/usr/lib/jvm/java-11-openjdk/lib/jli/libjli.so)
+	    7f89e30fba9d start_thread+0xfd (/usr/lib/libpthread-2.28.so)
+
+java 10488  9962.619178:   10101010 cpu-clock: 
+	ffffffffaec0418e do_syscall_64+0x1e ([kernel.kallsyms])
+	ffffffffaf60008c entry_SYSCALL_64_after_hwframe+0x44 ([kernel.kallsyms])
+	    7f89e341d84f __GI___libc_write+0x4f (/usr/lib/libc-2.28.so)
+	5966605dd52f8e00 [unknown] ([unknown])
+
+java 10488  9962.629279:   10101010 cpu-clock: 
+	    7f89cc45f847 Lsun/nio/cs/StreamEncoder;::flushBuffer->Lsun/nio/cs/StreamEncoder;::implFlushBuffer->Lsun/nio/cs/StreamEncoder;::writeBytes->Ljava/io/PrintStream;::write->Ljava/io/BufferedOutputStream;::flush->Ljava/io/BufferedOutputStream;::flushBuffer->Ljava/io/FileOutputStream;::write+0xbf (/tmp/perf-10487.map)
+	    7f89cc467fc4 Ljava/io/PrintStream;::println->Ljava/io/PrintStream;::newLine->Ljava/io/OutputStreamWriter;::flushBuffer+0x0 (/tmp/perf-10487.map)
+	    7f89cc46a890 LCounter;::countTo+0x50 (/tmp/perf-10487.map)
+	    7f89c4991c43 Interpreter+0x1743 (/tmp/perf-10487.map)
+	    7f89c4991c43 Interpreter+0x1743 (/tmp/perf-10487.map)
+	    7f89c4988849 call_stub+0x8a (/tmp/perf-10487.map)
+	    7f89e278d702 [unknown] (/usr/lib/jvm/java-11-openjdk/lib/server/libjvm.so)
+	    7f89e2808c50 [unknown] (/usr/lib/jvm/java-11-openjdk/lib/server/libjvm.so)
+	    7f89e280b18c [unknown] (/usr/lib/jvm/java-11-openjdk/lib/server/libjvm.so)
+	    7f89e350b0c0 [unknown] (/usr/lib/jvm/java-11-openjdk/lib/jli/libjli.so)
+	    7f89e30fba9d start_thread+0xfd (/usr/lib/libpthread-2.28.so)
+
+java 10488  9962.639612:   10101010 cpu-clock: 
+	ffffffffaf153679 n_tty_write+0x149 ([kernel.kallsyms])
+	ffffffffaf14f382 tty_write+0x152 ([kernel.kallsyms])
+	ffffffffaee7f046 __vfs_write+0x36 ([kernel.kallsyms])
+	ffffffffaee7f359 vfs_write+0xa9 ([kernel.kallsyms])
+	ffffffffaee7f5cf ksys_write+0x4f ([kernel.kallsyms])
+	ffffffffaec041cb do_syscall_64+0x5b ([kernel.kallsyms])
+	ffffffffaf60008c entry_SYSCALL_64_after_hwframe+0x44 ([kernel.kallsyms])
+	    7f89e341d84f __GI___libc_write+0x4f (/usr/lib/libc-2.28.so)
+	5966605dd52f8e00 [unknown] ([unknown])
+
+java 10488  9962.650700:   10101010 cpu-clock: 
+	    7f89e28120cf [unknown] (/usr/lib/jvm/java-11-openjdk/lib/server/libjvm.so)
+	    7f89e27ff5b3 [unknown] (/usr/lib/jvm/java-11-openjdk/lib/server/libjvm.so)
+	    7f89e1adfe85 [unknown] (/usr/lib/jvm/java-11-openjdk/lib/libjava.so)
+	    7f89e1ad5b58 Java_java_io_FileOutputStream_writeBytes+0x18 (/usr/lib/jvm/java-11-openjdk/lib/libjava.so)
+	    7f89cc455389 Ljava/io/FileOutputStream;::writeBytes+0xc9 (/tmp/perf-10487.map)
+	    7f89cc45f788 Lsun/nio/cs/StreamEncoder;::flushBuffer->Lsun/nio/cs/StreamEncoder;::implFlushBuffer->Lsun/nio/cs/StreamEncoder;::writeBytes->Ljava/io/PrintStream;::write->Ljava/io/BufferedOutputStream;::flush->Ljava/io/BufferedOutputStream;::flushBuffer->Ljava/io/FileOutputStream;::write+0x0 (/tmp/perf-10487.map)
+	    7f89cc467fc4 Ljava/io/PrintStream;::println->Ljava/io/PrintStream;::newLine->Ljava/io/OutputStreamWriter;::flushBuffer+0x0 (/tmp/perf-10487.map)
+	    7f89cc46a890 LCounter;::countTo+0x50 (/tmp/perf-10487.map)
+	    7f89c4991c43 Interpreter+0x1743 (/tmp/perf-10487.map)
+	    7f89c4991c43 Interpreter+0x1743 (/tmp/perf-10487.map)
+	    7f89c4988849 call_stub+0x8a (/tmp/perf-10487.map)
+	    7f89e278d702 [unknown] (/usr/lib/jvm/java-11-openjdk/lib/server/libjvm.so)
+	    7f89e2808c50 [unknown] (/usr/lib/jvm/java-11-openjdk/lib/server/libjvm.so)
+	    7f89e280b18c [unknown] (/usr/lib/jvm/java-11-openjdk/lib/server/libjvm.so)
+	    7f89e350b0c0 [unknown] (/usr/lib/jvm/java-11-openjdk/lib/jli/libjli.so)
+	    7f89e30fba9d start_thread+0xfd (/usr/lib/libpthread-2.28.so)
+
+java 10488  9962.660841:   10101010 cpu-clock: 
+	    7f89e341d84f __GI___libc_write+0x4f (/usr/lib/libc-2.28.so)
+	5966605dd52f8e00 [unknown] ([unknown])
+
+java 10488  9962.671228:   10101010 cpu-clock: 
+	    7f89e341d84f __GI___libc_write+0x4f (/usr/lib/libc-2.28.so)
+	5966605dd52f8e00 [unknown] ([unknown])
+
+java 10488  9962.681332:   10101010 cpu-clock: 
+	ffffffffaee9e127 __fget_light+0x17 ([kernel.kallsyms])
+	ffffffffaee9ee13 __fdget_pos+0x13 ([kernel.kallsyms])
+	ffffffffaee7f5aa ksys_write+0x2a ([kernel.kallsyms])
+	ffffffffaec041cb do_syscall_64+0x5b ([kernel.kallsyms])
+	ffffffffaf60008c entry_SYSCALL_64_after_hwframe+0x44 ([kernel.kallsyms])
+	    7f89e341d84f __GI___libc_write+0x4f (/usr/lib/libc-2.28.so)
+	5966605dd52f8e00 [unknown] ([unknown])
+
+java 10488  9962.692465:   10101010 cpu-clock: 
+	    7f89cc45ff92 Lsun/nio/cs/StreamEncoder;::flushBuffer->Lsun/nio/cs/StreamEncoder;::implFlushBuffer->Lsun/nio/cs/StreamEncoder;::writeBytes->Ljava/io/PrintStream;::write->Ljava/io/BufferedOutputStream;::flush+0x262 (/tmp/perf-10487.map)
+	    7f89cc467c14 Ljava/io/PrintStream;::println->Ljava/io/PrintStream;::print->Ljava/io/PrintStream;::write->Ljava/io/OutputStreamWriter;::flushBuffer+0x0 (/tmp/perf-10487.map)
+	    7f89cc46a890 LCounter;::countTo+0x50 (/tmp/perf-10487.map)
+	    7f89c4991c43 Interpreter+0x1743 (/tmp/perf-10487.map)
+	    7f89c4991c43 Interpreter+0x1743 (/tmp/perf-10487.map)
+	    7f89c4988849 call_stub+0x8a (/tmp/perf-10487.map)
+	    7f89e278d702 [unknown] (/usr/lib/jvm/java-11-openjdk/lib/server/libjvm.so)
+	    7f89e2808c50 [unknown] (/usr/lib/jvm/java-11-openjdk/lib/server/libjvm.so)
+	    7f89e280b18c [unknown] (/usr/lib/jvm/java-11-openjdk/lib/server/libjvm.so)
+	    7f89e350b0c0 [unknown] (/usr/lib/jvm/java-11-openjdk/lib/jli/libjli.so)
+	    7f89e30fba9d start_thread+0xfd (/usr/lib/libpthread-2.28.so)
+
+java 10488  9962.702556:   10101010 cpu-clock: 
+	    7f89e341d84f __GI___libc_write+0x4f (/usr/lib/libc-2.28.so)
+	5966605dd52f8e00 [unknown] ([unknown])
+
+java 10488  9962.713328:   10101010 cpu-clock: 
+	ffffffffaee9e167 __fget_light+0x57 ([kernel.kallsyms])
+	ffffffffaee9ee13 __fdget_pos+0x13 ([kernel.kallsyms])
+	ffffffffaee7f5aa ksys_write+0x2a ([kernel.kallsyms])
+	ffffffffaec041cb do_syscall_64+0x5b ([kernel.kallsyms])
+	ffffffffaf60008c entry_SYSCALL_64_after_hwframe+0x44 ([kernel.kallsyms])
+	    7f89e341d84f __GI___libc_write+0x4f (/usr/lib/libc-2.28.so)
+	5966605dd52f8e00 [unknown] ([unknown])
+
+java 10488  9962.723401:   10101010 cpu-clock: 
+	ffffffffaee9e127 __fget_light+0x17 ([kernel.kallsyms])
+	ffffffffaee9ee13 __fdget_pos+0x13 ([kernel.kallsyms])
+	ffffffffaee7f5aa ksys_write+0x2a ([kernel.kallsyms])
+	ffffffffaec041cb do_syscall_64+0x5b ([kernel.kallsyms])
+	ffffffffaf60008c entry_SYSCALL_64_after_hwframe+0x44 ([kernel.kallsyms])
+	    7f89e341d84f __GI___libc_write+0x4f (/usr/lib/libc-2.28.so)
+	5966605dd52f8e00 [unknown] ([unknown])
