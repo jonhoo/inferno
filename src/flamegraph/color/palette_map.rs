@@ -3,8 +3,7 @@ use std::collections::HashMap;
 use std::fs::File;
 use std::fs::OpenOptions;
 use std::io;
-use std::io::BufRead;
-use std::io::BufReader;
+use std::io::{BufRead, BufReader};
 use std::path::Path;
 use std::str::FromStr;
 
@@ -39,9 +38,8 @@ impl PaletteMap {
     /// included.
     ///
     /// This function will return an [`std::io::Error`] if the input is not correctly formatted.
-    pub fn from_stream(reader: &mut dyn io::Read) -> io::Result<Self> {
+    pub fn from_stream(reader: &mut dyn io::BufRead) -> io::Result<Self> {
         let mut map = HashMap::default();
-        let reader = BufReader::new(reader);
 
         for line in reader.lines() {
             let line = line?;
@@ -78,8 +76,9 @@ impl PaletteMap {
         // If the file does not exist, it is probably the first call to flamegraph with a consistent
         // palette: there is nothing to load.
         if path.as_ref().exists() {
-            let mut file = File::open(path)?;
-            PaletteMap::from_stream(&mut file)
+            let file = File::open(path)?;
+            let mut reader = BufReader::new(file);
+            PaletteMap::from_stream(&mut reader)
         } else {
             Ok(PaletteMap::default())
         }
