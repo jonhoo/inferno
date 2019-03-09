@@ -5,7 +5,6 @@ use std::fs::OpenOptions;
 use std::io;
 use std::io::BufRead;
 use std::io::BufReader;
-use std::io::Write;
 use std::path::Path;
 use std::str::FromStr;
 
@@ -89,60 +88,6 @@ impl<'a> PaletteMap<'a> {
     pub fn save_to_file(&self, path: &dyn AsRef<Path>) -> io::Result<()> {
         let mut file = OpenOptions::new().write(true).create(true).open(path)?;
         self.to_stream(&mut file)
-    }
-
-    pub fn load(file: &str) -> quick_xml::Result<Self> {
-        let mut map = HashMap::default();
-        let path = Path::new(file);
-
-        // If the file does not exist, it is probably the first call to flamegraph with a consistent
-        // palette: there is nothing to load.
-        if path.exists() {
-            let file = File::open(path).map_err(quick_xml::Error::Io)?;
-            let file = BufReader::new(file);
-
-            for line in file.lines() {
-                let line = line.map_err(quick_xml::Error::Io)?;
-
-                // A line is formatted like this: NAME -> rbg(RED, GREEN, BLUE)
-                let mut words = line.split("->");
-
-                let name = match words.next() {
-                    Some(name) => name,
-                    None => return Err(quick_xml::Error::UnexpectedToken(line)),
-                };
-
-                let color = match words.next() {
-                    Some(name) => name,
-                    None => return Err(quick_xml::Error::UnexpectedToken(line)),
-                };
-
-                if words.next().is_some() {
-                    return Err(quick_xml::Error::UnexpectedToken(line));
-                }
-
-                let rgb_color = parse_rgb_string(color)
-                    .ok_or_else(|| quick_xml::Error::UnexpectedToken(color.to_string()))?;
-                map.insert(Cow::from(name.to_string()), rgb_color);
-            }
-        }
-
-        Ok(PaletteMap(map))
-    }
-
-    pub fn save(self, file: &str) -> Result<(), io::Error> {
-        let mut file = OpenOptions::new().write(true).create(true).open(file)?;
-        let mut entries = self.0.into_iter().collect::<Vec<_>>();
-        // We sort the palette because the Perl implementation does.
-        entries.sort_unstable();
-
-        for (name, color) in entries {
-            file.write_all(
-                format!("{}->rgb({},{},{})\n", name, color.0, color.1, color.2).as_bytes(),
-            )?
-        }
-
-        Ok(())
     }
 
     pub fn find_color_for<F: FnMut(&'a str) -> (u8, u8, u8)>(

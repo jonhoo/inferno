@@ -6,7 +6,7 @@ use std::str::FromStr;
 mod palette_map;
 mod palettes;
 
-pub(super) use palette_map::PaletteMap;
+pub use palette_map::PaletteMap;
 
 pub(super) const VDGREY: (u8, u8, u8) = (160, 160, 160);
 pub(super) const DGREY: (u8, u8, u8) = (200, 200, 200);
