@@ -257,7 +257,7 @@ pub fn from_sorted_lines<'a, I, W>(
     opt: Options,
     lines: I,
     writer: W,
-    mut palette_map: Option<&mut color::PaletteMap<'a>>,
+    mut palette_map: Option<&mut color::PaletteMap>,
 ) -> quick_xml::Result<()>
 where
     I: IntoIterator<Item = &'a str>,
@@ -590,10 +590,10 @@ where
     save_consistent_palette_if_needed(&palette_map, &palette_file).map_err(quick_xml::Error::Io)
 }
 
-fn fetch_consistent_palette_if_needed<'a>(
+fn fetch_consistent_palette_if_needed(
     use_consistent_palette: bool,
     palette_file: &str,
-) -> io::Result<Option<color::PaletteMap<'a>>> {
+) -> io::Result<Option<color::PaletteMap>> {
     let palette_map = if use_consistent_palette {
         let path = Path::new(palette_file);
         Some(color::PaletteMap::load_from_file_or_empty(&path)?)

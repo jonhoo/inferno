@@ -1,5 +1,4 @@
 use crate::flamegraph::color::Color;
-use std::borrow::Cow;
 use std::collections::HashMap;
 use std::fs::File;
 use std::fs::OpenOptions;
@@ -12,22 +11,22 @@ use std::str::FromStr;
 /// Mapping of the association between a function name and the color used when drawing information
 /// from this function.
 #[derive(Default)]
-pub struct PaletteMap<'a>(HashMap<Cow<'a, str>, Color>);
+pub struct PaletteMap(HashMap<String, Color>);
 
-impl<'a> PaletteMap<'a> {
+impl PaletteMap {
     /// Returns the color value corresponding to the given function name.
     pub fn get(&self, func: &str) -> Option<Color> {
         self.0.get(func).cloned()
     }
 
     /// Inserts a function name/color pair in the map.
-    pub fn insert(&mut self, func: &'a str, color: Color) -> Option<Color> {
-        self.0.insert(Cow::from(func), color)
+    pub fn insert<S: ToString>(&mut self, func: S, color: Color) -> Option<Color> {
+        self.0.insert(func.to_string(), color)
     }
 
     /// Provides an iterator over the elements of the map.
     pub fn iter(&self) -> impl Iterator<Item = (&str, Color)> {
-        self.0.iter().map(|(func, color)| (func.as_ref(), *color))
+        self.0.iter().map(|(func, color)| (func.as_str(), *color))
     }
 
     /// Builds a mapping based on the inputs given by the reader.
@@ -47,7 +46,7 @@ impl<'a> PaletteMap<'a> {
         for line in reader.lines() {
             let line = line?;
             let (name, color) = parse_line(&line)?;
-            map.insert(Cow::from(name.to_string()), color);
+            map.insert(name.to_string(), color);
         }
 
         Ok(PaletteMap(map))
@@ -96,14 +95,14 @@ impl<'a> PaletteMap<'a> {
 
     /// Returns the color value corresponding to the given function name if it is present.
     /// Otherwise compute the color, and insert the new function name/color in the map.
-    pub(crate) fn find_color_for<F: FnMut(&'a str) -> Color>(
+    pub(crate) fn find_color_for<S: ToString, F: FnMut(&S) -> Color>(
         &mut self,
-        name: &'a str,
+        name: &S,
         mut compute_color: F,
     ) -> Color {
         *self
             .0
-            .entry(Cow::from(name))
+            .entry(name.to_string())
             .or_insert_with(|| compute_color(name))
     }
 }
