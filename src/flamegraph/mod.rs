@@ -555,11 +555,7 @@ where
 
     from_sorted_lines(opt, input.lines(), writer, palette_map.as_mut())?;
 
-    if let Some(palette_map) = palette_map {
-        save_consistent_palette(&palette_map, &palette_file).map_err(quick_xml::Error::Io)?;
-    }
-
-    Ok(())
+    save_consistent_palette_if_needed(&palette_map, &palette_file).map_err(quick_xml::Error::Io)
 }
 
 /// Produce a flame graph from a set of readers that contain folded stack lines.
@@ -590,11 +586,7 @@ where
 
     from_sorted_lines(opt, lines, writer, palette_map.as_mut())?;
 
-    if let Some(palette_map) = palette_map {
-        save_consistent_palette(&palette_map, &palette_file).map_err(quick_xml::Error::Io)?;
-    }
-
-    Ok(())
+    save_consistent_palette_if_needed(&palette_map, &palette_file).map_err(quick_xml::Error::Io)
 }
 
 fn fetch_consistent_palette_if_needed<'a>(
@@ -611,9 +603,16 @@ fn fetch_consistent_palette_if_needed<'a>(
     Ok(palette_map)
 }
 
-fn save_consistent_palette(palette_map: &color::PaletteMap, palette_file: &str) -> io::Result<()> {
-    let path = Path::new(palette_file);
-    palette_map.save_to_file(&path)
+fn save_consistent_palette_if_needed(
+    palette_map: &Option<color::PaletteMap>,
+    palette_file: &str,
+) -> io::Result<()> {
+    if let Some(palette_map) = palette_map {
+        let path = Path::new(palette_file);
+        palette_map.save_to_file(&path)?;
+    }
+
+    Ok(())
 }
 
 fn deannotate(f: &str) -> &str {
