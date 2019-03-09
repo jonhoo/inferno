@@ -8,6 +8,7 @@ pub use color::BackgroundColor;
 pub use color::Palette;
 pub use color::PaletteMap;
 
+use crate::flamegraph::color::Color;
 use num_format::Locale;
 use quick_xml::{
     events::{BytesEnd, BytesStart, BytesText, Event},
@@ -630,14 +631,14 @@ fn filled_rectangle<W: Write>(
     svg: &mut Writer<W>,
     buffer: &mut StrStack,
     rect: &Rectangle,
-    color: (u8, u8, u8),
+    color: Color,
     cache_rect: &mut Event,
 ) -> quick_xml::Result<usize> {
     let x = write!(buffer, "{}", rect.x1);
     let y = write!(buffer, "{}", rect.y1);
     let width = write!(buffer, "{}", rect.width());
     let height = write!(buffer, "{}", rect.height());
-    let color = write!(buffer, "rgb({},{},{})", color.0, color.1, color.2);
+    let color = write!(buffer, "rgb({},{},{})", color.r, color.g, color.b);
 
     if let Event::Empty(bytes_start) = cache_rect {
         // clear the state

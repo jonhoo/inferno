@@ -1,3 +1,4 @@
+use crate::flamegraph::color::Color;
 use std::borrow::Cow;
 use std::collections::HashMap;
 use std::fs::File;
@@ -11,21 +12,21 @@ use std::str::FromStr;
 /// Mapping of the association between a function name and the color used when drawing information
 /// from this function.
 #[derive(Default)]
-pub struct PaletteMap<'a>(HashMap<Cow<'a, str>, (u8, u8, u8)>);
+pub struct PaletteMap<'a>(HashMap<Cow<'a, str>, Color>);
 
 impl<'a> PaletteMap<'a> {
     /// Returns the color value corresponding to the given function name.
-    pub fn get(&self, func: &str) -> Option<(u8, u8, u8)> {
+    pub fn get(&self, func: &str) -> Option<Color> {
         self.0.get(func).cloned()
     }
 
     /// Inserts a function name/color pair in the map.
-    pub fn insert(&mut self, func: &'a str, color: (u8, u8, u8)) -> Option<(u8, u8, u8)> {
+    pub fn insert(&mut self, func: &'a str, color: Color) -> Option<Color> {
         self.0.insert(Cow::from(func), color)
     }
 
     /// Provides an iterator over the elements of the map.
-    pub fn iter(&self) -> impl Iterator<Item = (&str, (u8, u8, u8))> {
+    pub fn iter(&self) -> impl Iterator<Item = (&str, Color)> {
         self.0.iter().map(|(func, color)| (func.as_ref(), *color))
     }
 
@@ -62,7 +63,7 @@ impl<'a> PaletteMap<'a> {
 
         for (name, color) in entries {
             writer.write_all(
-                format!("{}->rgb({},{},{})\n", name, color.0, color.1, color.2).as_bytes(),
+                format!("{}->rgb({},{},{})\n", name, color.r, color.g, color.b).as_bytes(),
             )?
         }
 
@@ -95,11 +96,11 @@ impl<'a> PaletteMap<'a> {
 
     /// Returns the color value corresponding to the given function name if it is present.
     /// Otherwise compute the color, and insert the new function name/color in the map.
-    pub(crate) fn find_color_for<F: FnMut(&'a str) -> (u8, u8, u8)>(
+    pub(crate) fn find_color_for<F: FnMut(&'a str) -> Color>(
         &mut self,
         name: &'a str,
         mut compute_color: F,
-    ) -> (u8, u8, u8) {
+    ) -> Color {
         *self
             .0
             .entry(Cow::from(name))
@@ -107,7 +108,7 @@ impl<'a> PaletteMap<'a> {
     }
 }
 
-fn parse_line(line: &str) -> io::Result<(&str, (u8, u8, u8))> {
+fn parse_line(line: &str) -> io::Result<(&str, Color)> {
     // A line is formatted like this: NAME -> rbg(RED, GREEN, BLUE)
     let mut words = line.split("->");
 
@@ -131,7 +132,7 @@ fn parse_line(line: &str) -> io::Result<(&str, (u8, u8, u8))> {
     Ok((name, rgb_color))
 }
 
-fn parse_rgb_string(s: &str) -> Option<(u8, u8, u8)> {
+fn parse_rgb_string(s: &str) -> Option<Color> {
     let s = s.trim();
 
     if !s.starts_with("rgb(") || !s.ends_with(')') {
@@ -151,36 +152,53 @@ fn parse_rgb_string(s: &str) -> Option<(u8, u8, u8)> {
     let b_str = &s[g_end_index + 1..].trim();
     let b = u8::from_str(b_str).ok()?;
 
-    Some((r, g, b))
+    Some(Color { r, g, b })
 }
 
 #[cfg(test)]
 mod tests {
     use crate::flamegraph::color::palette_map::{parse_line, PaletteMap};
+    use crate::flamegraph::color::Color;
     use std::io::Cursor;
+
+    macro_rules! color {
+        ($r:expr, $g:expr, $b:expr) => {
+            Color {
+                r: $r,
+                g: $g,
+                b: $b,
+            }
+        };
+    }
 
     #[test]
     fn palette_map_test() {
         let mut palette = PaletteMap::default();
 
-        assert_eq!(palette.insert("foo", (0, 50, 255)), None);
-        assert_eq!(palette.insert("bar", (50, 0, 60)), None);
-        assert_eq!(palette.insert("foo", (80, 20, 63)), Some((0, 50, 255)));
-        assert_eq!(palette.insert("foo", (128, 128, 128)), Some((80, 20, 63)));
-        assert_eq!(palette.insert("baz", (255, 0, 255)), None);
+        assert_eq!(palette.insert("foo", color!(0, 50, 255)), None);
+        assert_eq!(palette.insert("bar", color!(50, 0, 60)), None);
+        assert_eq!(
+            palette.insert("foo", color!(80, 20, 63)),
+            Some(color!(0, 50, 255))
+        );
+        assert_eq!(
+            palette.insert("foo", color!(128, 128, 128)),
+            Some(color!(80, 20, 63))
+        );
+        assert_eq!(palette.insert("baz", color!(255, 0, 255)), None);
 
         assert_eq!(palette.get("func"), None);
-        assert_eq!(palette.get("bar"), Some((50, 0, 60)));
-        assert_eq!(palette.get("foo"), Some((128, 128, 128)));
-        assert_eq!(palette.get("baz"), Some((255, 0, 255)));
+        assert_eq!(palette.get("bar"), Some(color!(50, 0, 60)));
+        assert_eq!(palette.get("foo"), Some(color!(128, 128, 128)));
+        assert_eq!(palette.get("baz"), Some(color!(255, 0, 255)));
 
         let mut vec = palette.iter().collect::<Vec<_>>();
         vec.sort_unstable();
         let mut iter = vec.iter();
 
-        assert_eq!(iter.next(), Some(&("bar", (50, 0, 60))));
-        assert_eq!(iter.next(), Some(&("baz", (255, 0, 255))));
-        assert_eq!(iter.next(), Some(&("foo", (128, 128, 128))));
+        assert_eq!(iter.next(), Some(&("bar", color!(50, 0, 60))));
+        assert_eq!(iter.next(), Some(&("baz", color!(255, 0, 255))));
+        assert_eq!(iter.next(), Some(&("foo", color!(128, 128, 128))));
         assert_eq!(iter.next(), None);
 
         let mut buf = Cursor::new(Vec::new());
@@ -193,9 +211,9 @@ mod tests {
         vec.sort_unstable();
         let mut iter = vec.iter();
 
-        assert_eq!(iter.next(), Some(&("bar", (50, 0, 60))));
-        assert_eq!(iter.next(), Some(&("baz", (255, 0, 255))));
-        assert_eq!(iter.next(), Some(&("foo", (128, 128, 128))));
+        assert_eq!(iter.next(), Some(&("bar", color!(50, 0, 60))));
+        assert_eq!(iter.next(), Some(&("baz", color!(255, 0, 255))));
+        assert_eq!(iter.next(), Some(&("foo", color!(128, 128, 128))));
         assert_eq!(iter.next(), None);
     }
 
@@ -203,11 +221,11 @@ mod tests {
     fn parse_line_test() {
         assert_eq!(
             parse_line("func->rgb(0, 0, 0)").unwrap(),
-            ("func", (0, 0, 0))
+            ("func", color!(0, 0, 0))
         );
         assert_eq!(
             parse_line("->rgb(255, 255, 255)").unwrap(),
-            ("", (255, 255, 255))
+            ("", color!(255, 255, 255))
         );
 
         assert!(parse_line("").is_err());
