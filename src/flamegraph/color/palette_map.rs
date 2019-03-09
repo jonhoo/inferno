@@ -148,3 +148,33 @@ fn parse_rgb_string(s: &str) -> Option<(u8, u8, u8)> {
 
     Some((r, g, b))
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::flamegraph::color::palette_map::PaletteMap;
+
+    #[test]
+    fn palette_map_test() {
+        let mut palette = PaletteMap::default();
+
+        assert_eq!(palette.insert("foo", (0, 50, 255)), None);
+        assert_eq!(palette.insert("bar", (50, 0, 60)), None);
+        assert_eq!(palette.insert("foo", (80, 20, 63)), Some((0, 50, 255)));
+        assert_eq!(palette.insert("foo", (128, 128, 128)), Some((80, 20, 63)));
+        assert_eq!(palette.insert("baz", (255, 0, 255)), None);
+
+        assert_eq!(palette.get("func"), None);
+        assert_eq!(palette.get("bar"), Some((50, 0, 60)));
+        assert_eq!(palette.get("foo"), Some((128, 128, 128)));
+        assert_eq!(palette.get("baz"), Some((255, 0, 255)));
+
+        let mut vec = palette.iter().collect::<Vec<_>>();
+        vec.sort_unstable();
+        let mut iter = vec.iter();
+
+        assert_eq!(iter.next(), Some(&("bar", (50, 0, 60))));
+        assert_eq!(iter.next(), Some(&("baz", (255, 0, 255))));
+        assert_eq!(iter.next(), Some(&("foo", (128, 128, 128))));
+        assert_eq!(iter.next(), None);
+    }
+}
