@@ -77,7 +77,7 @@ impl<'a> PaletteMap<'a> {
     pub fn load_from_file(path: &dyn AsRef<Path>) -> io::Result<Self> {
         // If the file does not exist, it is probably the first call to flamegraph with a consistent
         // palette: there is nothing to load.
-        if path.exists() {
+        if path.as_ref().exists() {
             let mut file = File::open(path)?;
             PaletteMap::from_stream(&mut file)
         } else {
