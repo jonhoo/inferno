@@ -95,7 +95,7 @@ impl<'a> PaletteMap<'a> {
 
     /// Returns the color value corresponding to the given function name if it is present.
     /// Otherwise compute the color, and insert the new function name/color in the map.
-    pub fn find_color_for<F: FnMut(&'a str) -> (u8, u8, u8)>(
+    pub(crate) fn find_color_for<F: FnMut(&'a str) -> (u8, u8, u8)>(
         &mut self,
         name: &'a str,
         mut compute_color: F,
