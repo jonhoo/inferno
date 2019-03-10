@@ -9,7 +9,7 @@ use std::str::FromStr;
 
 /// Mapping of the association between a function name and the color used when drawing information
 /// from this function.
-#[derive(Debug, Default)]
+#[derive(Clone, Debug, Default, Eq, PartialEq)]
 pub struct PaletteMap(HashMap<String, Color>);
 
 impl PaletteMap {
