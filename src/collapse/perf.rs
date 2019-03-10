@@ -1,5 +1,4 @@
 use super::Collapse;
-use smallvec::SmallVec;
 use std::collections::{HashMap, VecDeque};
 use std::io;
 use std::io::prelude::*;
@@ -65,6 +64,9 @@ pub struct Folder {
     /// Function entries on the stack in this entry thus far.
     stack: VecDeque<String>,
 
+    /// Keep track of inlined Java functions so they can be annotated with "_[i]".
+    java_inline: Vec<String>,
+
     /// Number of times each call stack has been seen.
     occurrences: HashMap<String, usize>,
 
@@ -114,6 +116,7 @@ impl From<Options> for Folder {
             in_event: false,
             skip_stack: false,
             stack: VecDeque::default(),
+            java_inline: Vec::default(),
             occurrences: HashMap::default(),
             pname: String::new(),
             event_filtering: EventFilterState::None,
@@ -275,9 +278,6 @@ impl Folder {
             // Support Java inlining by splitting on "->". After the first func, the
             // rest are annotated with "_[i]" to mark them as inlined.
             // See https://github.com/brendangregg/FlameGraph/pull/89.
-            let mut java_inline =
-                SmallVec::<[String; 1]>::with_capacity(rawfunc.split("->").count() + 1);
-
             for func in rawfunc.split("->") {
                 let mut func = with_module_fallback(module, func, pc, self.opt.include_addrs);
                 if TIDY_GENERIC {
@@ -300,7 +300,7 @@ impl Folder {
                 // detect jit from the module name; eg:
                 //
                 //     7f722d142778 Ljava/io/PrintStream;::print (/tmp/perf-19982.map)
-                if !java_inline.is_empty() {
+                if !self.java_inline.is_empty() {
                     func.push_str("_[i]"); // inlined
                 } else if self.opt.annotate_kernel
                     && (module.starts_with('[') || module.ends_with("vmlinux"))
@@ -314,10 +314,10 @@ impl Folder {
                     func.push_str("_[j]"); // jitted
                 }
 
-                java_inline.push(func);
+                self.java_inline.push(func);
             }
 
-            while let Some(func) = java_inline.pop() {
+            while let Some(func) = self.java_inline.pop() {
                 self.stack.push_front(func);
             }
         } else {
