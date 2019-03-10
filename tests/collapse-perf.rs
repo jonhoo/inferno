@@ -5,18 +5,29 @@ extern crate inferno;
 
 use inferno::collapse::perf::{Folder, Options};
 use inferno::collapse::Collapse;
+use libflate::gzip::Decoder;
 use log::Level;
 use std::fs::{self, File};
 use std::io::{self, BufRead, BufReader, Cursor};
 use std::path::Path;
 
-fn test_collapse_perf(test_file: &str, expected_file: &str, options: Options) -> io::Result<()> {
-    let r = BufReader::new(File::open(test_file).unwrap());
-    let expected_len = fs::metadata(expected_file).unwrap().len() as usize;
+fn test_collapse_perf(
+    test_filename: &str,
+    expected_filename: &str,
+    options: Options,
+) -> io::Result<()> {
+    let test_file = File::open(test_filename).unwrap();
+    let r: Box<BufRead> = if test_filename.ends_with(".gz") {
+        Box::new(BufReader::new(Decoder::new(test_file).unwrap()))
+    } else {
+        Box::new(BufReader::new(test_file))
+    };
+
+    let expected_len = fs::metadata(expected_filename).unwrap().len() as usize;
     let mut result = Cursor::new(Vec::with_capacity(expected_len));
     let mut perf = Folder::from(options);
     let return_value = perf.collapse(r, &mut result);
-    let mut expected = BufReader::new(File::open(expected_file).unwrap());
+    let mut expected = BufReader::new(File::open(expected_filename).unwrap());
     result.set_position(0);
 
     let mut buf = String::new();
@@ -27,10 +38,10 @@ fn test_collapse_perf(test_file: &str, expected_file: &str, options: Options) ->
         if expected.read_line(&mut buf).unwrap() == 0 {
             panic!(
                 "\noutput has more lines than expected result file: {}",
-                expected_file
+                expected_filename
             );
         }
-        assert_eq!(line, buf.trim_end(), "\n{}:{}", expected_file, line_num);
+        assert_eq!(line, buf.trim_end(), "\n{}:{}", expected_filename, line_num);
         buf.clear();
         line_num += 1;
     }
@@ -38,7 +49,7 @@ fn test_collapse_perf(test_file: &str, expected_file: &str, options: Options) ->
     if expected.read_line(&mut buf).unwrap() > 0 {
         panic!(
             "\n{} has more lines than output, beginning at line: {}",
-            expected_file, line_num
+            expected_filename, line_num
         )
     }
 
@@ -239,6 +250,16 @@ macro_rules! collapse_perf_tests {
 collapse_perf_tests! {
     collapse_perf_go_stacks,
     collapse_perf_java_inline
+}
+
+#[test]
+fn collapse_perf_example_perf_stacks() {
+    test_collapse_perf(
+        "./flamegraph/example-perf-stacks.txt.gz",
+        "./tests/data/collapse-perf/results/example-perf-stacks-collapsed.txt",
+        Default::default(),
+    )
+    .unwrap();
 }
 
 #[test]

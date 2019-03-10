@@ -38,6 +38,7 @@ rgb ="0.8.13"
 [dev-dependencies]
 pretty_assertions = "0.6"
 testing_logger = "0.1.1"
+libflate = "0.1"
 
 [profile.release]
 debug = true
