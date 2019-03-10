@@ -38,7 +38,7 @@ impl PaletteMap {
     /// included.
     ///
     /// This function will return an [`std::io::Error`] if the input is not correctly formatted.
-    pub fn from_stream(reader: &mut dyn io::BufRead) -> io::Result<Self> {
+    pub fn from_reader(reader: &mut dyn io::BufRead) -> io::Result<Self> {
         let mut map = HashMap::default();
 
         for line in reader.lines() {
@@ -53,7 +53,7 @@ impl PaletteMap {
     /// Writes the palette map using the given writer.
     /// The output content will follow the same format described in [from_stream()]
     /// The name/color pairs will be sorted by name in lexicographic order.
-    pub fn to_stream(&self, writer: &mut dyn io::Write) -> io::Result<()> {
+    pub fn to_writer(&self, writer: &mut dyn io::Write) -> io::Result<()> {
         let mut entries = self.0.iter().collect::<Vec<_>>();
         // We sort the palette because the Perl implementation does.
         entries.sort_unstable();
@@ -78,7 +78,7 @@ impl PaletteMap {
         if path.as_ref().exists() {
             let file = File::open(path)?;
             let mut reader = BufReader::new(file);
-            PaletteMap::from_stream(&mut reader)
+            PaletteMap::from_reader(&mut reader)
         } else {
             Ok(PaletteMap::default())
         }
@@ -89,7 +89,7 @@ impl PaletteMap {
     /// The file content will follow the format described in [from_stream()].
     pub fn save_to_file(&self, path: &dyn AsRef<Path>) -> io::Result<()> {
         let mut file = OpenOptions::new().write(true).create(true).open(path)?;
-        self.to_stream(&mut file)
+        self.to_writer(&mut file)
     }
 
     /// Returns the color value corresponding to the given function name if it is present.
@@ -201,9 +201,9 @@ mod tests {
 
         let mut buf = Cursor::new(Vec::new());
 
-        palette.to_stream(&mut buf).unwrap();
+        palette.to_writer(&mut buf).unwrap();
         buf.set_position(0);
-        let palette = PaletteMap::from_stream(&mut buf).unwrap();
+        let palette = PaletteMap::from_reader(&mut buf).unwrap();
 
         let mut vec = palette.iter().collect::<Vec<_>>();
         vec.sort_unstable();
