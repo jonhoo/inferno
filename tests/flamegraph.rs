@@ -3,11 +3,11 @@ extern crate pretty_assertions;
 
 extern crate inferno;
 
-use inferno::flamegraph::{self, BackgroundColor, Direction, Options, Palette};
+use inferno::flamegraph::{self, BackgroundColor, Direction, Options, Palette, PaletteMap};
 use log::Level;
 use std::fs::{self, File};
 use std::io::{self, BufRead, BufReader, Cursor};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::str::FromStr;
 
 fn test_flamegraph(
@@ -251,11 +251,11 @@ fn flamegraph_should_not_warn_about_fractional_sample_with_tricky_stack() {
 fn flamegraph_palette_map() {
     let input_file = "./flamegraph/test/results/perf-vertx-stacks-01-collapsed-all.txt";
     let expected_result_file = "./tests/data/flamegraph/palette-map/consistent-palette.svg";
-    let palette_file = "./tests/data/flamegraph/palette-map/palette.map".to_string();
+    let palette_file = "./tests/data/flamegraph/palette-map/palette.map";
+    let mut palette_map = load_palette_map_file(palette_file);
 
     let options = flamegraph::Options {
-        consistent_palette: true,
-        palette_file,
+        palette_map: Some(&mut palette_map),
         ..Default::default()
     };
 
@@ -369,13 +369,18 @@ fn flamegraph_example_perf_stacks() {
     let input_file = "./tests/data/collapse-perf/results/example-perf-stacks-collapsed.txt";
     let expected_result_file =
         "./tests/data/flamegraph/example-perf-stacks/example-perf-stacks.svg";
-    let palette_file = "./tests/data/flamegraph/example-perf-stacks/palette.map".to_string();
+    let palette_file = "./tests/data/flamegraph/example-perf-stacks/palette.map";
+    let mut palette_map = load_palette_map_file(palette_file);
 
     let options = flamegraph::Options {
-        consistent_palette: true,
-        palette_file,
+        palette_map: Some(&mut palette_map),
         ..Default::default()
     };
 
     test_flamegraph(input_file, expected_result_file, options).unwrap();
+}
+
+fn load_palette_map_file(palette_file: &str) -> PaletteMap {
+    let path = Path::new(palette_file);
+    PaletteMap::load_from_file_or_empty(&path).unwrap()
 }

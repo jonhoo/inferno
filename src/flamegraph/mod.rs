@@ -16,7 +16,6 @@ use quick_xml::{
 };
 use std::io;
 use std::io::prelude::*;
-use std::path::Path;
 use str_stack::StrStack;
 use svg::StyleOptions;
 
@@ -32,7 +31,7 @@ const FRAMEPAD: usize = 1; // vertical padding for frames
 
 /// Configure the flame graph.
 #[derive(Debug)]
-pub struct Options {
+pub struct Options<'a> {
     /// The color palette to use when plotting.
     pub colors: color::Palette,
 
@@ -56,12 +55,7 @@ pub struct Options {
     ///
     /// This feature was first implemented [by Shawn
     /// Sterling](https://github.com/brendangregg/FlameGraph/pull/25).
-    pub consistent_palette: bool,
-
-    /// If `consistent_palette` is set to `true` the palette will be stored in this file.
-    ///
-    /// Defaults to "palette.map"
-    pub palette_file: String,
+    pub palette_map: Option<&'a mut color::PaletteMap>,
 
     /// Assign extra attributes to particular functions.
     ///
@@ -105,16 +99,15 @@ pub struct Options {
     pub no_javascript: bool,
 }
 
-impl Default for Options {
+impl<'a> Default for Options<'a> {
     fn default() -> Self {
         Options {
             title: "Flame Graph".to_string(),
-            palette_file: "palette.map".to_string(),
             factor: 1.0,
             colors: Default::default(),
             bgcolors: Default::default(),
             hash: Default::default(),
-            consistent_palette: Default::default(),
+            palette_map: Default::default(),
             func_frameattrs: Default::default(),
             direction: Default::default(),
             negate_differentials: Default::default(),
@@ -253,12 +246,7 @@ impl Rectangle {
 ///
 /// [differential flame graph]: http://www.brendangregg.com/blog/2014-11-09/differential-flame-graphs.html
 #[allow(clippy::cyclomatic_complexity)]
-pub fn from_sorted_lines<'a, I, W>(
-    opt: Options,
-    lines: I,
-    writer: W,
-    mut palette_map: Option<&mut color::PaletteMap>,
-) -> quick_xml::Result<()>
+pub fn from_sorted_lines<'a, I, W>(mut opt: Options, lines: I, writer: W) -> quick_xml::Result<()>
 where
     I: IntoIterator<Item = &'a str>,
     W: Write,
@@ -467,7 +455,7 @@ where
                 delta = -delta;
             }
             color::color_scale(delta, delta_max)
-        } else if let Some(ref mut palette_map) = palette_map {
+        } else if let Some(ref mut palette_map) = opt.palette_map {
             let colors = opt.colors;
             let hash = opt.hash;
             palette_map.find_color_for(&frame.location.function, |name| {
@@ -550,13 +538,7 @@ where
         .read_to_string(&mut input)
         .map_err(quick_xml::Error::Io)?;
 
-    let palette_file = opt.palette_file.clone();
-    let mut palette_map =
-        fetch_consistent_palette_if_needed(opt.consistent_palette, &palette_file)?;
-
-    from_sorted_lines(opt, input.lines(), writer, palette_map.as_mut())?;
-
-    save_consistent_palette_if_needed(&palette_map, &palette_file).map_err(quick_xml::Error::Io)
+    from_sorted_lines(opt, input.lines(), writer)
 }
 
 /// Produce a flame graph from a set of readers that contain folded stack lines.
@@ -581,39 +563,7 @@ where
     let mut lines: Vec<&str> = input.lines().collect();
     lines.sort_unstable();
 
-    let palette_file = opt.palette_file.clone();
-    let mut palette_map =
-        fetch_consistent_palette_if_needed(opt.consistent_palette, &palette_file)?;
-
-    from_sorted_lines(opt, lines, writer, palette_map.as_mut())?;
-
-    save_consistent_palette_if_needed(&palette_map, &palette_file).map_err(quick_xml::Error::Io)
-}
-
-fn fetch_consistent_palette_if_needed(
-    use_consistent_palette: bool,
-    palette_file: &str,
-) -> io::Result<Option<color::PaletteMap>> {
-    let palette_map = if use_consistent_palette {
-        let path = Path::new(palette_file);
-        Some(color::PaletteMap::load_from_file_or_empty(&path)?)
-    } else {
-        None
-    };
-
-    Ok(palette_map)
-}
-
-fn save_consistent_palette_if_needed(
-    palette_map: &Option<color::PaletteMap>,
-    palette_file: &str,
-) -> io::Result<()> {
-    if let Some(palette_map) = palette_map {
-        let path = Path::new(palette_file);
-        palette_map.save_to_file(&path)?;
-    }
-
-    Ok(())
+    from_sorted_lines(opt, lines, writer)
 }
 
 fn deannotate(f: &str) -> &str {
