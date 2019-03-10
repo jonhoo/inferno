@@ -6,7 +6,9 @@ mod svg;
 pub use attrs::FuncFrameAttrsMap;
 pub use color::BackgroundColor;
 pub use color::Palette;
+pub use color::PaletteMap;
 
+use crate::flamegraph::color::Color;
 use num_format::Locale;
 use quick_xml::{
     events::{BytesEnd, BytesStart, BytesText, Event},
@@ -29,7 +31,7 @@ const FRAMEPAD: usize = 1; // vertical padding for frames
 
 /// Configure the flame graph.
 #[derive(Debug)]
-pub struct Options {
+pub struct Options<'a> {
     /// The color palette to use when plotting.
     pub colors: color::Palette,
 
@@ -53,12 +55,7 @@ pub struct Options {
     ///
     /// This feature was first implemented [by Shawn
     /// Sterling](https://github.com/brendangregg/FlameGraph/pull/25).
-    pub consistent_palette: bool,
-
-    /// If `consistent_palette` is set to `true` the palette will be stored in this file.
-    ///
-    /// Defaults to "palette.map"
-    pub palette_file: String,
+    pub palette_map: Option<&'a mut color::PaletteMap>,
 
     /// Assign extra attributes to particular functions.
     ///
@@ -102,16 +99,15 @@ pub struct Options {
     pub no_javascript: bool,
 }
 
-impl Default for Options {
+impl<'a> Default for Options<'a> {
     fn default() -> Self {
         Options {
             title: "Flame Graph".to_string(),
-            palette_file: "palette.map".to_string(),
             factor: 1.0,
             colors: Default::default(),
             bgcolors: Default::default(),
             hash: Default::default(),
-            consistent_palette: Default::default(),
+            palette_map: Default::default(),
             func_frameattrs: Default::default(),
             direction: Default::default(),
             negate_differentials: Default::default(),
@@ -250,17 +246,11 @@ impl Rectangle {
 ///
 /// [differential flame graph]: http://www.brendangregg.com/blog/2014-11-09/differential-flame-graphs.html
 #[allow(clippy::cyclomatic_complexity)]
-pub fn from_sorted_lines<'a, I, W>(opt: Options, lines: I, writer: W) -> quick_xml::Result<()>
+pub fn from_sorted_lines<'a, I, W>(mut opt: Options, lines: I, writer: W) -> quick_xml::Result<()>
 where
     I: IntoIterator<Item = &'a str>,
     W: Write,
 {
-    let mut palette_map = if opt.consistent_palette {
-        Some(color::PaletteMap::load(&opt.palette_file)?)
-    } else {
-        None
-    };
-
     let (bgcolor1, bgcolor2) = color::bgcolor_for(opt.bgcolors, opt.colors);
 
     let mut buffer = StrStack::new();
@@ -465,9 +455,11 @@ where
                 delta = -delta;
             }
             color::color_scale(delta, delta_max)
-        } else if let Some(ref mut palette_map) = palette_map {
+        } else if let Some(ref mut palette_map) = opt.palette_map {
+            let colors = opt.colors;
+            let hash = opt.hash;
             palette_map.find_color_for(&frame.location.function, |name| {
-                color::color(opt.colors, opt.hash, name, &mut thread_rng)
+                color::color(colors, hash, name, &mut thread_rng)
             })
         } else {
             color::color(
@@ -528,12 +520,6 @@ where
     svg.write_event(Event::End(BytesEnd::borrowed(b"svg")))?;
     svg.write_event(Event::Eof)?;
 
-    if let Some(palette_map) = palette_map {
-        palette_map
-            .save(&opt.palette_file)
-            .map_err(quick_xml::Error::Io)?;
-    }
-
     Ok(())
 }
 
@@ -576,6 +562,7 @@ where
 
     let mut lines: Vec<&str> = input.lines().collect();
     lines.sort_unstable();
+
     from_sorted_lines(opt, lines, writer)
 }
 
@@ -594,14 +581,14 @@ fn filled_rectangle<W: Write>(
     svg: &mut Writer<W>,
     buffer: &mut StrStack,
     rect: &Rectangle,
-    color: (u8, u8, u8),
+    color: Color,
     cache_rect: &mut Event,
 ) -> quick_xml::Result<usize> {
     let x = write!(buffer, "{}", rect.x1);
     let y = write!(buffer, "{}", rect.y1);
     let width = write!(buffer, "{}", rect.width());
     let height = write!(buffer, "{}", rect.height());
-    let color = write!(buffer, "rgb({},{},{})", color.0, color.1, color.2);
+    let color = write!(buffer, "rgb({},{},{})", color.r, color.g, color.b);
 
     if let Event::Empty(bytes_start) = cache_rect {
         // clear the state

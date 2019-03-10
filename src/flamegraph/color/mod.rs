@@ -6,10 +6,21 @@ use std::str::FromStr;
 mod palette_map;
 mod palettes;
 
-pub(super) use palette_map::PaletteMap;
+pub use palette_map::PaletteMap;
+use rgb::RGB8;
 
-pub(super) const VDGREY: (u8, u8, u8) = (160, 160, 160);
-pub(super) const DGREY: (u8, u8, u8) = (200, 200, 200);
+pub type Color = RGB8;
+
+pub(super) const VDGREY: Color = Color {
+    r: 160,
+    g: 160,
+    b: 160,
+};
+pub(super) const DGREY: Color = Color {
+    r: 200,
+    g: 200,
+    b: 200,
+};
 
 const YELLOW_GRADIENT: (&str, &str) = ("#eeeeee", "#eeeeb0");
 const BLUE_GRADIENT: (&str, &str) = ("#eeeeee", "#e0e0ff");
@@ -40,7 +51,7 @@ pub enum BackgroundColor {
     /// A flag background color with the given RGB components.
     ///
     /// Expressed in string form as `#RRGGBB` where each component is written in hexadecimal.
-    Flat(u8, u8, u8),
+    Flat(Color),
 }
 
 impl Default for BackgroundColor {
@@ -123,7 +134,7 @@ impl FromStr for BackgroundColor {
             "green" => Ok(BackgroundColor::Green),
             "grey" => Ok(BackgroundColor::Grey),
             flat => parse_flat_bgcolor(flat)
-                .map(|(r, g, b)| BackgroundColor::Flat(r, g, b))
+                .map(BackgroundColor::Flat)
                 .ok_or_else(|| format!("unknown background color: {}", flat)),
         }
     }
@@ -135,7 +146,7 @@ macro_rules! u8_from_hex_iter {
     };
 }
 
-fn parse_flat_bgcolor(s: &str) -> Option<(u8, u8, u8)> {
+fn parse_flat_bgcolor(s: &str) -> Option<Color> {
     if !s.starts_with('#') || (s.len() != 7) {
         None
     } else {
@@ -145,7 +156,7 @@ fn parse_flat_bgcolor(s: &str) -> Option<(u8, u8, u8)> {
         let g = u8_from_hex_iter!(s);
         let b = u8_from_hex_iter!(s);
 
-        Some((r, g, b))
+        Some(Color { r, g, b })
     }
 }
 
@@ -256,13 +267,17 @@ macro_rules! t {
     };
 }
 
-fn rgb_components_for_palette(
-    palette: Palette,
-    name: &str,
-    v1: f32,
-    v2: f32,
-    v3: f32,
-) -> (u8, u8, u8) {
+macro_rules! color {
+    ($r:expr, $g:expr, $b:expr) => {
+        Color {
+            r: $r,
+            g: $g,
+            b: $b,
+        }
+    };
+}
+
+fn rgb_components_for_palette(palette: Palette, name: &str, v1: f32, v2: f32, v3: f32) -> Color {
     let basic_palette = match palette {
         Palette::Basic(basic) => basic,
         Palette::Multi(MultiPalette::Java) => palettes::java::resolve(name),
@@ -272,25 +287,20 @@ fn rgb_components_for_palette(
     };
 
     match basic_palette {
-        BasicPalette::Hot => (t!(205, 50, v3), t!(0, 230, v1), t!(0, 55, v2)),
-        BasicPalette::Mem => (t!(0, 0, v3), t!(190, 50, v2), t!(0, 210, v1)),
-        BasicPalette::Io => (t!(80, 60, v1), t!(80, 60, v1), t!(190, 55, v2)),
-        BasicPalette::Red => (t!(200, 55, v1), t!(50, 80, v1), t!(50, 80, v1)),
-        BasicPalette::Green => (t!(50, 60, v1), t!(200, 55, v1), t!(50, 60, v1)),
-        BasicPalette::Blue => (t!(80, 60, v1), t!(80, 60, v1), t!(205, 50, v1)),
-        BasicPalette::Yellow => (t!(175, 55, v1), t!(175, 55, v1), t!(50, 20, v1)),
-        BasicPalette::Purple => (t!(190, 65, v1), t!(80, 60, v1), t!(190, 65, v1)),
-        BasicPalette::Aqua => (t!(50, 60, v1), t!(165, 55, v1), t!(165, 55, v1)),
-        BasicPalette::Orange => (t!(190, 65, v1), t!(90, 65, v1), t!(0, 0, v1)),
+        BasicPalette::Hot => color!(t!(205, 50, v3), t!(0, 230, v1), t!(0, 55, v2)),
+        BasicPalette::Mem => color!(t!(0, 0, v3), t!(190, 50, v2), t!(0, 210, v1)),
+        BasicPalette::Io => color!(t!(80, 60, v1), t!(80, 60, v1), t!(190, 55, v2)),
+        BasicPalette::Red => color!(t!(200, 55, v1), t!(50, 80, v1), t!(50, 80, v1)),
+        BasicPalette::Green => color!(t!(50, 60, v1), t!(200, 55, v1), t!(50, 60, v1)),
+        BasicPalette::Blue => color!(t!(80, 60, v1), t!(80, 60, v1), t!(205, 50, v1)),
+        BasicPalette::Yellow => color!(t!(175, 55, v1), t!(175, 55, v1), t!(50, 20, v1)),
+        BasicPalette::Purple => color!(t!(190, 65, v1), t!(80, 60, v1), t!(190, 65, v1)),
+        BasicPalette::Aqua => color!(t!(50, 60, v1), t!(165, 55, v1), t!(165, 55, v1)),
+        BasicPalette::Orange => color!(t!(190, 65, v1), t!(90, 65, v1), t!(0, 0, v1)),
     }
 }
 
-pub(super) fn color(
-    palette: Palette,
-    hash: bool,
-    name: &str,
-    thread_rng: &mut ThreadRng,
-) -> (u8, u8, u8) {
+pub(super) fn color(palette: Palette, hash: bool, name: &str, thread_rng: &mut ThreadRng) -> Color {
     let (v1, v2, v3) = if hash {
         let name_hash = namehash(name.bytes());
         let reverse_name_hash = namehash(name.bytes().rev());
@@ -303,19 +313,23 @@ pub(super) fn color(
     rgb_components_for_palette(palette, name, v1, v2, v3)
 }
 
-pub(super) fn color_scale(value: isize, max: usize) -> (u8, u8, u8) {
+pub(super) fn color_scale(value: isize, max: usize) -> Color {
     if value == 0 {
-        (255, 255, 255)
+        Color {
+            r: 255,
+            g: 255,
+            b: 255,
+        }
     } else if value > 0 {
         // A positive value indicates _more_ samples,
         // and hence more time spent, so we give it a red hue.
         let c = (210 * (max as isize - value) / max as isize) as u8;
-        (255, c, c)
+        Color { r: 255, g: c, b: c }
     } else {
         // A negative value indicates _fewer_ samples,
         // or a speed-up, so we give it a green hue.
         let c = (210 * (max as isize + value) / max as isize) as u8;
-        (c, c, 255)
+        Color { r: c, g: c, b: 255 }
     }
 }
 
@@ -353,8 +367,8 @@ pub(super) fn bgcolor_for<'a>(
         BackgroundColor::Blue => cow!(BLUE_GRADIENT),
         BackgroundColor::Green => cow!(GREEN_GRADIENT),
         BackgroundColor::Grey => cow!(GRAY_GRADIENT),
-        BackgroundColor::Flat(r, g, b) => {
-            let color = format!("#{:02x}{:02x}{:02x}", r, g, b);
+        BackgroundColor::Flat(color) => {
+            let color = format!("#{:02x}{:02x}{:02x}", color.r, color.g, color.b);
             let first = Cow::from(color);
             let second = first.clone();
             (first, second)
@@ -366,14 +380,30 @@ pub(super) fn bgcolor_for<'a>(
 mod tests {
     use super::namehash;
     use super::parse_flat_bgcolor;
+    use super::Color;
 
     #[test]
     fn bgcolor_parse_test() {
-        assert_eq!(parse_flat_bgcolor("#ffffff"), Some((0xff, 0xff, 0xff)));
-        assert_eq!(parse_flat_bgcolor("#000000"), Some((0x00, 0x00, 0x00)));
-        assert_eq!(parse_flat_bgcolor("#abcdef"), Some((0xab, 0xcd, 0xef)));
-        assert_eq!(parse_flat_bgcolor("#123456"), Some((0x12, 0x34, 0x56)));
-        assert_eq!(parse_flat_bgcolor("#789000"), Some((0x78, 0x90, 0x00)));
+        assert_eq!(
+            parse_flat_bgcolor("#ffffff"),
+            Some(color!(0xff, 0xff, 0xff))
+        );
+        assert_eq!(
+            parse_flat_bgcolor("#000000"),
+            Some(color!(0x00, 0x00, 0x00))
+        );
+        assert_eq!(
+            parse_flat_bgcolor("#abcdef"),
+            Some(color!(0xab, 0xcd, 0xef))
+        );
+        assert_eq!(
+            parse_flat_bgcolor("#123456"),
+            Some(color!(0x12, 0x34, 0x56))
+        );
+        assert_eq!(
+            parse_flat_bgcolor("#789000"),
+            Some(color!(0x78, 0x90, 0x00))
+        );
         assert_eq!(parse_flat_bgcolor("ffffff"), None);
         assert_eq!(parse_flat_bgcolor("#fffffff"), None);
         assert_eq!(parse_flat_bgcolor("#xfffff"), None);

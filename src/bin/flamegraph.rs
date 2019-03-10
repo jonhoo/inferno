@@ -1,10 +1,12 @@
 use env_logger::Env;
 use std::fs::File;
 use std::io::{self, BufReader, Read};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use structopt::StructOpt;
 
-use inferno::flamegraph::{self, BackgroundColor, Direction, FuncFrameAttrsMap, Options, Palette};
+use inferno::flamegraph::{
+    self, BackgroundColor, Direction, FuncFrameAttrsMap, Options, Palette, PaletteMap,
+};
 
 #[derive(Debug, StructOpt)]
 #[structopt(name = "inferno-flamegraph", author = "")]
@@ -74,13 +76,14 @@ struct Opt {
     no_javascript: bool,
 }
 
-impl Into<Options> for Opt {
-    fn into(self) -> Options {
+const PALETTE_MAP_FILE: &str = "palette.map"; // default name for the palette map file
+
+impl<'a> Into<Options<'a>> for Opt {
+    fn into(self) -> Options<'a> {
         let mut options = Options::default();
         options.colors = self.colors;
         options.bgcolors = self.bgcolors;
         options.hash = self.hash;
-        options.consistent_palette = self.cp;
         if let Some(file) = self.nameattr_file {
             match FuncFrameAttrsMap::from_file(&file) {
                 Ok(m) => {
@@ -116,13 +119,26 @@ fn main() -> quick_xml::Result<()> {
         .init();
     }
 
+    let mut palette_map = match fetch_consistent_palette_if_needed(opt.cp, PALETTE_MAP_FILE) {
+        Ok(palette_map) => palette_map,
+        Err(e) => panic!("Error reading {}: {:?}", PALETTE_MAP_FILE, e),
+    };
+
     if opt.infiles.is_empty() || opt.infiles.len() == 1 && opt.infiles[0].to_str() == Some("-") {
         let stdin = io::stdin();
         let r = BufReader::with_capacity(128 * 1024, stdin.lock());
-        flamegraph::from_reader(opt.into(), r, io::stdout().lock())
+        flamegraph::from_reader(
+            build_options(opt, palette_map.as_mut()),
+            r,
+            io::stdout().lock(),
+        )?;
     } else if opt.infiles.len() == 1 {
         let r = File::open(&opt.infiles[0]).map_err(quick_xml::Error::Io)?;
-        flamegraph::from_reader(opt.into(), r, io::stdout().lock())
+        flamegraph::from_reader(
+            build_options(opt, palette_map.as_mut()),
+            r,
+            io::stdout().lock(),
+        )?;
     } else {
         let stdin = io::stdin();
         let mut stdin_added = false;
@@ -140,6 +156,44 @@ fn main() -> quick_xml::Result<()> {
             }
         }
 
-        flamegraph::from_readers(opt.into(), readers, io::stdout().lock())
+        flamegraph::from_readers(
+            build_options(opt, palette_map.as_mut()),
+            readers,
+            io::stdout().lock(),
+        )?;
     }
+
+    save_consistent_palette_if_needed(&palette_map, PALETTE_MAP_FILE).map_err(quick_xml::Error::Io)
+}
+
+fn build_options(opt: Opt, palette_map: Option<&mut PaletteMap>) -> Options {
+    let mut options: Options = opt.into();
+    options.palette_map = palette_map;
+    options
+}
+
+fn fetch_consistent_palette_if_needed(
+    use_consistent_palette: bool,
+    palette_file: &str,
+) -> io::Result<Option<PaletteMap>> {
+    let palette_map = if use_consistent_palette {
+        let path = Path::new(palette_file);
+        Some(PaletteMap::load_from_file_or_empty(&path)?)
+    } else {
+        None
+    };
+
+    Ok(palette_map)
+}
+
+fn save_consistent_palette_if_needed(
+    palette_map: &Option<PaletteMap>,
+    palette_file: &str,
+) -> io::Result<()> {
+    if let Some(palette_map) = palette_map {
+        let path = Path::new(palette_file);
+        palette_map.save_to_file(&path)?;
+    }
+
+    Ok(())
 }
