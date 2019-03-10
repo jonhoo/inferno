@@ -3,57 +3,19 @@ extern crate pretty_assertions;
 
 extern crate inferno;
 
+mod collapse_common;
+
+use collapse_common::*;
 use inferno::collapse::perf::{Folder, Options};
 use inferno::collapse::Collapse;
-use libflate::gzip::Decoder;
 use log::Level;
-use std::fs::{self, File};
-use std::io::{self, BufRead, BufReader, Cursor};
+use std::fs::File;
+use std::io::{self, BufReader, Cursor};
 use std::path::Path;
+use std::process::{Command, Stdio};
 
-fn test_collapse_perf(
-    test_filename: &str,
-    expected_filename: &str,
-    options: Options,
-) -> io::Result<()> {
-    let test_file = File::open(test_filename).unwrap();
-    let r: Box<BufRead> = if test_filename.ends_with(".gz") {
-        Box::new(BufReader::new(Decoder::new(test_file).unwrap()))
-    } else {
-        Box::new(BufReader::new(test_file))
-    };
-
-    let expected_len = fs::metadata(expected_filename).unwrap().len() as usize;
-    let mut result = Cursor::new(Vec::with_capacity(expected_len));
-    let mut perf = Folder::from(options);
-    let return_value = perf.collapse(r, &mut result);
-    let mut expected = BufReader::new(File::open(expected_filename).unwrap());
-    result.set_position(0);
-
-    let mut buf = String::new();
-    let mut line_num = 1;
-    for line in result.lines() {
-        // Strip out " and ' since perl version does.
-        let line = line.unwrap().replace("\"", "").replace("'", "");
-        if expected.read_line(&mut buf).unwrap() == 0 {
-            panic!(
-                "\noutput has more lines than expected result file: {}",
-                expected_filename
-            );
-        }
-        assert_eq!(line, buf.trim_end(), "\n{}:{}", expected_filename, line_num);
-        buf.clear();
-        line_num += 1;
-    }
-
-    if expected.read_line(&mut buf).unwrap() > 0 {
-        panic!(
-            "\n{} has more lines than output, beginning at line: {}",
-            expected_filename, line_num
-        )
-    }
-
-    return_value
+fn test_collapse_perf(test_file: &str, expected_file: &str, options: Options) -> io::Result<()> {
+    test_collapse(Folder::from(options), test_file, expected_file)
 }
 
 fn options_from_vec(opt_vec: Vec<&str>) -> Options {
@@ -300,4 +262,41 @@ fn collapse_perf_should_warn_about_weird_input_lines() {
             );
         },
     );
+}
+
+#[test]
+fn collapse_perf_cli() {
+    let input_file = "./flamegraph/test/perf-vertx-stacks-01.txt";
+    let expected_file = "./flamegraph/test/results/perf-vertx-stacks-01-collapsed-all.txt";
+
+    // Test with file passed in
+    let output = Command::new("cargo")
+        .arg("run")
+        .arg("--bin")
+        .arg("inferno-collapse-perf")
+        .arg("--")
+        .arg("--all")
+        .arg(input_file)
+        .output()
+        .expect("failed to execute process");
+    let expected = BufReader::new(File::open(expected_file).unwrap());
+    compare_results(Cursor::new(output.stdout), expected, expected_file);
+
+    // Test with STDIN
+    let mut child = Command::new("cargo")
+        .arg("run")
+        .arg("--bin")
+        .arg("inferno-collapse-perf")
+        .arg("--")
+        .arg("--all")
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .spawn()
+        .expect("Failed to spawn child process");
+    let mut input = BufReader::new(File::open(input_file).unwrap());
+    let stdin = child.stdin.as_mut().expect("Failed to open stdin");
+    io::copy(&mut input, stdin).unwrap();
+    let output = child.wait_with_output().expect("Failed to read stdout");
+    let expected = BufReader::new(File::open(expected_file).unwrap());
+    compare_results(Cursor::new(output.stdout), expected, expected_file);
 }
