@@ -36,15 +36,17 @@ impl PaletteMap {
     /// Each line should follow the format: NAME->rgb(RED, GREEN, BLUE)
     /// where NAME is the function name, and RED, GREEN, BLUE integer values between 0 and 255
     /// included.
+    /// Any line which does not follow the previous format will be ignored.
     ///
-    /// This function will return an [`std::io::Error`] if the input is not correctly formatted.
+    /// This function will propagate any [`std::io::Error`] returned by the given reader.
     pub fn from_reader(reader: &mut dyn io::BufRead) -> io::Result<Self> {
         let mut map = HashMap::default();
 
         for line in reader.lines() {
             let line = line?;
-            let (name, color) = parse_line(&line)?;
-            map.insert(name.to_string(), color);
+            if let Ok((name, color)) = parse_line(&line) {
+                map.insert(name.to_string(), color);
+            }
         }
 
         Ok(PaletteMap(map))
