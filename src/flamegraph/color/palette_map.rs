@@ -94,15 +94,19 @@ impl PaletteMap {
 
     /// Returns the color value corresponding to the given function name if it is present.
     /// Otherwise compute the color, and insert the new function name/color in the map.
-    pub(crate) fn find_color_for<S: ToString, F: FnMut(&S) -> Color>(
+    pub(crate) fn find_color_for<F: FnMut(&str) -> Color>(
         &mut self,
-        name: &S,
+        name: &str,
         mut compute_color: F,
     ) -> Color {
-        *self
-            .0
-            .entry(name.to_string())
-            .or_insert_with(|| compute_color(name))
+        match self.get(name) {
+            Some(color) => color,
+            None => {
+                let color = compute_color(name);
+                self.insert(name, color);
+                color
+            }
+        }
     }
 }
 
