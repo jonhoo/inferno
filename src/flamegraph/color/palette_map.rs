@@ -41,12 +41,19 @@ impl PaletteMap {
     /// This function will propagate any [`std::io::Error`] returned by the given reader.
     pub fn from_reader(reader: &mut dyn io::BufRead) -> io::Result<Self> {
         let mut map = HashMap::default();
+        let mut ignored = 0;
 
         for line in reader.lines() {
             let line = line?;
             if let Ok((name, color)) = parse_line(&line) {
                 map.insert(name.to_string(), color);
+            } else {
+                ignored += 1;
             }
+        }
+
+        if ignored != 0 {
+            warn!("Ignored {} lines with invalid format", ignored);
         }
 
         Ok(PaletteMap(map))
