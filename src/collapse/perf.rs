@@ -64,8 +64,9 @@ pub struct Folder {
     /// Function entries on the stack in this entry thus far.
     stack: VecDeque<String>,
 
-    /// Keep track of inlined Java functions so they can be annotated with "_[i]".
-    java_inline: Vec<String>,
+    /// General String cache that can be used while processing lines.
+    /// Currently only used to keep track of functions for Java inlining.
+    cache_line: Vec<String>,
 
     /// Number of times each call stack has been seen.
     occurrences: HashMap<String, usize>,
@@ -116,7 +117,7 @@ impl From<Options> for Folder {
             in_event: false,
             skip_stack: false,
             stack: VecDeque::default(),
-            java_inline: Vec::default(),
+            cache_line: Vec::default(),
             occurrences: HashMap::default(),
             pname: String::new(),
             event_filtering: EventFilterState::None,
@@ -290,7 +291,7 @@ impl Folder {
 
                 // Annotations
                 //
-                // detect inlined when java_inline has funcs
+                // detect inlined when self.cache_line has funcs
                 // detect kernel from the module name; eg, frames to parse include:
                 //
                 //     ffffffff8103ce3b native_safe_halt ([kernel.kallsyms])
@@ -300,7 +301,7 @@ impl Folder {
                 // detect jit from the module name; eg:
                 //
                 //     7f722d142778 Ljava/io/PrintStream;::print (/tmp/perf-19982.map)
-                if !self.java_inline.is_empty() {
+                if !self.cache_line.is_empty() {
                     func.push_str("_[i]"); // inlined
                 } else if self.opt.annotate_kernel
                     && (module.starts_with('[') || module.ends_with("vmlinux"))
@@ -314,10 +315,10 @@ impl Folder {
                     func.push_str("_[j]"); // jitted
                 }
 
-                self.java_inline.push(func);
+                self.cache_line.push(func);
             }
 
-            while let Some(func) = self.java_inline.pop() {
+            while let Some(func) = self.cache_line.pop() {
                 self.stack.push_front(func);
             }
         } else {
