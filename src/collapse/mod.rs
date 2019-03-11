@@ -13,7 +13,7 @@ pub mod dtrace;
 pub mod perf;
 
 use std::fs::File;
-use std::io;
+use std::io::{self, Write};
 use std::path::Path;
 
 const READER_CAPACITY: usize = 128 * 1024;
@@ -38,13 +38,12 @@ pub trait Collapse {
         W: io::Write;
 
     /// Collapses the contents of a file (or of STDIN if `infile` is `None`) and writes folded
-    /// stack lines to `STDOUT`.
-    fn collapse_file<P>(&mut self, infile: Option<P>) -> io::Result<()>
+    /// stack lines to provided `writer`.
+    fn collapse_file<P, W>(&mut self, infile: Option<P>, writer: W) -> io::Result<()>
     where
         P: AsRef<Path>,
+        W: Write,
     {
-        let stdout = io::stdout();
-        let writer = stdout.lock();
         match infile {
             Some(ref path) => {
                 let file = File::open(path)?;

@@ -8,31 +8,22 @@ use log::Level;
 use std::fs::{self, File};
 use std::io::{self, BufRead, BufReader, Cursor};
 use std::path::{Path, PathBuf};
-use std::process::{Command, Stdio};
 use std::str::FromStr;
 
 fn test_flamegraph(
     input_file: &str,
     expected_result_file: &str,
-    mut options: Options,
+    options: Options,
 ) -> quick_xml::Result<()> {
-    // Always pretty print XML to make it easier to find differences when tests fail.
-    options.pretty_xml = true;
-    // Never include static JavaScript in tests so we don't have to have it duplicated
-    // in all of the test files.
-    options.no_javascript = true;
-    let r = File::open(input_file).unwrap();
-    let expected_len = fs::metadata(expected_result_file).unwrap().len() as usize;
-    let mut result = Cursor::new(Vec::with_capacity(expected_len));
-    let return_value = flamegraph::from_reader(options, r, &mut result);
-    let expected = BufReader::new(File::open(expected_result_file).unwrap());
-    result.set_position(0);
-    compare_results(result, expected, expected_result_file);
-    return_value
+    test_flamegraph_multiple_files(
+        vec![PathBuf::from_str(input_file).unwrap()],
+        expected_result_file,
+        options,
+    )
 }
 
 fn test_flamegraph_multiple_files(
-    input_files: Vec<String>,
+    input_files: Vec<PathBuf>,
     expected_result_file: &str,
     mut options: Options,
 ) -> quick_xml::Result<()> {
@@ -41,14 +32,9 @@ fn test_flamegraph_multiple_files(
     // Never include static JavaScript in tests so we don't have to have it duplicated
     // in all of the test files.
     options.no_javascript = true;
-    let mut readers: Vec<File> = Vec::with_capacity(input_files.len());
-    for infile in input_files.iter() {
-        let r = File::open(infile).map_err(quick_xml::Error::Io)?;
-        readers.push(r);
-    }
     let expected_len = fs::metadata(expected_result_file).unwrap().len() as usize;
     let mut result = Cursor::new(Vec::with_capacity(expected_len));
-    let return_value = flamegraph::from_readers(options, readers, &mut result);
+    let return_value = flamegraph::from_files(options, input_files, &mut result);
     let expected = BufReader::new(File::open(expected_result_file).unwrap());
     result.set_position(0);
     compare_results(result, expected, expected_result_file);
@@ -311,9 +297,9 @@ fn flamegraph_empty_input() {
 fn flamegraph_unsorted_multiple_input_files() {
     let input_files = vec![
         "./tests/data/flamegraph/multiple-inputs/perf-vertx-stacks-01-collapsed-all-unsorted-1.txt"
-            .to_string(),
+            .into(),
         "./tests/data/flamegraph/multiple-inputs/perf-vertx-stacks-01-collapsed-all-unsorted-2.txt"
-            .to_string(),
+            .into(),
     ];
     let expected_result_file =
         "./tests/data/flamegraph/multiple-inputs/perf-vertx-stacks-01-collapsed-all.svg";
@@ -384,66 +370,4 @@ fn flamegraph_example_perf_stacks() {
 fn load_palette_map_file(palette_file: &str) -> PaletteMap {
     let path = Path::new(palette_file);
     PaletteMap::load_from_file_or_empty(&path).unwrap()
-}
-
-#[test]
-fn flamegraph_cli() {
-    let input_file = "./flamegraph/test/results/perf-vertx-stacks-01-collapsed-all.txt";
-    let expected_file =
-        "./tests/data/flamegraph/multiple-inputs/perf-vertx-stacks-01-collapsed-all.svg";
-
-    // Test with file passed in
-    let output = Command::new("cargo")
-        .arg("run")
-        .arg("--bin")
-        .arg("inferno-flamegraph")
-        .arg("--")
-        .arg("--pretty-xml")
-        .arg("--no-javascript")
-        .arg("--hash")
-        .arg(input_file)
-        .output()
-        .expect("failed to execute process");
-    let expected = BufReader::new(File::open(expected_file).unwrap());
-    compare_results(Cursor::new(output.stdout), expected, expected_file);
-
-    // Test with STDIN
-    let mut child = Command::new("cargo")
-        .arg("run")
-        .arg("--bin")
-        .arg("inferno-flamegraph")
-        .arg("--")
-        .arg("--pretty-xml")
-        .arg("--no-javascript")
-        .arg("--hash")
-        .stdin(Stdio::piped())
-        .stdout(Stdio::piped())
-        .spawn()
-        .expect("Failed to spawn child process");
-    let mut input = BufReader::new(File::open(input_file).unwrap());
-    let stdin = child.stdin.as_mut().expect("Failed to open stdin");
-    io::copy(&mut input, stdin).unwrap();
-    let output = child.wait_with_output().expect("Failed to read stdout");
-    let expected = BufReader::new(File::open(expected_file).unwrap());
-    compare_results(Cursor::new(output.stdout), expected, expected_file);
-
-    // Test with multiple files passed in
-    let input_file_part1 =
-        "./tests/data/flamegraph/multiple-inputs/perf-vertx-stacks-01-collapsed-all-unsorted-1.txt";
-    let input_file_part2 =
-        "./tests/data/flamegraph/multiple-inputs/perf-vertx-stacks-01-collapsed-all-unsorted-2.txt";
-    let output = Command::new("cargo")
-        .arg("run")
-        .arg("--bin")
-        .arg("inferno-flamegraph")
-        .arg("--")
-        .arg("--pretty-xml")
-        .arg("--no-javascript")
-        .arg("--hash")
-        .arg(input_file_part1)
-        .arg(input_file_part2)
-        .output()
-        .expect("failed to execute process");
-    let expected = BufReader::new(File::open(expected_file).unwrap());
-    compare_results(Cursor::new(output.stdout), expected, expected_file);
 }

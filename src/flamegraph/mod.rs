@@ -14,8 +14,10 @@ use quick_xml::{
     events::{BytesEnd, BytesStart, BytesText, Event},
     Writer,
 };
-use std::io;
+use std::fs::File;
 use std::io::prelude::*;
+use std::io::{self, BufReader};
+use std::path::PathBuf;
 use str_stack::StrStack;
 use svg::StyleOptions;
 
@@ -564,6 +566,39 @@ where
     lines.sort_unstable();
 
     from_sorted_lines(opt, lines, writer)
+}
+
+/// Produce a flame graph from files that contain folded stack lines
+/// and write the result to provided `writer`.
+///
+/// If files is empty, STDIN will be used as input.
+pub fn from_files<W: Write>(opt: Options, files: Vec<PathBuf>, writer: W) -> quick_xml::Result<()> {
+    if files.is_empty() || files.len() == 1 && files[0].to_str() == Some("-") {
+        let stdin = io::stdin();
+        let r = BufReader::with_capacity(128 * 1024, stdin.lock());
+        from_reader(opt, r, writer)
+    } else if files.len() == 1 {
+        let r = File::open(&files[0]).map_err(quick_xml::Error::Io)?;
+        from_reader(opt, r, writer)
+    } else {
+        let stdin = io::stdin();
+        let mut stdin_added = false;
+        let mut readers: Vec<Box<Read>> = Vec::with_capacity(files.len());
+        for infile in files.iter() {
+            if infile.to_str() == Some("-") {
+                if !stdin_added {
+                    let r = BufReader::with_capacity(128 * 1024, stdin.lock());
+                    readers.push(Box::new(r));
+                    stdin_added = true;
+                }
+            } else {
+                let r = File::open(infile).map_err(quick_xml::Error::Io)?;
+                readers.push(Box::new(r));
+            }
+        }
+
+        from_readers(opt, readers, writer)
+    }
 }
 
 fn deannotate(f: &str) -> &str {
