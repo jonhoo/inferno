@@ -11,37 +11,75 @@ primary focus is on speeding up the `stackcollapse-*` tools that process
 output from various profiling tools into the "folded" format expected by
 the `flamegraph` plotting tool. So far, the focus has been on parsing
 profiling results from
-[`perf`](https://perf.wiki.kernel.org/index.php/Main_Page), and
-`inferno-collapse-perf` is ~10x faster than `stackcollapse-perf`.
+[`perf`](https://perf.wiki.kernel.org/index.php/Main_Page) and
+[`dtrace`](https://www.joyent.com/dtrace). At the time of writing,
+`inferno-collapse-perf` is ~9x faster than `stackcollapse-perf.pl` and
+`inferno-collapse-dtrace` is ~10x faster than `stackcollapse.pl` (see
+`compare.sh`.
 
 It is developed in part through live coding sessions, which you can find
 [on YouTube](https://www.youtube.com/watch?v=jTpK-bNZiA4&list=PLqbS7AVVErFimAvMW-kIJUwxpPvcPBCsz).
 
 # Dependency
 
-You need to have the [`perf`](https://perf.wiki.kernel.org/index.php/Main_Page) tool installed on your Linux systems.
-This can involve installing package like `linux-tools-generic` for Ubuntu or `linux-tools` for Debian.
-You may need to tweak a kernel config such as
+To profile your application, you'll need to have a "profiler" installed.
+This will likely be [`perf`]() or [`bpftrace`] on Linux, and [DTrace] on
+macOS. There are some great instructions on how to get started with
+these tools on Brendan Gregg's [CPU Flame Graphs page].
+
+  [profiler]: https://en.wikipedia.org/wiki/Profiling_(computer_programming
+  [`perf`]: https://perf.wiki.kernel.org/index.php/Main_Page
+  [`bpftrace`]: https://github.com/iovisor/bpftrace/
+  [DTrace]: https://www.joyent.com/dtrace
+  [CPU Flame Graphs page]: http://www.brendangregg.com/FlameGraphs/cpuflamegraphs.html#Instructions
+
+In Linux, you may need to tweak a kernel config such as
 ```console
 $ echo 0 | sudo tee /proc/sys/kernel/perf_event_paranoid
 ```
-See [this stackoverflow answer](https://unix.stackexchange.com/a/14256) for details.
+to get profiling [to work](https://unix.stackexchange.com/a/14256).
 
-# How to Use
+# How to use
 
-Build Inferno
+## As a library
+
+Inferno provides a [library interface](https://docs.rs/inferno/) through
+the `inferno` crate. This will let you collapse stacks and produce flame
+graphs without going through the command line, and is intended for
+integration with external Rust tools like [`cargo-flamegraph`].
+
+  [`cargo-flamegraph`]: https://github.com/ferrous-systems/cargo-flamegraph
+
+## As a binary
+
+First, install Inferno. Then, build your application (in release mode
+and with debug symbols). Finally, [run a profiler] to gather
+profiling data and pass it through the appropriate Inferno "collapser".
+Depending on your platform, this will look something like
+
+  [run a profiler]: http://www.brendangregg.com/FlameGraphs/cpuflamegraphs.html#Instructions
+
 ```console
-$ cargo build --release
+$ # Linux
+# perf record --call-graph dwarf target/release/mybin
+$ perf script | inferno-collapse-perf > stacks.folded
 ```
 
-Run a program using profiling with perf
+or
+
 ```console
-$ perf record -g [your program]
+$ # macOS
+$ target/release/mybin &
+$ pid=$!
+# dtrace -x ustackframes=100 -n "profile-97 /pid == $pid/ { @[ustack()] = count(); } tick-60s { exit(0); }"  -o out.user_stacks
+$ cat out.user_stacks | inferno-collapse-dtrace > stacks.folded
 ```
 
-Transform perf output to svg
+In the end, you'll end up with a "folded stack" file. You can pass that
+file to `inferno-flamegraph` to generate a flame graph SVG:
+
 ```console
-$ perf script | ./target/release/inferno-collapse-perf | ./target/release/inferno-flamegraph > out.svg
+$ cat stacks.folded | inferno-flamegraph > flamegraph.svg
 ```
 
 You'll end up with an image like this:
@@ -50,7 +88,10 @@ You'll end up with an image like this:
 
 # Comparison to the Perl implementation
 
-To compare performance, run `./compare.sh`. It requires [hyperfine](https://github.com/sharkdp/hyperfine).
+To run Inferno's performance comparison, run `./compare.sh`.
+It requires [hyperfine](https://github.com/sharkdp/hyperfine), and you
+must make sure you also check out Inferno's
+[submodules](https://github.blog/2016-02-01-working-with-submodules/).
 
 # License
 

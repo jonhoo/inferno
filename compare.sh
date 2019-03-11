@@ -1,18 +1,20 @@
 #!/usr/bin/env bash
 
 set -eu -o pipefail
+BIN="${CARGO_TARGET_DIR:-target}/release/"
+
 
 cargo build --release --bin inferno-collapse-perf
-BIN="${CARGO_TARGET_DIR:-target}/release/inferno-collapse-perf"
+f=flamegraph/example-perf-stacks.txt
+zcat flamegraph/example-perf-stacks.txt.gz > "$f"
+echo "==>  perf  <=="
+hyperfine --warmup 20 -m 50 "$BIN/inferno-collapse-perf --all $f" "./flamegraph/stackcollapse-perf.pl --all $f"
+rm "$f"
 
-(( maxsize = 100 * 1024 ))
-for f in ./flamegraph/test/*.txt; do
-	# only run benchmark on larger files
-	filesize=$(stat -c%s "$f")
-	if (( filesize > maxsize )); then
-		echo "==>  $f  <=="
-		hyperfine "$BIN --all $f" "./flamegraph/stackcollapse-perf.pl --all $f"
-		echo
-		echo
-	fi
-done
+echo
+echo
+
+cargo build --release --bin inferno-collapse-dtrace
+f=flamegraph/example-dtrace-stacks.txt
+echo "==>  dtrace  <=="
+hyperfine --warmup 20 -m 50 "$BIN/inferno-collapse-dtrace $f" "./flamegraph/stackcollapse.pl $f"

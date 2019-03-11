@@ -29,26 +29,41 @@
 //! Since profiling tools produce stack traces in a myriad of different formats, and the flame
 //! graph plotter expects input in a particular folded stack trace format, each profiler needs a
 //! separate collapse implementation. While the original Perl implementation supports _lots_ of
-//! profilers, Inferno currently only supports one: the widely used [`perf`] tool (specifically the
-//! output from `perf script`). Support for xdebug is [hopefully coming soon], and [`bpftrace`]
-//! should get [native support] before too long.
+//! profilers, Inferno currently only supports two: the widely used [`perf`] tool (specifically the
+//! output from `perf script`) and [DTrace]. Support for xdebug is [hopefully coming soon], and
+//! [`bpftrace`] should get [native support] before too long.
 //!
-//! To profile a Rust application with perf for example, you would first set
+//! Inferno supports profiles from applications written in any language, but we'll walk through an
+//! example with a Rust program. To profile a Rust application, you would first set
 //!
 //! ```toml
 //! [profile.release]
 //! debug = true
 //! ```
 //!
-//! in your `Cargo.toml`, and then run:
+//! in your `Cargo.toml` so that your profile will have useful function names and such included.
+//! Then, compile with `--release`, and then run your favorite performance profiler:
+//!
+//! ### perf (Linux)
 //!
 //! ```console
-//! $ cargo b --release --bin mybin
-//! $ perf record --call-graph dwarf target/release/mybin
+//! # perf record --call-graph dwarf target/release/mybin
 //! $ perf script | inferno-collapse-perf > stacks.folded
 //! ```
 //!
 //! For more advanced uses, see Brendan Gregg's excellent [perf examples] page.
+//!
+//! ### DTrace (macOS)
+//!
+//! ```console
+//! $ target/release/mybin &
+//! $ pid=$!
+//! # dtrace -x ustackframes=100 -n "profile-97 /pid == $pid/ { @[ustack()] = count(); } tick-60s { exit(0); }"  -o out.user_stacks
+//! $ cat out.user_stacks | inferno-collapse-dtrace > stacks.folded
+//! ```
+//!
+//! For more advanced uses, see also upstream FlameGraph's [DTrace examples].
+//! You may also be interested in something like [NodeJS's ustack helper].
 //!
 //! ## Producing a flame graph
 //!
@@ -61,10 +76,6 @@
 //! ```
 //!
 //! And then open `profile.svg` in your viewer of choice.
-//!
-//! # Programmatic access
-//!
-//! TODO: [https://github.com/jonhoo/inferno/issues/30](https://github.com/jonhoo/inferno/issues/30)
 //!
 //! # Development
 //!
@@ -79,10 +90,13 @@
 //!   [hardware or software events]: https://perf.wiki.kernel.org/index.php/Tutorial#Events
 //!   [stack traces]: https://en.wikipedia.org/wiki/Stack_trace
 //!   [`perf`]: https://perf.wiki.kernel.org/index.php/Main_Page
+//!   [DTrace]: https://www.joyent.com/dtrace
 //!   [hopefully coming soon]: https://twitter.com/DanielLockyer/status/1094605231155900416
 //!   [native support]: https://github.com/jonhoo/inferno/issues/51#issuecomment-466732304
 //!   [`bpftrace`]: https://github.com/iovisor/bpftrace
 //!   [perf examples]: http://www.brendangregg.com/perf.html
+//!   [DTrace examples]: http://www.brendangregg.com/FlameGraphs/cpuflamegraphs.html#DTrace
+//!   [NodeJS's ustack helper]: http://dtrace.org/blogs/dap/2012/01/05/where-does-your-node-program-spend-its-time/
 //!   [a series of live coding sessions]: https://www.youtube.com/watch?v=jTpK-bNZiA4&list=PLqbS7AVVErFimAvMW-kIJUwxpPvcPBCsz
 
 #![deny(missing_docs)]
