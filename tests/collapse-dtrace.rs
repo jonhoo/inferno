@@ -3,66 +3,29 @@ extern crate pretty_assertions;
 
 extern crate inferno;
 
+mod collapse_common;
+
+use collapse_common::*;
 use inferno::collapse::dtrace::{Folder, Options};
-use inferno::collapse::Collapse;
-use std::fs::{self, File};
-use std::io::{self, BufRead, BufReader, Cursor};
+use std::fs::File;
+use std::io::{self, BufReader, Cursor};
+use std::process::{Command, Stdio};
 
 fn test_collapse_dtrace(test_file: &str, expected_file: &str, options: Options) -> io::Result<()> {
-    let r = BufReader::new(
-        File::open(test_file).expect(&format!("Test file {} not found.", test_file)),
-    );
-    let expected_len = fs::metadata(expected_file)
-        .expect(&format!("Result file {} not found.", expected_file))
-        .len() as usize;
-    let mut result = Cursor::new(Vec::with_capacity(expected_len));
-    let mut dtrace = Folder::from(options);
-    let return_value = dtrace.collapse(r, &mut result);
-    let mut expected = BufReader::new(
-        File::open(expected_file).expect(&format!("Result file {} not found.", expected_file)),
-    );
-
-    result.set_position(0);
-
-    let mut buf = String::new();
-    let mut line_num = 1;
-    for line in result.lines() {
-        // Strip out " and ' since perl version does.
-        let line = line.unwrap().replace("\"", "").replace("'", "");
-
-        if expected.read_line(&mut buf).unwrap() == 0 {
-            println!("extra line: {}", line);
-            panic!(
-                "\noutput has more lines than expected result file: {}",
-                expected_file
-            );
-        }
-        assert_eq!(line, buf.trim_end(), "\n{}:{}", expected_file, line_num);
-        buf.clear();
-        line_num += 1;
-    }
-
-    if expected.read_line(&mut buf).unwrap() > 0 {
-        panic!(
-            "\n{} has more lines than output, beginning at line: {}",
-            expected_file, line_num
-        )
-    }
-
-    return_value
+    test_collapse(Folder::from(options), test_file, expected_file)
 }
 
 #[test]
 fn collapse_dtrace_compare_to_upstream() {
     let test_file = "./flamegraph/example-dtrace-stacks.txt";
-    let result_file = "./tests/data/collapse-dtrace/test/results/dtrace-example.txt";
+    let result_file = "./tests/data/collapse-dtrace/results/dtrace-example.txt";
     test_collapse_dtrace(test_file, result_file, Options::default()).unwrap()
 }
 
 #[test]
 fn collapse_dtrace_compare_to_upstream_with_offsets() {
     let test_file = "./flamegraph/example-dtrace-stacks.txt";
-    let result_file = "./tests/data/collapse-dtrace/test/results/dtrace-example-offsets.txt";
+    let result_file = "./tests/data/collapse-dtrace/results/dtrace-example-offsets.txt";
     test_collapse_dtrace(
         test_file,
         result_file,
@@ -75,8 +38,8 @@ fn collapse_dtrace_compare_to_upstream_with_offsets() {
 
 #[test]
 fn collapse_dtrace_compare_to_upstream_java() {
-    let test_file = "./tests/data/collapse-dtrace/test/java.txt";
-    let result_file = "./tests/data/collapse-dtrace/test/results/java.txt";
+    let test_file = "./tests/data/collapse-dtrace/java.txt";
+    let result_file = "./tests/data/collapse-dtrace/results/java.txt";
     test_collapse_dtrace(test_file, result_file, Options::default()).unwrap()
 }
 
@@ -87,8 +50,8 @@ fn collapse_dtrace_compare_to_flamegraph_bug() {
     // of bug compatibility.
     //
     // https://github.com/brendangregg/FlameGraph/issues/202
-    let test_file = "./tests/data/collapse-dtrace/test/flamegraph-bug.txt";
-    let result_file = "./tests/data/collapse-dtrace/test/results/flamegraph-bug.txt";
+    let test_file = "./tests/data/collapse-dtrace/flamegraph-bug.txt";
+    let result_file = "./tests/data/collapse-dtrace/results/flamegraph-bug.txt";
     test_collapse_dtrace(
         test_file,
         result_file,
@@ -97,4 +60,37 @@ fn collapse_dtrace_compare_to_flamegraph_bug() {
         },
     )
     .unwrap()
+}
+
+#[test]
+fn collapse_dtrace_cli() {
+    let input_file = "./flamegraph/example-dtrace-stacks.txt";
+    let expected_file = "./tests/data/collapse-dtrace/results/dtrace-example.txt";
+
+    // Test with file passed in
+    let output = Command::new("cargo")
+        .arg("run")
+        .arg("--bin")
+        .arg("inferno-collapse-dtrace")
+        .arg(input_file)
+        .output()
+        .expect("failed to execute process");
+    let expected = BufReader::new(File::open(expected_file).unwrap());
+    compare_results(Cursor::new(output.stdout), expected, expected_file);
+
+    // Test with STDIN
+    let mut child = Command::new("cargo")
+        .arg("run")
+        .arg("--bin")
+        .arg("inferno-collapse-dtrace")
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .spawn()
+        .expect("Failed to spawn child process");
+    let mut input = BufReader::new(File::open(input_file).unwrap());
+    let stdin = child.stdin.as_mut().expect("Failed to open stdin");
+    io::copy(&mut input, stdin).unwrap();
+    let output = child.wait_with_output().expect("Failed to read stdout");
+    let expected = BufReader::new(File::open(expected_file).unwrap());
+    compare_results(Cursor::new(output.stdout), expected, expected_file);
 }
