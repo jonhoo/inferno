@@ -18,14 +18,14 @@ fn test_collapse_dtrace(test_file: &str, expected_file: &str, options: Options) 
 #[test]
 fn collapse_dtrace_compare_to_upstream() {
     let test_file = "./flamegraph/example-dtrace-stacks.txt";
-    let result_file = "./tests/data/collapse-dtrace/test/results/dtrace-example.txt";
+    let result_file = "./tests/data/collapse-dtrace/results/dtrace-example.txt";
     test_collapse_dtrace(test_file, result_file, Options::default()).unwrap()
 }
 
 #[test]
 fn collapse_dtrace_compare_to_upstream_with_offsets() {
     let test_file = "./flamegraph/example-dtrace-stacks.txt";
-    let result_file = "./tests/data/collapse-dtrace/test/results/dtrace-example-offsets.txt";
+    let result_file = "./tests/data/collapse-dtrace/results/dtrace-example-offsets.txt";
     test_collapse_dtrace(
         test_file,
         result_file,
@@ -38,8 +38,8 @@ fn collapse_dtrace_compare_to_upstream_with_offsets() {
 
 #[test]
 fn collapse_dtrace_compare_to_upstream_java() {
-    let test_file = "./tests/data/collapse-dtrace/test/java.txt";
-    let result_file = "./tests/data/collapse-dtrace/test/results/java.txt";
+    let test_file = "./tests/data/collapse-dtrace/java.txt";
+    let result_file = "./tests/data/collapse-dtrace/results/java.txt";
     test_collapse_dtrace(test_file, result_file, Options::default()).unwrap()
 }
 
@@ -50,8 +50,8 @@ fn collapse_dtrace_compare_to_flamegraph_bug() {
     // of bug compatibility.
     //
     // https://github.com/brendangregg/FlameGraph/issues/202
-    let test_file = "./tests/data/collapse-dtrace/test/flamegraph-bug.txt";
-    let result_file = "./tests/data/collapse-dtrace/test/results/flamegraph-bug.txt";
+    let test_file = "./tests/data/collapse-dtrace/flamegraph-bug.txt";
+    let result_file = "./tests/data/collapse-dtrace/results/flamegraph-bug.txt";
     test_collapse_dtrace(
         test_file,
         result_file,
@@ -65,7 +65,7 @@ fn collapse_dtrace_compare_to_flamegraph_bug() {
 #[test]
 fn collapse_dtrace_cli() {
     let input_file = "./flamegraph/example-dtrace-stacks.txt";
-    let expected_file = "./tests/data/collapse-dtrace/test/results/dtrace-example.txt";
+    let expected_file = "./tests/data/collapse-dtrace/results/dtrace-example.txt";
 
     // Test with file passed in
     let output = Command::new("cargo")
