@@ -103,32 +103,6 @@ impl<'a> Opt {
 
 const PALETTE_MAP_FILE: &str = "palette.map"; // default name for the palette map file
 
-impl<'a> Into<Options<'a>> for Opt {
-    fn into(self) -> Options<'a> {
-        let mut options = Options::default();
-        options.colors = self.colors;
-        options.bgcolors = self.bgcolors;
-        options.hash = self.hash;
-        if let Some(file) = self.nameattr_file {
-            match FuncFrameAttrsMap::from_file(&file) {
-                Ok(m) => {
-                    options.func_frameattrs = m;
-                }
-                Err(e) => panic!("Error reading {}: {:?}", file.display(), e),
-            }
-        };
-        if self.inverted {
-            options.direction = Direction::Inverted;
-            options.title = "Icicle Graph".to_string();
-        }
-        options.negate_differentials = self.negate;
-        options.factor = self.factor;
-        options.pretty_xml = self.pretty_xml;
-        options.no_javascript = self.no_javascript;
-        options
-    }
-}
-
 fn main() -> quick_xml::Result<()> {
     let opt = Opt::from_args();
 
