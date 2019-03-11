@@ -12,10 +12,10 @@ output from various profiling tools into the "folded" format expected by
 the `flamegraph` plotting tool. So far, the focus has been on parsing
 profiling results from
 [`perf`](https://perf.wiki.kernel.org/index.php/Main_Page) and
-[`dtrace`](https://www.joyent.com/dtrace). At the time of writing,
+[DTrace](https://www.joyent.com/dtrace). At the time of writing,
 `inferno-collapse-perf` is ~9x faster than `stackcollapse-perf.pl` and
 `inferno-collapse-dtrace` is ~10x faster than `stackcollapse.pl` (see
-`compare.sh`.
+`compare.sh`).
 
 It is developed in part through live coding sessions, which you can find
 [on YouTube](https://www.youtube.com/watch?v=jTpK-bNZiA4&list=PLqbS7AVVErFimAvMW-kIJUwxpPvcPBCsz).
