@@ -87,6 +87,8 @@ impl From<Options> for Folder {
 }
 
 impl Folder {
+    // This function approximates the Perl regex s/(::.*)[(<].*/$1/
+    // from https://github.com/brendangregg/FlameGraph/blob/1b1c6deede9c33c5134c920bdb7a44cc5528e9a7/stackcollapse.pl#L88
     fn uncpp(probe: &str) -> &str {
         if let Some(scope) = probe.find("::") {
             if let Some(open) = probe[scope + 2..].rfind(|c| c == '(' || c == '<') {
