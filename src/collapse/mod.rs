@@ -1,3 +1,6 @@
+/// Attempts to use whichever Collapse implementation is appropriate for a given input
+pub mod guess;
+
 /// Stack collapsing for the output of [`dtrace`](https://www.joyent.com/dtrace).
 ///
 /// See the [crate-level documentation] for details.
@@ -58,4 +61,11 @@ pub trait Collapse {
             }
         }
     }
+
+    /// Returns whether this implementation is appropriate for the given input line.
+    ///
+    /// None means "not sure -- need more input".
+    /// Some(true) means "yes, this implementation should work with this string".
+    /// Some(false) means "no, this implementation definitely won't work".
+    fn is_applicable(&mut self, line: &str) -> Option<bool>;
 }

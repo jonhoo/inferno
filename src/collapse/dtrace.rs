@@ -31,6 +31,10 @@ pub struct Folder {
     cache_inlines: Vec<String>,
 
     opt: Options,
+
+    is_applicable_found_empty_line: bool,
+    is_applicable_found_stack_line: bool,
+    is_applicable_found_count_line: bool,
 }
 
 impl Collapse for Folder {
@@ -72,6 +76,33 @@ impl Collapse for Folder {
         }
         self.finish(writer)
     }
+
+    fn is_applicable(&mut self, line: &str) -> Option<bool> {
+        let line = line.trim();
+        if line.is_empty() {
+            if self.is_applicable_found_count_line && self.is_applicable_found_stack_line {
+                // Found stack lines and count line
+                return Some(true);
+            }
+            self.is_applicable_found_empty_line = true;
+        } else if self.is_applicable_found_empty_line {
+            if line.parse::<usize>().is_ok() {
+                if self.is_applicable_found_count_line || !self.is_applicable_found_stack_line {
+                    // Either multiple count lines, or a count line with no stack lines
+                    return Some(false);
+                }
+                self.is_applicable_found_count_line = true;
+            } else {
+                if self.is_applicable_found_count_line {
+                    // Found count line before stack lines
+                    return Some(false);
+                }
+                self.is_applicable_found_stack_line = true;
+            }
+        }
+
+        None
+    }
 }
 
 impl From<Options> for Folder {
@@ -82,6 +113,9 @@ impl From<Options> for Folder {
             cache_inlines: Vec::new(),
             opt,
             stack_str_size: 0,
+            is_applicable_found_empty_line: false,
+            is_applicable_found_stack_line: false,
+            is_applicable_found_count_line: false,
         }
     }
 }

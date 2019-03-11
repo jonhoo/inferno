@@ -79,6 +79,9 @@ pub struct Folder {
     event_filtering: EventFilterState,
 
     opt: Options,
+
+    /// Used by `is_applicable` to mark that a stack line was parsed successfully.
+    is_applicable_parsed_stack_line: bool,
 }
 
 impl Collapse for Folder {
@@ -108,6 +111,36 @@ impl Collapse for Folder {
         }
         self.finish(writer)
     }
+
+    fn is_applicable(&mut self, line: &str) -> Option<bool> {
+        if line.starts_with('#') {
+            return None;
+        }
+
+        let line = line.trim_end();
+        if line.is_empty() {
+            if self.in_event {
+                self.in_event = false;
+                // We ended an event. If there were stack lines we'll call it a success.
+                return Some(self.is_applicable_parsed_stack_line);
+            }
+        } else if !self.in_event {
+            if Self::event_line_parts(line).is_none() {
+                // Not a valid event line
+                return Some(false);
+            }
+            self.in_event = true;
+        } else {
+            if Self::stack_line_parts(line).is_none() {
+                self.in_event = false;
+                // Not a valid stack line
+                return Some(false);
+            }
+            self.is_applicable_parsed_stack_line = true;
+        }
+
+        None
+    }
 }
 
 impl From<Options> for Folder {
@@ -122,6 +155,7 @@ impl From<Options> for Folder {
             pname: String::new(),
             event_filtering: EventFilterState::None,
             opt,
+            is_applicable_parsed_stack_line: false,
         }
     }
 }
