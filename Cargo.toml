@@ -38,6 +38,7 @@ rgb ="0.8.13"
 pretty_assertions = "0.6"
 testing_logger = "0.1.1"
 libflate = "0.1"
+criterion = "0.2"
 
 [profile.release]
 debug = true
@@ -64,3 +65,7 @@ required-features = ["cli"]
 name = "inferno-flamegraph"
 path = "src/bin/flamegraph.rs"
 required-features = ["cli"]
+
+[[bench]]
+name = "collapse"
+harness = false

@@ -86,12 +86,33 @@ You'll end up with an image like this:
 
 [![colorized flamegraph output](tests/data/flamegraph/example-perf-stacks/example-perf-stacks.svg)](tests/data/flamegraph/example-perf-stacks/example-perf-stacks.svg)
 
-# Comparison to the Perl implementation
+# Performance
+
+## Comparison to the Perl implementation
 
 To run Inferno's performance comparison, run `./compare.sh`.
 It requires [hyperfine](https://github.com/sharkdp/hyperfine), and you
 must make sure you also check out Inferno's
 [submodules](https://github.blog/2016-02-01-working-with-submodules/).
+
+## Collapsing benchmarks
+
+Inferno includes [criterion](https://github.com/bheisler/criterion.rs)
+benchmarks of its stack collapser implementations in [`benches/`](benches/).
+Criterion saves its results in `target/criterion/`, and uses that to
+recognize changes in performance, which should make it easy to detect
+performance regressions while developing bugfixes and improvements.
+
+You can run the benchmarks with `cargo bench`. On my desktop computer
+(AMD Ryzen 5 2600X), I get these results, but YMMV:
+
+```
+collapse/perf           time:   [14.978 ms 14.987 ms 14.996 ms]
+                        thrpt:  [199.64 MiB/s 199.76 MiB/s 199.88 MiB/s]
+
+collapse/dtrace         time:   [9.8128 ms 9.8169 ms 9.8213 ms]
+                        thrpt:  [134.24 MiB/s 134.30 MiB/s 134.36 MiB/s]
+```
 
 # License
 
