@@ -34,6 +34,17 @@ where
     return_value
 }
 
+pub(crate) fn test_collapse_logs<C, F>(mut collapser: C, input_file: &str, asserter: F)
+where
+    C: Collapse,
+    F: Fn(&Vec<testing_logger::CapturedLog>),
+{
+    testing_logger::setup();
+    let r = BufReader::new(File::open(input_file).unwrap());
+    collapser.collapse(r, std::io::sink()).unwrap();
+    testing_logger::validate(asserter);
+}
+
 pub(crate) fn compare_results<R, E>(result: R, mut expected: E, expected_file: &str)
 where
     R: BufRead,
