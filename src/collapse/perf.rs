@@ -109,8 +109,9 @@ impl Collapse for Folder {
         self.finish(writer)
     }
 
+    // Check if the input has an event line followed by a stack line.
     fn is_applicable(&mut self, input: &str) -> Option<bool> {
-        let mut parsed_stack_line = false;
+        let mut last_line_was_event_line = false;
         let mut input = input.as_bytes();
         let mut line = String::new();
         loop {
@@ -123,30 +124,26 @@ impl Collapse for Folder {
                 return Some(false);
             }
 
+            let line = line.trim();
+            // Skip comments
             if line.starts_with('#') {
                 continue;
             }
 
-            let line = line.trim_end();
             if line.is_empty() {
-                if self.in_event {
-                    self.in_event = false;
-                    // We ended an event. If there were stack lines we'll call it a success.
-                    return Some(parsed_stack_line);
-                }
-            } else if !self.in_event {
-                if Self::event_line_parts(line).is_none() {
-                    // Not a valid event line
-                    return Some(false);
-                }
-                self.in_event = true;
+                last_line_was_event_line = false;
+                continue;
+            }
+
+            if last_line_was_event_line {
+                // If this is valid input this line should be a stack line.
+                return Some(Self::stack_line_parts(line).is_some());
             } else {
-                if Self::stack_line_parts(line).is_none() {
-                    self.in_event = false;
-                    // Not a valid stack line
+                if Self::event_line_parts(line).is_none() {
+                    // The first line that's not empty or a comment should be an event line.
                     return Some(false);
                 }
-                parsed_stack_line = true;
+                last_line_was_event_line = true;
             }
         }
         None
