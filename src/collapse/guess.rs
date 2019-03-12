@@ -3,7 +3,7 @@ use super::{dtrace, perf};
 use std::io::prelude::*;
 use std::io::{self, Cursor};
 
-const LINES_PER_READ: usize = 10;
+const LINES_PER_ITERATION: usize = 10;
 
 /// A collapser that tries to find an appropriate implementation of `Collapse`
 /// based on the input, then delegates to that collapser if one is found.
@@ -29,7 +29,7 @@ impl Collapse for Folder {
         let mut buffer = String::new();
         loop {
             let mut eof = false;
-            for _ in 0..LINES_PER_READ {
+            for _ in 0..LINES_PER_ITERATION {
                 if reader.read_line(&mut buffer)? == 0 {
                     buffer.push('\n');
                     eof = true;
