@@ -64,4 +64,3 @@ required-features = ["cli"]
 [[bench]]
 name = "collapse"
 harness = false
-
