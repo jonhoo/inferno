@@ -62,10 +62,10 @@ pub trait Collapse {
         }
     }
 
-    /// Returns whether this implementation is appropriate for the given input line.
+    /// Returns whether this implementation is appropriate for the given input.
     ///
     /// None means "not sure -- need more input".
     /// Some(true) means "yes, this implementation should work with this string".
     /// Some(false) means "no, this implementation definitely won't work".
-    fn is_applicable(&mut self, line: &str) -> Option<bool>;
+    fn is_applicable(&mut self, input: &str) -> Option<bool>;
 }
