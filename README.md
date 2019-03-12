@@ -93,6 +93,12 @@ It requires [hyperfine](https://github.com/sharkdp/hyperfine), and you
 must make sure you also check out Inferno's
 [submodules](https://github.blog/2016-02-01-working-with-submodules/).
 
+# Benchmarks
+Benchmarks are implemented using the [criterion](https://bheisler.github.io/criterion.rs/book/criterion_rs.html) library.
+It should be noted that criterion saves runs data in `target/criterion` directory and by that shows run to run changes.
+
+To run benchmarks simply run `cargo bench`.
+
 # License
 
 Inferno is a port of @brendangregg's awesome original
@@ -116,3 +122,4 @@ issues. Specifically, the CDDL 1.0 grants
 
 as long as the source is made available along with the license (3.1),
 both of which are true since you're reading this file!
+
