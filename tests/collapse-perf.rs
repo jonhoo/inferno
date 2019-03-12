@@ -12,7 +12,6 @@ use log::Level;
 use std::fs::File;
 use std::io::{self, BufReader, Cursor};
 use std::path::Path;
-use std::process::{Command, Stdio};
 
 fn test_collapse_perf(test_file: &str, expected_file: &str, options: Options) -> io::Result<()> {
     test_collapse(Folder::from(options), test_file, expected_file)
@@ -262,41 +261,4 @@ fn collapse_perf_should_warn_about_weird_input_lines() {
             );
         },
     );
-}
-
-#[test]
-fn collapse_perf_cli() {
-    let input_file = "./flamegraph/test/perf-vertx-stacks-01.txt";
-    let expected_file = "./flamegraph/test/results/perf-vertx-stacks-01-collapsed-all.txt";
-
-    // Test with file passed in
-    let output = Command::new("cargo")
-        .arg("run")
-        .arg("--bin")
-        .arg("inferno-collapse-perf")
-        .arg("--")
-        .arg("--all")
-        .arg(input_file)
-        .output()
-        .expect("failed to execute process");
-    let expected = BufReader::new(File::open(expected_file).unwrap());
-    compare_results(Cursor::new(output.stdout), expected, expected_file);
-
-    // Test with STDIN
-    let mut child = Command::new("cargo")
-        .arg("run")
-        .arg("--bin")
-        .arg("inferno-collapse-perf")
-        .arg("--")
-        .arg("--all")
-        .stdin(Stdio::piped())
-        .stdout(Stdio::piped())
-        .spawn()
-        .expect("Failed to spawn child process");
-    let mut input = BufReader::new(File::open(input_file).unwrap());
-    let stdin = child.stdin.as_mut().expect("Failed to open stdin");
-    io::copy(&mut input, stdin).unwrap();
-    let output = child.wait_with_output().expect("Failed to read stdout");
-    let expected = BufReader::new(File::open(expected_file).unwrap());
-    compare_results(Cursor::new(output.stdout), expected, expected_file);
 }

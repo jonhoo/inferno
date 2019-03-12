@@ -13,18 +13,18 @@ pub(crate) fn test_collapse<C>(
 where
     C: Collapse,
 {
-    let test_file =
-        File::open(test_filename).expect(&format!("Test file {} not found.", test_filename));
-    let r: Box<BufRead> = if test_filename.ends_with(".gz") {
-        Box::new(BufReader::new(Decoder::new(test_file).unwrap()))
-    } else {
-        Box::new(BufReader::new(test_file))
-    };
     let expected_len = fs::metadata(expected_filename)
         .expect(&format!("Result file {} not found.", expected_filename))
         .len() as usize;
     let mut result = Cursor::new(Vec::with_capacity(expected_len));
-    let return_value = collapser.collapse(r, &mut result);
+    let return_value = if test_filename.ends_with(".gz") {
+        let test_file =
+            File::open(test_filename).expect(&format!("Test file {} not found.", test_filename));
+        let r = BufReader::new(Decoder::new(test_file).unwrap());
+        collapser.collapse(r, &mut result)
+    } else {
+        collapser.collapse_file(Some(test_filename), &mut result)
+    };
     let expected = BufReader::new(
         File::open(expected_filename)
             .expect(&format!("Result file {} not found.", expected_filename)),

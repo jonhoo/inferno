@@ -1,6 +1,5 @@
 use env_logger::Env;
-use std::fs::File;
-use std::io::{self, BufReader, Read};
+use std::io;
 use std::path::{Path, PathBuf};
 use structopt::StructOpt;
 
@@ -76,10 +75,8 @@ struct Opt {
     no_javascript: bool,
 }
 
-const PALETTE_MAP_FILE: &str = "palette.map"; // default name for the palette map file
-
-impl<'a> Into<Options<'a>> for Opt {
-    fn into(self) -> Options<'a> {
+impl<'a> Opt {
+    fn into_parts(self) -> (Vec<PathBuf>, Options<'a>) {
         let mut options = Options::default();
         options.colors = self.colors;
         options.bgcolors = self.bgcolors;
@@ -100,9 +97,11 @@ impl<'a> Into<Options<'a>> for Opt {
         options.factor = self.factor;
         options.pretty_xml = self.pretty_xml;
         options.no_javascript = self.no_javascript;
-        options
+        (self.infiles, options)
     }
 }
+
+const PALETTE_MAP_FILE: &str = "palette.map"; // default name for the palette map file
 
 fn main() -> quick_xml::Result<()> {
     let opt = Opt::from_args();
@@ -124,52 +123,11 @@ fn main() -> quick_xml::Result<()> {
         Err(e) => panic!("Error reading {}: {:?}", PALETTE_MAP_FILE, e),
     };
 
-    if opt.infiles.is_empty() || opt.infiles.len() == 1 && opt.infiles[0].to_str() == Some("-") {
-        let stdin = io::stdin();
-        let r = BufReader::with_capacity(128 * 1024, stdin.lock());
-        flamegraph::from_reader(
-            build_options(opt, palette_map.as_mut()),
-            r,
-            io::stdout().lock(),
-        )?;
-    } else if opt.infiles.len() == 1 {
-        let r = File::open(&opt.infiles[0]).map_err(quick_xml::Error::Io)?;
-        flamegraph::from_reader(
-            build_options(opt, palette_map.as_mut()),
-            r,
-            io::stdout().lock(),
-        )?;
-    } else {
-        let stdin = io::stdin();
-        let mut stdin_added = false;
-        let mut readers: Vec<Box<Read>> = Vec::with_capacity(opt.infiles.len());
-        for infile in opt.infiles.iter() {
-            if infile.to_str() == Some("-") {
-                if !stdin_added {
-                    let r = BufReader::with_capacity(128 * 1024, stdin.lock());
-                    readers.push(Box::new(r));
-                    stdin_added = true;
-                }
-            } else {
-                let r = File::open(infile).map_err(quick_xml::Error::Io)?;
-                readers.push(Box::new(r));
-            }
-        }
+    let (infiles, mut options) = opt.into_parts();
+    options.palette_map = palette_map.as_mut();
 
-        flamegraph::from_readers(
-            build_options(opt, palette_map.as_mut()),
-            readers,
-            io::stdout().lock(),
-        )?;
-    }
-
+    flamegraph::from_files(options, infiles, io::stdout().lock())?;
     save_consistent_palette_if_needed(&palette_map, PALETTE_MAP_FILE).map_err(quick_xml::Error::Io)
-}
-
-fn build_options(opt: Opt, palette_map: Option<&mut PaletteMap>) -> Options {
-    let mut options: Options = opt.into();
-    options.palette_map = palette_map;
-    options
 }
 
 fn fetch_consistent_palette_if_needed(
