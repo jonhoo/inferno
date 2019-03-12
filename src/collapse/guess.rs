@@ -46,6 +46,7 @@ impl Collapse for Folder {
                             }
                             Some(true) => {
                                 // We found a collapser that works! Let's use it.
+                                info!("Using {} collapser", stringify!($collapse));
                                 let cursor = Cursor::new(buffer).chain(reader);
                                 return $collapse.collapse(cursor, writer);
                             }
