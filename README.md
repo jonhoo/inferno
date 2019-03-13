@@ -122,7 +122,7 @@ collapse/dtrace         time:   [9.8128 ms 9.8169 ms 9.8213 ms]
                         thrpt:  [134.24 MiB/s 134.30 MiB/s 134.36 MiB/s]
 ```
 
-My laptop (Intel(R) Core(TM) i7-8650U CPU @ 1.90GHz) get:
+My laptop (Intel Core i7-8650U) get:
 
 ```
 collapse/perf           time:   [13.548 ms 13.573 ms 13.603 ms]
