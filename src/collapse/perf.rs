@@ -1,9 +1,11 @@
 use super::Collapse;
 use fnv::FnvHashMap;
 use log::warn;
+use std::borrow::Cow;
 use std::collections::VecDeque;
 use std::io;
 use std::io::prelude::*;
+use symbolic_demangle::demangle;
 
 const TIDY_GENERIC: bool = true;
 const TIDY_JAVA: bool = true;
@@ -31,6 +33,9 @@ pub struct Options {
 
     /// Annotate kernel functions with a `_[k]` suffix.
     pub annotate_kernel: bool,
+
+    /// Demangle function names
+    pub demangle: bool,
 
     /// Only consider samples of the given event type (see `perf list`).
     ///
@@ -317,6 +322,12 @@ impl Folder {
             if rawfunc.starts_with('(') {
                 return;
             }
+
+            let rawfunc = if self.opt.demangle {
+                demangle(rawfunc)
+            } else {
+                Cow::Borrowed(rawfunc)
+            };
 
             // Support Java inlining by splitting on "->". After the first func, the
             // rest are annotated with "_[i]" to mark them as inlined.

@@ -10,7 +10,7 @@ use std::io::{self, BufReader, Cursor};
 use std::process::{Command, Stdio};
 
 fn test_collapse_dtrace(test_file: &str, expected_file: &str, options: Options) -> io::Result<()> {
-    test_collapse(Folder::from(options), test_file, expected_file)
+    test_collapse(Folder::from(options), test_file, expected_file, false)
 }
 
 fn test_collapse_dtrace_logs<F>(input_file: &str, asserter: F)
@@ -43,6 +43,7 @@ fn collapse_dtrace_compare_to_upstream_with_offsets() {
         result_file,
         Options {
             includeoffset: true,
+            demangle: false,
         },
     )
     .unwrap()
@@ -76,6 +77,7 @@ fn collapse_dtrace_compare_to_flamegraph_bug() {
         result_file,
         Options {
             includeoffset: true,
+            demangle: false,
         },
     )
     .unwrap()
@@ -109,6 +111,21 @@ fn collapse_dtrace_scope_with_no_argument_list() {
 }
 
 #[test]
+fn collapse_dtrace_demangle() {
+    let test_file = "./tests/data/collapse-dtrace/mangled.txt";
+    let result_file = "./tests/data/collapse-dtrace/results/demangled.txt";
+    test_collapse_dtrace(
+        test_file,
+        result_file,
+        Options {
+            includeoffset: false,
+            demangle: true,
+        },
+    )
+    .unwrap()
+}
+
+#[test]
 fn collapse_dtrace_cli() {
     let input_file = "./flamegraph/example-dtrace-stacks.txt";
     let expected_file = "./tests/data/collapse-dtrace/results/dtrace-example.txt";
@@ -120,7 +137,7 @@ fn collapse_dtrace_cli() {
         .output()
         .expect("failed to execute process");
     let expected = BufReader::new(File::open(expected_file).unwrap());
-    compare_results(Cursor::new(output.stdout), expected, expected_file);
+    compare_results(Cursor::new(output.stdout), expected, expected_file, false);
 
     // Test with STDIN
     let mut child = Command::cargo_bin("inferno-collapse-dtrace")
@@ -134,5 +151,5 @@ fn collapse_dtrace_cli() {
     io::copy(&mut input, stdin).unwrap();
     let output = child.wait_with_output().expect("Failed to read stdout");
     let expected = BufReader::new(File::open(expected_file).unwrap());
-    compare_results(Cursor::new(output.stdout), expected, expected_file);
+    compare_results(Cursor::new(output.stdout), expected, expected_file, false);
 }

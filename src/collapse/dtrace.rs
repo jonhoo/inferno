@@ -1,9 +1,11 @@
 use super::Collapse;
 use fnv::FnvHashMap;
 use log::warn;
+use std::borrow::Cow;
 use std::collections::VecDeque;
 use std::io;
 use std::io::prelude::*;
+use symbolic_demangle::demangle;
 
 /// Settings that change how frames are named from the incoming stack traces.
 ///
@@ -12,6 +14,9 @@ use std::io::prelude::*;
 pub struct Options {
     /// include function offset (except leafs)
     pub includeoffset: bool,
+
+    /// Demangle function names
+    pub demangle: bool,
 }
 
 /// A stack collapser for the output of dtrace `ustrace()`.
@@ -182,8 +187,17 @@ impl Folder {
             frame = Self::uncpp(frame);
         }
 
-        if frame.is_empty() {
-            frame = "-";
+        let frame = if frame.is_empty() {
+            Cow::Owned("-".to_owned())
+        } else if self.opt.demangle {
+            let mut parts = frame.split('`');
+            if let (Some(pname), Some(func)) = (parts.next(), parts.next()) {
+                Cow::Owned(format!("{}`{}", pname, demangle(func)))
+            } else {
+                Cow::Borrowed(frame)
+            }
+        } else {
+            Cow::Borrowed(frame)
         };
 
         if has_inlines {
@@ -207,7 +221,7 @@ impl Folder {
         } else if has_semicolon {
             self.stack.push_front(frame.replace(';', ":"))
         } else {
-            self.stack.push_front(frame.to_owned())
+            self.stack.push_front(frame.to_string())
         }
     }
 
@@ -231,6 +245,7 @@ impl Folder {
                 stack_str.push_str(&e);
             }
         }
+
         // count it!
         *self.occurrences.entry(stack_str).or_insert(0) += count;
         // reset for the next event
