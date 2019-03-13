@@ -114,7 +114,7 @@ impl From<Options> for Folder {
     fn from(opt: Options) -> Self {
         Self {
             stack: VecDeque::default(),
-            occurrences: HashMap::default(),
+            occurrences: HashMap::with_capacity(100),
             cache_inlines: Vec::new(),
             opt,
             stack_str_size: 0,
