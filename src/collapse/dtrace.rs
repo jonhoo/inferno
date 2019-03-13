@@ -138,7 +138,7 @@ impl Folder {
     }
 
     fn remove_offset(line: &str) -> &str {
-        if let Some(offset) = line.find('+') {
+        if let Some(offset) = line.rfind('+') {
             &line[..offset]
         } else {
             line
@@ -153,7 +153,6 @@ impl Folder {
     //     unix`sys_syscall+0x10e
     //       1
     fn on_stack_line(&mut self, line: &str) {
-        let line = line.trim_start();
         let frame = if self.opt.includeoffset {
             line
         } else {
@@ -192,7 +191,7 @@ impl Folder {
             if first {
                 first = false
             } else {
-                stack_str.push_str(";");
+                stack_str.push(';');
             }
             //trim leaf offset if these were retained:
             if self.opt.includeoffset && i == last {
