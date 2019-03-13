@@ -20,28 +20,9 @@ profiling results from
 It is developed in part through live coding sessions, which you can find
 [on YouTube](https://www.youtube.com/watch?v=jTpK-bNZiA4&list=PLqbS7AVVErFimAvMW-kIJUwxpPvcPBCsz).
 
-# Dependency
+## Using Inferno
 
-To profile your application, you'll need to have a "profiler" installed.
-This will likely be [`perf`]() or [`bpftrace`] on Linux, and [DTrace] on
-macOS. There are some great instructions on how to get started with
-these tools on Brendan Gregg's [CPU Flame Graphs page].
-
-  [profiler]: https://en.wikipedia.org/wiki/Profiling_(computer_programming
-  [`perf`]: https://perf.wiki.kernel.org/index.php/Main_Page
-  [`bpftrace`]: https://github.com/iovisor/bpftrace/
-  [DTrace]: https://www.joyent.com/dtrace
-  [CPU Flame Graphs page]: http://www.brendangregg.com/FlameGraphs/cpuflamegraphs.html#Instructions
-
-In Linux, you may need to tweak a kernel config such as
-```console
-$ echo 0 | sudo tee /proc/sys/kernel/perf_event_paranoid
-```
-to get profiling [to work](https://unix.stackexchange.com/a/14256).
-
-# How to use
-
-## As a library
+### As a library
 
 Inferno provides a [library interface](https://docs.rs/inferno/) through
 the `inferno` crate. This will let you collapse stacks and produce flame
@@ -50,12 +31,17 @@ integration with external Rust tools like [`cargo-flamegraph`].
 
   [`cargo-flamegraph`]: https://github.com/ferrous-systems/cargo-flamegraph
 
-## As a binary
+### As a binary
 
-First, install Inferno. Then, build your application (in release mode
-and with debug symbols). Finally, [run a profiler] to gather
-profiling data and pass it through the appropriate Inferno "collapser".
-Depending on your platform, this will look something like
+First of all, you may want to look into [cargo
+flamegraph](https://github.com/ferrous-systems/cargo-flamegraph/), which
+deals with much of the infrastructure for you!
+
+If you want to use Inferno directly, then build your application in
+release mode and with debug symbols, and then [run a profiler] to gather
+profiling data. Once you have the data, pass it through the appropriate
+Inferno "collapser". Depending on your platform, this will look
+something like
 
   [run a profiler]: http://www.brendangregg.com/FlameGraphs/cpuflamegraphs.html#Instructions
 
@@ -75,8 +61,10 @@ $ pid=$!
 $ cat out.user_stacks | inferno-collapse-dtrace > stacks.folded
 ```
 
-In the end, you'll end up with a "folded stack" file. You can pass that
-file to `inferno-flamegraph` to generate a flame graph SVG:
+You can also use `inferno-collapse-guess` which should work on both
+perf and DTrace samples. In the end, you'll end up with a "folded stack"
+file. You can pass that file to `inferno-flamegraph` to generate a flame
+graph SVG:
 
 ```console
 $ cat stacks.folded | inferno-flamegraph > flamegraph.svg
@@ -86,16 +74,35 @@ You'll end up with an image like this:
 
 [![colorized flamegraph output](tests/data/flamegraph/example-perf-stacks/example-perf-stacks.svg)](tests/data/flamegraph/example-perf-stacks/example-perf-stacks.svg)
 
-# Performance
+### Obtaining profiling data
 
-## Comparison to the Perl implementation
+To profile your application, you'll need to have a "profiler" installed.
+This will likely be [`perf`]() or [`bpftrace`] on Linux, and [DTrace] on
+macOS. There are some great instructions on how to get started with
+these tools on Brendan Gregg's [CPU Flame Graphs page].
+
+  [profiler]: https://en.wikipedia.org/wiki/Profiling_(computer_programming
+  [`perf`]: https://perf.wiki.kernel.org/index.php/Main_Page
+  [`bpftrace`]: https://github.com/iovisor/bpftrace/
+  [DTrace]: https://www.joyent.com/dtrace
+  [CPU Flame Graphs page]: http://www.brendangregg.com/FlameGraphs/cpuflamegraphs.html#Instructions
+
+On Linux, you may need to tweak a kernel config such as
+```console
+$ echo 0 | sudo tee /proc/sys/kernel/perf_event_paranoid
+```
+to get profiling [to work](https://unix.stackexchange.com/a/14256).
+
+## Performance
+
+### Comparison to the Perl implementation
 
 To run Inferno's performance comparison, run `./compare.sh`.
 It requires [hyperfine](https://github.com/sharkdp/hyperfine), and you
 must make sure you also check out Inferno's
 [submodules](https://github.blog/2016-02-01-working-with-submodules/).
 
-## Collapsing benchmarks
+### Collapsing benchmarks
 
 Inferno includes [criterion](https://github.com/bheisler/criterion.rs)
 benchmarks of its stack collapser implementations in [`benches/`](benches/).
@@ -114,7 +121,7 @@ collapse/dtrace         time:   [9.8128 ms 9.8169 ms 9.8213 ms]
                         thrpt:  [134.24 MiB/s 134.30 MiB/s 134.36 MiB/s]
 ```
 
-# License
+## License
 
 Inferno is a port of @brendangregg's awesome original
 [FlameGraph](https://github.com/brendangregg/FlameGraph) project,
