@@ -42,6 +42,13 @@ fn collapse_dtrace_compare_to_upstream_java() {
 }
 
 #[test]
+fn collapse_dtrace_hex_addresses() {
+    let test_file = "./tests/data/collapse-dtrace/hex-addresses.txt";
+    let result_file = "./tests/data/collapse-dtrace/results/hex-addresses.txt";
+    test_collapse_dtrace(test_file, result_file, Options::default()).unwrap()
+}
+
+#[test]
 fn collapse_dtrace_compare_to_flamegraph_bug() {
     // There is a bug in flamegraph that causes the following stack to render
     // badly. We fix this but keep the test around to point out this breakage

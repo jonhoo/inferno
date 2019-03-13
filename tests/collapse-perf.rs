@@ -7,14 +7,26 @@ mod collapse_common;
 
 use collapse_common::*;
 use inferno::collapse::perf::{Folder, Options};
-use inferno::collapse::Collapse;
 use log::Level;
-use std::fs::File;
-use std::io::{self, BufReader, Cursor};
+use std::io;
 use std::path::Path;
 
 fn test_collapse_perf(test_file: &str, expected_file: &str, options: Options) -> io::Result<()> {
     test_collapse(Folder::from(options), test_file, expected_file)
+}
+
+fn test_collapse_perf_logs<F>(input_file: &str, asserter: F)
+where
+    F: Fn(&Vec<testing_logger::CapturedLog>),
+{
+    test_collapse_perf_logs_with_options(input_file, asserter, Options::default());
+}
+
+fn test_collapse_perf_logs_with_options<F>(input_file: &str, asserter: F, options: Options)
+where
+    F: Fn(&Vec<testing_logger::CapturedLog>),
+{
+    test_collapse_logs(Folder::from(options), input_file, asserter);
 }
 
 fn options_from_vec(opt_vec: Vec<&str>) -> Options {
@@ -34,25 +46,6 @@ fn options_from_vec(opt_vec: Vec<&str>) -> Options {
         }
     }
     options
-}
-
-fn test_collapse_perf_logs<F>(input_file: &str, asserter: F)
-where
-    F: Fn(&Vec<testing_logger::CapturedLog>),
-{
-    test_collapse_perf_logs_with_options(input_file, asserter, Options::default());
-}
-
-fn test_collapse_perf_logs_with_options<F>(input_file: &str, asserter: F, options: Options)
-where
-    F: Fn(&Vec<testing_logger::CapturedLog>),
-{
-    testing_logger::setup();
-    let r = BufReader::new(File::open(input_file).unwrap());
-    let mut result = Cursor::new(vec![]);
-    let mut perf = Folder::from(options);
-    perf.collapse(r, &mut result).unwrap();
-    testing_logger::validate(asserter);
 }
 
 // Create tests for test files in $dir. The test files are used as input

@@ -72,6 +72,41 @@ impl Collapse for Folder {
         }
         self.finish(writer)
     }
+
+    fn is_applicable(&mut self, input: &str) -> Option<bool> {
+        let mut found_empty_line = false;
+        let mut found_stack_line = false;
+        let mut input = input.as_bytes();
+        let mut line = String::new();
+        loop {
+            line.clear();
+            if let Ok(n) = input.read_line(&mut line) {
+                if n == 0 {
+                    break;
+                }
+            } else {
+                return Some(false);
+            }
+
+            let line = line.trim();
+            if line.is_empty() {
+                found_empty_line = true;
+            } else if found_empty_line {
+                if line.parse::<usize>().is_ok() {
+                    return Some(found_stack_line);
+                } else if line.contains('`')
+                    || (line.starts_with("0x") && usize::from_str_radix(&line[2..], 16).is_ok())
+                {
+                    found_stack_line = true;
+                } else {
+                    // This is not a stack or count line
+                    return Some(false);
+                }
+            }
+        }
+
+        None
+    }
 }
 
 impl From<Options> for Folder {
