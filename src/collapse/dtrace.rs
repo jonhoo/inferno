@@ -138,13 +138,10 @@ impl Folder {
     }
 
     fn remove_offset(line: &str) -> &str {
-        let mut line = line.rsplitn(2, '+');
-        // at least one element will be returned
-        let second = line.next().unwrap();
-        if let Some(first) = line.next() {
-            first
+        if let Some(offset) = line.find('+') {
+            &line[..offset]
         } else {
-            second
+            line
         }
     }
 
