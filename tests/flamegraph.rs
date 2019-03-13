@@ -34,13 +34,36 @@ fn test_flamegraph_multiple_files(
     // Never include static JavaScript in tests so we don't have to have it duplicated
     // in all of the test files.
     options.no_javascript = true;
-    let expected_len = fs::metadata(expected_result_file).unwrap().len() as usize;
+
+    let metadata = match fs::metadata(expected_result_file) {
+        Ok(m) => m,
+        Err(e) => {
+            if e.kind() == io::ErrorKind::NotFound {
+                // be nice to the dev and make the file
+                let mut f = File::create(expected_result_file).unwrap();
+                flamegraph::from_files(&mut options, &input_files, &mut f)?;
+                fs::metadata(expected_result_file).unwrap()
+            } else {
+                return Err(e.into());
+            }
+        }
+    };
+
+    let expected_len = metadata.len() as usize;
     let mut result = Cursor::new(Vec::with_capacity(expected_len));
-    let return_value = flamegraph::from_files(options, input_files, &mut result);
+    let return_value = flamegraph::from_files(&mut options, &input_files, &mut result)?;
     let expected = BufReader::new(File::open(expected_result_file).unwrap());
+    // write out the expected result to /tmp for easy restoration
+    result.set_position(0);
+    let rand: u64 = rand::random();
+    let tm = std::env::temp_dir().join(format!("test-{}.svg", rand));
+    if fs::write(&tm, result.get_ref()).is_ok() {
+        eprintln!("test output in {}", tm.display());
+    }
+    // and then compare
     result.set_position(0);
     compare_results(result, expected, expected_result_file);
-    return_value
+    Ok(return_value)
 }
 
 fn compare_results<R, E>(result: R, mut expected: E, expected_file: &str)
@@ -83,14 +106,17 @@ where
     test_flamegraph_logs_with_options(input_file, asserter, Default::default());
 }
 
-fn test_flamegraph_logs_with_options<F>(input_file: &str, asserter: F, options: flamegraph::Options)
-where
+fn test_flamegraph_logs_with_options<F>(
+    input_file: &str,
+    asserter: F,
+    mut options: flamegraph::Options,
+) where
     F: Fn(&Vec<testing_logger::CapturedLog>),
 {
     testing_logger::setup();
     let r = File::open(input_file).unwrap();
     let sink = io::sink();
-    let _ = flamegraph::from_reader(options, r, sink);
+    let _ = flamegraph::from_reader(&mut options, r, sink);
     testing_logger::validate(asserter);
 }
 

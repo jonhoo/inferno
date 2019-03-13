@@ -314,7 +314,7 @@ impl Rectangle {
 ///
 /// [differential flame graph]: http://www.brendangregg.com/blog/2014-11-09/differential-flame-graphs.html
 #[allow(clippy::cyclomatic_complexity)]
-pub fn from_sorted_lines<'a, I, W>(mut opt: Options, lines: I, writer: W) -> quick_xml::Result<()>
+pub fn from_sorted_lines<'a, I, W>(opt: &mut Options, lines: I, writer: W) -> quick_xml::Result<()>
 where
     I: IntoIterator<Item = &'a str>,
     W: Write,
@@ -602,7 +602,7 @@ where
 /// See [`from_sorted_lines`] for the expected format of each line.
 ///
 /// The resulting flame graph will be written out to `writer` in SVG format.
-pub fn from_reader<R, W>(opt: Options, mut reader: R, writer: W) -> quick_xml::Result<()>
+pub fn from_reader<R, W>(opt: &mut Options, mut reader: R, writer: W) -> quick_xml::Result<()>
 where
     R: Read,
     W: Write,
@@ -621,7 +621,7 @@ where
 /// See [`from_sorted_lines`] for the expected format of each line.
 ///
 /// The resulting flame graph will be written out to `writer` in SVG format.
-pub fn from_readers<R, W>(opt: Options, readers: R, writer: W) -> quick_xml::Result<()>
+pub fn from_readers<R, W>(opt: &mut Options, readers: R, writer: W) -> quick_xml::Result<()>
 where
     R: IntoIterator,
     R::Item: Read,
@@ -644,7 +644,11 @@ where
 /// and write the result to provided `writer`.
 ///
 /// If files is empty, STDIN will be used as input.
-pub fn from_files<W: Write>(opt: Options, files: Vec<PathBuf>, writer: W) -> quick_xml::Result<()> {
+pub fn from_files<W: Write>(
+    opt: &mut Options,
+    files: &[PathBuf],
+    writer: W,
+) -> quick_xml::Result<()> {
     if files.is_empty() || files.len() == 1 && files[0].to_str() == Some("-") {
         let stdin = io::stdin();
         let r = BufReader::with_capacity(128 * 1024, stdin.lock());
