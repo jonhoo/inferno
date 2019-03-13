@@ -68,6 +68,6 @@ impl Collapse for Folder {
     }
 
     fn is_applicable(&mut self, _line: &str) -> Option<bool> {
-        None
+        unreachable!()
     }
 }
