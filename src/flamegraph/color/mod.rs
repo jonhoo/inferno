@@ -1,3 +1,5 @@
+//! Color palettes and options for flame graph generation.
+
 use rand::rngs::ThreadRng;
 use rand::Rng;
 use std::borrow::Cow;
@@ -9,6 +11,7 @@ mod palettes;
 pub use palette_map::PaletteMap;
 use rgb::RGB8;
 
+/// A re-export of `RGB8` from the [`rgb` crate](https://docs.rs/rgb).
 pub type Color = RGB8;
 
 pub(super) const VDGREY: Color = Color {
