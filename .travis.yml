@@ -4,19 +4,13 @@ rust:
   - stable
   - beta
   - nightly
+os: linux
 
 # always test things that aren't pushes (like PRs)
 # never test tags or pushes to non-master branches (wait for PR)
 # https://github.com/travis-ci/travis-ci/issues/2200#issuecomment-441395545)
 if: type != push OR (tag IS blank AND branch = master)
 
-# an entry in stage=test will be generated for each rust/os combination.
-# each entry will run these commands.
-script:
-  - cargo test --examples
-  - cargo test --doc
-  - cargo test --lib
-  - cargo test --bins
 jobs:
   allow_failures:
     - rust: nightly
@@ -24,21 +18,11 @@ jobs:
     - stage: check # do a pre-screen to make sure this is even worth testing
       script: cargo check --all-targets
       rust: stable
-      os: linux
     - stage: test
       rust: stable
       os: osx
     - rust: stable
       os: windows
-    - &integration
-      stage: integration # make integration tests its own stage
-      script: cargo test --tests
-      rust: stable
-      os: linux
-    - <<: *integration
-      rust: beta
-    - <<: *integration
-      rust: nightly
     - stage: lint # we lint on beta to future-proof
       name: "Rust: beta, rustfmt"
       rust: beta
@@ -64,9 +48,15 @@ jobs:
       script:
         - rustup component add clippy-preview
         - touch ./src/lib.rs && cargo clippy -- -D warnings
-    - <<: *integration
+    - os: linux
       stage: coverage
       rust: nightly
+      sudo: required
+      dist: trusty
+      addons:
+        apt:
+          packages:
+            - libssl-dev
       env: CACHE_NAME=coverage
       script:
         - RUSTFLAGS="--cfg procmacro2_semver_exempt" cargo install --force cargo-tarpaulin || true
@@ -76,6 +66,5 @@ jobs:
 stages:
  - check
  - test
- - integration
  - lint
  - coverage
