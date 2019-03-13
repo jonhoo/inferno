@@ -1,7 +1,7 @@
 language: rust
 cache: cargo
 rust:
-  - 1.31.1 # first release to support 2018 edition
+  - 1.32 # uniform paths
   - stable
   - beta
   - nightly
