@@ -208,10 +208,10 @@ impl Folder {
     }
 
     fn finish<W: Write>(&self, mut writer: W) -> io::Result<()> {
-        let mut keys: Vec<_> = self.occurrences.keys().collect();
+        let mut keys: Vec<(&String, &usize)> = self.occurrences.iter().collect();
         keys.sort();
-        for key in keys {
-            writeln!(writer, "{} {}", key, self.occurrences[key])?;
+        for (key, count) in keys {
+            writeln!(writer, "{} {}", key, count)?;
         }
         Ok(())
     }
