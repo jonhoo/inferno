@@ -9,7 +9,7 @@
     </defs>
     <style type="text/css">.func_g:hover { stroke:black; stroke-width:0.5; cursor:pointer; }</style>
     <script type="text/ecmascript">
-        <![CDATA[var nametype = 'Function:';
+        <![CDATA[var nametype = 'Tfunction:';
 var fontsize = 12;
 var fontwidth = 0.59;
 var xpad = 10;

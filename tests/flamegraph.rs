@@ -354,6 +354,185 @@ fn flamegraph_grey_frames() {
 }
 
 #[test]
+fn flamegraph_default_options() {
+    let input_file =
+        "./tests/data/flamegraph/differential/perf-cycles-instructions-01-collapsed-all-diff.txt";
+    let expected_result_file = "./tests/data/flamegraph/options/default.svg";
+
+    let options = flamegraph::Options::default();
+
+    test_flamegraph(input_file, expected_result_file, options).unwrap();
+}
+
+#[test]
+fn flamegraph_title_simple() {
+    let input_file =
+        "./tests/data/flamegraph/differential/perf-cycles-instructions-01-collapsed-all-diff.txt";
+    let expected_result_file = "./tests/data/flamegraph/options/title_simple.svg";
+
+    let options = flamegraph::Options {
+        title: "Test Graph".to_owned(),
+        ..Default::default()
+    };
+
+    test_flamegraph(input_file, expected_result_file, options).unwrap();
+}
+
+#[test]
+fn flamegraph_title_with_symbols() {
+    let input_file =
+        "./tests/data/flamegraph/differential/perf-cycles-instructions-01-collapsed-all-diff.txt";
+    let expected_result_file = "./tests/data/flamegraph/options/title_with_symbols.svg";
+
+    let options = flamegraph::Options {
+        title: "Test <& ' \"".to_owned(),
+        ..Default::default()
+    };
+
+    test_flamegraph(input_file, expected_result_file, options).unwrap();
+}
+
+#[test]
+fn flamegraph_subtitle_simple() {
+    let input_file =
+        "./tests/data/flamegraph/differential/perf-cycles-instructions-01-collapsed-all-diff.txt";
+    let expected_result_file = "./tests/data/flamegraph/options/subtitle_simple.svg";
+
+    let options = flamegraph::Options {
+        subtitle: Some("Test Subtitle".to_owned()),
+        ..Default::default()
+    };
+
+    test_flamegraph(input_file, expected_result_file, options).unwrap();
+}
+
+#[test]
+fn flamegraph_subtitle_with_symbols() {
+    let input_file =
+        "./tests/data/flamegraph/differential/perf-cycles-instructions-01-collapsed-all-diff.txt";
+    let expected_result_file = "./tests/data/flamegraph/options/subtitle_with_symbols.svg";
+
+    let options = flamegraph::Options {
+        subtitle: Some("Test Subtitle <& ' \"".to_owned()),
+        ..Default::default()
+    };
+
+    test_flamegraph(input_file, expected_result_file, options).unwrap();
+}
+
+#[test]
+fn flamegraph_notes_simple() {
+    let input_file =
+        "./tests/data/flamegraph/differential/perf-cycles-instructions-01-collapsed-all-diff.txt";
+    let expected_result_file = "./tests/data/flamegraph/options/notes_simple.svg";
+
+    let options = flamegraph::Options {
+        notes: "Test Notes".to_owned(),
+        ..Default::default()
+    };
+
+    test_flamegraph(input_file, expected_result_file, options).unwrap();
+}
+
+#[test]
+fn flamegraph_notes_with_symbols() {
+    let input_file =
+        "./tests/data/flamegraph/differential/perf-cycles-instructions-01-collapsed-all-diff.txt";
+    let expected_result_file = "./tests/data/flamegraph/options/notes_with_symbols.svg";
+
+    let options = flamegraph::Options {
+        notes: "Test Notes <& ' \"".to_owned(),
+        ..Default::default()
+    };
+
+    test_flamegraph(input_file, expected_result_file, options).unwrap();
+}
+
+#[test]
+fn flamegraph_count_name_simple() {
+    let input_file =
+        "./tests/data/flamegraph/differential/perf-cycles-instructions-01-collapsed-all-diff.txt";
+    let expected_result_file = "./tests/data/flamegraph/options/count_name_simple.svg";
+
+    let options = flamegraph::Options {
+        count_name: "test-samples".to_owned(),
+        ..Default::default()
+    };
+
+    test_flamegraph(input_file, expected_result_file, options).unwrap();
+}
+
+#[test]
+fn flamegraph_count_name_with_symbols() {
+    let input_file =
+        "./tests/data/flamegraph/differential/perf-cycles-instructions-01-collapsed-all-diff.txt";
+    let expected_result_file = "./tests/data/flamegraph/options/count_name_with_symbols.svg";
+
+    let options = flamegraph::Options {
+        count_name: "test-samples <& ' \"".to_owned(),
+        ..Default::default()
+    };
+
+    test_flamegraph(input_file, expected_result_file, options).unwrap();
+}
+
+#[test]
+fn flamegraph_name_type_simple() {
+    let input_file =
+        "./tests/data/flamegraph/differential/perf-cycles-instructions-01-collapsed-all-diff.txt";
+    let expected_result_file = "./tests/data/flamegraph/options/name_type_simple.svg";
+
+    let options = flamegraph::Options {
+        name_type: "Tfunction:".to_owned(),
+        ..Default::default()
+    };
+
+    test_flamegraph(input_file, expected_result_file, options).unwrap();
+}
+
+#[test]
+fn flamegraph_name_type_with_quote() {
+    let input_file =
+        "./tests/data/flamegraph/differential/perf-cycles-instructions-01-collapsed-all-diff.txt";
+    let expected_result_file = "./tests/data/flamegraph/options/name_type_with_quote.svg";
+
+    let options = flamegraph::Options {
+        name_type: "Test: '".to_owned(),
+        ..Default::default()
+    };
+
+    test_flamegraph(input_file, expected_result_file, options).unwrap();
+}
+
+#[test]
+fn flamegraph_name_type_with_backslash() {
+    let input_file =
+        "./tests/data/flamegraph/differential/perf-cycles-instructions-01-collapsed-all-diff.txt";
+    let expected_result_file = "./tests/data/flamegraph/options/name_type_with_backslash.svg";
+
+    let options = flamegraph::Options {
+        name_type: "Test: \\".to_owned(),
+        ..Default::default()
+    };
+
+    test_flamegraph(input_file, expected_result_file, options).unwrap();
+}
+
+#[test]
+fn flamegraph_font_type_simple() {
+    let input_file =
+        "./tests/data/flamegraph/differential/perf-cycles-instructions-01-collapsed-all-diff.txt";
+    let expected_result_file = "./tests/data/flamegraph/options/font_type_simple.svg";
+
+    let options = flamegraph::Options {
+        font_type: "Andale Mono".to_owned(),
+        ..Default::default()
+    };
+
+    test_flamegraph(input_file, expected_result_file, options).unwrap();
+}
+
+#[test]
 fn flamegraph_example_perf_stacks() {
     let input_file = "./tests/data/collapse-perf/results/example-perf-stacks-collapsed.txt";
     let expected_result_file =
@@ -363,6 +542,20 @@ fn flamegraph_example_perf_stacks() {
 
     let options = flamegraph::Options {
         palette_map: Some(&mut palette_map),
+        ..Default::default()
+    };
+
+    test_flamegraph(input_file, expected_result_file, options).unwrap();
+}
+
+#[test]
+fn flamegraph_font_type_with_quote() {
+    let input_file =
+        "./tests/data/flamegraph/differential/perf-cycles-instructions-01-collapsed-all-diff.txt";
+    let expected_result_file = "./tests/data/flamegraph/options/font_type_with_quote.svg";
+
+    let options = flamegraph::Options {
+        font_type: "Andale Mono\"".to_owned(),
         ..Default::default()
     };
 

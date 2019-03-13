@@ -19,15 +19,11 @@ use std::path::PathBuf;
 use str_stack::StrStack;
 use svg::StyleOptions;
 
-const IMAGEWIDTH: usize = 1200; // max width, pixels
-const FRAMEHEIGHT: usize = 16; // max height is dynamic
-const FONTSIZE: usize = 12; // base text size
-const FONTWIDTH: f64 = 0.59; // avg width relative to FONTSIZE
-const MINWIDTH: f64 = 0.1; // min function width, pixels
-const YPAD1: usize = FONTSIZE * 3; // pad top, include title
-const YPAD2: usize = FONTSIZE * 2 + 10; // pad bottom, include labels
 const XPAD: usize = 10; // pad lefm and right
 const FRAMEPAD: usize = 1; // vertical padding for frames
+
+/// Default title
+pub const DEFAULT_TITLE: &str = "Flame Graph";
 
 /// Configure the flame graph.
 #[derive(Debug)]
@@ -71,6 +67,56 @@ pub struct Options<'a> {
     /// Defaults to "Flame Graph".
     pub title: String,
 
+    /// The subtitle for the flame chart.
+    ///
+    /// Defaults to None.
+    pub subtitle: Option<String>,
+
+    /// Width of for the flame chart
+    ///
+    /// Defaults to 1200.
+    pub image_width: usize,
+
+    /// Height of each frame.
+    ///
+    /// Defaults to 16.
+    pub frame_height: usize,
+
+    /// Minimal width to omit smaller functions
+    ///
+    /// Defaults to 0.1.
+    pub min_width: f64,
+
+    /// The font type for the flame chart.
+    ///
+    /// Defaults to "Verdana".
+    pub font_type: String,
+
+    /// Font size for the flame chart.
+    ///
+    /// Defaults to 12.
+    pub font_size: usize,
+
+    /// Font width for the flame chart.
+    ///
+    /// Defaults to 0.59.
+    pub font_width: f64,
+
+    /// Count type label for the flame chart.
+    ///
+    /// Defaults to "samples".
+    pub count_name: String,
+
+    /// Name type label for the flame chart.
+    ///
+    /// Defaults to "Function:".
+    pub name_type: String,
+
+    /// The notes for the flame chart.
+    ///
+    /// Defaults to "".
+    pub notes: String,
+
     /// By default, if [differential] samples are included in the provided stacks, the resulting
     /// flame graph will compute and show differentials as `sample#2 - sample#1`. If this option is
     /// set, the differential is instead computed using `sample#1 - sample#2`.
@@ -99,10 +145,32 @@ pub struct Options<'a> {
     pub no_javascript: bool,
 }
 
+impl<'a> Options<'a> {
+    /// Calculate pad top, including title
+    pub(super) fn ypad1(&self) -> usize {
+        self.font_size * 3
+    }
+
+    /// Calculate pad bottom, including labels
+    pub(super) fn ypad2(&self) -> usize {
+        self.font_size * 2 + 10
+    }
+}
+
 impl<'a> Default for Options<'a> {
     fn default() -> Self {
         Options {
-            title: "Flame Graph".to_string(),
+            title: DEFAULT_TITLE.to_string(),
+            subtitle: None,
+            image_width: 1200,
+            frame_height: 16,
+            min_width: 0.1,
+            font_type: "Verdana".to_owned(),
+            font_size: 12,
+            font_width: 0.59,
+            count_name: "samples".to_owned(),
+            name_type: "Function:".to_owned(),
+            notes: "".to_owned(),
             factor: 1.0,
             colors: Default::default(),
             bgcolors: Default::default(),
@@ -269,20 +337,21 @@ where
     if time == 0 {
         error!("No stack counts found");
         // emit an error message SVG, for tools automating flamegraph use
-        let imageheight = FONTSIZE * 5;
-        svg::write_header(&mut svg, imageheight)?;
+        let imageheight = opt.font_size * 5;
+        svg::write_header(&mut svg, imageheight, &opt)?;
         svg::write_str(
             &mut svg,
             &mut buffer,
             svg::TextItem {
                 color: "black",
-                size: FONTSIZE + 2,
-                x: (IMAGEWIDTH / 2) as f64,
-                y: (FONTSIZE * 2) as f64,
+                size: opt.font_size + 2,
+                x: (opt.image_width / 2) as f64,
+                y: (opt.font_size * 2) as f64,
                 text: "ERROR: No valid input provided to flamegraph".into(),
                 location: Some("middle"),
                 extra: None,
             },
+            &opt.font_type,
         )?;
         svg.write_event(Event::End(BytesEnd::borrowed(b"svg")))?;
         svg.write_event(Event::Eof)?;
@@ -293,8 +362,8 @@ where
     }
 
     let timemax = time;
-    let widthpertime = (IMAGEWIDTH - 2 * XPAD) as f64 / timemax as f64;
-    let minwidth_time = MINWIDTH / widthpertime;
+    let widthpertime = (opt.image_width - 2 * XPAD) as f64 / timemax as f64;
+    let minwidth_time = opt.min_width / widthpertime;
 
     // prune blocks that are too narrow
     let mut depthmax = 0;
@@ -308,14 +377,15 @@ where
     });
 
     // draw canvas, and embed interactive JavaScript program
-    let imageheight = ((depthmax + 1) * FRAMEHEIGHT) + YPAD1 + YPAD2;
-    svg::write_header(&mut svg, imageheight)?;
+    let imageheight = ((depthmax + 1) * opt.frame_height) + opt.ypad1() + opt.ypad2();
+    svg::write_header(&mut svg, imageheight, &opt)?;
 
     let style_options = StyleOptions {
         imageheight,
         bgcolor1,
         bgcolor2,
     };
+
     svg::write_prelude(&mut svg, &style_options, &opt)?;
 
     // Used when picking color parameters at random, when no option determines how to pick these
@@ -333,15 +403,17 @@ where
     for frame in frames {
         let x1 = XPAD + (frame.start_time as f64 * widthpertime) as usize;
         let x2 = XPAD + (frame.end_time as f64 * widthpertime) as usize;
+
         let (y1, y2) = match opt.direction {
             Direction::Straight => {
-                let y1 = imageheight - YPAD2 - (frame.location.depth + 1) * FRAMEHEIGHT + FRAMEPAD;
-                let y2 = imageheight - YPAD2 - frame.location.depth * FRAMEHEIGHT;
+                let y1 = imageheight - opt.ypad2() - (frame.location.depth + 1) * opt.frame_height
+                    + FRAMEPAD;
+                let y2 = imageheight - opt.ypad2() - frame.location.depth * opt.frame_height;
                 (y1, y2)
             }
             Direction::Inverted => {
-                let y1 = YPAD1 + frame.location.depth * FRAMEHEIGHT;
-                let y2 = YPAD1 + (frame.location.depth + 1) * FRAMEHEIGHT - FRAMEPAD;
+                let y1 = opt.ypad1() + frame.location.depth * opt.frame_height;
+                let y2 = opt.ypad1() + (frame.location.depth + 1) * opt.frame_height - FRAMEPAD;
                 (y1, y2)
             }
         };
@@ -360,21 +432,21 @@ where
         let samples_txt = samples_txt_buffer.as_str();
 
         let info = if frame.location.function.is_empty() && frame.location.depth == 0 {
-            write!(buffer, "all ({} samples, 100%)", samples_txt)
+            write!(buffer, "all ({} {}, 100%)", samples_txt, opt.count_name)
         } else {
             let pct = (100 * samples) as f64 / (timemax as f64 * opt.factor);
             let function = deannotate(&frame.location.function);
             match frame.delta {
                 None => write!(
                     buffer,
-                    "{} ({} samples, {:.2}%)",
-                    function, samples_txt, pct
+                    "{} ({} {}, {:.2}%)",
+                    function, samples_txt, opt.count_name, pct
                 ),
                 // Special case delta == 0 so we don't format percentage with a + sign.
                 Some(delta) if delta == 0 => write!(
                     buffer,
-                    "{} ({} samples, {:.2}%; 0.00%)",
-                    function, samples_txt, pct,
+                    "{} ({} {}, {:.2}%; 0.00%)",
+                    function, samples_txt, opt.count_name, pct,
                 ),
                 Some(mut delta) => {
                     if opt.negate_differentials {
@@ -383,8 +455,8 @@ where
                     let delta_pct = (100 * delta) as f64 / (timemax as f64 * opt.factor);
                     write!(
                         buffer,
-                        "{} ({} samples, {:.2}%; {:+.2}%)",
-                        function, samples_txt, pct, delta_pct
+                        "{} ({} {}, {:.2}%; {:+.2}%)",
+                        function, samples_txt, opt.count_name, pct, delta_pct
                     )
                 }
             }
@@ -471,7 +543,8 @@ where
         };
         filled_rectangle(&mut svg, &mut buffer, &rect, color, &mut cache_rect)?;
 
-        let fitchars = (rect.width() as f64 / (FONTSIZE as f64 * FONTWIDTH)).trunc() as usize;
+        let fitchars =
+            (rect.width() as f64 / (opt.font_size as f64 * opt.font_width)).trunc() as usize;
         let text: svg::TextArgument = if fitchars >= 3 {
             // room for one char plus two dots
             let f = deannotate(&frame.location.function);
@@ -501,13 +574,14 @@ where
             &mut buffer,
             svg::TextItem {
                 color: "rgb(0, 0, 0)",
-                size: FONTSIZE,
+                size: opt.font_size,
                 x: rect.x1 as f64 + 3.0,
                 y: 3.0 + (rect.y1 + rect.y2) as f64 / 2.0,
                 text,
                 location: None,
                 extra: None,
             },
+            &opt.font_type,
         )?;
 
         buffer.clear();
