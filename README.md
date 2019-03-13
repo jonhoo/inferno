@@ -110,8 +110,9 @@ Criterion saves its results in `target/criterion/`, and uses that to
 recognize changes in performance, which should make it easy to detect
 performance regressions while developing bugfixes and improvements.
 
-You can run the benchmarks with `cargo bench`. On my desktop computer
-(AMD Ryzen 5 2600X), I get these results, but YMMV:
+You can run the benchmarks with `cargo bench`. Some results (YMMV):
+
+My desktop computer (AMD Ryzen 5 2600X) gets:
 
 ```
 collapse/perf           time:   [14.978 ms 14.987 ms 14.996 ms]
@@ -119,6 +120,16 @@ collapse/perf           time:   [14.978 ms 14.987 ms 14.996 ms]
 
 collapse/dtrace         time:   [9.8128 ms 9.8169 ms 9.8213 ms]
                         thrpt:  [134.24 MiB/s 134.30 MiB/s 134.36 MiB/s]
+```
+
+My laptop (Intel(R) Core(TM) i7-8650U CPU @ 1.90GHz) get:
+
+```
+collapse/perf           time:   [13.548 ms 13.573 ms 13.603 ms]
+                        thrpt:  [220.07 MiB/s 220.56 MiB/s 220.97 MiB/s]
+
+collapse/dtrace         time:   [9.1285 ms 9.1403 ms 9.1534 ms]
+                        thrpt:  [144.04 MiB/s 144.24 MiB/s 144.43 MiB/s]
 ```
 
 ## License
