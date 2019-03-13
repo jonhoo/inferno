@@ -27,7 +27,7 @@ pub struct Folder {
     /// Keep track of stack string size while we consume a stack
     stack_str_size: usize,
 
-    /// vecotr for processing java stuff
+    /// Vector for processing java stuff
     cache_inlines: Vec<String>,
 
     opt: Options,
