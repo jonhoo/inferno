@@ -18,6 +18,7 @@ var searchcolor = 'rgb(230,0,230)';]]>
     </script>
     <rect x="0" y="0" width="1200" height="246" fill="url(#background)"/>
     <text text-anchor="middle" x="600.00" y="24.00" font-size="17" font-family="Verdana" fill="rgb(0, 0, 0)">Flame Graph</text>
+    <text text-anchor="middle" x="600.00" y="48.00" font-size="12" font-family="Verdana" fill="rgb(160, 160, 160)">Test Subtitle &lt;&amp; &apos; &quot;</text>
     <text id="details" text-anchor="left" x="10.00" y="229.00" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)"> </text>
     <text id="unzoom" onclick="unzoom()" style="opacity:0.0;cursor:pointer" text-anchor="left" x="10.00" y="24.00" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">Reset Zoom</text>
     <text id="search" onmouseover="searchover()" onmouseout="searchout()" onclick="search_prompt()" style="opacity:0.1;cursor:pointer" text-anchor="left" x="1090.00" y="24.00" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">Search</text>

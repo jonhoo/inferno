@@ -4,7 +4,8 @@ use std::path::{Path, PathBuf};
 use structopt::StructOpt;
 
 use inferno::flamegraph::{
-    self, color::BackgroundColor, color::PaletteMap, Direction, FuncFrameAttrsMap, Options, Palette,
+    self, color::BackgroundColor, color::PaletteMap, Direction, FuncFrameAttrsMap, Options,
+    Palette, DEFAULT_TITLE,
 };
 
 #[derive(Debug, StructOpt)]
@@ -46,6 +47,50 @@ struct Opt {
     /// Use consistent palette (palette.map)
     #[structopt(long = "cp")]
     cp: bool,
+
+    /// Change title text
+    #[structopt(long = "title", default_value = "Flame Graph")]
+    title: String,
+
+    /// Second level title (optional)
+    #[structopt(long = "subtitle")]
+    subtitle: Option<String>,
+
+    /// Width of image
+    #[structopt(long = "width", default_value = "1200")]
+    image_width: usize,
+
+    /// Height of each frame
+    #[structopt(long = "height", default_value = "16")]
+    frame_height: usize,
+
+    /// Omit smaller functions (default 0.1 pixels)
+    #[structopt(long = "minwidth", default_value = "0.1")]
+    min_width: f64,
+
+    /// Font type
+    #[structopt(long = "fonttype", default_value = "Verdana")]
+    font_type: String,
+
+    /// Font size
+    #[structopt(long = "fontsize", default_value = "12")]
+    font_size: usize,
+
+    /// Font width
+    #[structopt(long = "fontwidth", default_value = "0.59")]
+    font_width: f64,
+
+    /// Count type label
+    #[structopt(long = "countname", default_value = "samples")]
+    count_name: String,
+
+    /// Name type label
+    #[structopt(long = "nametype", default_value = "Function:")]
+    name_type: String,
+
+    /// Set embedded notes in SVG
+    #[structopt(long = "notes", default_value = "")]
+    notes: String,
 
     /// Switch differential hues (green<->red)
     #[structopt(long = "negate")]
@@ -91,12 +136,28 @@ impl<'a> Opt {
         };
         if self.inverted {
             options.direction = Direction::Inverted;
-            options.title = "Icicle Graph".to_string();
+            if self.title == DEFAULT_TITLE {
+                options.title = "Icicle Graph".to_string();
+            }
         }
         options.negate_differentials = self.negate;
         options.factor = self.factor;
         options.pretty_xml = self.pretty_xml;
         options.no_javascript = self.no_javascript;
+
+        // set style options
+        options.subtitle = self.subtitle;
+        options.image_width = self.image_width;
+        options.frame_height = self.frame_height;
+        options.min_width = self.min_width;
+        options.font_type = self.font_type;
+        options.font_size = self.font_size;
+        options.font_width = self.font_width;
+        options.count_name = self.count_name;
+        options.name_type = self.name_type;
+        options.notes = self.notes;
+        options.negate_differentials = self.negate;
+        options.factor = self.factor;
         (self.infiles, options)
     }
 }

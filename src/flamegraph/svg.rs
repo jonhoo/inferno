@@ -48,7 +48,11 @@ pub(super) struct StyleOptions<'a> {
     pub(super) bgcolor2: Cow<'a, str>,
 }
 
-pub(super) fn write_header<W>(svg: &mut Writer<W>, imageheight: usize) -> quick_xml::Result<()>
+pub fn write_header<W>(
+    svg: &mut Writer<W>,
+    imageheight: usize,
+    opt: &Options,
+) -> quick_xml::Result<()>
 where
     W: Write,
 {
@@ -57,12 +61,12 @@ where
     svg.write_event(Event::Start(
         BytesStart::borrowed_name(b"svg").with_attributes(vec![
             ("version", "1.1"),
-            ("width", &*format!("{}", super::IMAGEWIDTH)),
+            ("width", &*format!("{}", opt.image_width)),
             ("height", &*format!("{}", imageheight)),
             ("onload", "init(evt)"),
             (
                 "viewBox",
-                &*format!("0 0 {} {}", super::IMAGEWIDTH, imageheight),
+                &*format!("0 0 {} {}", opt.image_width, imageheight),
             ),
             ("xmlns", "http://www.w3.org/2000/svg"),
             ("xmlns:xlink", "http://www.w3.org/1999/xlink"),
@@ -72,6 +76,9 @@ where
         "Flame graph stack visualization. \
          See https://github.com/brendangregg/FlameGraph for latest version, \
          and http://www.brendangregg.com/flamegraphs.html for examples.",
+    )))?;
+    svg.write_event(Event::Comment(BytesText::from_plain_str(
+        format!("NOTES: {}", opt.notes).as_str(),
     )))?;
     Ok(())
 }
@@ -118,16 +125,17 @@ where
     ))?;
     svg.write_event(Event::CData(BytesText::from_escaped_str(&format!(
         "\
-var nametype = 'Function:';
+var nametype = {};
 var fontsize = {};
 var fontwidth = {};
 var xpad = {};
 var inverted = {};
 var searchcolor = 'rgb(230,0,230)';",
-        super::FONTSIZE,
-        super::FONTWIDTH,
+        enquote('\'', &opt.name_type),
+        opt.font_size,
+        opt.font_width,
         super::XPAD,
-        opt.direction == Direction::Inverted,
+        opt.direction == Direction::Inverted
     ))))?;
     if !opt.no_javascript {
         svg.write_event(Event::CData(BytesText::from_escaped_str(include_str!(
@@ -140,7 +148,7 @@ var searchcolor = 'rgb(230,0,230)';",
         BytesStart::borrowed_name(b"rect").with_attributes(vec![
             ("x", "0"),
             ("y", "0"),
-            ("width", &*format!("{}", super::IMAGEWIDTH)),
+            ("width", &*format!("{}", opt.image_width)),
             ("height", &*format!("{}", style_options.imageheight)),
             ("fill", "url(#background)"),
         ]),
@@ -153,27 +161,46 @@ var searchcolor = 'rgb(230,0,230)';",
         &mut buf,
         TextItem {
             color: "rgb(0, 0, 0)",
-            size: super::FONTSIZE + 5,
-            x: (super::IMAGEWIDTH / 2) as f64,
-            y: (super::FONTSIZE * 2) as f64,
+            size: opt.font_size + 5,
+            x: (opt.image_width / 2) as f64,
+            y: (opt.font_size * 2) as f64,
             text: (&*opt.title).into(),
             location: Some("middle"),
             extra: None,
         },
+        &opt.font_type,
     )?;
+
+    if let Some(ref subtitle) = opt.subtitle {
+        write_str(
+            svg,
+            &mut buf,
+            TextItem {
+                color: "rgb(160, 160, 160)",
+                size: opt.font_size,
+                x: (opt.image_width / 2) as f64,
+                y: (opt.font_size * 4) as f64,
+                text: (&**subtitle).into(),
+                location: Some("middle"),
+                extra: None,
+            },
+            &opt.font_type,
+        )?
+    }
 
     write_str(
         svg,
         &mut buf,
         TextItem {
             color: "rgb(0, 0, 0)",
-            size: super::FONTSIZE,
+            size: opt.font_size,
             x: super::XPAD as f64,
-            y: (style_options.imageheight - (super::YPAD2 / 2)) as f64,
+            y: (style_options.imageheight - (opt.ypad2() / 2)) as f64,
             text: " ".into(),
             location: None,
             extra: iter::once(("id", "details")),
         },
+        &opt.font_type,
     )?;
 
     write_str(
@@ -181,9 +208,9 @@ var searchcolor = 'rgb(230,0,230)';",
         &mut buf,
         TextItem {
             color: "rgb(0, 0, 0)",
-            size: super::FONTSIZE,
+            size: opt.font_size,
             x: super::XPAD as f64,
-            y: (super::FONTSIZE * 2) as f64,
+            y: (opt.font_size * 2) as f64,
             text: "Reset Zoom".into(),
             location: None,
             extra: vec![
@@ -192,6 +219,7 @@ var searchcolor = 'rgb(230,0,230)';",
                 ("style", "opacity:0.0;cursor:pointer"),
             ],
         },
+        &opt.font_type,
     )?;
 
     write_str(
@@ -199,9 +227,9 @@ var searchcolor = 'rgb(230,0,230)';",
         &mut buf,
         TextItem {
             color: "rgb(0, 0, 0)",
-            size: super::FONTSIZE,
-            x: (super::IMAGEWIDTH - super::XPAD - 100) as f64,
-            y: (super::FONTSIZE * 2) as f64,
+            size: opt.font_size,
+            x: (opt.image_width - super::XPAD - 100) as f64,
+            y: (opt.font_size * 2) as f64,
             text: "Search".into(),
             location: None,
             extra: vec![
@@ -212,6 +240,7 @@ var searchcolor = 'rgb(230,0,230)';",
                 ("style", "opacity:0.1;cursor:pointer"),
             ],
         },
+        &opt.font_type,
     )?;
 
     write_str(
@@ -219,13 +248,14 @@ var searchcolor = 'rgb(230,0,230)';",
         &mut buf,
         TextItem {
             color: "rgb(0, 0, 0)",
-            size: super::FONTSIZE,
-            x: (super::IMAGEWIDTH - super::XPAD - 100) as f64,
-            y: (style_options.imageheight - (super::YPAD2 / 2)) as f64,
+            size: opt.font_size,
+            x: (opt.image_width - super::XPAD - 100) as f64,
+            y: (style_options.imageheight - (opt.ypad2() / 2)) as f64,
             text: " ".into(),
             location: None,
             extra: iter::once(("id", "matched")),
         },
+        &opt.font_type,
     )?;
 
     Ok(())
@@ -235,6 +265,7 @@ pub(super) fn write_str<'a, W, I>(
     svg: &mut Writer<W>,
     buf: &mut StrStack,
     item: TextItem<'a, I>,
+    font_type: &str,
 ) -> quick_xml::Result<()>
 where
     W: Write,
@@ -260,7 +291,7 @@ where
         key: b"font-size",
         value: Cow::from(buf[fs].as_bytes()),
     });
-    text.push_attribute(Attribute::from(("font-family", "Verdana")));
+    text.push_attribute(Attribute::from(("font-family", font_type)));
     text.push_attribute(Attribute::from(("fill", item.color)));
     svg.write_event(Event::Start(text))?;
     let s = match item.text {
@@ -270,4 +301,24 @@ where
     svg.write_event(Event::Text(BytesText::from_plain_str(s)))?;
     svg.write_event(Event::End(BytesEnd::borrowed(b"text")))?;
     Ok(())
+}
+
+// Imported from the `enquote` crate @ 1.0.3.
+// It's "unlicense" licensed, so that's fine.
+fn enquote(quote: char, s: &str) -> String {
+    // escapes any `quote` in `s`
+    let escaped = s
+        .chars()
+        .map(|c| match c {
+            // escapes the character if it's the quote
+            _ if c == quote => format!("\\{}", quote),
+            // escapes backslashes
+            '\\' => "\\\\".into(),
+            // no escape required
+            _ => c.to_string(),
+        })
+        .collect::<String>();
+
+    // enquotes escaped string
+    quote.to_string() + &escaped + &quote.to_string()
 }
