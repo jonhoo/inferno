@@ -31,7 +31,6 @@ impl Collapse for Folder {
             let mut eof = false;
             for _ in 0..LINES_PER_ITERATION {
                 if reader.read_line(&mut buffer)? == 0 {
-                    buffer.push('\n');
                     eof = true;
                 }
             }
