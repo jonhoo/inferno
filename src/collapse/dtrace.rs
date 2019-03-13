@@ -137,12 +137,21 @@ impl Folder {
         }
     }
 
-    fn remove_offset(line: &str) -> &str {
-        if let Some(offset) = line.rfind('+') {
-            &line[..offset]
-        } else {
-            line
+    fn remove_offset(line: &str) -> (bool, bool, bool, &str) {
+        let mut could_be_java = false;
+        let mut could_be_cpp = false;
+        let mut has_colon = false;
+        let bytes = line.as_bytes();
+        for offset in 0..bytes.len() {
+            match bytes[offset] {
+                b'>' if offset > 0 && bytes[offset - 1] == b'-' => could_be_java = true,
+                b':' if offset > 0 && bytes[offset - 1] == b':' => could_be_cpp = true,
+                b';' => has_colon = true,
+                b'+' => return (could_be_java, could_be_cpp, has_colon, &line[..offset]),
+                _ => (),
+            }
         }
+        (could_be_java, could_be_cpp, has_colon, line)
     }
 
     // we have a stack line that shows one stack entry from the preceeding event, like:
@@ -153,30 +162,44 @@ impl Folder {
     //     unix`sys_syscall+0x10e
     //       1
     fn on_stack_line(&mut self, line: &str) {
-        let frame = if self.opt.includeoffset {
-            line
+        let (could_be_java, could_be_cpp, has_colon, mut frame) = if self.opt.includeoffset {
+            (true, true, true, line)
         } else {
             Self::remove_offset(line)
         };
 
-        let mut frame = Self::uncpp(frame);
+        if could_be_cpp {
+            frame = Self::uncpp(frame);
+        }
 
         if frame.is_empty() {
             frame = "-";
         };
 
-        let mut inline = false;
-        for func in frame.split("->") {
-            let mut func = func.trim_start_matches('L').replace(';', ":");
-            if inline {
-                func.push_str("_[i]")
-            };
-            inline = true;
-            self.stack_str_size += func.len() + 1;
-            self.cache_inlines.push(func);
-        }
-        while let Some(func) = self.cache_inlines.pop() {
-            self.stack.push_front(func);
+        if could_be_java {
+            let mut inline = false;
+            for func in frame.split("->") {
+                let mut func = if has_colon {
+                    func.trim_start_matches('L').replace(';', ":")
+                } else {
+                    func.trim_start_matches('L').to_owned()
+                };
+                if inline {
+                    func.push_str("_[i]")
+                };
+                inline = true;
+                self.stack_str_size += func.len() + 1;
+                self.cache_inlines.push(func);
+            }
+            while let Some(func) = self.cache_inlines.pop() {
+                self.stack.push_front(func);
+            }
+        } else {
+            if has_colon {
+                self.stack.push_front(frame.replace(';', ":"))
+            } else {
+                self.stack.push_front(frame.to_owned())
+            }
         }
     }
 
@@ -195,7 +218,7 @@ impl Folder {
             }
             //trim leaf offset if these were retained:
             if self.opt.includeoffset && i == last {
-                stack_str.push_str(Self::remove_offset(&e));
+                stack_str.push_str(Self::remove_offset(&e).3);
             } else {
                 stack_str.push_str(&e);
             }
