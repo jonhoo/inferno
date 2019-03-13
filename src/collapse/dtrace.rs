@@ -76,7 +76,6 @@ impl Collapse for Folder {
     fn is_applicable(&mut self, input: &str) -> Option<bool> {
         let mut found_empty_line = false;
         let mut found_stack_line = false;
-        let mut found_count_line = false;
         let mut input = input.as_bytes();
         let mut line = String::new();
         loop {
@@ -91,23 +90,17 @@ impl Collapse for Folder {
 
             let line = line.trim();
             if line.is_empty() {
-                if found_count_line && found_stack_line {
-                    return Some(true);
-                }
                 found_empty_line = true;
             } else if found_empty_line {
                 if line.parse::<usize>().is_ok() {
-                    if found_count_line || !found_stack_line {
-                        // Either multiple count lines, or a count line with no stack lines
-                        return Some(false);
-                    }
-                    found_count_line = true;
-                } else {
-                    if found_count_line {
-                        // Found count line before stack lines
-                        return Some(false);
-                    }
+                    return Some(found_stack_line);
+                } else if line.contains('`')
+                    || (line.starts_with("0x") && usize::from_str_radix(&line[2..], 16).is_ok())
+                {
                     found_stack_line = true;
+                } else {
+                    // This is not a stack or count line
+                    return Some(false);
                 }
             }
         }

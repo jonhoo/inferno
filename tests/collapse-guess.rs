@@ -36,6 +36,13 @@ fn collapse_guess_dtrace_java() {
 }
 
 #[test]
+fn collapse_guess_dtrace_hex_addresses() {
+    let test_file = "./tests/data/collapse-dtrace/hex-addresses.txt";
+    let result_file = "./tests/data/collapse-dtrace/results/hex-addresses.txt";
+    test_collapse_guess(test_file, result_file).unwrap()
+}
+
+#[test]
 fn collapse_guess_perf_example() {
     let test_file = "./flamegraph/example-perf-stacks.txt.gz";
     let result_file = "./tests/data/collapse-perf/results/example-perf-stacks-collapsed.txt";
