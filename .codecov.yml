@@ -2,3 +2,5 @@ coverage:
   range: 85..100 # set a high standard for ourselves
 ignore:
   - "src/bin" # don't consider binaries in coverage report
+  - "tests" # we also don't care about coverage of test code
+  - "benches" # or coverage of benchmarks
