@@ -126,7 +126,7 @@ fn main() -> quick_xml::Result<()> {
     let (infiles, mut options) = opt.into_parts();
     options.palette_map = palette_map.as_mut();
 
-    flamegraph::from_files(options, infiles, io::stdout().lock())?;
+    flamegraph::from_files(&mut options, &infiles, io::stdout().lock())?;
     save_consistent_palette_if_needed(&palette_map, PALETTE_MAP_FILE).map_err(quick_xml::Error::Io)
 }
 
