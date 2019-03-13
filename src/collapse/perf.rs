@@ -1,5 +1,6 @@
 use super::Collapse;
-use std::collections::{HashMap, VecDeque};
+use hashbrown::HashMap;
+use std::collections::VecDeque;
 use std::io;
 use std::io::prelude::*;
 
