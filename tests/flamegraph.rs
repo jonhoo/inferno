@@ -3,7 +3,9 @@ extern crate pretty_assertions;
 
 extern crate inferno;
 
-use inferno::flamegraph::{self, BackgroundColor, Direction, Options, Palette, PaletteMap};
+use inferno::flamegraph::{
+    self, color::BackgroundColor, color::PaletteMap, Direction, Options, Palette,
+};
 use log::Level;
 use std::fs::{self, File};
 use std::io::{self, BufRead, BufReader, Cursor};

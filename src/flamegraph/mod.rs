@@ -1,12 +1,10 @@
 mod attrs;
-mod color;
+pub mod color;
 mod merge;
 mod svg;
 
 pub use attrs::FuncFrameAttrsMap;
-pub use color::BackgroundColor;
 pub use color::Palette;
-pub use color::PaletteMap;
 
 use crate::flamegraph::color::Color;
 use num_format::Locale;

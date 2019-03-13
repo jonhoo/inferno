@@ -4,7 +4,7 @@ use std::path::{Path, PathBuf};
 use structopt::StructOpt;
 
 use inferno::flamegraph::{
-    self, BackgroundColor, Direction, FuncFrameAttrsMap, Options, Palette, PaletteMap,
+    self, color::BackgroundColor, color::PaletteMap, Direction, FuncFrameAttrsMap, Options, Palette,
 };
 
 #[derive(Debug, StructOpt)]
