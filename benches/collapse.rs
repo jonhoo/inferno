@@ -13,7 +13,7 @@ fn dtrace_benchmark(c: &mut Criterion) {
     let mut f = File::open("flamegraph/example-dtrace-stacks.txt").expect("file not found");
 
     let mut bytes = Vec::new();
-    f.read_to_end(&mut bytes).expect("Culd not read file");
+    f.read_to_end(&mut bytes).expect("Could not read file");
 
     let len = bytes.len();
     c.bench(
@@ -40,7 +40,7 @@ fn perf_benchmark(c: &mut Criterion) {
     let mut bytes = Vec::new();
 
     let mut r = BufReader::new(Decoder::new(f).unwrap());
-    r.read_to_end(&mut bytes).expect("Culd not read file");
+    r.read_to_end(&mut bytes).expect("Could not read file");
 
     let len = bytes.len();
     c.bench(
