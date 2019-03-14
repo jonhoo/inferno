@@ -66,6 +66,11 @@ name = "inferno-flamegraph"
 path = "src/bin/flamegraph.rs"
 required-features = ["cli"]
 
+[[bin]]
+name = "inferno-diff-folded"
+path = "src/bin/diff-folded.rs"
+required-features = ["cli"]
+
 [[bench]]
 name = "collapse"
 harness = false

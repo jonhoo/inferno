@@ -612,7 +612,10 @@ where
         .read_to_string(&mut input)
         .map_err(quick_xml::Error::Io)?;
 
-    from_sorted_lines(opt, input.lines(), writer)
+    let mut lines: Vec<&str> = input.lines().collect();
+    lines.sort_unstable();
+
+    from_sorted_lines(opt, lines, writer)
 }
 
 /// Produce a flame graph from a set of readers that contain folded stack lines.
