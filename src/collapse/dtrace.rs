@@ -114,7 +114,7 @@ impl From<Options> for Folder {
     fn from(opt: Options) -> Self {
         Self {
             stack: VecDeque::default(),
-            occurrences: HashMap::with_capacity(100),
+            occurrences: HashMap::with_capacity(512),
             cache_inlines: Vec::new(),
             opt,
             stack_str_size: 0,
@@ -194,12 +194,10 @@ impl Folder {
             while let Some(func) = self.cache_inlines.pop() {
                 self.stack.push_front(func);
             }
+        } else if has_colon {
+            self.stack.push_front(frame.replace(';', ":"))
         } else {
-            if has_colon {
-                self.stack.push_front(frame.replace(';', ":"))
-            } else {
-                self.stack.push_front(frame.to_owned())
-            }
+            self.stack.push_front(frame.to_owned())
         }
     }
 
