@@ -142,6 +142,9 @@ impl Folder {
         let mut could_be_cpp = false;
         let mut has_semicolon = false;
         let mut last_offset = line.len() - 1;
+        // This seems risly but dtrace stacks are c-strings as can be seen in the function
+        // responsible for printing them:
+        // https://github.com/opendtrace/opendtrace/blob/1a03ea5576a9219a43f28b4f159ff8a4b1f9a9fd/lib/libdtrace/common/dt_consume.c#L1331
         let bytes = line.as_bytes();
         for offset in 0..bytes.len() {
             match bytes[offset] {
