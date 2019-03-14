@@ -138,20 +138,20 @@ impl Folder {
     }
 
     fn remove_offset(line: &str) -> (bool, bool, bool, &str) {
-        let mut could_be_java = false;
+        let mut has_inlines = false;
         let mut could_be_cpp = false;
-        let mut has_colon = false;
+        let mut has_semicolon = false;
         let bytes = line.as_bytes();
         for offset in 0..bytes.len() {
             match bytes[offset] {
-                b'>' if offset > 0 && bytes[offset - 1] == b'-' => could_be_java = true,
+                b'>' if offset > 0 && bytes[offset - 1] == b'-' => has_inlines = true,
                 b':' if offset > 0 && bytes[offset - 1] == b':' => could_be_cpp = true,
-                b';' => has_colon = true,
-                b'+' => return (could_be_java, could_be_cpp, has_colon, &line[..offset]),
+                b';' => has_semicolon = true,
+                b'+' => return (has_inlines, could_be_cpp, has_semicolon, &line[..offset]),
                 _ => (),
             }
         }
-        (could_be_java, could_be_cpp, has_colon, line)
+        (has_inlines, could_be_cpp, has_semicolon, line)
     }
 
     // we have a stack line that shows one stack entry from the preceeding event, like:
@@ -162,7 +162,7 @@ impl Folder {
     //     unix`sys_syscall+0x10e
     //       1
     fn on_stack_line(&mut self, line: &str) {
-        let (could_be_java, could_be_cpp, has_colon, mut frame) = if self.opt.includeoffset {
+        let (has_inlines, could_be_cpp, has_semicolon, mut frame) = if self.opt.includeoffset {
             (true, true, true, line)
         } else {
             Self::remove_offset(line)
@@ -176,10 +176,10 @@ impl Folder {
             frame = "-";
         };
 
-        if could_be_java {
+        if has_inlines {
             let mut inline = false;
             for func in frame.split("->") {
-                let mut func = if has_colon {
+                let mut func = if has_semicolon {
                     func.trim_start_matches('L').replace(';', ":")
                 } else {
                     func.trim_start_matches('L').to_owned()
@@ -194,7 +194,7 @@ impl Folder {
             while let Some(func) = self.cache_inlines.pop() {
                 self.stack.push_front(func);
             }
-        } else if has_colon {
+        } else if has_semicolon {
             self.stack.push_front(frame.replace(';', ":"))
         } else {
             self.stack.push_front(frame.to_owned())
@@ -229,7 +229,7 @@ impl Folder {
     }
 
     fn finish<W: Write>(&self, mut writer: W) -> io::Result<()> {
-        let mut keys: Vec<(&String, &usize)> = self.occurrences.iter().collect();
+        let mut keys: Vec<_> = self.occurrences.iter().collect();
         keys.sort();
         for (key, count) in keys {
             writeln!(writer, "{} {}", key, count)?;
