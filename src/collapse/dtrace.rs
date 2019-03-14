@@ -141,17 +141,23 @@ impl Folder {
         let mut has_inlines = false;
         let mut could_be_cpp = false;
         let mut has_semicolon = false;
+        let mut last_offset = line.len() - 1;
         let bytes = line.as_bytes();
         for offset in 0..bytes.len() {
             match bytes[offset] {
                 b'>' if offset > 0 && bytes[offset - 1] == b'-' => has_inlines = true,
                 b':' if offset > 0 && bytes[offset - 1] == b':' => could_be_cpp = true,
                 b';' => has_semicolon = true,
-                b'+' => return (has_inlines, could_be_cpp, has_semicolon, &line[..offset]),
+                b'+' => last_offset = offset,
                 _ => (),
             }
         }
-        (has_inlines, could_be_cpp, has_semicolon, line)
+        (
+            has_inlines,
+            could_be_cpp,
+            has_semicolon,
+            &line[..last_offset],
+        )
     }
 
     // we have a stack line that shows one stack entry from the preceeding event, like:
