@@ -141,7 +141,7 @@ impl Folder {
         let mut has_inlines = false;
         let mut could_be_cpp = false;
         let mut has_semicolon = false;
-        let mut last_offset = line.len() - 1;
+        let mut last_offset = line.len();
         // This seems risly but dtrace stacks are c-strings as can be seen in the function
         // responsible for printing them:
         // https://github.com/opendtrace/opendtrace/blob/1a03ea5576a9219a43f28b4f159ff8a4b1f9a9fd/lib/libdtrace/common/dt_consume.c#L1331
