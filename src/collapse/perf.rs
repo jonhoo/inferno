@@ -159,7 +159,7 @@ impl From<Options> for Folder {
             skip_stack: false,
             stack: VecDeque::default(),
             cache_line: Vec::default(),
-            occurrences: HashMap::default(),
+            occurrences: HashMap::with_capacity(512),
             pname: String::new(),
             event_filtering: EventFilterState::None,
             opt,
