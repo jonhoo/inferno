@@ -115,10 +115,21 @@ where
     let mut delta = None;
     let mut delta_max = 1;
     let mut stripped_fractional_samples = false;
+    let mut prev_line = None;
+    let mut unsorted_detected = false;
     for line in lines {
         let mut line = line.trim();
         if line.is_empty() {
             continue;
+        }
+
+        if !unsorted_detected {
+            if let Some(prev_line) = prev_line {
+                if prev_line > line {
+                    unsorted_detected = true;
+                    warn!("Unsorted input lines detected");
+                }
+            }
         }
 
         // Parse the number of samples for the purpose of computing overall time passed.
@@ -166,6 +177,7 @@ where
 
         last = stack;
         time += nsamples;
+        prev_line = Some(line);
     }
 
     if !last.is_empty() {

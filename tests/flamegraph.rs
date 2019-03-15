@@ -592,3 +592,40 @@ fn load_palette_map_file(palette_file: &str) -> PaletteMap {
     let path = Path::new(palette_file);
     PaletteMap::load_from_file_or_empty(&path).unwrap()
 }
+
+#[test]
+fn flamegraph_unsorted_input_files() {
+    let input_file =
+        "./tests/data/flamegraph/multiple-inputs/perf-vertx-stacks-01-collapsed-all-unsorted-1.txt";
+    let expected_result_file = "./tests/data/flamegraph/unsorted-input/unsorted-input.svg";
+    let options = Options {
+        hash: true,
+        ..Default::default()
+    };
+    test_flamegraph(input_file, expected_result_file, options).unwrap();
+}
+
+#[test]
+fn flamegraph_no_sort_should_warn_about_unsorted_input() {
+    let options = Options {
+        no_sort: true,
+        ..Default::default()
+    };
+    test_flamegraph_logs_with_options(
+        "./tests/data/flamegraph/multiple-inputs/perf-vertx-stacks-01-collapsed-all-unsorted-1.txt",
+        |captured_logs| {
+            let nwarnings = captured_logs
+                .into_iter()
+                .filter(|log| {
+                    log.body == "Unsorted input lines detected" && log.level == Level::Warn
+                })
+                .count();
+            assert_eq!(
+                nwarnings, 1,
+                "unsorted input lines warning logged {} times, but should be logged exactly once",
+                nwarnings
+            );
+        },
+        options,
+    );
+}

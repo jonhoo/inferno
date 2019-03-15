@@ -112,6 +112,12 @@ struct Opt {
     #[structopt(long = "pretty-xml")]
     pretty_xml: bool,
 
+    /// Don't sort the input lines.
+    /// If you set this flag you need to be sure your
+    /// input stack lines are already sorted.
+    #[structopt(long = "no-sort")]
+    pub no_sort: bool,
+
     /// Don't include static JavaScript in flame graph.
     /// This flag is hidden since it's only meant to be used in
     /// tests so we don't have to include the same static
@@ -143,6 +149,7 @@ impl<'a> Opt {
         options.negate_differentials = self.negate;
         options.factor = self.factor;
         options.pretty_xml = self.pretty_xml;
+        options.no_sort = self.no_sort;
         options.no_javascript = self.no_javascript;
 
         // set style options
