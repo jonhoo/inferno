@@ -70,3 +70,7 @@ required-features = ["cli"]
 [[bench]]
 name = "collapse"
 harness = false
+
+[[bench]]
+name = "flamegraph"
+harness = false

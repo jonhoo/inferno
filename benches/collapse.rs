@@ -2,30 +2,35 @@ extern crate criterion;
 extern crate inferno;
 
 use criterion::*;
-use inferno::collapse::dtrace::{Folder as DFolder, Options as DOptions};
-use inferno::collapse::perf::{Folder as PFolder, Options as POptions};
+use inferno::collapse::dtrace;
+use inferno::collapse::perf;
 use inferno::collapse::Collapse;
 use libflate::gzip::Decoder;
 use std::fs::File;
-use std::io::{BufReader, Cursor, Read};
+use std::io::{self, BufReader, Read};
 
-fn dtrace_benchmark(c: &mut Criterion) {
-    let mut f = File::open("flamegraph/example-dtrace-stacks.txt").expect("file not found");
+fn collapse_benchmark<C>(c: &mut Criterion, mut collapser: C, id: &str, infile: &str)
+where
+    C: 'static + Collapse,
+{
+    let mut f = File::open(infile).expect("file not found");
 
     let mut bytes = Vec::new();
-    f.read_to_end(&mut bytes).expect("Could not read file");
+    if infile.ends_with(".gz") {
+        let mut r = BufReader::new(Decoder::new(f).unwrap());
+        r.read_to_end(&mut bytes).expect("Could not read file");
+    } else {
+        f.read_to_end(&mut bytes).expect("Could not read file");
+    }
 
-    let len = bytes.len();
     c.bench(
         "collapse",
         ParameterizedBenchmark::new(
-            "dtrace",
+            id,
             move |b, data| {
                 b.iter(|| {
                     let reader = BufReader::new(data.as_slice());
-                    let mut result = Cursor::new(Vec::with_capacity(len));
-                    result.set_position(0);
-                    let _folder = DFolder::from(DOptions::default()).collapse(reader, &mut result);
+                    let _folder = collapser.collapse(reader, io::sink());
                 })
             },
             vec![bytes],
@@ -34,32 +39,25 @@ fn dtrace_benchmark(c: &mut Criterion) {
     );
 }
 
-fn perf_benchmark(c: &mut Criterion) {
-    let f = File::open("flamegraph/example-perf-stacks.txt.gz").expect("file not found");
-
-    let mut bytes = Vec::new();
-
-    let mut r = BufReader::new(Decoder::new(f).unwrap());
-    r.read_to_end(&mut bytes).expect("Could not read file");
-
-    let len = bytes.len();
-    c.bench(
-        "collapse",
-        ParameterizedBenchmark::new(
-            "perf",
-            move |b, data| {
-                b.iter(|| {
-                    let reader = BufReader::new(data.as_slice());
-                    let mut result = Cursor::new(Vec::with_capacity(len));
-                    result.set_position(0);
-                    let _folder = PFolder::from(POptions::default()).collapse(reader, &mut result);
-                })
-            },
-            vec![bytes],
-        )
-        .throughput(|bytes| Throughput::Bytes(bytes.len() as u32)),
+fn dtrace(c: &mut Criterion) {
+    let infile = "flamegraph/example-dtrace-stacks.txt";
+    collapse_benchmark(
+        c,
+        dtrace::Folder::from(dtrace::Options::default()),
+        "dtrace",
+        infile,
     );
 }
 
-criterion_group!(benches, perf_benchmark, dtrace_benchmark);
+fn perf(c: &mut Criterion) {
+    let infile = "flamegraph/example-perf-stacks.txt.gz";
+    collapse_benchmark(
+        c,
+        perf::Folder::from(perf::Options::default()),
+        "perf",
+        infile,
+    );
+}
+
+criterion_group!(benches, dtrace, perf);
 criterion_main!(benches);
