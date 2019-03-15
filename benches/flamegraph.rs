@@ -6,7 +6,7 @@ use inferno::flamegraph;
 use std::fs::File;
 use std::io::{BufReader, Cursor, Read};
 
-fn flamegraph_benchmark<S: Into<String>>(c: &mut Criterion, id: S, infile: &str) {
+fn flamegraph_benchmark(c: &mut Criterion, id: &str, infile: &str) {
     let mut f = File::open(infile).expect("file not found");
 
     let mut bytes = Vec::new();

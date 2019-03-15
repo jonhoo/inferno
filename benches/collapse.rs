@@ -9,10 +9,9 @@ use libflate::gzip::Decoder;
 use std::fs::File;
 use std::io::{BufReader, Cursor, Read};
 
-fn collapse_benchmark<C, S>(c: &mut Criterion, mut collapser: C, id: S, infile: &str)
+fn collapse_benchmark<C>(c: &mut Criterion, mut collapser: C, id: &str, infile: &str)
 where
     C: 'static + Collapse,
-    S: Into<String>,
 {
     let mut f = File::open(infile).expect("file not found");
 
