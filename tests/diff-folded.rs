@@ -138,6 +138,19 @@ fn diff_folded_strip_hex() {
 }
 
 #[test]
+fn diff_folded_fractional_samples() {
+    let infile1 = "./tests/data/diff-folded/before_fractionals.txt";
+    let infile2 = "./tests/data/diff-folded/after.txt";
+    let expected_result_file = "./tests/data/diff-folded/results/fractionals.txt";
+
+    let opt = Options {
+        strip_hex: true,
+        ..Default::default()
+    };
+    test_diff_folded(infile1, infile2, expected_result_file, opt).unwrap();
+}
+
+#[test]
 fn diff_folded_should_log_warning_on_bad_input_line() {
     test_diff_folded_logs(
         "./tests/data/diff-folded/bad_before.txt",
