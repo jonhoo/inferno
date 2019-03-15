@@ -8,7 +8,7 @@ const LINES_PER_ITERATION: usize = 10;
 /// A collapser that tries to find an appropriate implementation of `Collapse`
 /// based on the input, then delegates to that collapser if one is found.
 ///
-/// If no applicable collapser is found, and error will be logged and
+/// If no applicable collapser is found, an error will be logged and
 /// nothing will be written.
 #[derive(Default)]
 pub struct Folder {}
