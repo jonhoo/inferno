@@ -3,7 +3,7 @@ use std::io;
 use std::path::PathBuf;
 use structopt::StructOpt;
 
-use inferno::diff_folded::{self, Options};
+use inferno::differential::{self, Options};
 
 #[derive(Debug, StructOpt)]
 #[structopt(name = "inferno-diff-folded", author = "")]
@@ -60,5 +60,5 @@ fn main() -> io::Result<()> {
     }
 
     let (folded1, folded2, options) = opt.into_parts();
-    diff_folded::from_files(&options, folded1, folded2, io::stdout().lock())
+    differential::from_files(options, folded1, folded2, io::stdout().lock())
 }

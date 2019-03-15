@@ -3,7 +3,7 @@ extern crate pretty_assertions;
 
 extern crate inferno;
 
-use inferno::diff_folded::{self, Options};
+use inferno::differential::{self, Options};
 use log::Level;
 use std::fs::{self, File};
 use std::io::{self, BufRead, BufReader, Cursor};
@@ -20,7 +20,7 @@ fn test_diff_folded(
             if e.kind() == io::ErrorKind::NotFound {
                 // be nice to the dev and make the file
                 let mut f = File::create(expected_result_file).unwrap();
-                diff_folded::from_files(&options, &infile1, &infile2, &mut f)?;
+                differential::from_files(options, &infile1, &infile2, &mut f)?;
                 fs::metadata(expected_result_file).unwrap()
             } else {
                 return Err(e.into());
@@ -30,7 +30,7 @@ fn test_diff_folded(
 
     let expected_len = metadata.len() as usize;
     let mut result = Cursor::new(Vec::with_capacity(expected_len));
-    let return_value = diff_folded::from_files(&options, infile1, infile2, &mut result)?;
+    let return_value = differential::from_files(options, infile1, infile2, &mut result)?;
     let expected = BufReader::new(File::open(expected_result_file).unwrap());
     // write out the expected result to /tmp for easy restoration
     result.set_position(0);
@@ -90,7 +90,7 @@ fn test_diff_folded_logs_with_options<F>(
     infile1: &str,
     infile2: &str,
     asserter: F,
-    mut options: Options,
+    options: Options,
 ) where
     F: Fn(&Vec<testing_logger::CapturedLog>),
 {
@@ -98,7 +98,7 @@ fn test_diff_folded_logs_with_options<F>(
     let r1 = BufReader::new(File::open(infile1).unwrap());
     let r2 = BufReader::new(File::open(infile2).unwrap());
     let sink = io::sink();
-    let _ = diff_folded::from_readers(&mut options, r1, r2, sink);
+    let _ = differential::from_readers(options, r1, r2, sink);
     testing_logger::validate(asserter);
 }
 

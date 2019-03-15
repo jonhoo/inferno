@@ -6,16 +6,16 @@ use std::path::Path;
 
 const READER_CAPACITY: usize = 128 * 1024;
 
-#[derive(Default)]
+#[derive(Debug, Clone, Copy, Default)]
 struct Counts {
-    first: usize,
-    second: usize,
+    first: f64,
+    second: f64,
 }
 
 /// Configure the generated output.
 ///
 /// All options default to off.
-#[derive(Debug, Default)]
+#[derive(Debug, Clone, Copy, Default)]
 pub struct Options {
     /// Normalize the first profile count to match the second.
     ///
@@ -39,7 +39,7 @@ pub struct Options {
 ///
 /// The output written to the `writer` will be similar to the inputs, except there will be two
 /// sample count columns -- one for each profile.
-pub fn from_readers<R1, R2, W>(opt: &Options, reader1: R1, reader2: R2, writer: W) -> io::Result<()>
+pub fn from_readers<R1, R2, W>(opt: Options, reader1: R1, reader2: R2, writer: W) -> io::Result<()>
 where
     R1: BufRead,
     R2: BufRead,
@@ -48,9 +48,9 @@ where
     let mut stack_counts = HashMap::new();
     let total1 = parse_stack_counts(&opt, &mut stack_counts, reader1, true)?;
     let total2 = parse_stack_counts(&opt, &mut stack_counts, reader2, false)?;
-    if opt.normalize && total1 != total2 {
+    if opt.normalize && (total1 - total2).abs() > 0.01 {
         for counts in stack_counts.values_mut() {
-            counts.first = counts.first * total2 / total1;
+            counts.first = (counts.first * total2 / total1).floor();
         }
     }
     write_stacks(&stack_counts, writer)
@@ -61,7 +61,7 @@ where
 ///
 /// See [`from_readers`] for the input and output formats.
 pub fn from_files<P1, P2, W>(
-    opt: &Options,
+    opt: Options,
     filename1: P1,
     filename2: P2,
     writer: W,
@@ -84,11 +84,11 @@ fn parse_stack_counts<R>(
     stack_counts: &mut HashMap<String, Counts>,
     mut reader: R,
     is_first: bool,
-) -> io::Result<usize>
+) -> io::Result<f64>
 where
     R: BufRead,
 {
-    let mut total = 0;
+    let mut total = 0.0;
     let mut line = String::new();
     loop {
         line.clear();
@@ -126,10 +126,10 @@ where
 }
 
 // Parse stack and sample count from line.
-fn parse_line(line: &str, strip_hex: bool) -> Option<(String, usize)> {
+fn parse_line(line: &str, strip_hex: bool) -> Option<(String, f64)> {
     let counti = line.rfind(' ')?;
     let count = &line[(counti + 1)..].trim_end();
-    let count = count.parse::<usize>().ok()?;
+    let count = count.parse::<f64>().ok()?;
     let mut stack = line[..counti].trim_end().to_string();
     if strip_hex {
         stack = strip_hex_address(stack);

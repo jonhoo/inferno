@@ -90,6 +90,7 @@
 //! ```
 //!
 //! And then open `differential.svg` in your viewer of choice.
+//!
 //! # Development
 //!
 //! This crate was initially developed through [a series of live coding sessions]. If you want to
@@ -141,4 +142,4 @@ pub mod flamegraph;
 /// See the [crate-level documentation] for details.
 ///
 ///   [crate-level documentation]: ../index.html
-pub mod diff_folded;
+pub mod differential;
