@@ -4,7 +4,7 @@ extern crate inferno;
 use criterion::*;
 use inferno::flamegraph;
 use std::fs::File;
-use std::io::{BufReader, Cursor, Read};
+use std::io::{self, BufReader, Read};
 
 fn flamegraph_benchmark(c: &mut Criterion, id: &str, infile: &str) {
     let mut f = File::open(infile).expect("file not found");
@@ -19,10 +19,8 @@ fn flamegraph_benchmark(c: &mut Criterion, id: &str, infile: &str) {
             move |b, data| {
                 b.iter(|| {
                     let reader = BufReader::new(data.as_slice());
-                    let mut result = Cursor::new(Vec::new());
-                    result.set_position(0);
                     let _folder =
-                        flamegraph::from_reader(&mut Default::default(), reader, &mut result);
+                        flamegraph::from_reader(&mut Default::default(), reader, io::sink());
                 })
             },
             vec![bytes],

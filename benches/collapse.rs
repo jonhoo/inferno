@@ -7,7 +7,7 @@ use inferno::collapse::perf;
 use inferno::collapse::Collapse;
 use libflate::gzip::Decoder;
 use std::fs::File;
-use std::io::{BufReader, Cursor, Read};
+use std::io::{self, BufReader, Read};
 
 fn collapse_benchmark<C>(c: &mut Criterion, mut collapser: C, id: &str, infile: &str)
 where
@@ -30,9 +30,7 @@ where
             move |b, data| {
                 b.iter(|| {
                     let reader = BufReader::new(data.as_slice());
-                    let mut result = Cursor::new(Vec::new());
-                    result.set_position(0);
-                    let _folder = collapser.collapse(reader, &mut result);
+                    let _folder = collapser.collapse(reader, io::sink());
                 })
             },
             vec![bytes],
