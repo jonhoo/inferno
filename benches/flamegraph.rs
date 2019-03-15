@@ -6,22 +6,20 @@ use inferno::flamegraph;
 use std::fs::File;
 use std::io::{BufReader, Cursor, Read};
 
-fn flamegraph_benchmark(c: &mut Criterion) {
-    let mut f = File::open("tests/data/collapse-perf/results/example-perf-stacks-collapsed.txt")
-        .expect("file not found");
+fn flamegraph_benchmark<S: Into<String>>(c: &mut Criterion, id: S, infile: &str) {
+    let mut f = File::open(infile).expect("file not found");
 
     let mut bytes = Vec::new();
     f.read_to_end(&mut bytes).expect("Could not read file");
 
-    let len = bytes.len();
     c.bench(
         "flamegraph",
         ParameterizedBenchmark::new(
-            "example-perf-stacks-collapsed",
+            id,
             move |b, data| {
                 b.iter(|| {
                     let reader = BufReader::new(data.as_slice());
-                    let mut result = Cursor::new(Vec::with_capacity(len));
+                    let mut result = Cursor::new(Vec::new());
                     result.set_position(0);
                     let _folder =
                         flamegraph::from_reader(&mut Default::default(), reader, &mut result);
@@ -33,5 +31,21 @@ fn flamegraph_benchmark(c: &mut Criterion) {
     );
 }
 
-criterion_group!(benches, flamegraph_benchmark);
-criterion_main!(benches);
+macro_rules! flamegraph_benchmarks {
+    ($($name:ident : $infile:expr),*) => {
+        $(
+            fn $name(c: &mut Criterion) {
+                let id = stringify!($name);
+                flamegraph_benchmark(c, id, $infile);
+            }
+        )*
+
+        criterion_group!(benches, $($name),*);
+        criterion_main!(benches);
+    }
+}
+
+flamegraph_benchmarks! {
+    dtrace: "tests/data/collapse-dtrace/results/dtrace-example.txt",
+    perf: "tests/data/collapse-perf/results/example-perf-stacks-collapsed.txt"
+}
