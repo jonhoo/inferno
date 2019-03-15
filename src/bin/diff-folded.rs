@@ -6,7 +6,26 @@ use structopt::StructOpt;
 use inferno::differential::{self, Options};
 
 #[derive(Debug, StructOpt)]
-#[structopt(name = "inferno-diff-folded", author = "")]
+#[structopt(
+    name = "inferno-diff-folded",
+    author = "",
+    after_help = "\
+Creates a differential between two folded stack profiles that can be passed
+to inferno-flamegraph to generate a differential flame graph.
+
+$ inferno-diff-folded folded1 folded2 | inferno-flamegraph > diff2.svg
+
+The flamegraph will be colored based on higher samples (red) and smaller
+samples (blue). The frame widths will be based on the 2nd folded profile.
+This might be confusing if stack frames disappear entirely; it will make
+the most sense to ALSO create a differential based on the 1st profile widths,
+while switching the hues. To do this, reverse the order of the folded files
+and pass the --negate flag to inferno-flamegraph like this:
+
+$ inferno-diff-folded folded2 folded1 | inferno-flamegraph --negate > diff1.svg
+
+You can use the inferno-collapse-* tools to generate the folded files."
+)]
 struct Opt {
     /// Normalize sample counts
     #[structopt(short = "n", long = "normalize")]

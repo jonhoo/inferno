@@ -86,10 +86,18 @@
 //! then send the output to `inferno-flamegraph`. Example:
 //!
 //! ```console
-//! $ inferno-diff-folded stacks1.folded stacks2.folded | inferno-flamegraph > differential.svg
+//! $ inferno-diff-folded folded1 folded2 | inferno-flamegraph > diff2.svg
 //! ```
 //!
-//! And then open `differential.svg` in your viewer of choice.
+//! The flamegraph will be colored based on higher samples (red) and smaller samples (blue). The
+//! frame widths will be based on the 2nd folded profile. This might be confusing if stack frames
+//! disappear entirely; it will make the most sense to ALSO create a differential based on the 1st
+//! profile widths, while switching the hues. To do this, reverse the order of the input files
+//! and pass the `--negate` flag to `inferno-flamegraph` like this:
+//!
+//! ```console
+//! $ inferno-diff-folded folded2 folded1 | inferno-flamegraph --negate > diff1.svg
+//! ```
 //!
 //! # Development
 //!
