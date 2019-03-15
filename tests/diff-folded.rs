@@ -143,11 +143,7 @@ fn diff_folded_fractional_samples() {
     let infile2 = "./tests/data/diff-folded/after.txt";
     let expected_result_file = "./tests/data/diff-folded/results/fractionals.txt";
 
-    let opt = Options {
-        strip_hex: true,
-        ..Default::default()
-    };
-    test_diff_folded(infile1, infile2, expected_result_file, opt).unwrap();
+    test_diff_folded(infile1, infile2, expected_result_file, Default::default()).unwrap();
 }
 
 #[test]
@@ -165,6 +161,27 @@ fn diff_folded_should_log_warning_on_bad_input_line() {
             assert_eq!(
                 nwarnings, 1,
                 "bad lines warning logged {} times, but should be logged exactly once",
+                nwarnings
+            );
+        },
+    );
+}
+
+#[test]
+fn diff_folded_should_log_warning_about_fractional_samples() {
+    test_diff_folded_logs(
+        "./tests/data/diff-folded/before_fractionals.txt",
+        "./tests/data/diff-folded/after.txt",
+        |captured_logs| {
+            let nwarnings = captured_logs
+                .into_iter()
+                .filter(|log| {
+                    log.body == "The input data has fractional sample counts that will be truncated to integers" && log.level == Level::Warn
+                })
+                .count();
+            assert_eq!(
+                nwarnings, 1,
+                "fractional samples warning logged {} times, but should be logged exactly once",
                 nwarnings
             );
         },
