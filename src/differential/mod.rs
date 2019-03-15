@@ -46,8 +46,8 @@ where
     W: Write,
 {
     let mut stack_counts = HashMap::new();
-    let total1 = parse_stack_counts(&opt, &mut stack_counts, reader1, true)?;
-    let total2 = parse_stack_counts(&opt, &mut stack_counts, reader2, false)?;
+    let total1 = parse_stack_counts(opt, &mut stack_counts, reader1, true)?;
+    let total2 = parse_stack_counts(opt, &mut stack_counts, reader2, false)?;
     if opt.normalize && total1 != total2 {
         for counts in stack_counts.values_mut() {
             counts.first = (counts.first as f64 * total2 as f64 / total1 as f64) as usize;
@@ -80,7 +80,7 @@ where
 
 // Populate stack_counts based on lines from the reader and returns the sum of the sample counts.
 fn parse_stack_counts<R>(
-    opt: &Options,
+    opt: Options,
     stack_counts: &mut HashMap<String, Counts>,
     mut reader: R,
     is_first: bool,
