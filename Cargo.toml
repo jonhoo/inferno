@@ -29,6 +29,7 @@ quick-xml = "0.13.3"
 num-format = { version = "0.4", default-features = false }
 str_stack = "0.1"
 indexmap = "1.0"
+hashbrown = "0.1"
 rand = "0.6.5"
 structopt = { version = "0.2", optional = true }
 env_logger = { version = "0.6.0", optional = true }
