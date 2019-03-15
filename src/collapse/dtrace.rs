@@ -1,5 +1,6 @@
 use super::Collapse;
-use std::collections::{HashMap, VecDeque};
+use hashbrown::HashMap;
+use std::collections::VecDeque;
 use std::io;
 use std::io::prelude::*;
 
@@ -113,7 +114,7 @@ impl From<Options> for Folder {
     fn from(opt: Options) -> Self {
         Self {
             stack: VecDeque::default(),
-            occurrences: HashMap::default(),
+            occurrences: HashMap::with_capacity(512),
             cache_inlines: Vec::new(),
             opt,
             stack_str_size: 0,
@@ -136,15 +137,30 @@ impl Folder {
         }
     }
 
-    fn remove_offset(line: &str) -> &str {
-        let mut line = line.rsplitn(2, '+');
-        // at least one element will be returned
-        let second = line.next().unwrap();
-        if let Some(first) = line.next() {
-            first
-        } else {
-            second
+    fn remove_offset(line: &str) -> (bool, bool, bool, &str) {
+        let mut has_inlines = false;
+        let mut could_be_cpp = false;
+        let mut has_semicolon = false;
+        let mut last_offset = line.len();
+        // This seems risly but dtrace stacks are c-strings as can be seen in the function
+        // responsible for printing them:
+        // https://github.com/opendtrace/opendtrace/blob/1a03ea5576a9219a43f28b4f159ff8a4b1f9a9fd/lib/libdtrace/common/dt_consume.c#L1331
+        let bytes = line.as_bytes();
+        for offset in 0..bytes.len() {
+            match bytes[offset] {
+                b'>' if offset > 0 && bytes[offset - 1] == b'-' => has_inlines = true,
+                b':' if offset > 0 && bytes[offset - 1] == b':' => could_be_cpp = true,
+                b';' => has_semicolon = true,
+                b'+' => last_offset = offset,
+                _ => (),
+            }
         }
+        (
+            has_inlines,
+            could_be_cpp,
+            has_semicolon,
+            &line[..last_offset],
+        )
     }
 
     // we have a stack line that shows one stack entry from the preceeding event, like:
@@ -155,31 +171,42 @@ impl Folder {
     //     unix`sys_syscall+0x10e
     //       1
     fn on_stack_line(&mut self, line: &str) {
-        let line = line.trim_start();
-        let frame = if self.opt.includeoffset {
-            line
+        let (has_inlines, could_be_cpp, has_semicolon, mut frame) = if self.opt.includeoffset {
+            (true, true, true, line)
         } else {
             Self::remove_offset(line)
         };
 
-        let mut frame = Self::uncpp(frame);
+        if could_be_cpp {
+            frame = Self::uncpp(frame);
+        }
 
         if frame.is_empty() {
             frame = "-";
         };
 
-        let mut inline = false;
-        for func in frame.split("->") {
-            let mut func = func.trim_start_matches('L').replace(';', ":");
-            if inline {
-                func.push_str("_[i]")
-            };
-            inline = true;
-            self.stack_str_size += func.len() + 1;
-            self.cache_inlines.push(func);
-        }
-        while let Some(func) = self.cache_inlines.pop() {
-            self.stack.push_front(func);
+        if has_inlines {
+            let mut inline = false;
+            for func in frame.split("->") {
+                let mut func = if has_semicolon {
+                    func.trim_start_matches('L').replace(';', ":")
+                } else {
+                    func.trim_start_matches('L').to_owned()
+                };
+                if inline {
+                    func.push_str("_[i]")
+                };
+                inline = true;
+                self.stack_str_size += func.len() + 1;
+                self.cache_inlines.push(func);
+            }
+            while let Some(func) = self.cache_inlines.pop() {
+                self.stack.push_front(func);
+            }
+        } else if has_semicolon {
+            self.stack.push_front(frame.replace(';', ":"))
+        } else {
+            self.stack.push_front(frame.to_owned())
         }
     }
 
@@ -194,11 +221,11 @@ impl Folder {
             if first {
                 first = false
             } else {
-                stack_str.push_str(";");
+                stack_str.push(';');
             }
             //trim leaf offset if these were retained:
             if self.opt.includeoffset && i == last {
-                stack_str.push_str(Self::remove_offset(&e));
+                stack_str.push_str(Self::remove_offset(&e).3);
             } else {
                 stack_str.push_str(&e);
             }
@@ -211,10 +238,10 @@ impl Folder {
     }
 
     fn finish<W: Write>(&self, mut writer: W) -> io::Result<()> {
-        let mut keys: Vec<_> = self.occurrences.keys().collect();
+        let mut keys: Vec<_> = self.occurrences.iter().collect();
         keys.sort();
-        for key in keys {
-            writeln!(writer, "{} {}", key, self.occurrences[key])?;
+        for (key, count) in keys {
+            writeln!(writer, "{} {}", key, count)?;
         }
         Ok(())
     }
