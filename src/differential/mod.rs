@@ -39,15 +39,15 @@ pub struct Options {
 ///
 /// The output written to the `writer` will be similar to the inputs, except there will be two
 /// sample count columns -- one for each profile.
-pub fn from_readers<R1, R2, W>(opt: Options, reader1: R1, reader2: R2, writer: W) -> io::Result<()>
+pub fn from_readers<R1, R2, W>(opt: Options, before: R1, after: R2, writer: W) -> io::Result<()>
 where
     R1: BufRead,
     R2: BufRead,
     W: Write,
 {
     let mut stack_counts = HashMap::new();
-    let total1 = parse_stack_counts(opt, &mut stack_counts, reader1, true)?;
-    let total2 = parse_stack_counts(opt, &mut stack_counts, reader2, false)?;
+    let total1 = parse_stack_counts(opt, &mut stack_counts, before, true)?;
+    let total2 = parse_stack_counts(opt, &mut stack_counts, after, false)?;
     if opt.normalize && total1 != total2 {
         for counts in stack_counts.values_mut() {
             counts.first = (counts.first as f64 * total2 as f64 / total1 as f64) as usize;
@@ -62,8 +62,8 @@ where
 /// See [`from_readers`] for the input and output formats.
 pub fn from_files<P1, P2, W>(
     opt: Options,
-    filename1: P1,
-    filename2: P2,
+    file_before: P1,
+    file_after: P2,
     writer: W,
 ) -> io::Result<()>
 where
@@ -71,9 +71,9 @@ where
     P2: AsRef<Path>,
     W: Write,
 {
-    let file1 = File::open(filename1)?;
+    let file1 = File::open(file_before)?;
     let reader1 = io::BufReader::with_capacity(READER_CAPACITY, file1);
-    let file2 = File::open(filename2)?;
+    let file2 = File::open(file_after)?;
     let reader2 = io::BufReader::with_capacity(READER_CAPACITY, file2);
     from_readers(opt, reader1, reader2, writer)
 }
