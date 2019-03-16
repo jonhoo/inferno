@@ -330,7 +330,7 @@ fn flamegraph_unsorted_multiple_input_files() {
             .into(),
     ];
     let expected_result_file =
-        "./tests/data/flamegraph/multiple-inputs/perf-vertx-stacks-01-collapsed-all.svg";
+        "./tests/data/flamegraph/perf-vertx-stacks/perf-vertx-stacks-01-collapsed-all.svg";
     let options = Options {
         hash: true,
         ..Default::default()
@@ -594,10 +594,23 @@ fn load_palette_map_file(palette_file: &str) -> PaletteMap {
 }
 
 #[test]
-fn flamegraph_unsorted_input_files() {
+fn flamegraph_sorted_input_file() {
+    let input_file = "./flamegraph/test/results/perf-vertx-stacks-01-collapsed-all.txt";
+    let expected_result_file =
+        "./tests/data/flamegraph/perf-vertx-stacks/perf-vertx-stacks-01-collapsed-all.svg";
+    let options = Options {
+        hash: true,
+        ..Default::default()
+    };
+    test_flamegraph(input_file, expected_result_file, options).unwrap();
+}
+
+#[test]
+fn flamegraph_unsorted_input_file() {
     let input_file =
-        "./tests/data/flamegraph/multiple-inputs/perf-vertx-stacks-01-collapsed-all-unsorted-1.txt";
-    let expected_result_file = "./tests/data/flamegraph/unsorted-input/unsorted-input.svg";
+        "./tests/data/flamegraph/unsorted-input/perf-vertx-stacks-01-collapsed-all-unsorted.txt";
+    let expected_result_file =
+        "./tests/data/flamegraph/perf-vertx-stacks/perf-vertx-stacks-01-collapsed-all.svg";
     let options = Options {
         hash: true,
         ..Default::default()
