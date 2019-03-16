@@ -139,6 +139,16 @@ pub struct Options<'a> {
     /// Pretty print XML with newlines and indentation.
     pub pretty_xml: bool,
 
+    /// Don't sort the input lines.
+    ///
+    /// If you know for sure that your folded stack lines are sorted you can set this flag to get
+    /// a performance boost. If you have multiple input files, the lines will be merged and sorted
+    /// regardless.
+    ///
+    /// Note that if you use `from_sorted_lines` directly, the it is always your responsibility to
+    /// make sure the lines are sorted.
+    pub no_sort: bool,
+
     /// Don't include static JavaScript in flame graph.
     /// This is only meant to be used in tests.
     #[doc(hidden)]
@@ -180,6 +190,7 @@ impl<'a> Default for Options<'a> {
             direction: Default::default(),
             negate_differentials: Default::default(),
             pretty_xml: Default::default(),
+            no_sort: Default::default(),
             no_javascript: Default::default(),
         }
     }
@@ -322,7 +333,7 @@ where
     let (bgcolor1, bgcolor2) = color::bgcolor_for(opt.bgcolors, opt.colors);
 
     let mut buffer = StrStack::new();
-    let (mut frames, time, ignored, delta_max) = merge::frames(lines);
+    let (mut frames, time, ignored, delta_max) = merge::frames(lines)?;
     if ignored != 0 {
         warn!("Ignored {} lines with invalid format", ignored);
     }
@@ -612,7 +623,13 @@ where
         .read_to_string(&mut input)
         .map_err(quick_xml::Error::Io)?;
 
-    from_sorted_lines(opt, input.lines(), writer)
+    if opt.no_sort {
+        from_sorted_lines(opt, input.lines(), writer)
+    } else {
+        let mut lines: Vec<&str> = input.lines().collect();
+        lines.sort_unstable();
+        from_sorted_lines(opt, lines, writer)
+    }
 }
 
 /// Produce a flame graph from a set of readers that contain folded stack lines.

@@ -77,6 +77,28 @@
 //!
 //! And then open `profile.svg` in your viewer of choice.
 //!
+//! ## Differential flame graphs
+//!
+//! You can debug CPU performance regressions with the help of differential flame graphs.
+//! They let you easily visualize the differences between two profiles performed before and
+//! after a code change. See Brendan Gregg's [differential flame graphs] blog post for a great
+//! writeup. To create one you must first pass the two folded stack files to `inferno-diff-folded`,
+//! then send the output to `inferno-flamegraph`. Example:
+//!
+//! ```console
+//! $ inferno-diff-folded folded1 folded2 | inferno-flamegraph > diff2.svg
+//! ```
+//!
+//! The flamegraph will be colored based on higher samples (red) and smaller samples (blue). The
+//! frame widths will be based on the 2nd folded profile. This might be confusing if stack frames
+//! disappear entirely; it will make the most sense to ALSO create a differential based on the 1st
+//! profile widths, while switching the hues. To do this, reverse the order of the input files
+//! and pass the `--negate` flag to `inferno-flamegraph` like this:
+//!
+//! ```console
+//! $ inferno-diff-folded folded2 folded1 | inferno-flamegraph --negate > diff1.svg
+//! ```
+//!
 //! # Development
 //!
 //! This crate was initially developed through [a series of live coding sessions]. If you want to
@@ -98,6 +120,7 @@
 //!   [DTrace examples]: http://www.brendangregg.com/FlameGraphs/cpuflamegraphs.html#DTrace
 //!   [NodeJS's ustack helper]: http://dtrace.org/blogs/dap/2012/01/05/where-does-your-node-program-spend-its-time/
 //!   [a series of live coding sessions]: https://www.youtube.com/watch?v=jTpK-bNZiA4&list=PLqbS7AVVErFimAvMW-kIJUwxpPvcPBCsz
+//!   [differential flame graphs]: http://www.brendangregg.com/blog/2014-11-09/differential-flame-graphs.html
 
 #![deny(missing_docs)]
 
@@ -121,3 +144,10 @@ pub mod collapse;
 ///
 ///   [crate-level documentation]: ../index.html
 pub mod flamegraph;
+
+/// Tool for creating an output required to generate differential flame graphs.
+///
+/// See the [crate-level documentation] for details.
+///
+///   [crate-level documentation]: ../index.html
+pub mod differential;
