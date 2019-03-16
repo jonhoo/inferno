@@ -333,7 +333,7 @@ where
     let (bgcolor1, bgcolor2) = color::bgcolor_for(opt.bgcolors, opt.colors);
 
     let mut buffer = StrStack::new();
-    let (mut frames, time, ignored, delta_max) = merge::frames(lines);
+    let (mut frames, time, ignored, delta_max) = merge::frames(lines)?;
     if ignored != 0 {
         warn!("Ignored {} lines with invalid format", ignored);
     }

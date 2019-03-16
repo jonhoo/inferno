@@ -619,26 +619,14 @@ fn flamegraph_unsorted_input_file() {
 }
 
 #[test]
-fn flamegraph_no_sort_should_warn_about_unsorted_input() {
+fn flamegraph_no_sort_should_return_error_on_unsorted_input() {
+    let input_file =
+        "./tests/data/flamegraph/unsorted-input/perf-vertx-stacks-01-collapsed-all-unsorted.txt";
+    let expected_result_file =
+        "./tests/data/flamegraph/perf-vertx-stacks/perf-vertx-stacks-01-collapsed-all.svg";
     let options = Options {
         no_sort: true,
         ..Default::default()
     };
-    test_flamegraph_logs_with_options(
-        "./tests/data/flamegraph/multiple-inputs/perf-vertx-stacks-01-collapsed-all-unsorted-1.txt",
-        |captured_logs| {
-            let nwarnings = captured_logs
-                .into_iter()
-                .filter(|log| {
-                    log.body == "Unsorted input lines detected" && log.level == Level::Warn
-                })
-                .count();
-            assert_eq!(
-                nwarnings, 1,
-                "unsorted input lines warning logged {} times, but should be logged exactly once",
-                nwarnings
-            );
-        },
-        options,
-    );
+    assert!(test_flamegraph(input_file, expected_result_file, options).is_err());
 }

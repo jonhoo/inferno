@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::io;
 use std::iter;
 
 #[derive(Debug, PartialEq, Eq, Hash)]
@@ -103,7 +104,9 @@ fn flow<'a, LI, TI>(
     }
 }
 
-pub(super) fn frames<'a, I>(lines: I) -> (Vec<TimedFrame<'a>>, usize, usize, usize)
+pub(super) fn frames<'a, I>(
+    lines: I,
+) -> quick_xml::Result<(Vec<TimedFrame<'a>>, usize, usize, usize)>
 where
     I: IntoIterator<Item = &'a str>,
 {
@@ -116,19 +119,18 @@ where
     let mut delta_max = 1;
     let mut stripped_fractional_samples = false;
     let mut prev_line = None;
-    let mut unsorted_detected = false;
     for line in lines {
         let mut line = line.trim();
         if line.is_empty() {
             continue;
         }
 
-        if !unsorted_detected {
-            if let Some(prev_line) = prev_line {
-                if prev_line > line {
-                    unsorted_detected = true;
-                    warn!("Unsorted input lines detected");
-                }
+        if let Some(prev_line) = prev_line {
+            if prev_line > line {
+                return Err(quick_xml::Error::Io(io::Error::new(
+                    io::ErrorKind::InvalidData,
+                    "unsorted input lines detected",
+                )));
             }
         }
 
@@ -192,7 +194,7 @@ where
         );
     }
 
-    (frames, time, ignored, delta_max)
+    Ok((frames, time, ignored, delta_max))
 }
 
 // Parse and remove the number of samples from the end of a line.
