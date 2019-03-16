@@ -151,3 +151,6 @@ pub mod flamegraph;
 ///
 ///   [crate-level documentation]: ../index.html
 pub mod differential;
+
+/// Parsers for different formats
+pub mod parse;
