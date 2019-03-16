@@ -1,5 +1,6 @@
 use super::Collapse;
-use std::collections::{HashMap, VecDeque};
+use hashbrown::HashMap;
+use std::collections::VecDeque;
 use std::io;
 use std::io::prelude::*;
 
@@ -158,7 +159,7 @@ impl From<Options> for Folder {
             skip_stack: false,
             stack: VecDeque::default(),
             cache_line: Vec::default(),
-            occurrences: HashMap::default(),
+            occurrences: HashMap::with_capacity(512),
             pname: String::new(),
             event_filtering: EventFilterState::None,
             opt,
@@ -393,10 +394,10 @@ impl Folder {
     }
 
     fn finish<W: Write>(&self, mut writer: W) -> io::Result<()> {
-        let mut keys: Vec<_> = self.occurrences.keys().collect();
+        let mut keys: Vec<_> = self.occurrences.iter().collect();
         keys.sort();
-        for key in keys {
-            writeln!(writer, "{} {}", key, self.occurrences[key])?;
+        for (key, value) in keys {
+            writeln!(writer, "{} {}", key, value)?;
         }
         Ok(())
     }
