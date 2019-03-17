@@ -338,7 +338,7 @@ where
     I: IntoIterator<Item = &'a str>,
     W: Write,
 {
-    let mut reversed: Vec<String> = Vec::new();
+    let mut reversed = StrStack::new();
     let (mut frames, time, ignored, delta_max) = if !opt.no_sort && !opt.reverse_stack_order {
         // Sort lines by default.
         let mut lines: Vec<&str> = lines.into_iter().collect();
@@ -349,10 +349,11 @@ where
             warn!("Input lines are always sorted when using --reverse. The --no-sort flag is being ignored.");
         }
         // Reverse order of stacks and sort.
+        let mut stack = String::new();
         for line in lines {
+            stack.clear();
             let samples_idx = rfind_samples(line).unwrap_or_else(|| line.len());
             let samples_idx = rfind_samples(&line[..samples_idx - 1]).unwrap_or(samples_idx);
-            let mut stack = String::with_capacity(line.len());
             for (i, func) in line[..samples_idx].trim().split(';').rev().enumerate() {
                 if i != 0 {
                     stack.push(';');
@@ -361,10 +362,11 @@ where
             }
             stack.push(' ');
             stack.push_str(&line[samples_idx..]);
-            reversed.push(stack);
+            reversed.push(&stack);
         }
+        let mut reversed: Vec<&str> = reversed.iter().collect();
         reversed.sort_unstable();
-        merge::frames(reversed.iter().map(|x| &**x))?
+        merge::frames(reversed)?
     } else {
         // Lines don't need sorting.
         merge::frames(lines)?
