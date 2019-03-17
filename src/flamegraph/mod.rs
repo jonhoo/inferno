@@ -15,6 +15,7 @@ use quick_xml::{
 use std::fs::File;
 use std::io::prelude::*;
 use std::io::{self, BufReader};
+use std::iter;
 use std::path::PathBuf;
 use str_stack::StrStack;
 use svg::StyleOptions;
@@ -149,6 +150,12 @@ pub struct Options<'a> {
     /// make sure the lines are sorted.
     pub no_sort: bool,
 
+    /// Generate stack-reversed flame graph.
+    ///
+    /// Note that stack lines must always be sorted after reversing the stacks so the `no-sort`
+    /// option will be ignored.
+    pub reverse_stack_order: bool,
+
     /// Don't include static JavaScript in flame graph.
     /// This is only meant to be used in tests.
     #[doc(hidden)]
@@ -191,6 +198,7 @@ impl<'a> Default for Options<'a> {
             negate_differentials: Default::default(),
             pretty_xml: Default::default(),
             no_sort: Default::default(),
+            reverse_stack_order: Default::default(),
             no_javascript: Default::default(),
         }
     }
@@ -309,7 +317,7 @@ impl Rectangle {
     }
 }
 
-/// Produce a flame graph from a sorted iterator over folded stack lines.
+/// Produce a flame graph from an iterator over folded stack lines.
 ///
 /// This function expects each folded stack to contain the following whitespace-separated fields:
 ///
@@ -325,18 +333,48 @@ impl Rectangle {
 ///
 /// [differential flame graph]: http://www.brendangregg.com/blog/2014-11-09/differential-flame-graphs.html
 #[allow(clippy::cyclomatic_complexity)]
-pub fn from_sorted_lines<'a, I, W>(opt: &mut Options, lines: I, writer: W) -> quick_xml::Result<()>
+pub fn from_lines<'a, I, W>(opt: &mut Options, lines: I, writer: W) -> quick_xml::Result<()>
 where
     I: IntoIterator<Item = &'a str>,
     W: Write,
 {
-    let (bgcolor1, bgcolor2) = color::bgcolor_for(opt.bgcolors, opt.colors);
+    let mut reversed: Vec<String> = Vec::new();
+    let (mut frames, time, ignored, delta_max) = if !opt.no_sort && !opt.reverse_stack_order {
+        // Sort lines by default.
+        let mut lines: Vec<&str> = lines.into_iter().collect();
+        lines.sort_unstable();
+        merge::frames(lines)?
+    } else if opt.reverse_stack_order {
+        if opt.no_sort {
+            warn!("Input lines are always sorted when using --reverse. The --no-sort flag is being ignored.");
+        }
+        // Reverse order of stacks and sort.
+        for line in lines {
+            let samples_idx = rfind_samples(line).unwrap_or_else(|| line.len());
+            let samples_idx = rfind_samples(&line[..samples_idx - 1]).unwrap_or(samples_idx);
+            let mut stack = String::with_capacity(line.len());
+            for (i, func) in line[..samples_idx].trim().split(';').rev().enumerate() {
+                if i != 0 {
+                    stack.push(';');
+                }
+                stack.push_str(func);
+            }
+            stack.push(' ');
+            stack.push_str(&line[samples_idx..]);
+            reversed.push(stack);
+        }
+        reversed.sort_unstable();
+        merge::frames(reversed.iter().map(|x| &**x))?
+    } else {
+        // Lines don't need sorting.
+        merge::frames(lines)?
+    };
 
-    let mut buffer = StrStack::new();
-    let (mut frames, time, ignored, delta_max) = merge::frames(lines)?;
     if ignored != 0 {
         warn!("Ignored {} lines with invalid format", ignored);
     }
+
+    let mut buffer = StrStack::new();
 
     // let's start writing the svg!
     let mut svg = if opt.pretty_xml {
@@ -391,6 +429,7 @@ where
     let imageheight = ((depthmax + 1) * opt.frame_height) + opt.ypad1() + opt.ypad2();
     svg::write_header(&mut svg, imageheight, &opt)?;
 
+    let (bgcolor1, bgcolor2) = color::bgcolor_for(opt.bgcolors, opt.colors);
     let style_options = StyleOptions {
         imageheight,
         bgcolor1,
@@ -608,33 +647,21 @@ where
     Ok(())
 }
 
-/// Produce a flame graph from a reader that contains a sorted sequence of folded stack lines.
+/// Produce a flame graph from a reader that contains a sequence of folded stack lines.
 ///
 /// See [`from_sorted_lines`] for the expected format of each line.
 ///
 /// The resulting flame graph will be written out to `writer` in SVG format.
-pub fn from_reader<R, W>(opt: &mut Options, mut reader: R, writer: W) -> quick_xml::Result<()>
+pub fn from_reader<R, W>(opt: &mut Options, reader: R, writer: W) -> quick_xml::Result<()>
 where
     R: Read,
     W: Write,
 {
-    let mut input = String::new();
-    reader
-        .read_to_string(&mut input)
-        .map_err(quick_xml::Error::Io)?;
-
-    if opt.no_sort {
-        from_sorted_lines(opt, input.lines(), writer)
-    } else {
-        let mut lines: Vec<&str> = input.lines().collect();
-        lines.sort_unstable();
-        from_sorted_lines(opt, lines, writer)
-    }
+    from_readers(opt, iter::once(reader), writer)
 }
 
 /// Produce a flame graph from a set of readers that contain folded stack lines.
 ///
-/// This function sorts all the read lines before processing them.
 /// See [`from_sorted_lines`] for the expected format of each line.
 ///
 /// The resulting flame graph will be written out to `writer` in SVG format.
@@ -650,11 +677,7 @@ where
             .read_to_string(&mut input)
             .map_err(quick_xml::Error::Io)?;
     }
-
-    let mut lines: Vec<&str> = input.lines().collect();
-    lines.sort_unstable();
-
-    from_sorted_lines(opt, lines, writer)
+    from_lines(opt, input.lines(), writer)
 }
 
 /// Produce a flame graph from files that contain folded stack lines
@@ -732,4 +755,23 @@ fn filled_rectangle<W: Write>(
         unreachable!("cache wrapper was of wrong type: {:?}", cache_rect);
     }
     svg.write_event(&cache_rect)
+}
+
+// Tries to find a sample count at the end of a line and returns its index.
+fn rfind_samples(line: &str) -> Option<usize> {
+    let samplesi = line.rfind(' ')?;
+    let samples = &line[samplesi + 1..];
+    if let Some(doti) = samples.find('.') {
+        if !samples[..doti]
+            .chars()
+            .chain(samples[doti + 1..].chars())
+            .all(|c| c.is_digit(10))
+        {
+            return None;
+        }
+    } else if !samples.chars().all(|c| c.is_digit(10)) {
+        return None;
+    }
+
+    Some(samplesi + 1)
 }
