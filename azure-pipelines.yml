@@ -1,0 +1,114 @@
+variables:
+  linux: ubuntu-16.04
+  win: vs2017-win2016
+  macos: macos-10.13
+
+trigger:
+  branches:
+    include: ["azure-pipelines"]
+
+jobs:
+- job: check
+  template: '_build/rust-setup.yml'
+  displayName: 'cargo check'
+  steps:
+   - script: cargo check --all-targets
+  pool:
+    vmImage: $(linux)
+- job: test
+  dependsOn: check
+  displayName: 'cargo test'
+  strategy:
+    matrix:
+      windows-stable:
+        imageName: $(win)
+      linux-stable:
+        imageName: $(linux)
+      linux-beta:
+        imageName: $(linux)
+        toolchain: 'beta'
+      linux-nightly:
+        imageName: $(linux)
+        toolchain: 'nightly'
+      macos-stable:
+        imageName: $(macos)
+  template: '_build/rust-setup.yml'
+  inputs:
+   toolchain: $(toolchain)
+  pool:
+   vmImage: $(imageName)
+  steps:
+   - script: cargo test
+- job: test-nightly
+  dependsOn: check
+  displayName: 'cargo test (nightly)'
+  template: '_build/rust-setup.yml'
+  inputs:
+    toolchain: 'linux'
+  continueOnError: true # needs to be separate due to https://github.com/Microsoft/azure-pipelines-tasks/issues/9302
+  steps:
+   - script: cargo test
+  pool:
+    vmImage: $(linux)
+- job: lint
+  dependsOn: check
+  displayName: 'cargo clippy (beta)'
+  template: '_build/rust-setup.yml'
+  inputs:
+    toolchain: 'beta'
+  steps:
+   - script: rustup component add rustfmt-preview
+   - script: cargo fmt -v -- --check
+  pool:
+    vmImage: $(linux)
+- job: lint-nightly
+  dependsOn: check
+  displayName: 'cargo clippy (nightly)'
+  template: '_build/rust-setup.yml'
+  inputs:
+    toolchain: 'nightly'
+  continueOnError: true # needs to be separate due to https://github.com/Microsoft/azure-pipelines-tasks/issues/9302
+  steps:
+   - script: rustup component add rustfmt-preview
+   - script: cargo fmt -v -- --check
+  pool:
+    vmImage: $(linux)
+- job: fmt
+  dependsOn: check
+  displayName: 'rustfmt (beta)'
+  template: '_build/rust-setup.yml'
+  inputs:
+    toolchain: 'beta'
+  steps:
+   - script: rustup component add clippy-preview
+   - bash: touch ./src/lib.rs && cargo clippy -- -D warnings
+  pool:
+    vmImage: $(linux)
+- job: fmt-nightly
+  dependsOn: check
+  displayName: 'rustfmt (nightly)'
+  template: '_build/rust-setup.yml'
+  inputs:
+    toolchain: 'nightly'
+  continueOnError: true # needs to be separate due to https://github.com/Microsoft/azure-pipelines-tasks/issues/9302
+  steps:
+   - script: rustup component add clippy-preview
+   - bash: touch ./src/lib.rs && cargo clippy -- -D warnings
+  pool:
+    vmImage: $(linux)
+- job: coverage
+  dependsOn: test
+  displayName: 'Code coverage'
+  template: '_build/rust-setup.yml'
+  inputs:
+    toolchain: 'nightly'
+  steps:
+   - script: apt install libssl-dev
+   - bash: RUSTFLAGS="--cfg procmacro2_semver_exempt" cargo install cargo-tarpaulin || true
+   - script: cargo tarpaulin --out Xml
+   - bash: bash <(curl -s https://codecov.io/bash)
+   - script: cargo clean -p inferno # ensure we don't cache build for coverage
+  pool:
+    vmImage: $(linux)
+
+# vim: set ts=2:sw=2
