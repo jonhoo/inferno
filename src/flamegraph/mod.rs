@@ -6,7 +6,7 @@ mod svg;
 pub use attrs::FuncFrameAttrsMap;
 pub use color::Palette;
 
-use crate::flamegraph::color::Color;
+use crate::flamegraph::color::{Color, SearchColor};
 use num_format::Locale;
 use quick_xml::{
     events::{BytesEnd, BytesStart, BytesText, Event},
@@ -61,6 +61,11 @@ pub struct Options<'a> {
 
     /// Whether to plot a plot that grows top-to-bottom or bottom-up (the default).
     pub direction: Direction,
+
+    /// The search color for flame chart.
+    ///
+    /// Defaults to "rgb(230,0,230)".
+    pub search_color: SearchColor,
 
     /// The title for the flame chart.
     ///
@@ -186,6 +191,7 @@ impl<'a> Default for Options<'a> {
             bgcolors: Default::default(),
             hash: Default::default(),
             palette_map: Default::default(),
+            search_color: Default::default(),
             func_frameattrs: Default::default(),
             direction: Default::default(),
             negate_differentials: Default::default(),

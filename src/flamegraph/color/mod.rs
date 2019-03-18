@@ -3,6 +3,7 @@
 use rand::rngs::ThreadRng;
 use rand::Rng;
 use std::borrow::Cow;
+use std::fmt;
 use std::str::FromStr;
 
 mod palette_map;
@@ -160,6 +161,37 @@ fn parse_flat_bgcolor(s: &str) -> Option<Color> {
         let b = u8_from_hex_iter!(s);
 
         Some(Color { r, g, b })
+    }
+}
+
+/// `SearchColor::default()` is `rgb(230,0,230)`.
+#[derive(Clone, Copy, Debug)]
+pub struct SearchColor(Color);
+
+impl Default for SearchColor {
+    fn default() -> Self {
+        SearchColor(Color {
+            r: 230,
+            g: 0,
+            b: 230,
+        })
+    }
+}
+
+impl FromStr for SearchColor {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        parse_flat_bgcolor(s)
+            .map(SearchColor)
+            .ok_or_else(|| format!("unknown color: {}", s))
+    }
+}
+
+impl fmt::Display for SearchColor {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "rgb({},{},{})", self.0.r, self.0.g, self.0.b)?;
+        Ok(())
     }
 }
 
