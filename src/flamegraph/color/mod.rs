@@ -190,8 +190,7 @@ impl FromStr for SearchColor {
 
 impl fmt::Display for SearchColor {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "rgb({},{},{})", self.0.r, self.0.g, self.0.b)?;
-        Ok(())
+        write!(f, "rgb({},{},{})", self.0.r, self.0.g, self.0.b)
     }
 }
 
