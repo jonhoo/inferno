@@ -214,7 +214,11 @@ fn parse_nsamples(line: &mut &str, stripped_fractional_samples: &mut bool) -> Op
             && !samples[doti + 1..].chars().all(|c| c == '0')
         {
             *stripped_fractional_samples = true;
-            warn!("The input data has fractional sample counts that will be truncated to integers. If you need to retain the extra precision you can scale up the sample data and use the --factor option to scale it back down.");
+            warn!(
+                "The input data has fractional sample counts that will be truncated to integers. \
+                 If you need to retain the extra precision you can scale up the sample data and \
+                 use the --factor option to scale it back down."
+            );
         }
         samples = &samples[..doti];
         let nsamples = samples.parse::<usize>().ok()?;

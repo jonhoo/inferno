@@ -347,7 +347,10 @@ where
     let mut reversed = StrStack::new();
     let (mut frames, time, ignored, delta_max) = if opt.reverse_stack_order {
         if opt.no_sort {
-            warn!("Input lines are always sorted when `reverse_stack_order` is `true`. The `no_sort` option is being ignored.");
+            warn!(
+                "Input lines are always sorted when `reverse_stack_order` is `true`. \
+                 The `no_sort` option is being ignored."
+            );
         }
         // Reverse order of stacks and sort.
         let mut stack = String::new();
