@@ -64,7 +64,7 @@ pub struct Options<'a> {
 
     /// The search color for flame chart.
     ///
-    /// Defaults to "rgb(230,0,230)".
+    /// Defaults to `rgb(230,0,230)`.
     pub search_color: SearchColor,
 
     /// The title for the flame chart.
