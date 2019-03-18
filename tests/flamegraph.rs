@@ -588,6 +588,20 @@ fn flamegraph_font_type_with_quote() {
     test_flamegraph(input_file, expected_result_file, options).unwrap();
 }
 
+#[test]
+fn search_color_non_default() {
+    let input_file =
+        "./tests/data/flamegraph/differential/perf-cycles-instructions-01-collapsed-all-diff.txt";
+    let expected_result_file = "./tests/data/flamegraph/options/search_color.svg";
+
+    let options = flamegraph::Options {
+        search_color: "#7d7d7d".parse().unwrap(),
+        ..Default::default()
+    };
+
+    test_flamegraph(input_file, expected_result_file, options).unwrap();
+}
+
 fn load_palette_map_file(palette_file: &str) -> PaletteMap {
     let path = Path::new(palette_file);
     PaletteMap::load_from_file_or_empty(&path).unwrap()

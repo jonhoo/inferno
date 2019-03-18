@@ -130,12 +130,13 @@ var fontsize = {};
 var fontwidth = {};
 var xpad = {};
 var inverted = {};
-var searchcolor = 'rgb(230,0,230)';",
+var searchcolor = '{}';",
         enquote('\'', &opt.name_type),
         opt.font_size,
         opt.font_width,
         super::XPAD,
-        opt.direction == Direction::Inverted
+        opt.direction == Direction::Inverted,
+        opt.search_color
     ))))?;
     if !opt.no_javascript {
         svg.write_event(Event::CData(BytesText::from_escaped_str(include_str!(
