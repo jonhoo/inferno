@@ -199,33 +199,62 @@ where
 
 // Parse and remove the number of samples from the end of a line.
 fn parse_nsamples(line: &mut &str, stripped_fractional_samples: &mut bool) -> Option<usize> {
-    let samplesi = line.rfind(' ')?;
-    let mut samples = &line[(samplesi + 1)..];
+    if let Some((samplesi, doti)) = rfind_samples(line) {
+        let mut samples = &line[samplesi..];
+        // Strip fractional part (if any);
+        // foobar 1.klwdjlakdj
+        //
+        // The Perl version keeps the fractional part but this can be problematic
+        // because of cumulative floating point errors. Instead we recommend to
+        // use the --factor option. See https://github.com/brendangregg/FlameGraph/pull/18
+        //
+        // Warn if we're stripping a non-zero fractional part, but only the first time.
+        if !*stripped_fractional_samples
+            && doti < samples.len() - 1
+            && !samples[doti + 1..].chars().all(|c| c == '0')
+        {
+            *stripped_fractional_samples = true;
+            warn!(
+                "The input data has fractional sample counts that will be truncated to integers. \
+                 If you need to retain the extra precision you can scale up the sample data and \
+                 use the --factor option to scale it back down."
+            );
+        }
+        samples = &samples[..doti];
+        let nsamples = samples.parse::<usize>().ok()?;
+        // remove nsamples part we just parsed from line
+        *line = line[..samplesi].trim_end();
+        Some(nsamples)
+    } else {
+        None
+    }
+}
 
-    // Strip fractional part (if any);
-    // foobar 1.klwdjlakdj
-    //
-    // The Perl version keeps the fractional part but this can be problematic
-    // because of cumulative floating point errors. Instead we recommend to
-    // use the --factor option. See https://github.com/brendangregg/FlameGraph/pull/18
+// Tries to find a sample count at the end of a line.
+//
+// On success, the first value of the returned tuple will be the index to the sample count.
+// If the sample count is fractional, the second value will be the offset of the dot within
+// the sample count.
+// If the sample count is not fractional, the second value returned is the offset
+// to the last digit in the sample count.
+//
+// If no sample count is found, `None` will be returned.
+pub(super) fn rfind_samples(line: &str) -> Option<(usize, usize)> {
+    let samplesi = line.rfind(' ')? + 1;
+    let samples = &line[samplesi..];
     if let Some(doti) = samples.find('.') {
-        if !samples[..doti]
+        if samples[..doti]
             .chars()
             .chain(samples[doti + 1..].chars())
             .all(|c| c.is_digit(10))
         {
-            return None;
+            Some((samplesi, doti))
+        } else {
+            None
         }
-        // Warn if we're stripping a non-zero fractional part, but only the first time.
-        if !*stripped_fractional_samples && !samples[doti + 1..].chars().all(|c| c == '0') {
-            *stripped_fractional_samples = true;
-            warn!("The input data has fractional sample counts that will be truncated to integers. If you need to retain the extra precision you can scale up the sample data and use the --factor option to scale it back down.");
-        }
-        samples = &samples[..doti];
+    } else if !samples.chars().all(|c| c.is_digit(10)) {
+        None
+    } else {
+        Some((samplesi, line.len() - samplesi))
     }
-
-    let nsamples = samples.parse::<usize>().ok()?;
-    // remove nsamples part we just parsed from line
-    *line = line[..samplesi].trim_end();
-    Some(nsamples)
 }

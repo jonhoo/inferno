@@ -644,3 +644,80 @@ fn flamegraph_no_sort_should_return_error_on_unsorted_input() {
     };
     assert!(test_flamegraph(input_file, expected_result_file, options).is_err());
 }
+
+#[test]
+fn flamegraph_reversed_stack_ordering() {
+    let input_file =
+        "./tests/data/flamegraph/unsorted-input/perf-vertx-stacks-01-collapsed-all-unsorted.txt";
+    let expected_result_file =
+        "./tests/data/flamegraph/perf-vertx-stacks/perf-vertx-stacks-01-collapsed-all-reversed-stacks.svg";
+    let options = Options {
+        hash: true,
+        reverse_stack_order: true,
+        ..Default::default()
+    };
+    test_flamegraph(input_file, expected_result_file, options).unwrap();
+}
+
+#[test]
+fn flamegraph_reversed_stack_ordering_with_fractional_samples() {
+    let input_file = "./tests/data/flamegraph/fractional-samples/fractional.txt";
+    let expected_result_file = "./tests/data/flamegraph/fractional-samples/fractional-reversed.svg";
+    let options = Options {
+        hash: true,
+        reverse_stack_order: true,
+        ..Default::default()
+    };
+    test_flamegraph(input_file, expected_result_file, options).unwrap();
+}
+
+#[test]
+fn flamegraph_should_warn_about_no_sort_when_reversing_stack_ordering() {
+    let options = Options {
+        no_sort: true,
+        reverse_stack_order: true,
+        ..Default::default()
+    };
+    test_flamegraph_logs_with_options(
+        "./flamegraph/test/results/perf-funcab-cmd-01-collapsed-all.txt",
+        |captured_logs| {
+            let nwarnings = captured_logs
+            .into_iter()
+            .filter(|log| log.body == "Input lines are always sorted when `reverse_stack_order` is `true`. The `no_sort` option is being ignored." && log.level == Level::Warn)
+            .count();
+            assert_eq!(
+                nwarnings, 1,
+                "no-sort warning logged {} times, but should be logged exactly once",
+                nwarnings
+            );
+        },
+        options,
+    );
+}
+
+#[test]
+fn flamegraph_should_warn_about_bad_input_lines_with_reversed_stack_ordering() {
+    let options = Options {
+        reverse_stack_order: true,
+        ..Default::default()
+    };
+    test_flamegraph_logs_with_options(
+        "./tests/data/flamegraph/bad-lines/bad-lines.txt",
+        |captured_logs| {
+            let nwarnings = captured_logs
+                .into_iter()
+                .filter(|log| {
+                    log.body.starts_with("Ignored")
+                        && log.body.ends_with(" lines with invalid format")
+                        && log.level == Level::Warn
+                })
+                .count();
+            assert_eq!(
+                nwarnings, 1,
+                "bad lines warning logged {} times, but should be logged exactly once",
+                nwarnings
+            );
+        },
+        options,
+    );
+}

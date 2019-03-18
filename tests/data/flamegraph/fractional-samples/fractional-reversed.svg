@@ -1,0 +1,135 @@
+<?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg version="1.1" width="1200" height="246" onload="init(evt)" viewBox="0 0 1200 246" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!--Flame graph stack visualization. See https://github.com/brendangregg/FlameGraph for latest version, and http://www.brendangregg.com/flamegraphs.html for examples.-->
+    <!--NOTES: -->
+    <defs>
+        <linearGradient id="background" y1="0" y2="1" x1="0" x2="0">
+            <stop stop-color="#eeeeee" offset="5%"/>
+            <stop stop-color="#eeeeb0" offset="95%"/>
+        </linearGradient>
+    </defs>
+    <style type="text/css">.func_g:hover { stroke:black; stroke-width:0.5; cursor:pointer; }</style>
+    <script type="text/ecmascript">
+        <![CDATA[var nametype = 'Function:';
+var fontsize = 12;
+var fontwidth = 0.59;
+var xpad = 10;
+var inverted = false;
+var searchcolor = 'rgb(230,0,230)';]]>
+    </script>
+    <rect x="0" y="0" width="1200" height="246" fill="url(#background)"/>
+    <text text-anchor="middle" x="600.00" y="24.00" font-size="17" font-family="Verdana" fill="rgb(0, 0, 0)">Flame Graph</text>
+    <text id="details" text-anchor="left" x="10.00" y="229.00" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)"> </text>
+    <text id="unzoom" onclick="unzoom()" style="opacity:0.0;cursor:pointer" text-anchor="left" x="10.00" y="24.00" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">Reset Zoom</text>
+    <text id="search" onmouseover="searchover()" onmouseout="searchout()" onclick="search_prompt()" style="opacity:0.1;cursor:pointer" text-anchor="left" x="1090.00" y="24.00" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">Search</text>
+    <text id="matched" text-anchor="left" x="1090.00" y="229.00" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)"> </text>
+    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
+        <title>[unknown] (2 samples, 0.60%)</title>
+        <rect x="10" y="181" width="7" height="15" fill="rgb(242,180,40)"/>
+        <text text-anchor="left" x="13.00" y="191.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)"></text>
+    </g>
+    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
+        <title>noploop (2 samples, 0.60%)</title>
+        <rect x="10" y="165" width="7" height="15" fill="rgb(248,212,47)"/>
+        <text text-anchor="left" x="13.00" y="175.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)"></text>
+    </g>
+    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
+        <title>cksum (6 samples, 1.80%)</title>
+        <rect x="17" y="165" width="21" height="15" fill="rgb(226,95,23)"/>
+        <text text-anchor="left" x="20.00" y="175.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)"></text>
+    </g>
+    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
+        <title>__libc_start_main (31 samples, 9.31%)</title>
+        <rect x="38" y="149" width="110" height="15" fill="rgb(247,154,46)"/>
+        <text text-anchor="left" x="41.00" y="159.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">__libc_start_..</text>
+    </g>
+    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
+        <title>_start (31 samples, 9.31%)</title>
+        <rect x="38" y="133" width="110" height="15" fill="rgb(239,139,37)"/>
+        <text text-anchor="left" x="41.00" y="143.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">_start</text>
+    </g>
+    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
+        <title>cksum (31 samples, 9.31%)</title>
+        <rect x="38" y="117" width="110" height="15" fill="rgb(226,95,23)"/>
+        <text text-anchor="left" x="41.00" y="127.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">cksum</text>
+    </g>
+    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
+        <title>cksum (56 samples, 16.82%)</title>
+        <rect x="17" y="181" width="198" height="15" fill="rgb(226,95,23)"/>
+        <text text-anchor="left" x="20.00" y="191.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">cksum</text>
+    </g>
+    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
+        <title>main (50 samples, 15.02%)</title>
+        <rect x="38" y="165" width="177" height="15" fill="rgb(247,83,46)"/>
+        <text text-anchor="left" x="41.00" y="175.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">main</text>
+    </g>
+    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
+        <title>cksum (19 samples, 5.71%)</title>
+        <rect x="148" y="149" width="67" height="15" fill="rgb(226,95,23)"/>
+        <text text-anchor="left" x="151.00" y="159.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">cksum</text>
+    </g>
+    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
+        <title>ext4_file_read_iter (1 samples, 0.30%)</title>
+        <rect x="215" y="181" width="4" height="15" fill="rgb(236,145,34)"/>
+        <text text-anchor="left" x="218.00" y="191.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)"></text>
+    </g>
+    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
+        <title>__vfs_read (1 samples, 0.30%)</title>
+        <rect x="215" y="165" width="4" height="15" fill="rgb(236,122,34)"/>
+        <text text-anchor="left" x="218.00" y="175.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)"></text>
+    </g>
+    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
+        <title>vfs_read (1 samples, 0.30%)</title>
+        <rect x="215" y="149" width="4" height="15" fill="rgb(236,128,34)"/>
+        <text text-anchor="left" x="218.00" y="159.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)"></text>
+    </g>
+    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
+        <title>sys_read (1 samples, 0.30%)</title>
+        <rect x="215" y="133" width="4" height="15" fill="rgb(236,167,34)"/>
+        <text text-anchor="left" x="218.00" y="143.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)"></text>
+    </g>
+    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
+        <title>entry_SYSCALL_64_fastpath (1 samples, 0.30%)</title>
+        <rect x="215" y="117" width="4" height="15" fill="rgb(236,196,34)"/>
+        <text text-anchor="left" x="218.00" y="127.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)"></text>
+    </g>
+    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
+        <title>_IO_file_read (1 samples, 0.30%)</title>
+        <rect x="215" y="101" width="4" height="15" fill="rgb(241,132,40)"/>
+        <text text-anchor="left" x="218.00" y="111.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)"></text>
+    </g>
+    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
+        <title>_IO_file_xsgetn (1 samples, 0.30%)</title>
+        <rect x="215" y="85" width="4" height="15" fill="rgb(244,132,43)"/>
+        <text text-anchor="left" x="218.00" y="95.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)"></text>
+    </g>
+    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
+        <title>__GI___fread_unlocked (1 samples, 0.30%)</title>
+        <rect x="215" y="69" width="4" height="15" fill="rgb(245,119,44)"/>
+        <text text-anchor="left" x="218.00" y="79.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)"></text>
+    </g>
+    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
+        <title>cksum (1 samples, 0.30%)</title>
+        <rect x="215" y="53" width="4" height="15" fill="rgb(226,95,23)"/>
+        <text text-anchor="left" x="218.00" y="63.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)"></text>
+    </g>
+    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
+        <title>cksum (1 samples, 0.30%)</title>
+        <rect x="215" y="37" width="4" height="15" fill="rgb(226,95,23)"/>
+        <text text-anchor="left" x="218.00" y="47.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)"></text>
+    </g>
+    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
+        <title>all (333 samples, 100%)</title>
+        <rect x="10" y="197" width="1180" height="15" fill="rgb(255,230,55)"/>
+        <text text-anchor="left" x="13.00" y="207.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)"></text>
+    </g>
+    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
+        <title>main (274 samples, 82.28%)</title>
+        <rect x="219" y="181" width="971" height="15" fill="rgb(247,83,46)"/>
+        <text text-anchor="left" x="222.00" y="191.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">main</text>
+    </g>
+    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
+        <title>noploop (274 samples, 82.28%)</title>
+        <rect x="219" y="165" width="971" height="15" fill="rgb(248,212,47)"/>
+        <text text-anchor="left" x="222.00" y="175.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">noploop</text>
+    </g>
+</svg>

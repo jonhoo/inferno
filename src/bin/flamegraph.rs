@@ -119,8 +119,12 @@ struct Opt {
     /// Don't sort the input lines.
     /// If you set this flag you need to be sure your
     /// input stack lines are already sorted.
-    #[structopt(long = "no-sort")]
-    pub no_sort: bool,
+    #[structopt(name = "no-sort", long = "no-sort")]
+    no_sort: bool,
+
+    /// Generate stack-reversed flame graph.
+    #[structopt(long = "reverse", conflicts_with = "no-sort")]
+    reverse: bool,
 
     /// Don't include static JavaScript in flame graph.
     /// This flag is hidden since it's only meant to be used in
@@ -155,6 +159,7 @@ impl<'a> Opt {
         options.pretty_xml = self.pretty_xml;
         options.no_sort = self.no_sort;
         options.no_javascript = self.no_javascript;
+        options.reverse_stack_order = self.reverse;
 
         // set style options
         options.subtitle = self.subtitle;
