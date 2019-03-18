@@ -115,14 +115,11 @@ struct Opt {
     /// Don't sort the input lines.
     /// If you set this flag you need to be sure your
     /// input stack lines are already sorted.
-    #[structopt(long = "no-sort")]
+    #[structopt(name = "no-sort", long = "no-sort")]
     no_sort: bool,
 
     /// Generate stack-reversed flame graph.
-    /// Note that stack lines must always be sorted
-    /// after reversing the stacks so the no-sort
-    /// flag will be ignored.
-    #[structopt(long = "reverse")]
+    #[structopt(long = "reverse", conflicts_with = "no-sort")]
     reverse: bool,
 
     /// Don't include static JavaScript in flame graph.

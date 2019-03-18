@@ -669,7 +669,7 @@ fn flamegraph_should_warn_about_no_sort_when_reversing_stack_ordering() {
         |captured_logs| {
             let nwarnings = captured_logs
             .into_iter()
-            .filter(|log| log.body == "Input lines are always sorted when using --reverse. The --no-sort flag is being ignored." && log.level == Level::Warn)
+            .filter(|log| log.body == "Input lines are always sorted when `reverse_stack_order` is `true`. The `no_sort` option is being ignored." && log.level == Level::Warn)
             .count();
             assert_eq!(
                 nwarnings, 1,
