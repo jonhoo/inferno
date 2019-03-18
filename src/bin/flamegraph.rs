@@ -4,8 +4,8 @@ use std::path::{Path, PathBuf};
 use structopt::StructOpt;
 
 use inferno::flamegraph::{
-    self, color::BackgroundColor, color::PaletteMap, Direction, FuncFrameAttrsMap, Options,
-    Palette, DEFAULT_TITLE,
+    self, color::BackgroundColor, color::PaletteMap, color::SearchColor, Direction,
+    FuncFrameAttrsMap, Options, Palette, DEFAULT_TITLE,
 };
 
 #[derive(Debug, StructOpt)]
@@ -47,6 +47,10 @@ struct Opt {
     /// Use consistent palette (palette.map)
     #[structopt(long = "cp")]
     cp: bool,
+
+    /// Search color
+    #[structopt(long = "search-color", default_value = "#e600e6")]
+    search_color: SearchColor,
 
     /// Change title text
     #[structopt(long = "title", default_value = "Flame Graph")]
@@ -170,6 +174,7 @@ impl<'a> Opt {
         options.notes = self.notes;
         options.negate_differentials = self.negate;
         options.factor = self.factor;
+        options.search_color = self.search_color;
         (self.infiles, options)
     }
 }
