@@ -29,7 +29,7 @@ struct Opt {
     #[structopt(
         short = "c",
         long = "colors",
-        raw(default_value = "defaults::COLORS.strval"),
+        raw(default_value = "defaults::str::COLORS"),
         raw(
             possible_values = r#"&["hot","mem","io","wakeup","java","js","perl","red","green","blue","aqua","yellow","purple","orange"]"#
         )
@@ -51,12 +51,12 @@ struct Opt {
     /// Search color
     #[structopt(
         long = "search-color",
-        raw(default_value = "defaults::SEARCH_COLOR.strval")
+        raw(default_value = "defaults::str::SEARCH_COLOR")
     )]
     search_color: SearchColor,
 
     /// Change title text
-    #[structopt(long = "title", raw(default_value = "defaults::TITLE.strval"))]
+    #[structopt(long = "title", raw(default_value = "defaults::str::TITLE"))]
     title: String,
 
     /// Second level title (optional)
@@ -64,35 +64,35 @@ struct Opt {
     subtitle: Option<String>,
 
     /// Width of image
-    #[structopt(long = "width", raw(default_value = "defaults::IMAGE_WIDTH.strval"))]
+    #[structopt(long = "width", raw(default_value = "defaults::str::IMAGE_WIDTH"))]
     image_width: usize,
 
     /// Height of each frame
-    #[structopt(long = "height", raw(default_value = "defaults::FRAME_HEIGHT.strval"))]
+    #[structopt(long = "height", raw(default_value = "defaults::str::FRAME_HEIGHT"))]
     frame_height: usize,
 
     /// Omit smaller functions (default 0.1 pixels)
-    #[structopt(long = "minwidth", raw(default_value = "defaults::MIN_WIDTH.strval"))]
+    #[structopt(long = "minwidth", raw(default_value = "defaults::str::MIN_WIDTH"))]
     min_width: f64,
 
     /// Font type
-    #[structopt(long = "fonttype", raw(default_value = "defaults::FONT_TYPE.strval"))]
+    #[structopt(long = "fonttype", raw(default_value = "defaults::str::FONT_TYPE"))]
     font_type: String,
 
     /// Font size
-    #[structopt(long = "fontsize", raw(default_value = "defaults::FONT_SIZE.strval"))]
+    #[structopt(long = "fontsize", raw(default_value = "defaults::str::FONT_SIZE"))]
     font_size: usize,
 
     /// Font width
-    #[structopt(long = "fontwidth", raw(default_value = "defaults::FONT_WIDTH.strval"))]
+    #[structopt(long = "fontwidth", raw(default_value = "defaults::str::FONT_WIDTH"))]
     font_width: f64,
 
     /// Count type label
-    #[structopt(long = "countname", raw(default_value = "defaults::COUNT_NAME.strval"))]
+    #[structopt(long = "countname", raw(default_value = "defaults::str::COUNT_NAME"))]
     count_name: String,
 
     /// Name type label
-    #[structopt(long = "nametype", raw(default_value = "defaults::NAME_TYPE.strval"))]
+    #[structopt(long = "nametype", raw(default_value = "defaults::str::NAME_TYPE"))]
     name_type: String,
 
     /// Set embedded notes in SVG
@@ -104,7 +104,7 @@ struct Opt {
     negate: bool,
 
     /// Factor to scale sample counts by
-    #[structopt(long = "factor", raw(default_value = "defaults::FACTOR.strval"))]
+    #[structopt(long = "factor", raw(default_value = "defaults::str::FACTOR"))]
     factor: f64,
 
     /// Silence all log output
@@ -153,7 +153,7 @@ impl<'a> Opt {
         };
         if self.inverted {
             options.direction = Direction::Inverted;
-            if self.title == defaults::TITLE.strval {
+            if self.title == defaults::TITLE {
                 options.title = "Icicle Graph".to_string();
             }
         }

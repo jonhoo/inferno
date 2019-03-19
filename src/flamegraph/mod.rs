@@ -26,15 +26,6 @@ const FRAMEPAD: usize = 1; // vertical padding for frames
 
 /// Default values for [`Options`].
 pub mod defaults {
-    /// Default value with a string representation
-    pub struct DefaultValue<T> {
-        /// Default value
-        pub value: T,
-
-        /// Default value string representation
-        pub strval: &'static str,
-    }
-
     macro_rules! doc {
         ($str:expr, $($def:tt)*) => {
             #[doc = $str]
@@ -43,29 +34,37 @@ pub mod defaults {
     }
 
     macro_rules! define {
-        ($name:ident : $t:ty = $val:tt) => {
-            doc!(
-                concat!("`", stringify!($val), "`"),
-                pub const $name: DefaultValue<$t> = DefaultValue {
-                    value: $val,
-                    strval: stringify!($val),
-                };
-            );
-        };
+        ($($name:ident : $t:ty = $val:tt),*) => {
+            $(
+                doc!(
+                    concat!("`", stringify!($val), "`"),
+                    pub const $name: $t = $val;
+                );
+            )*
+
+            #[doc(hidden)]
+            pub mod str {
+            $(
+                pub const $name: &str = stringify!($val);
+            )*
+            }
+        }
     }
 
-    define!(COLORS: &str = "hot");
-    define!(SEARCH_COLOR: &str = "#e600e6");
-    define!(TITLE: &str = "Flame Graph");
-    define!(IMAGE_WIDTH: usize = 1200);
-    define!(FRAME_HEIGHT: usize = 16);
-    define!(MIN_WIDTH: f64 = 0.1);
-    define!(FONT_TYPE: &str = "Verdana");
-    define!(FONT_SIZE: usize = 12);
-    define!(FONT_WIDTH: f64 = 0.59);
-    define!(COUNT_NAME: &str = "samples");
-    define!(NAME_TYPE: &str = "Function:");
-    define!(FACTOR: f64 = 1.0);
+    define! {
+        COLORS: &str = "hot",
+        SEARCH_COLOR: &str = "#e600e6",
+        TITLE: &str = "Flame Graph",
+        IMAGE_WIDTH: usize = 1200,
+        FRAME_HEIGHT: usize = 16,
+        MIN_WIDTH: f64 = 0.1,
+        FONT_TYPE: &str = "Verdana",
+        FONT_SIZE: usize = 12,
+        FONT_WIDTH: f64 = 0.59,
+        COUNT_NAME: &str = "samples",
+        NAME_TYPE: &str = "Function:",
+        FACTOR: f64 = 1.0
+    }
 }
 
 /// Configure the flame graph.
@@ -222,18 +221,18 @@ impl<'a> Options<'a> {
 impl<'a> Default for Options<'a> {
     fn default() -> Self {
         Options {
-            colors: Palette::from_str(defaults::COLORS.value).unwrap(),
-            search_color: SearchColor::from_str(defaults::SEARCH_COLOR.value).unwrap(),
-            title: defaults::TITLE.value.to_string(),
-            image_width: defaults::IMAGE_WIDTH.value,
-            frame_height: defaults::FRAME_HEIGHT.value,
-            min_width: defaults::MIN_WIDTH.value,
-            font_type: defaults::FONT_TYPE.value.to_string(),
-            font_size: defaults::FONT_SIZE.value,
-            font_width: defaults::FONT_WIDTH.value,
-            count_name: defaults::COUNT_NAME.value.to_string(),
-            name_type: defaults::NAME_TYPE.value.to_string(),
-            factor: defaults::FACTOR.value,
+            colors: Palette::from_str(defaults::COLORS).unwrap(),
+            search_color: SearchColor::from_str(defaults::SEARCH_COLOR).unwrap(),
+            title: defaults::TITLE.to_string(),
+            image_width: defaults::IMAGE_WIDTH,
+            frame_height: defaults::FRAME_HEIGHT,
+            min_width: defaults::MIN_WIDTH,
+            font_type: defaults::FONT_TYPE.to_string(),
+            font_size: defaults::FONT_SIZE,
+            font_width: defaults::FONT_WIDTH,
+            count_name: defaults::COUNT_NAME.to_string(),
+            name_type: defaults::NAME_TYPE.to_string(),
+            factor: defaults::FACTOR,
             notes: Default::default(),
             subtitle: Default::default(),
             bgcolors: Default::default(),
