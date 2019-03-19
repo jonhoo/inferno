@@ -312,6 +312,11 @@ fn flamegraph_should_not_warn_about_fractional_sample_with_tricky_stack() {
     );
 }
 
+fn load_palette_map_file(palette_file: &str) -> PaletteMap {
+    let path = Path::new(palette_file);
+    PaletteMap::load_from_file_or_empty(&path).unwrap()
+}
+
 #[test]
 fn flamegraph_palette_map() {
     let input_file = "./flamegraph/test/results/perf-vertx-stacks-01-collapsed-all.txt";
@@ -325,6 +330,26 @@ fn flamegraph_palette_map() {
     };
 
     test_flamegraph(input_file, expected_result_file, options).unwrap();
+}
+
+#[test]
+fn flamegraph_palette_map_should_warn_about_invalid_lines() {
+    testing_logger::setup();
+    let palette_file = "./tests/data/flamegraph/palette-map/palette_invalid.map";
+    let _ = load_palette_map_file(palette_file);
+    testing_logger::validate(|captured_logs| {
+        let nwarnings = captured_logs
+            .into_iter()
+            .filter(|log| {
+                log.body == ("Ignored 5 lines with invalid format") && log.level == Level::Warn
+            })
+            .count();
+        assert_eq!(
+            nwarnings, 1,
+            "invalide palette map line warning logged {} times, but should be logged exactly once",
+            nwarnings
+        );
+    });
 }
 
 #[test]
@@ -650,11 +675,6 @@ fn search_color_non_default() {
     };
 
     test_flamegraph(input_file, expected_result_file, options).unwrap();
-}
-
-fn load_palette_map_file(palette_file: &str) -> PaletteMap {
-    let path = Path::new(palette_file);
-    PaletteMap::load_from_file_or_empty(&path).unwrap()
 }
 
 #[test]

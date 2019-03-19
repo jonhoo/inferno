@@ -247,4 +247,10 @@ mod tests {
         assert!(parse_line("func->rgb(255, 255, 256)").is_err());
         assert!(parse_line("func->rgb(-1, 255, 255)").is_err());
     }
+
+    #[test]
+    fn load_from_non_existing_file() {
+        let palette_map = PaletteMap::load_from_file_or_empty(&"non-existing-palette.map").unwrap();
+        assert_eq!(palette_map, PaletteMap::default());
+    }
 }
