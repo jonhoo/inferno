@@ -106,12 +106,12 @@ pub struct Options<'a> {
 
     /// The search color for flame graph.
     ///
-    /// [Default value](defaults::SEARCH_COLOR)
+    /// [Default value](defaults::SEARCH_COLOR).
     pub search_color: SearchColor,
 
     /// The title for the flame graph.
     ///
-    /// [Default value](defaults::TITLE)
+    /// [Default value](defaults::TITLE).
     pub title: String,
 
     /// The subtitle for the flame graph.
@@ -121,42 +121,42 @@ pub struct Options<'a> {
 
     /// Width of for the flame graph
     ///
-    /// [Default value](defaults::IMAGE_WIDTH)
+    /// [Default value](defaults::IMAGE_WIDTH).
     pub image_width: usize,
 
     /// Height of each frame.
     ///
-    /// [Default value](defaults::FRAME_HEIGHT)
+    /// [Default value](defaults::FRAME_HEIGHT).
     pub frame_height: usize,
 
     /// Minimal width to omit smaller functions
     ///
-    /// [Default value](defaults::MIN_WIDTH)
+    /// [Default value](defaults::MIN_WIDTH).
     pub min_width: f64,
 
     /// The font type for the flame graph.
     ///
-    /// [Default value](defaults::FONT_TYPE)
+    /// [Default value](defaults::FONT_TYPE).
     pub font_type: String,
 
     /// Font size for the flame graph.
     ///
-    /// [Default value](defaults::FONT_SIZE)
+    /// [Default value](defaults::FONT_SIZE).
     pub font_size: usize,
 
     /// Font width for the flame graph.
     ///
-    /// [Default value](defaults::FONT_WIDTH)
+    /// [Default value](defaults::FONT_WIDTH).
     pub font_width: f64,
 
     /// Count type label for the flame graph.
     ///
-    /// [Default value](defaults::COUNT_NAME)
+    /// [Default value](defaults::COUNT_NAME).
     pub count_name: String,
 
     /// Name type label for the flame graph.
     ///
-    /// [Default value](defaults::NAME_TYPE)
+    /// [Default value](defaults::NAME_TYPE).
     pub name_type: String,
 
     /// The notes for the flame graph.
@@ -178,7 +178,7 @@ pub struct Options<'a> {
     /// For example, if you have `23.4` as a sample count you can upscale it to `234`, then set `factor`
     /// to `0.1`.
     ///
-    /// [Default value](defaults::FACTOR)
+    /// [Default value](defaults::FACTOR).
     pub factor: f64,
 
     /// Pretty print XML with newlines and indentation.
