@@ -96,8 +96,8 @@ struct Opt {
     name_type: String,
 
     /// Set embedded notes in SVG
-    #[structopt(long = "notes", raw(default_value = "defaults::NOTES.strval"))]
-    notes: String,
+    #[structopt(long = "notes")]
+    notes: Option<String>,
 
     /// Switch differential hues (green<->red)
     #[structopt(long = "negate")]
@@ -174,7 +174,9 @@ impl<'a> Opt {
         options.font_width = self.font_width;
         options.count_name = self.count_name;
         options.name_type = self.name_type;
-        options.notes = self.notes;
+        if let Some(notes) = self.notes {
+            options.notes = notes;
+        }
         options.negate_differentials = self.negate;
         options.factor = self.factor;
         options.search_color = self.search_color;
