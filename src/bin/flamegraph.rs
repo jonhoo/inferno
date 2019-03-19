@@ -29,7 +29,7 @@ struct Opt {
     #[structopt(
         short = "c",
         long = "colors",
-        raw(default_value = "defaults::str::COLORS"),
+        raw(default_value = "defaults::COLORS"),
         raw(
             possible_values = r#"&["hot","mem","io","wakeup","java","js","perl","red","green","blue","aqua","yellow","purple","orange"]"#
         )
@@ -49,14 +49,11 @@ struct Opt {
     cp: bool,
 
     /// Search color
-    #[structopt(
-        long = "search-color",
-        raw(default_value = "defaults::str::SEARCH_COLOR")
-    )]
+    #[structopt(long = "search-color", raw(default_value = "defaults::SEARCH_COLOR"))]
     search_color: SearchColor,
 
     /// Change title text
-    #[structopt(long = "title", raw(default_value = "defaults::str::TITLE"))]
+    #[structopt(long = "title", raw(default_value = "defaults::TITLE"))]
     title: String,
 
     /// Second level title (optional)
@@ -76,7 +73,7 @@ struct Opt {
     min_width: f64,
 
     /// Font type
-    #[structopt(long = "fonttype", raw(default_value = "defaults::str::FONT_TYPE"))]
+    #[structopt(long = "fonttype", raw(default_value = "defaults::FONT_TYPE"))]
     font_type: String,
 
     /// Font size
@@ -88,11 +85,11 @@ struct Opt {
     font_width: f64,
 
     /// Count type label
-    #[structopt(long = "countname", raw(default_value = "defaults::str::COUNT_NAME"))]
+    #[structopt(long = "countname", raw(default_value = "defaults::COUNT_NAME"))]
     count_name: String,
 
     /// Name type label
-    #[structopt(long = "nametype", raw(default_value = "defaults::str::NAME_TYPE"))]
+    #[structopt(long = "nametype", raw(default_value = "defaults::NAME_TYPE"))]
     name_type: String,
 
     /// Set embedded notes in SVG
