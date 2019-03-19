@@ -83,3 +83,24 @@ fn collapse_guess_unknown_format_should_log_error() {
         },
     );
 }
+
+#[test]
+fn collapse_guess_invalid_perf_should_log_error() {
+    test_collapse_guess_logs(
+        "./tests/data/collapse-guess/invalid-perf-with-empty-line-after-event-line.txt",
+        |captured_logs| {
+            let nerrors = captured_logs
+                .into_iter()
+                .filter(|log| {
+                    log.level == Level::Error
+                        && log.body == "No applicable collapse implementation found for input"
+                })
+                .count();
+            assert_eq!(
+                nerrors, 1,
+                "bad lines error logged {} times, but should be logged exactly once",
+                nerrors
+            );
+        },
+    );
+}
