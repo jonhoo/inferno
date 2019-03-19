@@ -17,14 +17,47 @@ use std::io::prelude::*;
 use std::io::{self, BufReader};
 use std::iter;
 use std::path::PathBuf;
+use std::str::FromStr;
 use str_stack::StrStack;
 use svg::StyleOptions;
 
 const XPAD: usize = 10; // pad lefm and right
 const FRAMEPAD: usize = 1; // vertical padding for frames
 
-/// Default title
-pub const DEFAULT_TITLE: &str = "Flame Graph";
+/// Default values for `Options`
+#[doc(hidden)]
+pub mod defaults {
+    pub struct DefaultValue<T> {
+        /// Default value
+        pub value: T,
+
+        /// Default value string representation
+        pub strval: &'static str,
+    }
+
+    macro_rules! define {
+        ($name:ident : $t:ty = $val:tt) => {
+            pub const $name: DefaultValue<$t> = DefaultValue {
+                value: $val,
+                strval: stringify!($val),
+            };
+        };
+    }
+
+    define!(COLORS: &str = "hot");
+    define!(SEARCH_COLOR: &str = "#e600e6");
+    define!(TITLE: &str = "Flame Graph");
+    define!(IMAGE_WIDTH: usize = 1200);
+    define!(FRAME_HEIGHT: usize = 16);
+    define!(MIN_WIDTH: f64 = 0.1);
+    define!(FONT_TYPE: &str = "Verdana");
+    define!(FONT_SIZE: usize = 12);
+    define!(FONT_WIDTH: f64 = 0.59);
+    define!(COUNT_NAME: &str = "samples");
+    define!(NAME_TYPE: &str = "Function:");
+    define!(NOTES: &str = "");
+    define!(FACTOR: f64 = 1.0);
+}
 
 /// Configure the flame graph.
 #[derive(Debug)]
@@ -182,23 +215,23 @@ impl<'a> Options<'a> {
 impl<'a> Default for Options<'a> {
     fn default() -> Self {
         Options {
-            title: DEFAULT_TITLE.to_string(),
-            subtitle: None,
-            image_width: 1200,
-            frame_height: 16,
-            min_width: 0.1,
-            font_type: "Verdana".to_owned(),
-            font_size: 12,
-            font_width: 0.59,
-            count_name: "samples".to_owned(),
-            name_type: "Function:".to_owned(),
-            notes: "".to_owned(),
-            factor: 1.0,
-            colors: Default::default(),
+            colors: Palette::from_str(defaults::COLORS.value).unwrap(),
+            search_color: SearchColor::from_str(defaults::SEARCH_COLOR.value).unwrap(),
+            title: defaults::TITLE.value.to_string(),
+            image_width: defaults::IMAGE_WIDTH.value,
+            frame_height: defaults::FRAME_HEIGHT.value,
+            min_width: defaults::MIN_WIDTH.value,
+            font_type: defaults::FONT_TYPE.value.to_string(),
+            font_size: defaults::FONT_SIZE.value,
+            font_width: defaults::FONT_WIDTH.value,
+            count_name: defaults::COUNT_NAME.value.to_string(),
+            name_type: defaults::NAME_TYPE.value.to_string(),
+            notes: defaults::NOTES.value.to_string(),
+            factor: defaults::FACTOR.value,
+            subtitle: Default::default(),
             bgcolors: Default::default(),
             hash: Default::default(),
             palette_map: Default::default(),
-            search_color: Default::default(),
             func_frameattrs: Default::default(),
             direction: Default::default(),
             negate_differentials: Default::default(),

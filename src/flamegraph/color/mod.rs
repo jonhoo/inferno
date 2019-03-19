@@ -168,16 +168,6 @@ fn parse_flat_bgcolor(s: &str) -> Option<Color> {
 #[derive(Clone, Copy, Debug)]
 pub struct SearchColor(Color);
 
-impl Default for SearchColor {
-    fn default() -> Self {
-        SearchColor(Color {
-            r: 230,
-            g: 0,
-            b: 230,
-        })
-    }
-}
-
 impl FromStr for SearchColor {
     type Err = String;
 
