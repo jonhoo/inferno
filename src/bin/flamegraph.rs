@@ -4,8 +4,8 @@ use std::path::{Path, PathBuf};
 use structopt::StructOpt;
 
 use inferno::flamegraph::{
-    self, color::BackgroundColor, color::PaletteMap, color::SearchColor, Direction,
-    FuncFrameAttrsMap, Options, Palette, DEFAULT_TITLE,
+    self, color::BackgroundColor, color::PaletteMap, color::SearchColor, defaults, Direction,
+    FuncFrameAttrsMap, Options, Palette,
 };
 
 #[derive(Debug, StructOpt)]
@@ -29,7 +29,7 @@ struct Opt {
     #[structopt(
         short = "c",
         long = "colors",
-        default_value = "hot",
+        raw(default_value = "defaults::str::COLORS"),
         raw(
             possible_values = r#"&["hot","mem","io","wakeup","java","js","perl","red","green","blue","aqua","yellow","purple","orange"]"#
         )
@@ -49,11 +49,14 @@ struct Opt {
     cp: bool,
 
     /// Search color
-    #[structopt(long = "search-color", default_value = "#e600e6")]
+    #[structopt(
+        long = "search-color",
+        raw(default_value = "defaults::str::SEARCH_COLOR")
+    )]
     search_color: SearchColor,
 
     /// Change title text
-    #[structopt(long = "title", default_value = "Flame Graph")]
+    #[structopt(long = "title", raw(default_value = "defaults::str::TITLE"))]
     title: String,
 
     /// Second level title (optional)
@@ -61,47 +64,47 @@ struct Opt {
     subtitle: Option<String>,
 
     /// Width of image
-    #[structopt(long = "width", default_value = "1200")]
+    #[structopt(long = "width", raw(default_value = "defaults::str::IMAGE_WIDTH"))]
     image_width: usize,
 
     /// Height of each frame
-    #[structopt(long = "height", default_value = "16")]
+    #[structopt(long = "height", raw(default_value = "defaults::str::FRAME_HEIGHT"))]
     frame_height: usize,
 
     /// Omit smaller functions (default 0.1 pixels)
-    #[structopt(long = "minwidth", default_value = "0.1")]
+    #[structopt(long = "minwidth", raw(default_value = "defaults::str::MIN_WIDTH"))]
     min_width: f64,
 
     /// Font type
-    #[structopt(long = "fonttype", default_value = "Verdana")]
+    #[structopt(long = "fonttype", raw(default_value = "defaults::str::FONT_TYPE"))]
     font_type: String,
 
     /// Font size
-    #[structopt(long = "fontsize", default_value = "12")]
+    #[structopt(long = "fontsize", raw(default_value = "defaults::str::FONT_SIZE"))]
     font_size: usize,
 
     /// Font width
-    #[structopt(long = "fontwidth", default_value = "0.59")]
+    #[structopt(long = "fontwidth", raw(default_value = "defaults::str::FONT_WIDTH"))]
     font_width: f64,
 
     /// Count type label
-    #[structopt(long = "countname", default_value = "samples")]
+    #[structopt(long = "countname", raw(default_value = "defaults::str::COUNT_NAME"))]
     count_name: String,
 
     /// Name type label
-    #[structopt(long = "nametype", default_value = "Function:")]
+    #[structopt(long = "nametype", raw(default_value = "defaults::str::NAME_TYPE"))]
     name_type: String,
 
     /// Set embedded notes in SVG
-    #[structopt(long = "notes", default_value = "")]
-    notes: String,
+    #[structopt(long = "notes")]
+    notes: Option<String>,
 
     /// Switch differential hues (green<->red)
     #[structopt(long = "negate")]
     negate: bool,
 
     /// Factor to scale sample counts by
-    #[structopt(long = "factor", default_value = "1.0")]
+    #[structopt(long = "factor", raw(default_value = "defaults::str::FACTOR"))]
     factor: f64,
 
     /// Silence all log output
@@ -150,7 +153,7 @@ impl<'a> Opt {
         };
         if self.inverted {
             options.direction = Direction::Inverted;
-            if self.title == DEFAULT_TITLE {
+            if self.title == defaults::TITLE {
                 options.title = "Icicle Graph".to_string();
             }
         }
@@ -171,7 +174,9 @@ impl<'a> Opt {
         options.font_width = self.font_width;
         options.count_name = self.count_name;
         options.name_type = self.name_type;
-        options.notes = self.notes;
+        if let Some(notes) = self.notes {
+            options.notes = notes;
+        }
         options.negate_differentials = self.negate;
         options.factor = self.factor;
         options.search_color = self.search_color;

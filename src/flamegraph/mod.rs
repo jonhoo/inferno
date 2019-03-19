@@ -17,14 +17,55 @@ use std::io::prelude::*;
 use std::io::{self, BufReader};
 use std::iter;
 use std::path::PathBuf;
+use std::str::FromStr;
 use str_stack::StrStack;
 use svg::StyleOptions;
 
 const XPAD: usize = 10; // pad lefm and right
 const FRAMEPAD: usize = 1; // vertical padding for frames
 
-/// Default title
-pub const DEFAULT_TITLE: &str = "Flame Graph";
+/// Default values for [`Options`].
+pub mod defaults {
+    macro_rules! doc {
+        ($str:expr, $($def:tt)*) => {
+            #[doc = $str]
+            $($def)*
+        };
+    }
+
+    macro_rules! define {
+        ($($name:ident : $t:ty = $val:tt),*) => {
+            $(
+                doc!(
+                    concat!("`", stringify!($val), "`"),
+                    pub const $name: $t = $val;
+                );
+            )*
+
+            #[doc(hidden)]
+            pub mod str {
+            $(
+                pub const $name: &str = stringify!($val);
+            )*
+            }
+        }
+    }
+
+    define! {
+        COLORS: &str = "hot",
+        SEARCH_COLOR: &str = "#e600e6",
+        TITLE: &str = "Flame Graph",
+        IMAGE_WIDTH: usize = 1200,
+        FRAME_HEIGHT: usize = 16,
+        MIN_WIDTH: f64 = 0.1,
+        FONT_TYPE: &str = "Verdana",
+        FONT_SIZE: usize = 12,
+        FONT_WIDTH: f64 = 0.59,
+        COUNT_NAME: &str = "samples",
+        NAME_TYPE: &str = "Function:",
+        FACTOR: f64 = 1.0
+    }
+}
 
 /// Configure the flame graph.
 #[derive(Debug)]
@@ -63,64 +104,62 @@ pub struct Options<'a> {
     /// Whether to plot a plot that grows top-to-bottom or bottom-up (the default).
     pub direction: Direction,
 
-    /// The search color for flame chart.
+    /// The search color for flame graph.
     ///
-    /// Defaults to `rgb(230,0,230)`.
+    /// [Default value](defaults::SEARCH_COLOR).
     pub search_color: SearchColor,
 
-    /// The title for the flame chart.
+    /// The title for the flame graph.
     ///
-    /// Defaults to "Flame Graph".
+    /// [Default value](defaults::TITLE).
     pub title: String,
 
-    /// The subtitle for the flame chart.
+    /// The subtitle for the flame graph.
     ///
     /// Defaults to None.
     pub subtitle: Option<String>,
 
-    /// Width of for the flame chart
+    /// Width of for the flame graph
     ///
-    /// Defaults to 1200.
+    /// [Default value](defaults::IMAGE_WIDTH).
     pub image_width: usize,
 
     /// Height of each frame.
     ///
-    /// Defaults to 16.
+    /// [Default value](defaults::FRAME_HEIGHT).
     pub frame_height: usize,
 
     /// Minimal width to omit smaller functions
     ///
-    /// Defaults to 0.1.
+    /// [Default value](defaults::MIN_WIDTH).
     pub min_width: f64,
 
-    /// The font type for the flame chart.
+    /// The font type for the flame graph.
     ///
-    /// Defaults to "Verdana".
+    /// [Default value](defaults::FONT_TYPE).
     pub font_type: String,
 
-    /// Font size for the flame chart.
+    /// Font size for the flame graph.
     ///
-    /// Defaults to 12.
+    /// [Default value](defaults::FONT_SIZE).
     pub font_size: usize,
 
-    /// Font width for the flame chart.
+    /// Font width for the flame graph.
     ///
-    /// Defaults to 0.59.
+    /// [Default value](defaults::FONT_WIDTH).
     pub font_width: f64,
 
-    /// Count type label for the flame chart.
+    /// Count type label for the flame graph.
     ///
-    /// Defaults to "samples".
+    /// [Default value](defaults::COUNT_NAME).
     pub count_name: String,
 
-    /// Name type label for the flame chart.
+    /// Name type label for the flame graph.
     ///
-    /// Defaults to "Function:".
+    /// [Default value](defaults::NAME_TYPE).
     pub name_type: String,
 
-    /// The notes for the flame chart.
-    ///
-    /// Defaults to "".
+    /// The notes for the flame graph.
     pub notes: String,
 
     /// By default, if [differential] samples are included in the provided stacks, the resulting
@@ -139,7 +178,7 @@ pub struct Options<'a> {
     /// For example, if you have `23.4` as a sample count you can upscale it to `234`, then set `factor`
     /// to `0.1`.
     ///
-    /// Defaults to 1.0.
+    /// [Default value](defaults::FACTOR).
     pub factor: f64,
 
     /// Pretty print XML with newlines and indentation.
@@ -182,23 +221,23 @@ impl<'a> Options<'a> {
 impl<'a> Default for Options<'a> {
     fn default() -> Self {
         Options {
-            title: DEFAULT_TITLE.to_string(),
-            subtitle: None,
-            image_width: 1200,
-            frame_height: 16,
-            min_width: 0.1,
-            font_type: "Verdana".to_owned(),
-            font_size: 12,
-            font_width: 0.59,
-            count_name: "samples".to_owned(),
-            name_type: "Function:".to_owned(),
-            notes: "".to_owned(),
-            factor: 1.0,
-            colors: Default::default(),
+            colors: Palette::from_str(defaults::COLORS).unwrap(),
+            search_color: SearchColor::from_str(defaults::SEARCH_COLOR).unwrap(),
+            title: defaults::TITLE.to_string(),
+            image_width: defaults::IMAGE_WIDTH,
+            frame_height: defaults::FRAME_HEIGHT,
+            min_width: defaults::MIN_WIDTH,
+            font_type: defaults::FONT_TYPE.to_string(),
+            font_size: defaults::FONT_SIZE,
+            font_width: defaults::FONT_WIDTH,
+            count_name: defaults::COUNT_NAME.to_string(),
+            name_type: defaults::NAME_TYPE.to_string(),
+            factor: defaults::FACTOR,
+            notes: Default::default(),
+            subtitle: Default::default(),
             bgcolors: Default::default(),
             hash: Default::default(),
             palette_map: Default::default(),
-            search_color: Default::default(),
             func_frameattrs: Default::default(),
             direction: Default::default(),
             negate_differentials: Default::default(),
