@@ -1,0 +1,8 @@
+java 10488  9962.502413:   10101010 cpu-clock:
+
+	ffffffffaee8017b fput+0xb ([kernel.kallsyms])
+	ffffffffaee7f61c ksys_write+0x9c ([kernel.kallsyms])
+	ffffffffaec041cb do_syscall_64+0x5b ([kernel.kallsyms])
+	ffffffffaf60008c entry_SYSCALL_64_after_hwframe+0x44 ([kernel.kallsyms])
+	    7f89e341d84f __GI___libc_write+0x4f (/usr/lib/libc-2.28.so)
+	5966605dd52f8e00 [unknown] ([unknown])

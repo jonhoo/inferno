@@ -7,10 +7,25 @@ mod collapse_common;
 
 use collapse_common::*;
 use inferno::collapse::dtrace::{Folder, Options};
+use log::Level;
 use std::io;
 
 fn test_collapse_dtrace(test_file: &str, expected_file: &str, options: Options) -> io::Result<()> {
     test_collapse(Folder::from(options), test_file, expected_file)
+}
+
+fn test_collapse_dtrace_logs<F>(input_file: &str, asserter: F)
+where
+    F: Fn(&Vec<testing_logger::CapturedLog>),
+{
+    test_collapse_dtrace_logs_with_options(input_file, asserter, Options::default());
+}
+
+fn test_collapse_dtrace_logs_with_options<F>(input_file: &str, asserter: F, options: Options)
+where
+    F: Fn(&Vec<testing_logger::CapturedLog>),
+{
+    test_collapse_logs(Folder::from(options), input_file, asserter);
 }
 
 #[test]
@@ -65,4 +80,31 @@ fn collapse_dtrace_compare_to_flamegraph_bug() {
         },
     )
     .unwrap()
+}
+
+#[test]
+fn collapse_dtrace_should_log_warning_for_only_header_lines() {
+    test_collapse_dtrace_logs(
+        "./tests/data/collapse-dtrace/only-header-lines.txt",
+        |captured_logs| {
+            let nwarnings = captured_logs
+                .into_iter()
+                .filter(|log| {
+                    log.body == "File ended while skipping headers" && log.level == Level::Warn
+                })
+                .count();
+            assert_eq!(
+                nwarnings, 1,
+                "warning logged {} times, but should be logged exactly once",
+                nwarnings
+            );
+        },
+    );
+}
+
+#[test]
+fn collapse_dtrace_scope_with_no_argument_list() {
+    let test_file = "./tests/data/collapse-dtrace/scope_with_no_argument_list.txt";
+    let result_file = "./tests/data/collapse-dtrace/results/scope_with_no_argument_list.txt";
+    test_collapse_dtrace(test_file, result_file, Options::default()).unwrap()
 }

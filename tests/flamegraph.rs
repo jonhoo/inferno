@@ -199,6 +199,56 @@ fn flamegraph_nameattr() {
 }
 
 #[test]
+fn flamegraph_nameattr_empty_line() {
+    let input_file = "./flamegraph/test/results/perf-cycles-instructions-01-collapsed-all.txt";
+    let expected_result_file = "./tests/data/flamegraph/nameattr/nameattr.svg";
+    let nameattr_file = "./tests/data/flamegraph/nameattr/nameattr_empty_first_line.txt";
+
+    let options = flamegraph::Options {
+        hash: true,
+        func_frameattrs: flamegraph::FuncFrameAttrsMap::from_file(&PathBuf::from(nameattr_file))
+            .unwrap(),
+        ..Default::default()
+    };
+
+    test_flamegraph(input_file, expected_result_file, options).unwrap();
+}
+
+#[test]
+fn flamegraph_nameattr_empty_attribute() {
+    let input_file = "./flamegraph/test/results/perf-cycles-instructions-01-collapsed-all.txt";
+    let expected_result_file = "./tests/data/flamegraph/nameattr/nameattr.svg";
+    let nameattr_file = "./tests/data/flamegraph/nameattr/nameattr_empty_attribute.txt";
+
+    let options = flamegraph::Options {
+        hash: true,
+        func_frameattrs: flamegraph::FuncFrameAttrsMap::from_file(&PathBuf::from(nameattr_file))
+            .unwrap(),
+        ..Default::default()
+    };
+
+    test_flamegraph(input_file, expected_result_file, options).unwrap();
+}
+
+#[test]
+fn flamegraph_nameattr_should_warn_about_invalid_attribute() {
+    testing_logger::setup();
+    let nameattr_file = "./tests/data/flamegraph/nameattr/nameattr_invalid_attribute.txt";
+    let _ = flamegraph::FuncFrameAttrsMap::from_file(&PathBuf::from(nameattr_file));
+    testing_logger::validate(|captured_logs| {
+        let nwarnings = captured_logs
+            .into_iter()
+            .filter(|log| log.body.starts_with("invalid attribute") && log.level == Level::Warn)
+            .count();
+        assert_eq!(
+            nwarnings, 1,
+            "invalid attribute warning logged {} times, but should be logged exactly once",
+            nwarnings
+        );
+    });
+}
+
+#[test]
 fn flamegraph_should_warn_about_fractional_samples() {
     test_flamegraph_logs(
         "./tests/data/flamegraph/fractional-samples/fractional.txt",
@@ -262,6 +312,11 @@ fn flamegraph_should_not_warn_about_fractional_sample_with_tricky_stack() {
     );
 }
 
+fn load_palette_map_file(palette_file: &str) -> PaletteMap {
+    let path = Path::new(palette_file);
+    PaletteMap::load_from_file_or_empty(&path).unwrap()
+}
+
 #[test]
 fn flamegraph_palette_map() {
     let input_file = "./flamegraph/test/results/perf-vertx-stacks-01-collapsed-all.txt";
@@ -275,6 +330,26 @@ fn flamegraph_palette_map() {
     };
 
     test_flamegraph(input_file, expected_result_file, options).unwrap();
+}
+
+#[test]
+fn flamegraph_palette_map_should_warn_about_invalid_lines() {
+    testing_logger::setup();
+    let palette_file = "./tests/data/flamegraph/palette-map/palette_invalid.map";
+    let _ = load_palette_map_file(palette_file);
+    testing_logger::validate(|captured_logs| {
+        let nwarnings = captured_logs
+            .into_iter()
+            .filter(|log| {
+                log.body == ("Ignored 5 lines with invalid format") && log.level == Level::Warn
+            })
+            .count();
+        assert_eq!(
+            nwarnings, 1,
+            "invalide palette map line warning logged {} times, but should be logged exactly once",
+            nwarnings
+        );
+    });
 }
 
 #[test]
@@ -600,11 +675,6 @@ fn search_color_non_default() {
     };
 
     test_flamegraph(input_file, expected_result_file, options).unwrap();
-}
-
-fn load_palette_map_file(palette_file: &str) -> PaletteMap {
-    let path = Path::new(palette_file);
-    PaletteMap::load_from_file_or_empty(&path).unwrap()
 }
 
 #[test]

@@ -1,0 +1,9 @@
+->rgb(255,230,55)
+ClassLoaderData::oops_do->invalid(244,125,43)
+ClassLoaderDataGraph::oops_do-----rgb(244,125,43)
+GCTaskThread::run->rgb(243,216)
+InstanceKlass::oop_push_contents->
+Interpreter_[j]-rgb(237,180,35)
+JavaCalls::call_helper->rgb(243,120,41)
+JavaCalls::call_virtual->rgb(224,120,21)
+JavaThread::run->rgb(243,120,41)
