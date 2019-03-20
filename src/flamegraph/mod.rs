@@ -37,7 +37,7 @@ pub mod defaults {
         ($($name:ident : $t:ty = $val:tt),*) => {
             $(
                 doc!(
-                    concat!("`", stringify!($val), "`"),
+                    stringify!($val),
                     pub const $name: $t = $val;
                 );
             )*
@@ -45,7 +45,9 @@ pub mod defaults {
             #[doc(hidden)]
             pub mod str {
             $(
-                pub const $name: &str = stringify!($val);
+                lazy_static! {
+                    pub static ref $name: String = ($val).to_string();
+                }
             )*
             }
         }
