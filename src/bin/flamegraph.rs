@@ -11,6 +11,10 @@ use inferno::flamegraph::{
 #[derive(Debug, StructOpt)]
 #[structopt(name = "inferno-flamegraph", author = "")]
 struct Opt {
+    /// Collapsed perf output files. With no INFILE, or INFILE is -, read STDIN.
+    #[structopt(name = "INFILE", parse(from_os_str))]
+    infiles: Vec<PathBuf>,
+
     /// File containing attributes to use for the SVG frames of particular functions.
     /// Each line in the file should be a function name followed by a tab,
     /// then a sequence of tab separated name=value pairs.
@@ -20,10 +24,6 @@ struct Opt {
     /// Plot the flame graph up-side-down.
     #[structopt(short = "i", long = "inverted")]
     inverted: bool,
-
-    /// Collapsed perf output files. With no INFILE, or INFILE is -, read STDIN.
-    #[structopt(name = "INFILE", parse(from_os_str))]
-    infiles: Vec<PathBuf>,
 
     /// Set color palette
     #[structopt(
@@ -137,6 +137,7 @@ struct Opt {
 impl<'a> Opt {
     fn into_parts(self) -> (Vec<PathBuf>, Options<'a>) {
         let mut options = Options::default();
+        options.title = self.title.clone();
         options.colors = self.colors;
         options.bgcolors = self.bgcolors;
         options.hash = self.hash;
@@ -234,4 +235,100 @@ fn save_consistent_palette_if_needed(
     }
 
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::Opt;
+    use inferno::flamegraph::{color, Direction, Options, Palette};
+    use std::path::PathBuf;
+    use std::str::FromStr;
+    use structopt::StructOpt;
+
+    #[test]
+    fn default_options() {
+        let args = vec!["inferno-flamegraph", "test_infile"];
+        let opt = Opt::from_iter_safe(args).unwrap();
+        let (_infiles, options) = opt.into_parts();
+        assert_eq!(options, Options::default());
+    }
+
+    #[test]
+    fn options() {
+        let args = vec![
+            "inferno-flamegraph",
+            "--inverted",
+            "--colors",
+            "purple",
+            "--bgcolors",
+            "blue",
+            "--hash",
+            "--cp",
+            "--search-color",
+            "#203040",
+            "--title",
+            "Test Title",
+            "--subtitle",
+            "Test Subtitle",
+            "--width",
+            "100",
+            "--height",
+            "500",
+            "--minwidth",
+            "90.1",
+            "--fonttype",
+            "Helvetica",
+            "--fontsize",
+            "13",
+            "--fontwidth",
+            "10.5",
+            "--countname",
+            "test count name",
+            "--nametype",
+            "test name type",
+            "--notes",
+            "Test notes",
+            "--negate",
+            "--factor",
+            "0.1",
+            "--pretty-xml",
+            "--reverse",
+            "--no-javascript",
+            "test_infile1",
+            "test_infile2",
+        ];
+        let opt = Opt::from_iter_safe(args).unwrap();
+        let (infiles, options) = opt.into_parts();
+        let expected_options = Options {
+            colors: Palette::from_str("purple").unwrap(),
+            search_color: color::SearchColor::from_str("#203040").unwrap(),
+            title: "Test Title".to_string(),
+            image_width: 100,
+            frame_height: 500,
+            min_width: 90.1,
+            font_type: "Helvetica".to_string(),
+            font_size: 13,
+            font_width: 10.5,
+            count_name: "test count name".to_string(),
+            name_type: "test name type".to_string(),
+            factor: 0.1,
+            notes: "Test notes".to_string(),
+            subtitle: Some("Test Subtitle".to_string()),
+            bgcolors: Some(color::BackgroundColor::Blue),
+            hash: true,
+            palette_map: Default::default(),
+            func_frameattrs: Default::default(),
+            direction: Direction::Inverted,
+            negate_differentials: true,
+            pretty_xml: true,
+            no_sort: false,
+            reverse_stack_order: true,
+            no_javascript: true,
+        };
+
+        assert_eq!(options, expected_options);
+        assert_eq!(infiles.len(), 2, "expected 2 input files");
+        assert_eq!(infiles[0], PathBuf::from_str("test_infile1").unwrap());
+        assert_eq!(infiles[1], PathBuf::from_str("test_infile2").unwrap());
+    }
 }
