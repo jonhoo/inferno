@@ -1,6 +1,5 @@
 use super::{Direction, Options};
 use quick_xml::{
-    events::attributes::Attribute,
     events::{BytesEnd, BytesStart, BytesText, Event},
     Writer,
 };
@@ -87,6 +86,7 @@ pub(super) fn write_prelude<'a, W>(
     svg: &mut Writer<W>,
     style_options: &StyleOptions<'a>,
     opt: &Options,
+    cache_text: &mut Event,
 ) -> quick_xml::Result<()>
 where
     W: Write,
@@ -170,6 +170,7 @@ var searchcolor = '{}';",
             extra: None,
         },
         &opt.font_type,
+        cache_text,
     )?;
 
     if let Some(ref subtitle) = opt.subtitle {
@@ -186,7 +187,8 @@ var searchcolor = '{}';",
                 extra: None,
             },
             &opt.font_type,
-        )?
+            cache_text,
+        )?;
     }
 
     write_str(
@@ -202,6 +204,7 @@ var searchcolor = '{}';",
             extra: iter::once(("id", "details")),
         },
         &opt.font_type,
+        cache_text,
     )?;
 
     write_str(
@@ -221,6 +224,7 @@ var searchcolor = '{}';",
             ],
         },
         &opt.font_type,
+        cache_text,
     )?;
 
     write_str(
@@ -242,6 +246,7 @@ var searchcolor = '{}';",
             ],
         },
         &opt.font_type,
+        cache_text,
     )?;
 
     write_str(
@@ -257,6 +262,7 @@ var searchcolor = '{}';",
             extra: iter::once(("id", "matched")),
         },
         &opt.font_type,
+        cache_text,
     )?;
 
     Ok(())
@@ -267,7 +273,8 @@ pub(super) fn write_str<'a, W, I>(
     buf: &mut StrStack,
     item: TextItem<'a, I>,
     font_type: &str,
-) -> quick_xml::Result<()>
+    cache_text: &mut Event,
+) -> quick_xml::Result<usize>
 where
     W: Write,
     I: IntoIterator<Item = (&'a str, &'a str)>,
@@ -275,33 +282,29 @@ where
     let x = write!(buf, "{:.2}", item.x);
     let y = write!(buf, "{:.2}", item.y);
     let fs = write!(buf, "{}", item.size);
-    let mut text = BytesStart::borrowed_name(b"text").with_attributes(item.extra);
-    text.push_attribute(Attribute::from((
-        "text-anchor",
-        item.location.unwrap_or("left"),
-    )));
-    text.push_attribute(Attribute {
-        key: b"x",
-        value: Cow::from(buf[x].as_bytes()),
-    });
-    text.push_attribute(Attribute {
-        key: b"y",
-        value: Cow::from(buf[y].as_bytes()),
-    });
-    text.push_attribute(Attribute {
-        key: b"font-size",
-        value: Cow::from(buf[fs].as_bytes()),
-    });
-    text.push_attribute(Attribute::from(("font-family", font_type)));
-    text.push_attribute(Attribute::from(("fill", item.color)));
-    svg.write_event(Event::Start(text))?;
+
+    if let Event::Start(bytes_start) = cache_text {
+        bytes_start.clear_attributes();
+        bytes_start.extend_attributes(item.extra);
+        bytes_start.extend_attributes(args!(
+            "text-anchor" => item.location.unwrap_or("left"),
+            "x" => &buf[x],
+            "y" => &buf[y],
+            "font-size" => &buf[fs],
+            "font-family" => font_type,
+            "fill" => item.color
+        ));
+    } else {
+        unreachable!("cache wrapper was of wrong type: {:?}", cache_text);
+    }
+    svg.write_event(&cache_text)?;
+
     let s = match item.text {
         TextArgument::String(ref s) => &*s,
         TextArgument::FromBuffer(i) => &buf[i],
     };
     svg.write_event(Event::Text(BytesText::from_plain_str(s)))?;
-    svg.write_event(Event::End(BytesEnd::borrowed(b"text")))?;
-    Ok(())
+    svg.write_event(Event::End(BytesEnd::borrowed(b"text")))
 }
 
 // Imported from the `enquote` crate @ 1.0.3.

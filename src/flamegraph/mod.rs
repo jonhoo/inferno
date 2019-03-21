@@ -1,3 +1,9 @@
+macro_rules! args {
+    ($($key:expr => $value:expr),*) => {{
+        [$(($key, $value),)*].into_iter().map(|(k, v): &(&str, &str)| (*k, *v))
+    }};
+}
+
 mod attrs;
 pub mod color;
 mod merge;
@@ -271,12 +277,6 @@ impl Default for Direction {
     }
 }
 
-macro_rules! args {
-    ($($key:expr => $value:expr),*) => {{
-        [$(($key, $value),)*].into_iter().map(|(k, v): &(&str, &str)| (*k, *v))
-    }};
-}
-
 struct FrameAttributes<'a> {
     title: &'a str,
     class: &'a str,
@@ -439,6 +439,9 @@ where
         Writer::new(writer)
     };
 
+    // reuse for all text elements to avoid allocations
+    let mut cache_text = Event::Start(BytesStart::owned_name("text"));
+
     if time == 0 {
         error!("No stack counts found");
         // emit an error message SVG, for tools automating flamegraph use
@@ -457,6 +460,7 @@ where
                 extra: None,
             },
             &opt.font_type,
+            &mut cache_text,
         )?;
         svg.write_event(Event::End(BytesEnd::borrowed(b"svg")))?;
         svg.write_event(Event::Eof)?;
@@ -492,7 +496,7 @@ where
         bgcolor2,
     };
 
-    svg::write_prelude(&mut svg, &style_options, &opt)?;
+    svg::write_prelude(&mut svg, &style_options, &opt, &mut cache_text)?;
 
     // Used when picking color parameters at random, when no option determines how to pick these
     // parameters. We instanciate it here because it may be called once for each iteration in the
@@ -688,6 +692,7 @@ where
                 extra: None,
             },
             &opt.font_type,
+            &mut cache_text,
         )?;
 
         buffer.clear();
