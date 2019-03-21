@@ -70,7 +70,7 @@ pub mod defaults {
 }
 
 /// Configure the flame graph.
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct Options<'a> {
     /// The color palette to use when plotting.
     pub colors: color::Palette,

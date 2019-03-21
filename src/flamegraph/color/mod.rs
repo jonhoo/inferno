@@ -42,7 +42,7 @@ const GRAY_GRADIENT: (&str, &str) = ("#f8f8f8", "#e8e8e8");
 ///  - All other [`MultiPalette`] variants default to [`BackgroundColor::Yellow`].
 ///
 /// `BackgroundColor::default()` is `Yellow`.
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum BackgroundColor {
     /// A yellow gradient from `#EEEEEE` to `#EEEEB0`.
     Yellow,
@@ -165,7 +165,7 @@ fn parse_flat_bgcolor(s: &str) -> Option<Color> {
 }
 
 /// `SearchColor::default()` is `rgb(230,0,230)`.
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub struct SearchColor(Color);
 
 impl FromStr for SearchColor {
