@@ -7,7 +7,17 @@
             <stop stop-color="#e0e0ff" offset="95%"/>
         </linearGradient>
     </defs>
-    <style type="text/css">.func_g:hover { stroke:black; stroke-width:0.5; cursor:pointer; }</style>
+    <style type="text/css">
+text { font-family:Verdana; font-size:12px; fill:rgb(0,0,0); }
+#title { text-anchor:middle; font-size:17px; }
+#search { opacity:0.1; cursor:pointer; }
+#search:hover, #search.show { opacity:1; }
+#subtitle { text-anchor:middle; font-color:rgb(160,160,160); }
+#unzoom { cursor:pointer; }
+#frames > *:hover { stroke:black; stroke-width:0.5; cursor:pointer; }
+.hide { display:none; }
+.parent { opacity:0.5; }
+</style>
     <script type="text/ecmascript">
         <![CDATA[var nametype = 'Function:';
 var fontsize = 12;
@@ -17,1379 +27,1381 @@ var inverted = false;
 var searchcolor = 'rgb(230,0,230)';]]>
     </script>
     <rect x="0" y="0" width="1200" height="1206" fill="url(#background)"/>
-    <text text-anchor="middle" x="600.00" y="24.00" font-size="17" font-family="Verdana" fill="rgb(0, 0, 0)">Flame Graph</text>
-    <text id="details" text-anchor="left" x="10.00" y="1189.00" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)"> </text>
-    <text id="unzoom" onclick="unzoom()" style="opacity:0.0;cursor:pointer" text-anchor="left" x="10.00" y="24.00" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">Reset Zoom</text>
-    <text id="search" onmouseover="searchover()" onmouseout="searchout()" onclick="search_prompt()" style="opacity:0.1;cursor:pointer" text-anchor="left" x="1090.00" y="24.00" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">Search</text>
-    <text id="matched" text-anchor="left" x="1090.00" y="1189.00" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)"> </text>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>call_function_single_interrupt (4 samples, 8.89%)</title>
-        <rect x="10" y="997" width="104" height="15" fill="rgb(221,121,0)"/>
-        <text text-anchor="left" x="13.00" y="1007.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">call_functio..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>smp_call_function_single_interrupt (4 samples, 8.89%)</title>
-        <rect x="10" y="981" width="104" height="15" fill="rgb(225,125,0)"/>
-        <text text-anchor="left" x="13.00" y="991.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">smp_call_fun..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>generic_smp_call_function_single_interrupt (4 samples, 8.89%)</title>
-        <rect x="10" y="965" width="104" height="15" fill="rgb(243,143,0)"/>
-        <text text-anchor="left" x="13.00" y="975.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">generic_smp_..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>remote_function (4 samples, 8.89%)</title>
-        <rect x="10" y="949" width="104" height="15" fill="rgb(242,142,0)"/>
-        <text text-anchor="left" x="13.00" y="959.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">remote_funct..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>__perf_event_enable (4 samples, 8.89%)</title>
-        <rect x="10" y="933" width="104" height="15" fill="rgb(230,130,0)"/>
-        <text text-anchor="left" x="13.00" y="943.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">__perf_event..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>group_sched_in (4 samples, 8.89%)</title>
-        <rect x="10" y="917" width="104" height="15" fill="rgb(239,139,0)"/>
-        <text text-anchor="left" x="13.00" y="927.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">group_sched_..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>x86_pmu_commit_txn (4 samples, 8.89%)</title>
-        <rect x="10" y="901" width="104" height="15" fill="rgb(248,148,0)"/>
-        <text text-anchor="left" x="13.00" y="911.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">x86_pmu_comm..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>perf_pmu_enable (4 samples, 8.89%)</title>
-        <rect x="10" y="885" width="104" height="15" fill="rgb(242,142,0)"/>
-        <text text-anchor="left" x="13.00" y="895.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">perf_pmu_ena..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>x86_pmu_enable (4 samples, 8.89%)</title>
-        <rect x="10" y="869" width="104" height="15" fill="rgb(248,148,0)"/>
-        <text text-anchor="left" x="13.00" y="879.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">x86_pmu_enab..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>intel_pmu_enable_all (4 samples, 8.89%)</title>
-        <rect x="10" y="853" width="104" height="15" fill="rgb(236,136,0)"/>
-        <text text-anchor="left" x="13.00" y="863.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">intel_pmu_en..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>native_write_msr_safe (4 samples, 8.89%)</title>
-        <rect x="10" y="837" width="104" height="15" fill="rgb(234,134,0)"/>
-        <text text-anchor="left" x="13.00" y="847.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">native_write..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>__tcp_push_pending_frames (1 samples, 2.22%)</title>
-        <rect x="114" y="981" width="27" height="15" fill="rgb(226,126,0)"/>
-        <text text-anchor="left" x="117.00" y="991.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">_..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>tcp_write_xmit (1 samples, 2.22%)</title>
-        <rect x="114" y="965" width="27" height="15" fill="rgb(237,137,0)"/>
-        <text text-anchor="left" x="117.00" y="975.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">t..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>tcp_transmit_skb (1 samples, 2.22%)</title>
-        <rect x="114" y="949" width="27" height="15" fill="rgb(237,137,0)"/>
-        <text text-anchor="left" x="117.00" y="959.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">t..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>ip_queue_xmit (1 samples, 2.22%)</title>
-        <rect x="114" y="933" width="27" height="15" fill="rgb(230,130,0)"/>
-        <text text-anchor="left" x="117.00" y="943.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">i..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>ip_local_out (1 samples, 2.22%)</title>
-        <rect x="114" y="917" width="27" height="15" fill="rgb(230,130,0)"/>
-        <text text-anchor="left" x="117.00" y="927.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">i..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>ip_output (1 samples, 2.22%)</title>
-        <rect x="114" y="901" width="27" height="15" fill="rgb(230,130,0)"/>
-        <text text-anchor="left" x="117.00" y="911.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">i..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>ip_finish_output (1 samples, 2.22%)</title>
-        <rect x="114" y="885" width="27" height="15" fill="rgb(230,130,0)"/>
-        <text text-anchor="left" x="117.00" y="895.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">i..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>local_bh_enable (1 samples, 2.22%)</title>
-        <rect x="114" y="869" width="27" height="15" fill="rgb(232,132,0)"/>
-        <text text-anchor="left" x="117.00" y="879.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">l..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>do_softirq (1 samples, 2.22%)</title>
-        <rect x="114" y="853" width="27" height="15" fill="rgb(243,143,0)"/>
-        <text text-anchor="left" x="117.00" y="863.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">d..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>do_softirq_own_stack (1 samples, 2.22%)</title>
-        <rect x="114" y="837" width="27" height="15" fill="rgb(243,143,0)"/>
-        <text text-anchor="left" x="117.00" y="847.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">d..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>__do_softirq (1 samples, 2.22%)</title>
-        <rect x="114" y="821" width="27" height="15" fill="rgb(230,130,0)"/>
-        <text text-anchor="left" x="117.00" y="831.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">_..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>net_rx_action (1 samples, 2.22%)</title>
-        <rect x="114" y="805" width="27" height="15" fill="rgb(244,144,0)"/>
-        <text text-anchor="left" x="117.00" y="815.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">n..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>process_backlog (1 samples, 2.22%)</title>
-        <rect x="114" y="789" width="27" height="15" fill="rgb(242,142,0)"/>
-        <text text-anchor="left" x="117.00" y="799.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">p..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>__netif_receive_skb (1 samples, 2.22%)</title>
-        <rect x="114" y="773" width="27" height="15" fill="rgb(231,131,0)"/>
-        <text text-anchor="left" x="117.00" y="783.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">_..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>__netif_receive_skb_core (1 samples, 2.22%)</title>
-        <rect x="114" y="757" width="27" height="15" fill="rgb(231,131,0)"/>
-        <text text-anchor="left" x="117.00" y="767.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">_..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>ip_rcv (1 samples, 2.22%)</title>
-        <rect x="114" y="741" width="27" height="15" fill="rgb(230,130,0)"/>
-        <text text-anchor="left" x="117.00" y="751.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">i..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>ip_rcv_finish (1 samples, 2.22%)</title>
-        <rect x="114" y="725" width="27" height="15" fill="rgb(230,130,0)"/>
-        <text text-anchor="left" x="117.00" y="735.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">i..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>ip_local_deliver (1 samples, 2.22%)</title>
-        <rect x="114" y="709" width="27" height="15" fill="rgb(230,130,0)"/>
-        <text text-anchor="left" x="117.00" y="719.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">i..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>ip_local_deliver_finish (1 samples, 2.22%)</title>
-        <rect x="114" y="693" width="27" height="15" fill="rgb(230,130,0)"/>
-        <text text-anchor="left" x="117.00" y="703.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">i..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>tcp_v4_rcv (1 samples, 2.22%)</title>
-        <rect x="114" y="677" width="27" height="15" fill="rgb(237,137,0)"/>
-        <text text-anchor="left" x="117.00" y="687.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">t..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>tcp_v4_do_rcv (1 samples, 2.22%)</title>
-        <rect x="114" y="661" width="27" height="15" fill="rgb(237,137,0)"/>
-        <text text-anchor="left" x="117.00" y="671.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">t..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>tcp_rcv_established (1 samples, 2.22%)</title>
-        <rect x="114" y="645" width="27" height="15" fill="rgb(237,137,0)"/>
-        <text text-anchor="left" x="117.00" y="655.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">t..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>tcp_ack (1 samples, 2.22%)</title>
-        <rect x="114" y="629" width="27" height="15" fill="rgb(237,137,0)"/>
-        <text text-anchor="left" x="117.00" y="639.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">t..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>tcp_clean_rtx_queue (1 samples, 2.22%)</title>
-        <rect x="114" y="613" width="27" height="15" fill="rgb(237,137,0)"/>
-        <text text-anchor="left" x="117.00" y="623.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">t..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>__kfree_skb (1 samples, 2.22%)</title>
-        <rect x="114" y="597" width="27" height="15" fill="rgb(223,123,0)"/>
-        <text text-anchor="left" x="117.00" y="607.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">_..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>sk_stream_alloc_skb (1 samples, 2.22%)</title>
-        <rect x="141" y="981" width="26" height="15" fill="rgb(222,122,0)"/>
-        <text text-anchor="left" x="144.00" y="991.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">s..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>__alloc_skb (1 samples, 2.22%)</title>
-        <rect x="141" y="965" width="26" height="15" fill="rgb(232,132,0)"/>
-        <text text-anchor="left" x="144.00" y="975.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">_..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>__kmalloc_reserve.isra.26 (1 samples, 2.22%)</title>
-        <rect x="141" y="949" width="26" height="15" fill="rgb(223,123,0)"/>
-        <text text-anchor="left" x="144.00" y="959.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">_..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>ab (7 samples, 15.56%)</title>
-        <rect x="10" y="1141" width="183" height="15" fill="rgb(224,86,86)"/>
-        <text text-anchor="left" x="13.00" y="1151.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">ab</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>[unknown] (7 samples, 15.56%)</title>
-        <rect x="10" y="1125" width="183" height="15" fill="rgb(243,112,112)"/>
-        <text text-anchor="left" x="13.00" y="1135.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">[unknown]</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>__write_nocancel (7 samples, 15.56%)</title>
-        <rect x="10" y="1109" width="183" height="15" fill="rgb(228,91,91)"/>
-        <text text-anchor="left" x="13.00" y="1119.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">__write_nocancel</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>system_call_fastpath (7 samples, 15.56%)</title>
-        <rect x="10" y="1093" width="183" height="15" fill="rgb(237,137,0)"/>
-        <text text-anchor="left" x="13.00" y="1103.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">system_call_fastpath</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>sys_write (7 samples, 15.56%)</title>
-        <rect x="10" y="1077" width="183" height="15" fill="rgb(237,137,0)"/>
-        <text text-anchor="left" x="13.00" y="1087.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">sys_write</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>vfs_write (7 samples, 15.56%)</title>
-        <rect x="10" y="1061" width="183" height="15" fill="rgb(226,126,0)"/>
-        <text text-anchor="left" x="13.00" y="1071.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">vfs_write</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>do_sync_write (7 samples, 15.56%)</title>
-        <rect x="10" y="1045" width="183" height="15" fill="rgb(243,143,0)"/>
-        <text text-anchor="left" x="13.00" y="1055.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">do_sync_write</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>sock_aio_write (7 samples, 15.56%)</title>
-        <rect x="10" y="1029" width="183" height="15" fill="rgb(239,139,0)"/>
-        <text text-anchor="left" x="13.00" y="1039.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">sock_aio_write</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>inet_sendmsg (7 samples, 15.56%)</title>
-        <rect x="10" y="1013" width="183" height="15" fill="rgb(239,139,0)"/>
-        <text text-anchor="left" x="13.00" y="1023.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">inet_sendmsg</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>tcp_sendmsg (3 samples, 6.67%)</title>
-        <rect x="114" y="997" width="79" height="15" fill="rgb(237,137,0)"/>
-        <text text-anchor="left" x="117.00" y="1007.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">tcp_sendm..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>tcp_send_mss (1 samples, 2.22%)</title>
-        <rect x="167" y="981" width="26" height="15" fill="rgb(237,137,0)"/>
-        <text text-anchor="left" x="170.00" y="991.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">t..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>tcp_current_mss (1 samples, 2.22%)</title>
-        <rect x="167" y="965" width="26" height="15" fill="rgb(237,137,0)"/>
-        <text text-anchor="left" x="170.00" y="975.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">t..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>tcp_v4_md5_lookup (1 samples, 2.22%)</title>
-        <rect x="167" y="949" width="26" height="15" fill="rgb(237,137,0)"/>
-        <text text-anchor="left" x="170.00" y="959.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">t..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>io/netty/buffer/AbstractByteBuf:.writeBytes (2 samples, 4.44%)</title>
-        <rect x="193" y="885" width="53" height="15" fill="rgb(89,235,89)"/>
-        <text text-anchor="left" x="196.00" y="895.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">io/ne..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>sun/nio/ch/SocketChannelImpl:.read (2 samples, 4.44%)</title>
-        <rect x="193" y="869" width="53" height="15" fill="rgb(88,235,88)"/>
-        <text text-anchor="left" x="196.00" y="879.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">sun/n..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>java/lang/Thread:.blockedOn (1 samples, 2.22%)</title>
-        <rect x="219" y="853" width="27" height="15" fill="rgb(77,224,77)"/>
-        <text text-anchor="left" x="222.00" y="863.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">j..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>pthread_self (1 samples, 2.22%)</title>
-        <rect x="246" y="677" width="26" height="15" fill="rgb(237,104,104)"/>
-        <text text-anchor="left" x="249.00" y="687.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">p..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>ip_queue_xmit (1 samples, 2.22%)</title>
-        <rect x="272" y="485" width="26" height="15" fill="rgb(230,130,0)"/>
-        <text text-anchor="left" x="275.00" y="495.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">i..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>ip_local_out (1 samples, 2.22%)</title>
-        <rect x="272" y="469" width="26" height="15" fill="rgb(230,130,0)"/>
-        <text text-anchor="left" x="275.00" y="479.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">i..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>ip_output (1 samples, 2.22%)</title>
-        <rect x="272" y="453" width="26" height="15" fill="rgb(230,130,0)"/>
-        <text text-anchor="left" x="275.00" y="463.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">i..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>ip_finish_output (1 samples, 2.22%)</title>
-        <rect x="272" y="437" width="26" height="15" fill="rgb(230,130,0)"/>
-        <text text-anchor="left" x="275.00" y="447.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">i..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>local_bh_enable (1 samples, 2.22%)</title>
-        <rect x="272" y="421" width="26" height="15" fill="rgb(232,132,0)"/>
-        <text text-anchor="left" x="275.00" y="431.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">l..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>do_softirq (1 samples, 2.22%)</title>
-        <rect x="272" y="405" width="26" height="15" fill="rgb(243,143,0)"/>
-        <text text-anchor="left" x="275.00" y="415.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">d..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>do_softirq_own_stack (1 samples, 2.22%)</title>
-        <rect x="272" y="389" width="26" height="15" fill="rgb(243,143,0)"/>
-        <text text-anchor="left" x="275.00" y="399.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">d..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>__do_softirq (1 samples, 2.22%)</title>
-        <rect x="272" y="373" width="26" height="15" fill="rgb(230,130,0)"/>
-        <text text-anchor="left" x="275.00" y="383.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">_..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>net_rx_action (1 samples, 2.22%)</title>
-        <rect x="272" y="357" width="26" height="15" fill="rgb(244,144,0)"/>
-        <text text-anchor="left" x="275.00" y="367.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">n..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>process_backlog (1 samples, 2.22%)</title>
-        <rect x="272" y="341" width="26" height="15" fill="rgb(242,142,0)"/>
-        <text text-anchor="left" x="275.00" y="351.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">p..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>__netif_receive_skb (1 samples, 2.22%)</title>
-        <rect x="272" y="325" width="26" height="15" fill="rgb(231,131,0)"/>
-        <text text-anchor="left" x="275.00" y="335.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">_..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>__netif_receive_skb_core (1 samples, 2.22%)</title>
-        <rect x="272" y="309" width="26" height="15" fill="rgb(231,131,0)"/>
-        <text text-anchor="left" x="275.00" y="319.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">_..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>ip_rcv (1 samples, 2.22%)</title>
-        <rect x="272" y="293" width="26" height="15" fill="rgb(230,130,0)"/>
-        <text text-anchor="left" x="275.00" y="303.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">i..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>ip_rcv_finish (1 samples, 2.22%)</title>
-        <rect x="272" y="277" width="26" height="15" fill="rgb(230,130,0)"/>
-        <text text-anchor="left" x="275.00" y="287.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">i..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>ip_local_deliver (1 samples, 2.22%)</title>
-        <rect x="272" y="261" width="26" height="15" fill="rgb(230,130,0)"/>
-        <text text-anchor="left" x="275.00" y="271.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">i..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>ip_local_deliver_finish (1 samples, 2.22%)</title>
-        <rect x="272" y="245" width="26" height="15" fill="rgb(230,130,0)"/>
-        <text text-anchor="left" x="275.00" y="255.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">i..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>tcp_v4_rcv (1 samples, 2.22%)</title>
-        <rect x="272" y="229" width="26" height="15" fill="rgb(237,137,0)"/>
-        <text text-anchor="left" x="275.00" y="239.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">t..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>tcp_v4_do_rcv (1 samples, 2.22%)</title>
-        <rect x="272" y="213" width="26" height="15" fill="rgb(237,137,0)"/>
-        <text text-anchor="left" x="275.00" y="223.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">t..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>tcp_rcv_established (1 samples, 2.22%)</title>
-        <rect x="272" y="197" width="26" height="15" fill="rgb(237,137,0)"/>
-        <text text-anchor="left" x="275.00" y="207.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">t..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>tcp_data_queue (1 samples, 2.22%)</title>
-        <rect x="272" y="181" width="26" height="15" fill="rgb(237,137,0)"/>
-        <text text-anchor="left" x="275.00" y="191.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">t..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>sock_def_readable (1 samples, 2.22%)</title>
-        <rect x="272" y="165" width="26" height="15" fill="rgb(239,139,0)"/>
-        <text text-anchor="left" x="275.00" y="175.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">s..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>__wake_up_sync_key (1 samples, 2.22%)</title>
-        <rect x="272" y="149" width="26" height="15" fill="rgb(223,123,0)"/>
-        <text text-anchor="left" x="275.00" y="159.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">_..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>__wake_up_common (1 samples, 2.22%)</title>
-        <rect x="272" y="133" width="26" height="15" fill="rgb(223,123,0)"/>
-        <text text-anchor="left" x="275.00" y="143.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">_..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>ep_poll_callback (1 samples, 2.22%)</title>
-        <rect x="272" y="117" width="26" height="15" fill="rgb(239,139,0)"/>
-        <text text-anchor="left" x="275.00" y="127.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">e..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>__wake_up_locked (1 samples, 2.22%)</title>
-        <rect x="272" y="101" width="26" height="15" fill="rgb(223,123,0)"/>
-        <text text-anchor="left" x="275.00" y="111.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">_..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>__wake_up_common (1 samples, 2.22%)</title>
-        <rect x="272" y="85" width="26" height="15" fill="rgb(223,123,0)"/>
-        <text text-anchor="left" x="275.00" y="95.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">_..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>default_wake_function (1 samples, 2.22%)</title>
-        <rect x="272" y="69" width="26" height="15" fill="rgb(246,146,0)"/>
-        <text text-anchor="left" x="275.00" y="79.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">d..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>try_to_wake_up (1 samples, 2.22%)</title>
-        <rect x="272" y="53" width="26" height="15" fill="rgb(234,134,0)"/>
-        <text text-anchor="left" x="275.00" y="63.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">t..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>_raw_spin_unlock_irqrestore (1 samples, 2.22%)</title>
-        <rect x="272" y="37" width="26" height="15" fill="rgb(237,137,0)"/>
-        <text text-anchor="left" x="275.00" y="47.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">_..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>io/netty/channel/DefaultChannelHandlerContext:.fireChannelReadComplete (3 samples, 6.67%)</title>
-        <rect x="246" y="885" width="78" height="15" fill="rgb(89,235,89)"/>
-        <text text-anchor="left" x="249.00" y="895.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">io/netty/..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>io/netty/handler/codec/ByteToMessageDecoder:.channelReadComplete (3 samples, 6.67%)</title>
-        <rect x="246" y="869" width="78" height="15" fill="rgb(89,235,89)"/>
-        <text text-anchor="left" x="249.00" y="879.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">io/netty/..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>io/netty/channel/DefaultChannelHandlerContext:.fireChannelReadComplete (3 samples, 6.67%)</title>
-        <rect x="246" y="853" width="78" height="15" fill="rgb(89,235,89)"/>
-        <text text-anchor="left" x="249.00" y="863.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">io/netty/..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/vertx/java/core/net/impl/VertxHandler:.channelReadComplete (3 samples, 6.67%)</title>
-        <rect x="246" y="837" width="78" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="249.00" y="847.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">org/vertx..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>io/netty/channel/DefaultChannelHandlerContext:.flush (3 samples, 6.67%)</title>
-        <rect x="246" y="821" width="78" height="15" fill="rgb(89,235,89)"/>
-        <text text-anchor="left" x="249.00" y="831.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">io/netty/..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>io/netty/channel/ChannelDuplexHandler:.flush (3 samples, 6.67%)</title>
-        <rect x="246" y="805" width="78" height="15" fill="rgb(89,235,89)"/>
-        <text text-anchor="left" x="249.00" y="815.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">io/netty/..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>io/netty/channel/DefaultChannelHandlerContext:.flush (3 samples, 6.67%)</title>
-        <rect x="246" y="789" width="78" height="15" fill="rgb(89,235,89)"/>
-        <text text-anchor="left" x="249.00" y="799.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">io/netty/..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>io/netty/channel/ChannelOutboundHandlerAdapter:.flush (3 samples, 6.67%)</title>
-        <rect x="246" y="773" width="78" height="15" fill="rgb(89,235,89)"/>
-        <text text-anchor="left" x="249.00" y="783.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">io/netty/..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>io/netty/channel/DefaultChannelHandlerContext:.flush (3 samples, 6.67%)</title>
-        <rect x="246" y="757" width="78" height="15" fill="rgb(89,235,89)"/>
-        <text text-anchor="left" x="249.00" y="767.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">io/netty/..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>io/netty/channel/DefaultChannelPipeline$HeadHandler:.flush (3 samples, 6.67%)</title>
-        <rect x="246" y="741" width="78" height="15" fill="rgb(89,235,89)"/>
-        <text text-anchor="left" x="249.00" y="751.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">io/netty/..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>io/netty/channel/nio/AbstractNioByteChannel:.doWrite (3 samples, 6.67%)</title>
-        <rect x="246" y="725" width="78" height="15" fill="rgb(89,235,89)"/>
-        <text text-anchor="left" x="249.00" y="735.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">io/netty/..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>io/netty/buffer/PooledUnsafeDirectByteBuf:.getBytes (3 samples, 6.67%)</title>
-        <rect x="246" y="709" width="78" height="15" fill="rgb(89,235,89)"/>
-        <text text-anchor="left" x="249.00" y="719.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">io/netty/..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>sun/nio/ch/SocketChannelImpl:.write (3 samples, 6.67%)</title>
-        <rect x="246" y="693" width="78" height="15" fill="rgb(88,235,88)"/>
-        <text text-anchor="left" x="249.00" y="703.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">sun/nio/c..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>sun/nio/ch/FileDispatcherImpl:.write0 (2 samples, 4.44%)</title>
-        <rect x="272" y="677" width="52" height="15" fill="rgb(88,235,88)"/>
-        <text text-anchor="left" x="275.00" y="687.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">sun/n..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>[libpthread-2.19.so] (2 samples, 4.44%)</title>
-        <rect x="272" y="661" width="52" height="15" fill="rgb(235,101,101)"/>
-        <text text-anchor="left" x="275.00" y="671.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">[libp..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>system_call_fastpath (2 samples, 4.44%)</title>
-        <rect x="272" y="645" width="52" height="15" fill="rgb(237,137,0)"/>
-        <text text-anchor="left" x="275.00" y="655.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">syste..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>sys_write (2 samples, 4.44%)</title>
-        <rect x="272" y="629" width="52" height="15" fill="rgb(237,137,0)"/>
-        <text text-anchor="left" x="275.00" y="639.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">sys_w..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>vfs_write (2 samples, 4.44%)</title>
-        <rect x="272" y="613" width="52" height="15" fill="rgb(226,126,0)"/>
-        <text text-anchor="left" x="275.00" y="623.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">vfs_w..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>do_sync_write (2 samples, 4.44%)</title>
-        <rect x="272" y="597" width="52" height="15" fill="rgb(243,143,0)"/>
-        <text text-anchor="left" x="275.00" y="607.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">do_sy..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>sock_aio_write (2 samples, 4.44%)</title>
-        <rect x="272" y="581" width="52" height="15" fill="rgb(239,139,0)"/>
-        <text text-anchor="left" x="275.00" y="591.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">sock_..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>inet_sendmsg (2 samples, 4.44%)</title>
-        <rect x="272" y="565" width="52" height="15" fill="rgb(239,139,0)"/>
-        <text text-anchor="left" x="275.00" y="575.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">inet_..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>tcp_sendmsg (2 samples, 4.44%)</title>
-        <rect x="272" y="549" width="52" height="15" fill="rgb(237,137,0)"/>
-        <text text-anchor="left" x="275.00" y="559.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">tcp_s..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>__tcp_push_pending_frames (2 samples, 4.44%)</title>
-        <rect x="272" y="533" width="52" height="15" fill="rgb(226,126,0)"/>
-        <text text-anchor="left" x="275.00" y="543.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">__tcp..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>tcp_write_xmit (2 samples, 4.44%)</title>
-        <rect x="272" y="517" width="52" height="15" fill="rgb(237,137,0)"/>
-        <text text-anchor="left" x="275.00" y="527.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">tcp_w..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>tcp_transmit_skb (2 samples, 4.44%)</title>
-        <rect x="272" y="501" width="52" height="15" fill="rgb(237,137,0)"/>
-        <text text-anchor="left" x="275.00" y="511.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">tcp_t..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>tcp_v4_send_check (1 samples, 2.22%)</title>
-        <rect x="298" y="485" width="26" height="15" fill="rgb(237,137,0)"/>
-        <text text-anchor="left" x="301.00" y="495.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">t..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>__tcp_v4_send_check (1 samples, 2.22%)</title>
-        <rect x="298" y="469" width="26" height="15" fill="rgb(226,126,0)"/>
-        <text text-anchor="left" x="301.00" y="479.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">_..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/WrapFactory:.wrap (4 samples, 8.89%)</title>
-        <rect x="377" y="773" width="105" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="380.00" y="783.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">org/mozilla/..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>call_function_single_interrupt (4 samples, 8.89%)</title>
-        <rect x="377" y="757" width="105" height="15" fill="rgb(221,121,0)"/>
-        <text text-anchor="left" x="380.00" y="767.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">call_functio..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>smp_call_function_single_interrupt (4 samples, 8.89%)</title>
-        <rect x="377" y="741" width="105" height="15" fill="rgb(225,125,0)"/>
-        <text text-anchor="left" x="380.00" y="751.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">smp_call_fun..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>generic_smp_call_function_single_interrupt (4 samples, 8.89%)</title>
-        <rect x="377" y="725" width="105" height="15" fill="rgb(243,143,0)"/>
-        <text text-anchor="left" x="380.00" y="735.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">generic_smp_..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>remote_function (4 samples, 8.89%)</title>
-        <rect x="377" y="709" width="105" height="15" fill="rgb(242,142,0)"/>
-        <text text-anchor="left" x="380.00" y="719.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">remote_funct..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>__perf_event_enable (4 samples, 8.89%)</title>
-        <rect x="377" y="693" width="105" height="15" fill="rgb(230,130,0)"/>
-        <text text-anchor="left" x="380.00" y="703.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">__perf_event..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>group_sched_in (4 samples, 8.89%)</title>
-        <rect x="377" y="677" width="105" height="15" fill="rgb(239,139,0)"/>
-        <text text-anchor="left" x="380.00" y="687.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">group_sched_..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>x86_pmu_commit_txn (4 samples, 8.89%)</title>
-        <rect x="377" y="661" width="105" height="15" fill="rgb(248,148,0)"/>
-        <text text-anchor="left" x="380.00" y="671.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">x86_pmu_comm..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>perf_pmu_enable (4 samples, 8.89%)</title>
-        <rect x="377" y="645" width="105" height="15" fill="rgb(242,142,0)"/>
-        <text text-anchor="left" x="380.00" y="655.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">perf_pmu_ena..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>x86_pmu_enable (4 samples, 8.89%)</title>
-        <rect x="377" y="629" width="105" height="15" fill="rgb(248,148,0)"/>
-        <text text-anchor="left" x="380.00" y="639.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">x86_pmu_enab..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>intel_pmu_enable_all (4 samples, 8.89%)</title>
-        <rect x="377" y="613" width="105" height="15" fill="rgb(236,136,0)"/>
-        <text text-anchor="left" x="380.00" y="623.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">intel_pmu_en..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>native_write_msr_safe (4 samples, 8.89%)</title>
-        <rect x="377" y="597" width="105" height="15" fill="rgb(234,134,0)"/>
-        <text text-anchor="left" x="380.00" y="607.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">native_write..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_80:.call (1 samples, 2.22%)</title>
-        <rect x="482" y="773" width="26" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="485.00" y="783.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">o..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_80:.call (1 samples, 2.22%)</title>
-        <rect x="482" y="757" width="26" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="485.00" y="767.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">o..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/BaseFunction:.construct (1 samples, 2.22%)</title>
-        <rect x="482" y="741" width="26" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="485.00" y="751.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">o..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_80:.call (1 samples, 2.22%)</title>
-        <rect x="482" y="725" width="26" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="485.00" y="735.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">o..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_80:._c_anonymous_3 (1 samples, 2.22%)</title>
-        <rect x="482" y="709" width="26" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="485.00" y="719.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">o..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/BaseFunction:.construct (1 samples, 2.22%)</title>
-        <rect x="482" y="693" width="26" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="485.00" y="703.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">o..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_80:.call (1 samples, 2.22%)</title>
-        <rect x="482" y="677" width="26" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="485.00" y="687.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">o..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_80:._c_anonymous_21 (1 samples, 2.22%)</title>
-        <rect x="482" y="661" width="26" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="485.00" y="671.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">o..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/optimizer/OptRuntime:.call2 (1 samples, 2.22%)</title>
-        <rect x="482" y="645" width="26" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="485.00" y="655.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">o..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_streams_js_31:.call (1 samples, 2.22%)</title>
-        <rect x="482" y="629" width="26" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="485.00" y="639.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">o..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/ScriptRuntime:.setObjectProp (1 samples, 2.22%)</title>
-        <rect x="482" y="613" width="26" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="485.00" y="623.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">o..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/IdScriptableObject:.has (1 samples, 2.22%)</title>
-        <rect x="482" y="597" width="26" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="485.00" y="607.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">o..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/ScriptRuntime:.getPropFunctionAndThis (1 samples, 2.22%)</title>
-        <rect x="508" y="693" width="26" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="511.00" y="703.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">o..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/ScriptRuntime:.nameOrFunction (1 samples, 2.22%)</title>
-        <rect x="534" y="693" width="26" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="537.00" y="703.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">o..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/IdScriptableObject:.get (1 samples, 2.22%)</title>
-        <rect x="534" y="677" width="26" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="537.00" y="687.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">o..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/ScriptableObject:.getSlot (1 samples, 2.22%)</title>
-        <rect x="534" y="661" width="26" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="537.00" y="671.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">o..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/BaseFunction:.construct (3 samples, 6.67%)</title>
-        <rect x="508" y="741" width="78" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="511.00" y="751.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">org/mozil..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_90:.call (3 samples, 6.67%)</title>
-        <rect x="508" y="725" width="78" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="511.00" y="735.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">org/mozil..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_90:._c_anonymous_3 (3 samples, 6.67%)</title>
-        <rect x="508" y="709" width="78" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="511.00" y="719.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">org/mozil..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/ScriptRuntime:.setObjectProp (1 samples, 2.22%)</title>
-        <rect x="560" y="693" width="26" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="563.00" y="703.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">o..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/IdScriptableObject:.put (1 samples, 2.22%)</title>
-        <rect x="560" y="677" width="26" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="563.00" y="687.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">o..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/ScriptableObject:.getSlot (1 samples, 2.22%)</title>
-        <rect x="560" y="661" width="26" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="563.00" y="671.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">o..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/ScriptableObject:.createSlot (1 samples, 2.22%)</title>
-        <rect x="560" y="645" width="26" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="563.00" y="655.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">o..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_90:.call (4 samples, 8.89%)</title>
-        <rect x="508" y="773" width="105" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="511.00" y="783.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">org/mozilla/..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_90:.call (4 samples, 8.89%)</title>
-        <rect x="508" y="757" width="105" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="511.00" y="767.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">org/mozilla/..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/gen/file__home_bgregg_bench_Server_js_js_4:.call (1 samples, 2.22%)</title>
-        <rect x="586" y="741" width="27" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="589.00" y="751.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">o..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/gen/file__home_bgregg_bench_Server_js_js_4:._c_anonymous_1 (1 samples, 2.22%)</title>
-        <rect x="586" y="725" width="27" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="589.00" y="735.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">o..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_90:.call (1 samples, 2.22%)</title>
-        <rect x="586" y="709" width="27" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="589.00" y="719.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">o..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/NativeJavaMethod:.call (1 samples, 2.22%)</title>
-        <rect x="586" y="693" width="27" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="589.00" y="703.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">o..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/MemberBox:.invoke (1 samples, 2.22%)</title>
-        <rect x="586" y="677" width="27" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="589.00" y="687.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">o..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>java/lang/reflect/Method:.invoke (1 samples, 2.22%)</title>
-        <rect x="586" y="661" width="27" height="15" fill="rgb(77,224,77)"/>
-        <text text-anchor="left" x="589.00" y="671.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">j..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/BaseFunction:.construct (1 samples, 2.22%)</title>
-        <rect x="613" y="693" width="26" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="616.00" y="703.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">o..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_91:.call (1 samples, 2.22%)</title>
-        <rect x="613" y="677" width="26" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="616.00" y="687.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">o..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_91:._c_anonymous_21 (1 samples, 2.22%)</title>
-        <rect x="613" y="661" width="26" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="616.00" y="671.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">o..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/optimizer/OptRuntime:.call2 (1 samples, 2.22%)</title>
-        <rect x="613" y="645" width="26" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="616.00" y="655.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">o..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_streams_js_49:.call (1 samples, 2.22%)</title>
-        <rect x="613" y="629" width="26" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="616.00" y="639.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">o..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/optimizer/OptRuntime:.call2 (1 samples, 2.22%)</title>
-        <rect x="613" y="613" width="26" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="616.00" y="623.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">o..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_streams_js_49:.call (1 samples, 2.22%)</title>
-        <rect x="613" y="597" width="26" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="616.00" y="607.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">o..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/ScriptRuntime:.setObjectProp (1 samples, 2.22%)</title>
-        <rect x="613" y="581" width="26" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="616.00" y="591.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">o..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/ScriptableObject:.getSlot (1 samples, 2.22%)</title>
-        <rect x="613" y="565" width="26" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="616.00" y="575.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">o..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/IdScriptableObject:.has (1 samples, 2.22%)</title>
-        <rect x="639" y="677" width="26" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="642.00" y="687.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">o..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/BaseFunction:.construct (3 samples, 6.67%)</title>
-        <rect x="613" y="741" width="78" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="616.00" y="751.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">org/mozil..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_91:.call (3 samples, 6.67%)</title>
-        <rect x="613" y="725" width="78" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="616.00" y="735.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">org/mozil..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_91:._c_anonymous_3 (3 samples, 6.67%)</title>
-        <rect x="613" y="709" width="78" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="616.00" y="719.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">org/mozil..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/ScriptRuntime:.setObjectProp (2 samples, 4.44%)</title>
-        <rect x="639" y="693" width="52" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="642.00" y="703.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">org/m..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/IdScriptableObject:.put (1 samples, 2.22%)</title>
-        <rect x="665" y="677" width="26" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="668.00" y="687.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">o..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/ScriptableObject:.getSlot (1 samples, 2.22%)</title>
-        <rect x="665" y="661" width="26" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="668.00" y="671.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">o..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/ScriptableObject:.createSlot (1 samples, 2.22%)</title>
-        <rect x="665" y="645" width="26" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="668.00" y="655.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">o..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_91:.call (4 samples, 8.89%)</title>
-        <rect x="613" y="773" width="105" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="616.00" y="783.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">org/mozilla/..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_91:.call (4 samples, 8.89%)</title>
-        <rect x="613" y="757" width="105" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="616.00" y="767.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">org/mozilla/..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/gen/file__home_bgregg_bench_Server_js_js_2:.call (1 samples, 2.22%)</title>
-        <rect x="691" y="741" width="27" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="694.00" y="751.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">o..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_91:.call (1 samples, 2.22%)</title>
-        <rect x="691" y="725" width="27" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="694.00" y="735.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">o..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/NativeJavaMethod:.call (1 samples, 2.22%)</title>
-        <rect x="691" y="709" width="27" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="694.00" y="719.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">o..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/MemberBox:.invoke (1 samples, 2.22%)</title>
-        <rect x="691" y="693" width="27" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="694.00" y="703.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">o..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>java/lang/reflect/Method:.invoke (1 samples, 2.22%)</title>
-        <rect x="691" y="677" width="27" height="15" fill="rgb(77,224,77)"/>
-        <text text-anchor="left" x="694.00" y="687.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">j..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>io/netty/handler/codec/http/DefaultHttpHeaders:.add0 (1 samples, 2.22%)</title>
-        <rect x="691" y="661" width="27" height="15" fill="rgb(89,235,89)"/>
-        <text text-anchor="left" x="694.00" y="671.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">i..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/BaseFunction:.construct (1 samples, 2.22%)</title>
-        <rect x="744" y="693" width="26" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="747.00" y="703.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">o..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_93:.call (1 samples, 2.22%)</title>
-        <rect x="744" y="677" width="26" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="747.00" y="687.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">o..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_93:._c_anonymous_21 (1 samples, 2.22%)</title>
-        <rect x="744" y="661" width="26" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="747.00" y="671.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">o..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_93:.getParamAndVarCount (1 samples, 2.22%)</title>
-        <rect x="744" y="645" width="26" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="747.00" y="655.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">o..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/ScriptRuntime:.setObjectProp (1 samples, 2.22%)</title>
-        <rect x="770" y="693" width="26" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="773.00" y="703.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">o..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/IdScriptableObject:.has (1 samples, 2.22%)</title>
-        <rect x="770" y="677" width="26" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="773.00" y="687.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">o..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/ScriptableObject:.getSlot (1 samples, 2.22%)</title>
-        <rect x="770" y="661" width="26" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="773.00" y="671.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">o..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_93:.&lt;init&gt; (4 samples, 8.89%)</title>
-        <rect x="796" y="693" width="105" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="799.00" y="703.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">org/mozilla/..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/NativeFunction:.initScriptFunction (4 samples, 8.89%)</title>
-        <rect x="796" y="677" width="105" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="799.00" y="687.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">org/mozilla/..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/TopLevel:.getBuiltinPrototype (4 samples, 8.89%)</title>
-        <rect x="796" y="661" width="105" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="799.00" y="671.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">org/mozilla/..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>call_function_single_interrupt (4 samples, 8.89%)</title>
-        <rect x="796" y="645" width="105" height="15" fill="rgb(221,121,0)"/>
-        <text text-anchor="left" x="799.00" y="655.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">call_functio..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>smp_call_function_single_interrupt (4 samples, 8.89%)</title>
-        <rect x="796" y="629" width="105" height="15" fill="rgb(225,125,0)"/>
-        <text text-anchor="left" x="799.00" y="639.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">smp_call_fun..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>generic_smp_call_function_single_interrupt (4 samples, 8.89%)</title>
-        <rect x="796" y="613" width="105" height="15" fill="rgb(243,143,0)"/>
-        <text text-anchor="left" x="799.00" y="623.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">generic_smp_..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>remote_function (4 samples, 8.89%)</title>
-        <rect x="796" y="597" width="105" height="15" fill="rgb(242,142,0)"/>
-        <text text-anchor="left" x="799.00" y="607.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">remote_funct..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>__perf_event_enable (4 samples, 8.89%)</title>
-        <rect x="796" y="581" width="105" height="15" fill="rgb(230,130,0)"/>
-        <text text-anchor="left" x="799.00" y="591.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">__perf_event..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>group_sched_in (4 samples, 8.89%)</title>
-        <rect x="796" y="565" width="105" height="15" fill="rgb(239,139,0)"/>
-        <text text-anchor="left" x="799.00" y="575.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">group_sched_..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>x86_pmu_commit_txn (4 samples, 8.89%)</title>
-        <rect x="796" y="549" width="105" height="15" fill="rgb(248,148,0)"/>
-        <text text-anchor="left" x="799.00" y="559.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">x86_pmu_comm..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>perf_pmu_enable (4 samples, 8.89%)</title>
-        <rect x="796" y="533" width="105" height="15" fill="rgb(242,142,0)"/>
-        <text text-anchor="left" x="799.00" y="543.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">perf_pmu_ena..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>x86_pmu_enable (4 samples, 8.89%)</title>
-        <rect x="796" y="517" width="105" height="15" fill="rgb(248,148,0)"/>
-        <text text-anchor="left" x="799.00" y="527.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">x86_pmu_enab..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>intel_pmu_enable_all (4 samples, 8.89%)</title>
-        <rect x="796" y="501" width="105" height="15" fill="rgb(236,136,0)"/>
-        <text text-anchor="left" x="799.00" y="511.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">intel_pmu_en..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>native_write_msr_safe (4 samples, 8.89%)</title>
-        <rect x="796" y="485" width="105" height="15" fill="rgb(234,134,0)"/>
-        <text text-anchor="left" x="799.00" y="495.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">native_write..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_93:.getParamCount (1 samples, 2.22%)</title>
-        <rect x="901" y="693" width="26" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="904.00" y="703.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">o..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>io/netty/channel/DefaultChannelHandlerContext:.fireChannelRead (24 samples, 53.33%)</title>
-        <rect x="324" y="853" width="630" height="15" fill="rgb(89,235,89)"/>
-        <text text-anchor="left" x="327.00" y="863.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">io/netty/channel/DefaultChannelHandlerContext:.fireChannelRead</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/vertx/java/core/net/impl/VertxHandler:.channelRead (23 samples, 51.11%)</title>
-        <rect x="350" y="837" width="604" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="353.00" y="847.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">org/vertx/java/core/net/impl/VertxHandler:.channelRead</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/vertx/java/core/http/impl/VertxHttpHandler:.channelRead (23 samples, 51.11%)</title>
-        <rect x="350" y="821" width="604" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="353.00" y="831.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">org/vertx/java/core/http/impl/VertxHttpHandler:.channelRead</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/vertx/java/core/http/impl/DefaultHttpServer$ServerHandler:.doMessageReceived (23 samples, 51.11%)</title>
-        <rect x="350" y="805" width="604" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="353.00" y="815.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">org/vertx/java/core/http/impl/DefaultHttpServer$ServerHandler:.doMessageReceived</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/vertx/java/core/http/impl/ServerConnection:.handleMessage (23 samples, 51.11%)</title>
-        <rect x="350" y="789" width="604" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="353.00" y="799.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">org/vertx/java/core/http/impl/ServerConnection:.handleMessage</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_93:.call (9 samples, 20.00%)</title>
-        <rect x="718" y="773" width="236" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="721.00" y="783.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">org/mozilla/javascript/gen/file..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_93:.call (9 samples, 20.00%)</title>
-        <rect x="718" y="757" width="236" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="721.00" y="767.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">org/mozilla/javascript/gen/file..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/BaseFunction:.construct (8 samples, 17.78%)</title>
-        <rect x="744" y="741" width="210" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="747.00" y="751.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">org/mozilla/javascript/Base..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_93:.call (8 samples, 17.78%)</title>
-        <rect x="744" y="725" width="210" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="747.00" y="735.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">org/mozilla/javascript/gen/..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_93:._c_anonymous_3 (8 samples, 17.78%)</title>
-        <rect x="744" y="709" width="210" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="747.00" y="719.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">org/mozilla/javascript/gen/..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/optimizer/OptRuntime:.call2 (1 samples, 2.22%)</title>
-        <rect x="927" y="693" width="27" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="930.00" y="703.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">o..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_streams_js_47:.call (1 samples, 2.22%)</title>
-        <rect x="927" y="677" width="27" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="930.00" y="687.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">o..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/ScriptRuntime:.setObjectProp (1 samples, 2.22%)</title>
-        <rect x="927" y="661" width="27" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="930.00" y="671.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">o..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>org/mozilla/javascript/ScriptableObject:.getSlot (1 samples, 2.22%)</title>
-        <rect x="927" y="645" width="27" height="15" fill="rgb(96,242,96)"/>
-        <text text-anchor="left" x="930.00" y="655.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">o..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>io/netty/handler/codec/http/HttpMethod:.valueOf (1 samples, 2.22%)</title>
-        <rect x="954" y="837" width="26" height="15" fill="rgb(89,235,89)"/>
-        <text text-anchor="left" x="957.00" y="847.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">i..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>io/netty/channel/nio/NioEventLoop:.processSelectedKeysOptimized (31 samples, 68.89%)</title>
-        <rect x="193" y="933" width="813" height="15" fill="rgb(89,235,89)"/>
-        <text text-anchor="left" x="196.00" y="943.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">io/netty/channel/nio/NioEventLoop:.processSelectedKeysOptimized</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>io/netty/channel/nio/NioEventLoop:.processSelectedKey (31 samples, 68.89%)</title>
-        <rect x="193" y="917" width="813" height="15" fill="rgb(89,235,89)"/>
-        <text text-anchor="left" x="196.00" y="927.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">io/netty/channel/nio/NioEventLoop:.processSelectedKey</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>io/netty/channel/nio/AbstractNioByteChannel$NioByteUnsafe:.read (31 samples, 68.89%)</title>
-        <rect x="193" y="901" width="813" height="15" fill="rgb(89,235,89)"/>
-        <text text-anchor="left" x="196.00" y="911.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">io/netty/channel/nio/AbstractNioByteChannel$NioByteUnsafe:.read</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>io/netty/channel/DefaultChannelHandlerContext:.fireChannelRead (26 samples, 57.78%)</title>
-        <rect x="324" y="885" width="682" height="15" fill="rgb(89,235,89)"/>
-        <text text-anchor="left" x="327.00" y="895.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">io/netty/channel/DefaultChannelHandlerContext:.fireChannelRead</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>io/netty/handler/codec/ByteToMessageDecoder:.channelRead (26 samples, 57.78%)</title>
-        <rect x="324" y="869" width="682" height="15" fill="rgb(89,235,89)"/>
-        <text text-anchor="left" x="327.00" y="879.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">io/netty/handler/codec/ByteToMessageDecoder:.channelRead</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>io/netty/handler/codec/http/HttpObjectDecoder:.decode (2 samples, 4.44%)</title>
-        <rect x="954" y="853" width="52" height="15" fill="rgb(89,235,89)"/>
-        <text text-anchor="left" x="957.00" y="863.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">io/ne..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>io/netty/handler/codec/http/HttpObjectDecoder:.findWhitespace (1 samples, 2.22%)</title>
-        <rect x="980" y="837" width="26" height="15" fill="rgb(89,235,89)"/>
-        <text text-anchor="left" x="983.00" y="847.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">i..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>java (32 samples, 71.11%)</title>
-        <rect x="193" y="1141" width="839" height="15" fill="rgb(224,86,86)"/>
-        <text text-anchor="left" x="196.00" y="1151.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">java</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>start_thread (32 samples, 71.11%)</title>
-        <rect x="193" y="1125" width="839" height="15" fill="rgb(237,104,104)"/>
-        <text text-anchor="left" x="196.00" y="1135.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">start_thread</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>java_start (32 samples, 71.11%)</title>
-        <rect x="193" y="1109" width="839" height="15" fill="rgb(224,86,86)"/>
-        <text text-anchor="left" x="196.00" y="1119.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">java_start</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>JavaThread::run (32 samples, 71.11%)</title>
-        <rect x="193" y="1093" width="839" height="15" fill="rgb(203,203,60)"/>
-        <text text-anchor="left" x="196.00" y="1103.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">JavaThread::run</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>JavaThread::thread_main_inner (32 samples, 71.11%)</title>
-        <rect x="193" y="1077" width="839" height="15" fill="rgb(203,203,60)"/>
-        <text text-anchor="left" x="196.00" y="1087.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">JavaThread::thread_main_inner</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>thread_entry (32 samples, 71.11%)</title>
-        <rect x="193" y="1061" width="839" height="15" fill="rgb(232,97,97)"/>
-        <text text-anchor="left" x="196.00" y="1071.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">thread_entry</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>JavaCalls::call_virtual (32 samples, 71.11%)</title>
-        <rect x="193" y="1045" width="839" height="15" fill="rgb(203,203,60)"/>
-        <text text-anchor="left" x="196.00" y="1055.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">JavaCalls::call_virtual</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>JavaCalls::call_virtual (32 samples, 71.11%)</title>
-        <rect x="193" y="1029" width="839" height="15" fill="rgb(203,203,60)"/>
-        <text text-anchor="left" x="196.00" y="1039.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">JavaCalls::call_virtual</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>JavaCalls::call_helper (32 samples, 71.11%)</title>
-        <rect x="193" y="1013" width="839" height="15" fill="rgb(203,203,60)"/>
-        <text text-anchor="left" x="196.00" y="1023.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">JavaCalls::call_helper</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>call_stub (32 samples, 71.11%)</title>
-        <rect x="193" y="997" width="839" height="15" fill="rgb(79,226,79)"/>
-        <text text-anchor="left" x="196.00" y="1007.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">call_stub</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>Interpreter (32 samples, 71.11%)</title>
-        <rect x="193" y="981" width="839" height="15" fill="rgb(97,243,97)"/>
-        <text text-anchor="left" x="196.00" y="991.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">Interpreter</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>Interpreter (32 samples, 71.11%)</title>
-        <rect x="193" y="965" width="839" height="15" fill="rgb(97,243,97)"/>
-        <text text-anchor="left" x="196.00" y="975.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">Interpreter</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>io/netty/channel/nio/NioEventLoop:.run (32 samples, 71.11%)</title>
-        <rect x="193" y="949" width="839" height="15" fill="rgb(89,235,89)"/>
-        <text text-anchor="left" x="196.00" y="959.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">io/netty/channel/nio/NioEventLoop:.run</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>io/netty/channel/nio/NioEventLoop:.select (1 samples, 2.22%)</title>
-        <rect x="1006" y="933" width="26" height="15" fill="rgb(89,235,89)"/>
-        <text text-anchor="left" x="1009.00" y="943.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">i..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>sun/nio/ch/SelectorImpl:.lockAndDoSelect (1 samples, 2.22%)</title>
-        <rect x="1006" y="917" width="26" height="15" fill="rgb(88,235,88)"/>
-        <text text-anchor="left" x="1009.00" y="927.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">s..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>sun/nio/ch/EPollSelectorImpl:.doSelect (1 samples, 2.22%)</title>
-        <rect x="1006" y="901" width="26" height="15" fill="rgb(88,235,88)"/>
-        <text text-anchor="left" x="1009.00" y="911.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">s..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>sun/nio/ch/EPollArrayWrapper:.poll (1 samples, 2.22%)</title>
-        <rect x="1006" y="885" width="26" height="15" fill="rgb(88,235,88)"/>
-        <text text-anchor="left" x="1009.00" y="895.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">s..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>sun/nio/ch/EPollArrayWrapper:.epollWait (1 samples, 2.22%)</title>
-        <rect x="1006" y="869" width="26" height="15" fill="rgb(88,235,88)"/>
-        <text text-anchor="left" x="1009.00" y="879.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">s..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>__libc_enable_asynccancel (1 samples, 2.22%)</title>
-        <rect x="1006" y="853" width="26" height="15" fill="rgb(236,103,103)"/>
-        <text text-anchor="left" x="1009.00" y="863.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">_..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>__GI___ioctl (4 samples, 8.89%)</title>
-        <rect x="1032" y="1061" width="105" height="15" fill="rgb(228,91,91)"/>
-        <text text-anchor="left" x="1035.00" y="1071.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">__GI___ioctl</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>system_call_fastpath (4 samples, 8.89%)</title>
-        <rect x="1032" y="1045" width="105" height="15" fill="rgb(237,137,0)"/>
-        <text text-anchor="left" x="1035.00" y="1055.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">system_call_..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>sys_ioctl (4 samples, 8.89%)</title>
-        <rect x="1032" y="1029" width="105" height="15" fill="rgb(237,137,0)"/>
-        <text text-anchor="left" x="1035.00" y="1039.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">sys_ioctl</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>do_vfs_ioctl (4 samples, 8.89%)</title>
-        <rect x="1032" y="1013" width="105" height="15" fill="rgb(243,143,0)"/>
-        <text text-anchor="left" x="1035.00" y="1023.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">do_vfs_ioctl</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>perf_ioctl (4 samples, 8.89%)</title>
-        <rect x="1032" y="997" width="105" height="15" fill="rgb(242,142,0)"/>
-        <text text-anchor="left" x="1035.00" y="1007.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">perf_ioctl</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>perf_event_for_each_child (4 samples, 8.89%)</title>
-        <rect x="1032" y="981" width="105" height="15" fill="rgb(242,142,0)"/>
-        <text text-anchor="left" x="1035.00" y="991.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">perf_event_f..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>perf_event_enable (4 samples, 8.89%)</title>
-        <rect x="1032" y="965" width="105" height="15" fill="rgb(242,142,0)"/>
-        <text text-anchor="left" x="1035.00" y="975.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">perf_event_e..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>cpu_function_call (4 samples, 8.89%)</title>
-        <rect x="1032" y="949" width="105" height="15" fill="rgb(223,123,0)"/>
-        <text text-anchor="left" x="1035.00" y="959.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">cpu_function..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>smp_call_function_single (4 samples, 8.89%)</title>
-        <rect x="1032" y="933" width="105" height="15" fill="rgb(225,125,0)"/>
-        <text text-anchor="left" x="1035.00" y="943.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">smp_call_fun..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>remote_function (4 samples, 8.89%)</title>
-        <rect x="1032" y="917" width="105" height="15" fill="rgb(242,142,0)"/>
-        <text text-anchor="left" x="1035.00" y="927.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">remote_funct..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>__perf_event_enable (4 samples, 8.89%)</title>
-        <rect x="1032" y="901" width="105" height="15" fill="rgb(230,130,0)"/>
-        <text text-anchor="left" x="1035.00" y="911.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">__perf_event..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>group_sched_in (4 samples, 8.89%)</title>
-        <rect x="1032" y="885" width="105" height="15" fill="rgb(239,139,0)"/>
-        <text text-anchor="left" x="1035.00" y="895.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">group_sched_..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>x86_pmu_commit_txn (4 samples, 8.89%)</title>
-        <rect x="1032" y="869" width="105" height="15" fill="rgb(248,148,0)"/>
-        <text text-anchor="left" x="1035.00" y="879.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">x86_pmu_comm..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>perf_pmu_enable (4 samples, 8.89%)</title>
-        <rect x="1032" y="853" width="105" height="15" fill="rgb(242,142,0)"/>
-        <text text-anchor="left" x="1035.00" y="863.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">perf_pmu_ena..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>x86_pmu_enable (4 samples, 8.89%)</title>
-        <rect x="1032" y="837" width="105" height="15" fill="rgb(248,148,0)"/>
-        <text text-anchor="left" x="1035.00" y="847.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">x86_pmu_enab..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>intel_pmu_enable_all (4 samples, 8.89%)</title>
-        <rect x="1032" y="821" width="105" height="15" fill="rgb(236,136,0)"/>
-        <text text-anchor="left" x="1035.00" y="831.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">intel_pmu_en..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>native_write_msr_safe (4 samples, 8.89%)</title>
-        <rect x="1032" y="805" width="105" height="15" fill="rgb(234,134,0)"/>
-        <text text-anchor="left" x="1035.00" y="815.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">native_write..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>perf (5 samples, 11.11%)</title>
-        <rect x="1032" y="1141" width="131" height="15" fill="rgb(244,114,114)"/>
-        <text text-anchor="left" x="1035.00" y="1151.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">perf</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>__libc_start_main (5 samples, 11.11%)</title>
-        <rect x="1032" y="1125" width="131" height="15" fill="rgb(236,103,103)"/>
-        <text text-anchor="left" x="1035.00" y="1135.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">__libc_start_main</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>[perf] (5 samples, 11.11%)</title>
-        <rect x="1032" y="1109" width="131" height="15" fill="rgb(246,118,118)"/>
-        <text text-anchor="left" x="1035.00" y="1119.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">[perf]</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>[perf] (5 samples, 11.11%)</title>
-        <rect x="1032" y="1093" width="131" height="15" fill="rgb(246,118,118)"/>
-        <text text-anchor="left" x="1035.00" y="1103.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">[perf]</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>[perf] (5 samples, 11.11%)</title>
-        <rect x="1032" y="1077" width="131" height="15" fill="rgb(246,118,118)"/>
-        <text text-anchor="left" x="1035.00" y="1087.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">[perf]</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>page_fault (1 samples, 2.22%)</title>
-        <rect x="1137" y="1061" width="26" height="15" fill="rgb(231,131,0)"/>
-        <text text-anchor="left" x="1140.00" y="1071.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">p..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>all (45 samples, 100%)</title>
-        <rect x="10" y="1157" width="1180" height="15" fill="rgb(255,130,130)"/>
-        <text text-anchor="left" x="13.00" y="1167.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)"></text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>swapper (1 samples, 2.22%)</title>
-        <rect x="1163" y="1141" width="27" height="15" fill="rgb(233,99,99)"/>
-        <text text-anchor="left" x="1166.00" y="1151.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">s..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>x86_64_start_kernel (1 samples, 2.22%)</title>
-        <rect x="1163" y="1125" width="27" height="15" fill="rgb(248,148,0)"/>
-        <text text-anchor="left" x="1166.00" y="1135.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">x..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>x86_64_start_reservations (1 samples, 2.22%)</title>
-        <rect x="1163" y="1109" width="27" height="15" fill="rgb(248,148,0)"/>
-        <text text-anchor="left" x="1166.00" y="1119.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">x..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>start_kernel (1 samples, 2.22%)</title>
-        <rect x="1163" y="1093" width="27" height="15" fill="rgb(234,134,0)"/>
-        <text text-anchor="left" x="1166.00" y="1103.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">s..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>rest_init (1 samples, 2.22%)</title>
-        <rect x="1163" y="1077" width="27" height="15" fill="rgb(236,136,0)"/>
-        <text text-anchor="left" x="1166.00" y="1087.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">r..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>cpu_startup_entry (1 samples, 2.22%)</title>
-        <rect x="1163" y="1061" width="27" height="15" fill="rgb(223,123,0)"/>
-        <text text-anchor="left" x="1166.00" y="1071.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">c..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>rcu_idle_enter (1 samples, 2.22%)</title>
-        <rect x="1163" y="1045" width="27" height="15" fill="rgb(237,137,0)"/>
-        <text text-anchor="left" x="1166.00" y="1055.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">r..</text>
+    <text id="title" x="600.00" y="24.00">Flame Graph</text>
+    <text id="details" x="10.00" y="1189.00"> </text>
+    <text id="unzoom" class="hide" x="10.00" y="24.00">Reset Zoom</text>
+    <text id="search" x="1090.00" y="24.00">Search</text>
+    <text id="matched" x="1090.00" y="1189.00"> </text>
+    <g id="frames">
+        <g>
+            <title>call_function_single_interrupt (4 samples, 8.89%)</title>
+            <rect x="10" y="997" width="104" height="15" fill="rgb(221,121,0)"/>
+            <text x="13.00" y="1007.50">call_functio..</text>
+        </g>
+        <g>
+            <title>smp_call_function_single_interrupt (4 samples, 8.89%)</title>
+            <rect x="10" y="981" width="104" height="15" fill="rgb(225,125,0)"/>
+            <text x="13.00" y="991.50">smp_call_fun..</text>
+        </g>
+        <g>
+            <title>generic_smp_call_function_single_interrupt (4 samples, 8.89%)</title>
+            <rect x="10" y="965" width="104" height="15" fill="rgb(243,143,0)"/>
+            <text x="13.00" y="975.50">generic_smp_..</text>
+        </g>
+        <g>
+            <title>remote_function (4 samples, 8.89%)</title>
+            <rect x="10" y="949" width="104" height="15" fill="rgb(242,142,0)"/>
+            <text x="13.00" y="959.50">remote_funct..</text>
+        </g>
+        <g>
+            <title>__perf_event_enable (4 samples, 8.89%)</title>
+            <rect x="10" y="933" width="104" height="15" fill="rgb(230,130,0)"/>
+            <text x="13.00" y="943.50">__perf_event..</text>
+        </g>
+        <g>
+            <title>group_sched_in (4 samples, 8.89%)</title>
+            <rect x="10" y="917" width="104" height="15" fill="rgb(239,139,0)"/>
+            <text x="13.00" y="927.50">group_sched_..</text>
+        </g>
+        <g>
+            <title>x86_pmu_commit_txn (4 samples, 8.89%)</title>
+            <rect x="10" y="901" width="104" height="15" fill="rgb(248,148,0)"/>
+            <text x="13.00" y="911.50">x86_pmu_comm..</text>
+        </g>
+        <g>
+            <title>perf_pmu_enable (4 samples, 8.89%)</title>
+            <rect x="10" y="885" width="104" height="15" fill="rgb(242,142,0)"/>
+            <text x="13.00" y="895.50">perf_pmu_ena..</text>
+        </g>
+        <g>
+            <title>x86_pmu_enable (4 samples, 8.89%)</title>
+            <rect x="10" y="869" width="104" height="15" fill="rgb(248,148,0)"/>
+            <text x="13.00" y="879.50">x86_pmu_enab..</text>
+        </g>
+        <g>
+            <title>intel_pmu_enable_all (4 samples, 8.89%)</title>
+            <rect x="10" y="853" width="104" height="15" fill="rgb(236,136,0)"/>
+            <text x="13.00" y="863.50">intel_pmu_en..</text>
+        </g>
+        <g>
+            <title>native_write_msr_safe (4 samples, 8.89%)</title>
+            <rect x="10" y="837" width="104" height="15" fill="rgb(234,134,0)"/>
+            <text x="13.00" y="847.50">native_write..</text>
+        </g>
+        <g>
+            <title>__tcp_push_pending_frames (1 samples, 2.22%)</title>
+            <rect x="114" y="981" width="27" height="15" fill="rgb(226,126,0)"/>
+            <text x="117.00" y="991.50">_..</text>
+        </g>
+        <g>
+            <title>tcp_write_xmit (1 samples, 2.22%)</title>
+            <rect x="114" y="965" width="27" height="15" fill="rgb(237,137,0)"/>
+            <text x="117.00" y="975.50">t..</text>
+        </g>
+        <g>
+            <title>tcp_transmit_skb (1 samples, 2.22%)</title>
+            <rect x="114" y="949" width="27" height="15" fill="rgb(237,137,0)"/>
+            <text x="117.00" y="959.50">t..</text>
+        </g>
+        <g>
+            <title>ip_queue_xmit (1 samples, 2.22%)</title>
+            <rect x="114" y="933" width="27" height="15" fill="rgb(230,130,0)"/>
+            <text x="117.00" y="943.50">i..</text>
+        </g>
+        <g>
+            <title>ip_local_out (1 samples, 2.22%)</title>
+            <rect x="114" y="917" width="27" height="15" fill="rgb(230,130,0)"/>
+            <text x="117.00" y="927.50">i..</text>
+        </g>
+        <g>
+            <title>ip_output (1 samples, 2.22%)</title>
+            <rect x="114" y="901" width="27" height="15" fill="rgb(230,130,0)"/>
+            <text x="117.00" y="911.50">i..</text>
+        </g>
+        <g>
+            <title>ip_finish_output (1 samples, 2.22%)</title>
+            <rect x="114" y="885" width="27" height="15" fill="rgb(230,130,0)"/>
+            <text x="117.00" y="895.50">i..</text>
+        </g>
+        <g>
+            <title>local_bh_enable (1 samples, 2.22%)</title>
+            <rect x="114" y="869" width="27" height="15" fill="rgb(232,132,0)"/>
+            <text x="117.00" y="879.50">l..</text>
+        </g>
+        <g>
+            <title>do_softirq (1 samples, 2.22%)</title>
+            <rect x="114" y="853" width="27" height="15" fill="rgb(243,143,0)"/>
+            <text x="117.00" y="863.50">d..</text>
+        </g>
+        <g>
+            <title>do_softirq_own_stack (1 samples, 2.22%)</title>
+            <rect x="114" y="837" width="27" height="15" fill="rgb(243,143,0)"/>
+            <text x="117.00" y="847.50">d..</text>
+        </g>
+        <g>
+            <title>__do_softirq (1 samples, 2.22%)</title>
+            <rect x="114" y="821" width="27" height="15" fill="rgb(230,130,0)"/>
+            <text x="117.00" y="831.50">_..</text>
+        </g>
+        <g>
+            <title>net_rx_action (1 samples, 2.22%)</title>
+            <rect x="114" y="805" width="27" height="15" fill="rgb(244,144,0)"/>
+            <text x="117.00" y="815.50">n..</text>
+        </g>
+        <g>
+            <title>process_backlog (1 samples, 2.22%)</title>
+            <rect x="114" y="789" width="27" height="15" fill="rgb(242,142,0)"/>
+            <text x="117.00" y="799.50">p..</text>
+        </g>
+        <g>
+            <title>__netif_receive_skb (1 samples, 2.22%)</title>
+            <rect x="114" y="773" width="27" height="15" fill="rgb(231,131,0)"/>
+            <text x="117.00" y="783.50">_..</text>
+        </g>
+        <g>
+            <title>__netif_receive_skb_core (1 samples, 2.22%)</title>
+            <rect x="114" y="757" width="27" height="15" fill="rgb(231,131,0)"/>
+            <text x="117.00" y="767.50">_..</text>
+        </g>
+        <g>
+            <title>ip_rcv (1 samples, 2.22%)</title>
+            <rect x="114" y="741" width="27" height="15" fill="rgb(230,130,0)"/>
+            <text x="117.00" y="751.50">i..</text>
+        </g>
+        <g>
+            <title>ip_rcv_finish (1 samples, 2.22%)</title>
+            <rect x="114" y="725" width="27" height="15" fill="rgb(230,130,0)"/>
+            <text x="117.00" y="735.50">i..</text>
+        </g>
+        <g>
+            <title>ip_local_deliver (1 samples, 2.22%)</title>
+            <rect x="114" y="709" width="27" height="15" fill="rgb(230,130,0)"/>
+            <text x="117.00" y="719.50">i..</text>
+        </g>
+        <g>
+            <title>ip_local_deliver_finish (1 samples, 2.22%)</title>
+            <rect x="114" y="693" width="27" height="15" fill="rgb(230,130,0)"/>
+            <text x="117.00" y="703.50">i..</text>
+        </g>
+        <g>
+            <title>tcp_v4_rcv (1 samples, 2.22%)</title>
+            <rect x="114" y="677" width="27" height="15" fill="rgb(237,137,0)"/>
+            <text x="117.00" y="687.50">t..</text>
+        </g>
+        <g>
+            <title>tcp_v4_do_rcv (1 samples, 2.22%)</title>
+            <rect x="114" y="661" width="27" height="15" fill="rgb(237,137,0)"/>
+            <text x="117.00" y="671.50">t..</text>
+        </g>
+        <g>
+            <title>tcp_rcv_established (1 samples, 2.22%)</title>
+            <rect x="114" y="645" width="27" height="15" fill="rgb(237,137,0)"/>
+            <text x="117.00" y="655.50">t..</text>
+        </g>
+        <g>
+            <title>tcp_ack (1 samples, 2.22%)</title>
+            <rect x="114" y="629" width="27" height="15" fill="rgb(237,137,0)"/>
+            <text x="117.00" y="639.50">t..</text>
+        </g>
+        <g>
+            <title>tcp_clean_rtx_queue (1 samples, 2.22%)</title>
+            <rect x="114" y="613" width="27" height="15" fill="rgb(237,137,0)"/>
+            <text x="117.00" y="623.50">t..</text>
+        </g>
+        <g>
+            <title>__kfree_skb (1 samples, 2.22%)</title>
+            <rect x="114" y="597" width="27" height="15" fill="rgb(223,123,0)"/>
+            <text x="117.00" y="607.50">_..</text>
+        </g>
+        <g>
+            <title>sk_stream_alloc_skb (1 samples, 2.22%)</title>
+            <rect x="141" y="981" width="26" height="15" fill="rgb(222,122,0)"/>
+            <text x="144.00" y="991.50">s..</text>
+        </g>
+        <g>
+            <title>__alloc_skb (1 samples, 2.22%)</title>
+            <rect x="141" y="965" width="26" height="15" fill="rgb(232,132,0)"/>
+            <text x="144.00" y="975.50">_..</text>
+        </g>
+        <g>
+            <title>__kmalloc_reserve.isra.26 (1 samples, 2.22%)</title>
+            <rect x="141" y="949" width="26" height="15" fill="rgb(223,123,0)"/>
+            <text x="144.00" y="959.50">_..</text>
+        </g>
+        <g>
+            <title>ab (7 samples, 15.56%)</title>
+            <rect x="10" y="1141" width="183" height="15" fill="rgb(224,86,86)"/>
+            <text x="13.00" y="1151.50">ab</text>
+        </g>
+        <g>
+            <title>[unknown] (7 samples, 15.56%)</title>
+            <rect x="10" y="1125" width="183" height="15" fill="rgb(243,112,112)"/>
+            <text x="13.00" y="1135.50">[unknown]</text>
+        </g>
+        <g>
+            <title>__write_nocancel (7 samples, 15.56%)</title>
+            <rect x="10" y="1109" width="183" height="15" fill="rgb(228,91,91)"/>
+            <text x="13.00" y="1119.50">__write_nocancel</text>
+        </g>
+        <g>
+            <title>system_call_fastpath (7 samples, 15.56%)</title>
+            <rect x="10" y="1093" width="183" height="15" fill="rgb(237,137,0)"/>
+            <text x="13.00" y="1103.50">system_call_fastpath</text>
+        </g>
+        <g>
+            <title>sys_write (7 samples, 15.56%)</title>
+            <rect x="10" y="1077" width="183" height="15" fill="rgb(237,137,0)"/>
+            <text x="13.00" y="1087.50">sys_write</text>
+        </g>
+        <g>
+            <title>vfs_write (7 samples, 15.56%)</title>
+            <rect x="10" y="1061" width="183" height="15" fill="rgb(226,126,0)"/>
+            <text x="13.00" y="1071.50">vfs_write</text>
+        </g>
+        <g>
+            <title>do_sync_write (7 samples, 15.56%)</title>
+            <rect x="10" y="1045" width="183" height="15" fill="rgb(243,143,0)"/>
+            <text x="13.00" y="1055.50">do_sync_write</text>
+        </g>
+        <g>
+            <title>sock_aio_write (7 samples, 15.56%)</title>
+            <rect x="10" y="1029" width="183" height="15" fill="rgb(239,139,0)"/>
+            <text x="13.00" y="1039.50">sock_aio_write</text>
+        </g>
+        <g>
+            <title>inet_sendmsg (7 samples, 15.56%)</title>
+            <rect x="10" y="1013" width="183" height="15" fill="rgb(239,139,0)"/>
+            <text x="13.00" y="1023.50">inet_sendmsg</text>
+        </g>
+        <g>
+            <title>tcp_sendmsg (3 samples, 6.67%)</title>
+            <rect x="114" y="997" width="79" height="15" fill="rgb(237,137,0)"/>
+            <text x="117.00" y="1007.50">tcp_sendm..</text>
+        </g>
+        <g>
+            <title>tcp_send_mss (1 samples, 2.22%)</title>
+            <rect x="167" y="981" width="26" height="15" fill="rgb(237,137,0)"/>
+            <text x="170.00" y="991.50">t..</text>
+        </g>
+        <g>
+            <title>tcp_current_mss (1 samples, 2.22%)</title>
+            <rect x="167" y="965" width="26" height="15" fill="rgb(237,137,0)"/>
+            <text x="170.00" y="975.50">t..</text>
+        </g>
+        <g>
+            <title>tcp_v4_md5_lookup (1 samples, 2.22%)</title>
+            <rect x="167" y="949" width="26" height="15" fill="rgb(237,137,0)"/>
+            <text x="170.00" y="959.50">t..</text>
+        </g>
+        <g>
+            <title>io/netty/buffer/AbstractByteBuf:.writeBytes (2 samples, 4.44%)</title>
+            <rect x="193" y="885" width="53" height="15" fill="rgb(89,235,89)"/>
+            <text x="196.00" y="895.50">io/ne..</text>
+        </g>
+        <g>
+            <title>sun/nio/ch/SocketChannelImpl:.read (2 samples, 4.44%)</title>
+            <rect x="193" y="869" width="53" height="15" fill="rgb(88,235,88)"/>
+            <text x="196.00" y="879.50">sun/n..</text>
+        </g>
+        <g>
+            <title>java/lang/Thread:.blockedOn (1 samples, 2.22%)</title>
+            <rect x="219" y="853" width="27" height="15" fill="rgb(77,224,77)"/>
+            <text x="222.00" y="863.50">j..</text>
+        </g>
+        <g>
+            <title>pthread_self (1 samples, 2.22%)</title>
+            <rect x="246" y="677" width="26" height="15" fill="rgb(237,104,104)"/>
+            <text x="249.00" y="687.50">p..</text>
+        </g>
+        <g>
+            <title>ip_queue_xmit (1 samples, 2.22%)</title>
+            <rect x="272" y="485" width="26" height="15" fill="rgb(230,130,0)"/>
+            <text x="275.00" y="495.50">i..</text>
+        </g>
+        <g>
+            <title>ip_local_out (1 samples, 2.22%)</title>
+            <rect x="272" y="469" width="26" height="15" fill="rgb(230,130,0)"/>
+            <text x="275.00" y="479.50">i..</text>
+        </g>
+        <g>
+            <title>ip_output (1 samples, 2.22%)</title>
+            <rect x="272" y="453" width="26" height="15" fill="rgb(230,130,0)"/>
+            <text x="275.00" y="463.50">i..</text>
+        </g>
+        <g>
+            <title>ip_finish_output (1 samples, 2.22%)</title>
+            <rect x="272" y="437" width="26" height="15" fill="rgb(230,130,0)"/>
+            <text x="275.00" y="447.50">i..</text>
+        </g>
+        <g>
+            <title>local_bh_enable (1 samples, 2.22%)</title>
+            <rect x="272" y="421" width="26" height="15" fill="rgb(232,132,0)"/>
+            <text x="275.00" y="431.50">l..</text>
+        </g>
+        <g>
+            <title>do_softirq (1 samples, 2.22%)</title>
+            <rect x="272" y="405" width="26" height="15" fill="rgb(243,143,0)"/>
+            <text x="275.00" y="415.50">d..</text>
+        </g>
+        <g>
+            <title>do_softirq_own_stack (1 samples, 2.22%)</title>
+            <rect x="272" y="389" width="26" height="15" fill="rgb(243,143,0)"/>
+            <text x="275.00" y="399.50">d..</text>
+        </g>
+        <g>
+            <title>__do_softirq (1 samples, 2.22%)</title>
+            <rect x="272" y="373" width="26" height="15" fill="rgb(230,130,0)"/>
+            <text x="275.00" y="383.50">_..</text>
+        </g>
+        <g>
+            <title>net_rx_action (1 samples, 2.22%)</title>
+            <rect x="272" y="357" width="26" height="15" fill="rgb(244,144,0)"/>
+            <text x="275.00" y="367.50">n..</text>
+        </g>
+        <g>
+            <title>process_backlog (1 samples, 2.22%)</title>
+            <rect x="272" y="341" width="26" height="15" fill="rgb(242,142,0)"/>
+            <text x="275.00" y="351.50">p..</text>
+        </g>
+        <g>
+            <title>__netif_receive_skb (1 samples, 2.22%)</title>
+            <rect x="272" y="325" width="26" height="15" fill="rgb(231,131,0)"/>
+            <text x="275.00" y="335.50">_..</text>
+        </g>
+        <g>
+            <title>__netif_receive_skb_core (1 samples, 2.22%)</title>
+            <rect x="272" y="309" width="26" height="15" fill="rgb(231,131,0)"/>
+            <text x="275.00" y="319.50">_..</text>
+        </g>
+        <g>
+            <title>ip_rcv (1 samples, 2.22%)</title>
+            <rect x="272" y="293" width="26" height="15" fill="rgb(230,130,0)"/>
+            <text x="275.00" y="303.50">i..</text>
+        </g>
+        <g>
+            <title>ip_rcv_finish (1 samples, 2.22%)</title>
+            <rect x="272" y="277" width="26" height="15" fill="rgb(230,130,0)"/>
+            <text x="275.00" y="287.50">i..</text>
+        </g>
+        <g>
+            <title>ip_local_deliver (1 samples, 2.22%)</title>
+            <rect x="272" y="261" width="26" height="15" fill="rgb(230,130,0)"/>
+            <text x="275.00" y="271.50">i..</text>
+        </g>
+        <g>
+            <title>ip_local_deliver_finish (1 samples, 2.22%)</title>
+            <rect x="272" y="245" width="26" height="15" fill="rgb(230,130,0)"/>
+            <text x="275.00" y="255.50">i..</text>
+        </g>
+        <g>
+            <title>tcp_v4_rcv (1 samples, 2.22%)</title>
+            <rect x="272" y="229" width="26" height="15" fill="rgb(237,137,0)"/>
+            <text x="275.00" y="239.50">t..</text>
+        </g>
+        <g>
+            <title>tcp_v4_do_rcv (1 samples, 2.22%)</title>
+            <rect x="272" y="213" width="26" height="15" fill="rgb(237,137,0)"/>
+            <text x="275.00" y="223.50">t..</text>
+        </g>
+        <g>
+            <title>tcp_rcv_established (1 samples, 2.22%)</title>
+            <rect x="272" y="197" width="26" height="15" fill="rgb(237,137,0)"/>
+            <text x="275.00" y="207.50">t..</text>
+        </g>
+        <g>
+            <title>tcp_data_queue (1 samples, 2.22%)</title>
+            <rect x="272" y="181" width="26" height="15" fill="rgb(237,137,0)"/>
+            <text x="275.00" y="191.50">t..</text>
+        </g>
+        <g>
+            <title>sock_def_readable (1 samples, 2.22%)</title>
+            <rect x="272" y="165" width="26" height="15" fill="rgb(239,139,0)"/>
+            <text x="275.00" y="175.50">s..</text>
+        </g>
+        <g>
+            <title>__wake_up_sync_key (1 samples, 2.22%)</title>
+            <rect x="272" y="149" width="26" height="15" fill="rgb(223,123,0)"/>
+            <text x="275.00" y="159.50">_..</text>
+        </g>
+        <g>
+            <title>__wake_up_common (1 samples, 2.22%)</title>
+            <rect x="272" y="133" width="26" height="15" fill="rgb(223,123,0)"/>
+            <text x="275.00" y="143.50">_..</text>
+        </g>
+        <g>
+            <title>ep_poll_callback (1 samples, 2.22%)</title>
+            <rect x="272" y="117" width="26" height="15" fill="rgb(239,139,0)"/>
+            <text x="275.00" y="127.50">e..</text>
+        </g>
+        <g>
+            <title>__wake_up_locked (1 samples, 2.22%)</title>
+            <rect x="272" y="101" width="26" height="15" fill="rgb(223,123,0)"/>
+            <text x="275.00" y="111.50">_..</text>
+        </g>
+        <g>
+            <title>__wake_up_common (1 samples, 2.22%)</title>
+            <rect x="272" y="85" width="26" height="15" fill="rgb(223,123,0)"/>
+            <text x="275.00" y="95.50">_..</text>
+        </g>
+        <g>
+            <title>default_wake_function (1 samples, 2.22%)</title>
+            <rect x="272" y="69" width="26" height="15" fill="rgb(246,146,0)"/>
+            <text x="275.00" y="79.50">d..</text>
+        </g>
+        <g>
+            <title>try_to_wake_up (1 samples, 2.22%)</title>
+            <rect x="272" y="53" width="26" height="15" fill="rgb(234,134,0)"/>
+            <text x="275.00" y="63.50">t..</text>
+        </g>
+        <g>
+            <title>_raw_spin_unlock_irqrestore (1 samples, 2.22%)</title>
+            <rect x="272" y="37" width="26" height="15" fill="rgb(237,137,0)"/>
+            <text x="275.00" y="47.50">_..</text>
+        </g>
+        <g>
+            <title>io/netty/channel/DefaultChannelHandlerContext:.fireChannelReadComplete (3 samples, 6.67%)</title>
+            <rect x="246" y="885" width="78" height="15" fill="rgb(89,235,89)"/>
+            <text x="249.00" y="895.50">io/netty/..</text>
+        </g>
+        <g>
+            <title>io/netty/handler/codec/ByteToMessageDecoder:.channelReadComplete (3 samples, 6.67%)</title>
+            <rect x="246" y="869" width="78" height="15" fill="rgb(89,235,89)"/>
+            <text x="249.00" y="879.50">io/netty/..</text>
+        </g>
+        <g>
+            <title>io/netty/channel/DefaultChannelHandlerContext:.fireChannelReadComplete (3 samples, 6.67%)</title>
+            <rect x="246" y="853" width="78" height="15" fill="rgb(89,235,89)"/>
+            <text x="249.00" y="863.50">io/netty/..</text>
+        </g>
+        <g>
+            <title>org/vertx/java/core/net/impl/VertxHandler:.channelReadComplete (3 samples, 6.67%)</title>
+            <rect x="246" y="837" width="78" height="15" fill="rgb(96,242,96)"/>
+            <text x="249.00" y="847.50">org/vertx..</text>
+        </g>
+        <g>
+            <title>io/netty/channel/DefaultChannelHandlerContext:.flush (3 samples, 6.67%)</title>
+            <rect x="246" y="821" width="78" height="15" fill="rgb(89,235,89)"/>
+            <text x="249.00" y="831.50">io/netty/..</text>
+        </g>
+        <g>
+            <title>io/netty/channel/ChannelDuplexHandler:.flush (3 samples, 6.67%)</title>
+            <rect x="246" y="805" width="78" height="15" fill="rgb(89,235,89)"/>
+            <text x="249.00" y="815.50">io/netty/..</text>
+        </g>
+        <g>
+            <title>io/netty/channel/DefaultChannelHandlerContext:.flush (3 samples, 6.67%)</title>
+            <rect x="246" y="789" width="78" height="15" fill="rgb(89,235,89)"/>
+            <text x="249.00" y="799.50">io/netty/..</text>
+        </g>
+        <g>
+            <title>io/netty/channel/ChannelOutboundHandlerAdapter:.flush (3 samples, 6.67%)</title>
+            <rect x="246" y="773" width="78" height="15" fill="rgb(89,235,89)"/>
+            <text x="249.00" y="783.50">io/netty/..</text>
+        </g>
+        <g>
+            <title>io/netty/channel/DefaultChannelHandlerContext:.flush (3 samples, 6.67%)</title>
+            <rect x="246" y="757" width="78" height="15" fill="rgb(89,235,89)"/>
+            <text x="249.00" y="767.50">io/netty/..</text>
+        </g>
+        <g>
+            <title>io/netty/channel/DefaultChannelPipeline$HeadHandler:.flush (3 samples, 6.67%)</title>
+            <rect x="246" y="741" width="78" height="15" fill="rgb(89,235,89)"/>
+            <text x="249.00" y="751.50">io/netty/..</text>
+        </g>
+        <g>
+            <title>io/netty/channel/nio/AbstractNioByteChannel:.doWrite (3 samples, 6.67%)</title>
+            <rect x="246" y="725" width="78" height="15" fill="rgb(89,235,89)"/>
+            <text x="249.00" y="735.50">io/netty/..</text>
+        </g>
+        <g>
+            <title>io/netty/buffer/PooledUnsafeDirectByteBuf:.getBytes (3 samples, 6.67%)</title>
+            <rect x="246" y="709" width="78" height="15" fill="rgb(89,235,89)"/>
+            <text x="249.00" y="719.50">io/netty/..</text>
+        </g>
+        <g>
+            <title>sun/nio/ch/SocketChannelImpl:.write (3 samples, 6.67%)</title>
+            <rect x="246" y="693" width="78" height="15" fill="rgb(88,235,88)"/>
+            <text x="249.00" y="703.50">sun/nio/c..</text>
+        </g>
+        <g>
+            <title>sun/nio/ch/FileDispatcherImpl:.write0 (2 samples, 4.44%)</title>
+            <rect x="272" y="677" width="52" height="15" fill="rgb(88,235,88)"/>
+            <text x="275.00" y="687.50">sun/n..</text>
+        </g>
+        <g>
+            <title>[libpthread-2.19.so] (2 samples, 4.44%)</title>
+            <rect x="272" y="661" width="52" height="15" fill="rgb(235,101,101)"/>
+            <text x="275.00" y="671.50">[libp..</text>
+        </g>
+        <g>
+            <title>system_call_fastpath (2 samples, 4.44%)</title>
+            <rect x="272" y="645" width="52" height="15" fill="rgb(237,137,0)"/>
+            <text x="275.00" y="655.50">syste..</text>
+        </g>
+        <g>
+            <title>sys_write (2 samples, 4.44%)</title>
+            <rect x="272" y="629" width="52" height="15" fill="rgb(237,137,0)"/>
+            <text x="275.00" y="639.50">sys_w..</text>
+        </g>
+        <g>
+            <title>vfs_write (2 samples, 4.44%)</title>
+            <rect x="272" y="613" width="52" height="15" fill="rgb(226,126,0)"/>
+            <text x="275.00" y="623.50">vfs_w..</text>
+        </g>
+        <g>
+            <title>do_sync_write (2 samples, 4.44%)</title>
+            <rect x="272" y="597" width="52" height="15" fill="rgb(243,143,0)"/>
+            <text x="275.00" y="607.50">do_sy..</text>
+        </g>
+        <g>
+            <title>sock_aio_write (2 samples, 4.44%)</title>
+            <rect x="272" y="581" width="52" height="15" fill="rgb(239,139,0)"/>
+            <text x="275.00" y="591.50">sock_..</text>
+        </g>
+        <g>
+            <title>inet_sendmsg (2 samples, 4.44%)</title>
+            <rect x="272" y="565" width="52" height="15" fill="rgb(239,139,0)"/>
+            <text x="275.00" y="575.50">inet_..</text>
+        </g>
+        <g>
+            <title>tcp_sendmsg (2 samples, 4.44%)</title>
+            <rect x="272" y="549" width="52" height="15" fill="rgb(237,137,0)"/>
+            <text x="275.00" y="559.50">tcp_s..</text>
+        </g>
+        <g>
+            <title>__tcp_push_pending_frames (2 samples, 4.44%)</title>
+            <rect x="272" y="533" width="52" height="15" fill="rgb(226,126,0)"/>
+            <text x="275.00" y="543.50">__tcp..</text>
+        </g>
+        <g>
+            <title>tcp_write_xmit (2 samples, 4.44%)</title>
+            <rect x="272" y="517" width="52" height="15" fill="rgb(237,137,0)"/>
+            <text x="275.00" y="527.50">tcp_w..</text>
+        </g>
+        <g>
+            <title>tcp_transmit_skb (2 samples, 4.44%)</title>
+            <rect x="272" y="501" width="52" height="15" fill="rgb(237,137,0)"/>
+            <text x="275.00" y="511.50">tcp_t..</text>
+        </g>
+        <g>
+            <title>tcp_v4_send_check (1 samples, 2.22%)</title>
+            <rect x="298" y="485" width="26" height="15" fill="rgb(237,137,0)"/>
+            <text x="301.00" y="495.50">t..</text>
+        </g>
+        <g>
+            <title>__tcp_v4_send_check (1 samples, 2.22%)</title>
+            <rect x="298" y="469" width="26" height="15" fill="rgb(226,126,0)"/>
+            <text x="301.00" y="479.50">_..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/WrapFactory:.wrap (4 samples, 8.89%)</title>
+            <rect x="377" y="773" width="105" height="15" fill="rgb(96,242,96)"/>
+            <text x="380.00" y="783.50">org/mozilla/..</text>
+        </g>
+        <g>
+            <title>call_function_single_interrupt (4 samples, 8.89%)</title>
+            <rect x="377" y="757" width="105" height="15" fill="rgb(221,121,0)"/>
+            <text x="380.00" y="767.50">call_functio..</text>
+        </g>
+        <g>
+            <title>smp_call_function_single_interrupt (4 samples, 8.89%)</title>
+            <rect x="377" y="741" width="105" height="15" fill="rgb(225,125,0)"/>
+            <text x="380.00" y="751.50">smp_call_fun..</text>
+        </g>
+        <g>
+            <title>generic_smp_call_function_single_interrupt (4 samples, 8.89%)</title>
+            <rect x="377" y="725" width="105" height="15" fill="rgb(243,143,0)"/>
+            <text x="380.00" y="735.50">generic_smp_..</text>
+        </g>
+        <g>
+            <title>remote_function (4 samples, 8.89%)</title>
+            <rect x="377" y="709" width="105" height="15" fill="rgb(242,142,0)"/>
+            <text x="380.00" y="719.50">remote_funct..</text>
+        </g>
+        <g>
+            <title>__perf_event_enable (4 samples, 8.89%)</title>
+            <rect x="377" y="693" width="105" height="15" fill="rgb(230,130,0)"/>
+            <text x="380.00" y="703.50">__perf_event..</text>
+        </g>
+        <g>
+            <title>group_sched_in (4 samples, 8.89%)</title>
+            <rect x="377" y="677" width="105" height="15" fill="rgb(239,139,0)"/>
+            <text x="380.00" y="687.50">group_sched_..</text>
+        </g>
+        <g>
+            <title>x86_pmu_commit_txn (4 samples, 8.89%)</title>
+            <rect x="377" y="661" width="105" height="15" fill="rgb(248,148,0)"/>
+            <text x="380.00" y="671.50">x86_pmu_comm..</text>
+        </g>
+        <g>
+            <title>perf_pmu_enable (4 samples, 8.89%)</title>
+            <rect x="377" y="645" width="105" height="15" fill="rgb(242,142,0)"/>
+            <text x="380.00" y="655.50">perf_pmu_ena..</text>
+        </g>
+        <g>
+            <title>x86_pmu_enable (4 samples, 8.89%)</title>
+            <rect x="377" y="629" width="105" height="15" fill="rgb(248,148,0)"/>
+            <text x="380.00" y="639.50">x86_pmu_enab..</text>
+        </g>
+        <g>
+            <title>intel_pmu_enable_all (4 samples, 8.89%)</title>
+            <rect x="377" y="613" width="105" height="15" fill="rgb(236,136,0)"/>
+            <text x="380.00" y="623.50">intel_pmu_en..</text>
+        </g>
+        <g>
+            <title>native_write_msr_safe (4 samples, 8.89%)</title>
+            <rect x="377" y="597" width="105" height="15" fill="rgb(234,134,0)"/>
+            <text x="380.00" y="607.50">native_write..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_80:.call (1 samples, 2.22%)</title>
+            <rect x="482" y="773" width="26" height="15" fill="rgb(96,242,96)"/>
+            <text x="485.00" y="783.50">o..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_80:.call (1 samples, 2.22%)</title>
+            <rect x="482" y="757" width="26" height="15" fill="rgb(96,242,96)"/>
+            <text x="485.00" y="767.50">o..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/BaseFunction:.construct (1 samples, 2.22%)</title>
+            <rect x="482" y="741" width="26" height="15" fill="rgb(96,242,96)"/>
+            <text x="485.00" y="751.50">o..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_80:.call (1 samples, 2.22%)</title>
+            <rect x="482" y="725" width="26" height="15" fill="rgb(96,242,96)"/>
+            <text x="485.00" y="735.50">o..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_80:._c_anonymous_3 (1 samples, 2.22%)</title>
+            <rect x="482" y="709" width="26" height="15" fill="rgb(96,242,96)"/>
+            <text x="485.00" y="719.50">o..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/BaseFunction:.construct (1 samples, 2.22%)</title>
+            <rect x="482" y="693" width="26" height="15" fill="rgb(96,242,96)"/>
+            <text x="485.00" y="703.50">o..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_80:.call (1 samples, 2.22%)</title>
+            <rect x="482" y="677" width="26" height="15" fill="rgb(96,242,96)"/>
+            <text x="485.00" y="687.50">o..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_80:._c_anonymous_21 (1 samples, 2.22%)</title>
+            <rect x="482" y="661" width="26" height="15" fill="rgb(96,242,96)"/>
+            <text x="485.00" y="671.50">o..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/optimizer/OptRuntime:.call2 (1 samples, 2.22%)</title>
+            <rect x="482" y="645" width="26" height="15" fill="rgb(96,242,96)"/>
+            <text x="485.00" y="655.50">o..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_streams_js_31:.call (1 samples, 2.22%)</title>
+            <rect x="482" y="629" width="26" height="15" fill="rgb(96,242,96)"/>
+            <text x="485.00" y="639.50">o..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptRuntime:.setObjectProp (1 samples, 2.22%)</title>
+            <rect x="482" y="613" width="26" height="15" fill="rgb(96,242,96)"/>
+            <text x="485.00" y="623.50">o..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/IdScriptableObject:.has (1 samples, 2.22%)</title>
+            <rect x="482" y="597" width="26" height="15" fill="rgb(96,242,96)"/>
+            <text x="485.00" y="607.50">o..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptRuntime:.getPropFunctionAndThis (1 samples, 2.22%)</title>
+            <rect x="508" y="693" width="26" height="15" fill="rgb(96,242,96)"/>
+            <text x="511.00" y="703.50">o..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptRuntime:.nameOrFunction (1 samples, 2.22%)</title>
+            <rect x="534" y="693" width="26" height="15" fill="rgb(96,242,96)"/>
+            <text x="537.00" y="703.50">o..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/IdScriptableObject:.get (1 samples, 2.22%)</title>
+            <rect x="534" y="677" width="26" height="15" fill="rgb(96,242,96)"/>
+            <text x="537.00" y="687.50">o..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptableObject:.getSlot (1 samples, 2.22%)</title>
+            <rect x="534" y="661" width="26" height="15" fill="rgb(96,242,96)"/>
+            <text x="537.00" y="671.50">o..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/BaseFunction:.construct (3 samples, 6.67%)</title>
+            <rect x="508" y="741" width="78" height="15" fill="rgb(96,242,96)"/>
+            <text x="511.00" y="751.50">org/mozil..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_90:.call (3 samples, 6.67%)</title>
+            <rect x="508" y="725" width="78" height="15" fill="rgb(96,242,96)"/>
+            <text x="511.00" y="735.50">org/mozil..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_90:._c_anonymous_3 (3 samples, 6.67%)</title>
+            <rect x="508" y="709" width="78" height="15" fill="rgb(96,242,96)"/>
+            <text x="511.00" y="719.50">org/mozil..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptRuntime:.setObjectProp (1 samples, 2.22%)</title>
+            <rect x="560" y="693" width="26" height="15" fill="rgb(96,242,96)"/>
+            <text x="563.00" y="703.50">o..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/IdScriptableObject:.put (1 samples, 2.22%)</title>
+            <rect x="560" y="677" width="26" height="15" fill="rgb(96,242,96)"/>
+            <text x="563.00" y="687.50">o..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptableObject:.getSlot (1 samples, 2.22%)</title>
+            <rect x="560" y="661" width="26" height="15" fill="rgb(96,242,96)"/>
+            <text x="563.00" y="671.50">o..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptableObject:.createSlot (1 samples, 2.22%)</title>
+            <rect x="560" y="645" width="26" height="15" fill="rgb(96,242,96)"/>
+            <text x="563.00" y="655.50">o..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_90:.call (4 samples, 8.89%)</title>
+            <rect x="508" y="773" width="105" height="15" fill="rgb(96,242,96)"/>
+            <text x="511.00" y="783.50">org/mozilla/..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_90:.call (4 samples, 8.89%)</title>
+            <rect x="508" y="757" width="105" height="15" fill="rgb(96,242,96)"/>
+            <text x="511.00" y="767.50">org/mozilla/..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/gen/file__home_bgregg_bench_Server_js_js_4:.call (1 samples, 2.22%)</title>
+            <rect x="586" y="741" width="27" height="15" fill="rgb(96,242,96)"/>
+            <text x="589.00" y="751.50">o..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/gen/file__home_bgregg_bench_Server_js_js_4:._c_anonymous_1 (1 samples, 2.22%)</title>
+            <rect x="586" y="725" width="27" height="15" fill="rgb(96,242,96)"/>
+            <text x="589.00" y="735.50">o..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_90:.call (1 samples, 2.22%)</title>
+            <rect x="586" y="709" width="27" height="15" fill="rgb(96,242,96)"/>
+            <text x="589.00" y="719.50">o..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/NativeJavaMethod:.call (1 samples, 2.22%)</title>
+            <rect x="586" y="693" width="27" height="15" fill="rgb(96,242,96)"/>
+            <text x="589.00" y="703.50">o..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/MemberBox:.invoke (1 samples, 2.22%)</title>
+            <rect x="586" y="677" width="27" height="15" fill="rgb(96,242,96)"/>
+            <text x="589.00" y="687.50">o..</text>
+        </g>
+        <g>
+            <title>java/lang/reflect/Method:.invoke (1 samples, 2.22%)</title>
+            <rect x="586" y="661" width="27" height="15" fill="rgb(77,224,77)"/>
+            <text x="589.00" y="671.50">j..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/BaseFunction:.construct (1 samples, 2.22%)</title>
+            <rect x="613" y="693" width="26" height="15" fill="rgb(96,242,96)"/>
+            <text x="616.00" y="703.50">o..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_91:.call (1 samples, 2.22%)</title>
+            <rect x="613" y="677" width="26" height="15" fill="rgb(96,242,96)"/>
+            <text x="616.00" y="687.50">o..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_91:._c_anonymous_21 (1 samples, 2.22%)</title>
+            <rect x="613" y="661" width="26" height="15" fill="rgb(96,242,96)"/>
+            <text x="616.00" y="671.50">o..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/optimizer/OptRuntime:.call2 (1 samples, 2.22%)</title>
+            <rect x="613" y="645" width="26" height="15" fill="rgb(96,242,96)"/>
+            <text x="616.00" y="655.50">o..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_streams_js_49:.call (1 samples, 2.22%)</title>
+            <rect x="613" y="629" width="26" height="15" fill="rgb(96,242,96)"/>
+            <text x="616.00" y="639.50">o..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/optimizer/OptRuntime:.call2 (1 samples, 2.22%)</title>
+            <rect x="613" y="613" width="26" height="15" fill="rgb(96,242,96)"/>
+            <text x="616.00" y="623.50">o..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_streams_js_49:.call (1 samples, 2.22%)</title>
+            <rect x="613" y="597" width="26" height="15" fill="rgb(96,242,96)"/>
+            <text x="616.00" y="607.50">o..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptRuntime:.setObjectProp (1 samples, 2.22%)</title>
+            <rect x="613" y="581" width="26" height="15" fill="rgb(96,242,96)"/>
+            <text x="616.00" y="591.50">o..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptableObject:.getSlot (1 samples, 2.22%)</title>
+            <rect x="613" y="565" width="26" height="15" fill="rgb(96,242,96)"/>
+            <text x="616.00" y="575.50">o..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/IdScriptableObject:.has (1 samples, 2.22%)</title>
+            <rect x="639" y="677" width="26" height="15" fill="rgb(96,242,96)"/>
+            <text x="642.00" y="687.50">o..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/BaseFunction:.construct (3 samples, 6.67%)</title>
+            <rect x="613" y="741" width="78" height="15" fill="rgb(96,242,96)"/>
+            <text x="616.00" y="751.50">org/mozil..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_91:.call (3 samples, 6.67%)</title>
+            <rect x="613" y="725" width="78" height="15" fill="rgb(96,242,96)"/>
+            <text x="616.00" y="735.50">org/mozil..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_91:._c_anonymous_3 (3 samples, 6.67%)</title>
+            <rect x="613" y="709" width="78" height="15" fill="rgb(96,242,96)"/>
+            <text x="616.00" y="719.50">org/mozil..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptRuntime:.setObjectProp (2 samples, 4.44%)</title>
+            <rect x="639" y="693" width="52" height="15" fill="rgb(96,242,96)"/>
+            <text x="642.00" y="703.50">org/m..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/IdScriptableObject:.put (1 samples, 2.22%)</title>
+            <rect x="665" y="677" width="26" height="15" fill="rgb(96,242,96)"/>
+            <text x="668.00" y="687.50">o..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptableObject:.getSlot (1 samples, 2.22%)</title>
+            <rect x="665" y="661" width="26" height="15" fill="rgb(96,242,96)"/>
+            <text x="668.00" y="671.50">o..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptableObject:.createSlot (1 samples, 2.22%)</title>
+            <rect x="665" y="645" width="26" height="15" fill="rgb(96,242,96)"/>
+            <text x="668.00" y="655.50">o..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_91:.call (4 samples, 8.89%)</title>
+            <rect x="613" y="773" width="105" height="15" fill="rgb(96,242,96)"/>
+            <text x="616.00" y="783.50">org/mozilla/..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_91:.call (4 samples, 8.89%)</title>
+            <rect x="613" y="757" width="105" height="15" fill="rgb(96,242,96)"/>
+            <text x="616.00" y="767.50">org/mozilla/..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/gen/file__home_bgregg_bench_Server_js_js_2:.call (1 samples, 2.22%)</title>
+            <rect x="691" y="741" width="27" height="15" fill="rgb(96,242,96)"/>
+            <text x="694.00" y="751.50">o..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_91:.call (1 samples, 2.22%)</title>
+            <rect x="691" y="725" width="27" height="15" fill="rgb(96,242,96)"/>
+            <text x="694.00" y="735.50">o..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/NativeJavaMethod:.call (1 samples, 2.22%)</title>
+            <rect x="691" y="709" width="27" height="15" fill="rgb(96,242,96)"/>
+            <text x="694.00" y="719.50">o..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/MemberBox:.invoke (1 samples, 2.22%)</title>
+            <rect x="691" y="693" width="27" height="15" fill="rgb(96,242,96)"/>
+            <text x="694.00" y="703.50">o..</text>
+        </g>
+        <g>
+            <title>java/lang/reflect/Method:.invoke (1 samples, 2.22%)</title>
+            <rect x="691" y="677" width="27" height="15" fill="rgb(77,224,77)"/>
+            <text x="694.00" y="687.50">j..</text>
+        </g>
+        <g>
+            <title>io/netty/handler/codec/http/DefaultHttpHeaders:.add0 (1 samples, 2.22%)</title>
+            <rect x="691" y="661" width="27" height="15" fill="rgb(89,235,89)"/>
+            <text x="694.00" y="671.50">i..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/BaseFunction:.construct (1 samples, 2.22%)</title>
+            <rect x="744" y="693" width="26" height="15" fill="rgb(96,242,96)"/>
+            <text x="747.00" y="703.50">o..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_93:.call (1 samples, 2.22%)</title>
+            <rect x="744" y="677" width="26" height="15" fill="rgb(96,242,96)"/>
+            <text x="747.00" y="687.50">o..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_93:._c_anonymous_21 (1 samples, 2.22%)</title>
+            <rect x="744" y="661" width="26" height="15" fill="rgb(96,242,96)"/>
+            <text x="747.00" y="671.50">o..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_93:.getParamAndVarCount (1 samples, 2.22%)</title>
+            <rect x="744" y="645" width="26" height="15" fill="rgb(96,242,96)"/>
+            <text x="747.00" y="655.50">o..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptRuntime:.setObjectProp (1 samples, 2.22%)</title>
+            <rect x="770" y="693" width="26" height="15" fill="rgb(96,242,96)"/>
+            <text x="773.00" y="703.50">o..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/IdScriptableObject:.has (1 samples, 2.22%)</title>
+            <rect x="770" y="677" width="26" height="15" fill="rgb(96,242,96)"/>
+            <text x="773.00" y="687.50">o..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptableObject:.getSlot (1 samples, 2.22%)</title>
+            <rect x="770" y="661" width="26" height="15" fill="rgb(96,242,96)"/>
+            <text x="773.00" y="671.50">o..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_93:.&lt;init&gt; (4 samples, 8.89%)</title>
+            <rect x="796" y="693" width="105" height="15" fill="rgb(96,242,96)"/>
+            <text x="799.00" y="703.50">org/mozilla/..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/NativeFunction:.initScriptFunction (4 samples, 8.89%)</title>
+            <rect x="796" y="677" width="105" height="15" fill="rgb(96,242,96)"/>
+            <text x="799.00" y="687.50">org/mozilla/..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/TopLevel:.getBuiltinPrototype (4 samples, 8.89%)</title>
+            <rect x="796" y="661" width="105" height="15" fill="rgb(96,242,96)"/>
+            <text x="799.00" y="671.50">org/mozilla/..</text>
+        </g>
+        <g>
+            <title>call_function_single_interrupt (4 samples, 8.89%)</title>
+            <rect x="796" y="645" width="105" height="15" fill="rgb(221,121,0)"/>
+            <text x="799.00" y="655.50">call_functio..</text>
+        </g>
+        <g>
+            <title>smp_call_function_single_interrupt (4 samples, 8.89%)</title>
+            <rect x="796" y="629" width="105" height="15" fill="rgb(225,125,0)"/>
+            <text x="799.00" y="639.50">smp_call_fun..</text>
+        </g>
+        <g>
+            <title>generic_smp_call_function_single_interrupt (4 samples, 8.89%)</title>
+            <rect x="796" y="613" width="105" height="15" fill="rgb(243,143,0)"/>
+            <text x="799.00" y="623.50">generic_smp_..</text>
+        </g>
+        <g>
+            <title>remote_function (4 samples, 8.89%)</title>
+            <rect x="796" y="597" width="105" height="15" fill="rgb(242,142,0)"/>
+            <text x="799.00" y="607.50">remote_funct..</text>
+        </g>
+        <g>
+            <title>__perf_event_enable (4 samples, 8.89%)</title>
+            <rect x="796" y="581" width="105" height="15" fill="rgb(230,130,0)"/>
+            <text x="799.00" y="591.50">__perf_event..</text>
+        </g>
+        <g>
+            <title>group_sched_in (4 samples, 8.89%)</title>
+            <rect x="796" y="565" width="105" height="15" fill="rgb(239,139,0)"/>
+            <text x="799.00" y="575.50">group_sched_..</text>
+        </g>
+        <g>
+            <title>x86_pmu_commit_txn (4 samples, 8.89%)</title>
+            <rect x="796" y="549" width="105" height="15" fill="rgb(248,148,0)"/>
+            <text x="799.00" y="559.50">x86_pmu_comm..</text>
+        </g>
+        <g>
+            <title>perf_pmu_enable (4 samples, 8.89%)</title>
+            <rect x="796" y="533" width="105" height="15" fill="rgb(242,142,0)"/>
+            <text x="799.00" y="543.50">perf_pmu_ena..</text>
+        </g>
+        <g>
+            <title>x86_pmu_enable (4 samples, 8.89%)</title>
+            <rect x="796" y="517" width="105" height="15" fill="rgb(248,148,0)"/>
+            <text x="799.00" y="527.50">x86_pmu_enab..</text>
+        </g>
+        <g>
+            <title>intel_pmu_enable_all (4 samples, 8.89%)</title>
+            <rect x="796" y="501" width="105" height="15" fill="rgb(236,136,0)"/>
+            <text x="799.00" y="511.50">intel_pmu_en..</text>
+        </g>
+        <g>
+            <title>native_write_msr_safe (4 samples, 8.89%)</title>
+            <rect x="796" y="485" width="105" height="15" fill="rgb(234,134,0)"/>
+            <text x="799.00" y="495.50">native_write..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_93:.getParamCount (1 samples, 2.22%)</title>
+            <rect x="901" y="693" width="26" height="15" fill="rgb(96,242,96)"/>
+            <text x="904.00" y="703.50">o..</text>
+        </g>
+        <g>
+            <title>io/netty/channel/DefaultChannelHandlerContext:.fireChannelRead (24 samples, 53.33%)</title>
+            <rect x="324" y="853" width="630" height="15" fill="rgb(89,235,89)"/>
+            <text x="327.00" y="863.50">io/netty/channel/DefaultChannelHandlerContext:.fireChannelRead</text>
+        </g>
+        <g>
+            <title>org/vertx/java/core/net/impl/VertxHandler:.channelRead (23 samples, 51.11%)</title>
+            <rect x="350" y="837" width="604" height="15" fill="rgb(96,242,96)"/>
+            <text x="353.00" y="847.50">org/vertx/java/core/net/impl/VertxHandler:.channelRead</text>
+        </g>
+        <g>
+            <title>org/vertx/java/core/http/impl/VertxHttpHandler:.channelRead (23 samples, 51.11%)</title>
+            <rect x="350" y="821" width="604" height="15" fill="rgb(96,242,96)"/>
+            <text x="353.00" y="831.50">org/vertx/java/core/http/impl/VertxHttpHandler:.channelRead</text>
+        </g>
+        <g>
+            <title>org/vertx/java/core/http/impl/DefaultHttpServer$ServerHandler:.doMessageReceived (23 samples, 51.11%)</title>
+            <rect x="350" y="805" width="604" height="15" fill="rgb(96,242,96)"/>
+            <text x="353.00" y="815.50">org/vertx/java/core/http/impl/DefaultHttpServer$ServerHandler:.doMessageReceived</text>
+        </g>
+        <g>
+            <title>org/vertx/java/core/http/impl/ServerConnection:.handleMessage (23 samples, 51.11%)</title>
+            <rect x="350" y="789" width="604" height="15" fill="rgb(96,242,96)"/>
+            <text x="353.00" y="799.50">org/vertx/java/core/http/impl/ServerConnection:.handleMessage</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_93:.call (9 samples, 20.00%)</title>
+            <rect x="718" y="773" width="236" height="15" fill="rgb(96,242,96)"/>
+            <text x="721.00" y="783.50">org/mozilla/javascript/gen/file..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_93:.call (9 samples, 20.00%)</title>
+            <rect x="718" y="757" width="236" height="15" fill="rgb(96,242,96)"/>
+            <text x="721.00" y="767.50">org/mozilla/javascript/gen/file..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/BaseFunction:.construct (8 samples, 17.78%)</title>
+            <rect x="744" y="741" width="210" height="15" fill="rgb(96,242,96)"/>
+            <text x="747.00" y="751.50">org/mozilla/javascript/Base..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_93:.call (8 samples, 17.78%)</title>
+            <rect x="744" y="725" width="210" height="15" fill="rgb(96,242,96)"/>
+            <text x="747.00" y="735.50">org/mozilla/javascript/gen/..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_http_js_93:._c_anonymous_3 (8 samples, 17.78%)</title>
+            <rect x="744" y="709" width="210" height="15" fill="rgb(96,242,96)"/>
+            <text x="747.00" y="719.50">org/mozilla/javascript/gen/..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/optimizer/OptRuntime:.call2 (1 samples, 2.22%)</title>
+            <rect x="927" y="693" width="27" height="15" fill="rgb(96,242,96)"/>
+            <text x="930.00" y="703.50">o..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/gen/file__home_bgregg_vert_x_2_1_sys_mods_io_vertx_lang_js_1_1_0_vertx_streams_js_47:.call (1 samples, 2.22%)</title>
+            <rect x="927" y="677" width="27" height="15" fill="rgb(96,242,96)"/>
+            <text x="930.00" y="687.50">o..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptRuntime:.setObjectProp (1 samples, 2.22%)</title>
+            <rect x="927" y="661" width="27" height="15" fill="rgb(96,242,96)"/>
+            <text x="930.00" y="671.50">o..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptableObject:.getSlot (1 samples, 2.22%)</title>
+            <rect x="927" y="645" width="27" height="15" fill="rgb(96,242,96)"/>
+            <text x="930.00" y="655.50">o..</text>
+        </g>
+        <g>
+            <title>io/netty/handler/codec/http/HttpMethod:.valueOf (1 samples, 2.22%)</title>
+            <rect x="954" y="837" width="26" height="15" fill="rgb(89,235,89)"/>
+            <text x="957.00" y="847.50">i..</text>
+        </g>
+        <g>
+            <title>io/netty/channel/nio/NioEventLoop:.processSelectedKeysOptimized (31 samples, 68.89%)</title>
+            <rect x="193" y="933" width="813" height="15" fill="rgb(89,235,89)"/>
+            <text x="196.00" y="943.50">io/netty/channel/nio/NioEventLoop:.processSelectedKeysOptimized</text>
+        </g>
+        <g>
+            <title>io/netty/channel/nio/NioEventLoop:.processSelectedKey (31 samples, 68.89%)</title>
+            <rect x="193" y="917" width="813" height="15" fill="rgb(89,235,89)"/>
+            <text x="196.00" y="927.50">io/netty/channel/nio/NioEventLoop:.processSelectedKey</text>
+        </g>
+        <g>
+            <title>io/netty/channel/nio/AbstractNioByteChannel$NioByteUnsafe:.read (31 samples, 68.89%)</title>
+            <rect x="193" y="901" width="813" height="15" fill="rgb(89,235,89)"/>
+            <text x="196.00" y="911.50">io/netty/channel/nio/AbstractNioByteChannel$NioByteUnsafe:.read</text>
+        </g>
+        <g>
+            <title>io/netty/channel/DefaultChannelHandlerContext:.fireChannelRead (26 samples, 57.78%)</title>
+            <rect x="324" y="885" width="682" height="15" fill="rgb(89,235,89)"/>
+            <text x="327.00" y="895.50">io/netty/channel/DefaultChannelHandlerContext:.fireChannelRead</text>
+        </g>
+        <g>
+            <title>io/netty/handler/codec/ByteToMessageDecoder:.channelRead (26 samples, 57.78%)</title>
+            <rect x="324" y="869" width="682" height="15" fill="rgb(89,235,89)"/>
+            <text x="327.00" y="879.50">io/netty/handler/codec/ByteToMessageDecoder:.channelRead</text>
+        </g>
+        <g>
+            <title>io/netty/handler/codec/http/HttpObjectDecoder:.decode (2 samples, 4.44%)</title>
+            <rect x="954" y="853" width="52" height="15" fill="rgb(89,235,89)"/>
+            <text x="957.00" y="863.50">io/ne..</text>
+        </g>
+        <g>
+            <title>io/netty/handler/codec/http/HttpObjectDecoder:.findWhitespace (1 samples, 2.22%)</title>
+            <rect x="980" y="837" width="26" height="15" fill="rgb(89,235,89)"/>
+            <text x="983.00" y="847.50">i..</text>
+        </g>
+        <g>
+            <title>java (32 samples, 71.11%)</title>
+            <rect x="193" y="1141" width="839" height="15" fill="rgb(224,86,86)"/>
+            <text x="196.00" y="1151.50">java</text>
+        </g>
+        <g>
+            <title>start_thread (32 samples, 71.11%)</title>
+            <rect x="193" y="1125" width="839" height="15" fill="rgb(237,104,104)"/>
+            <text x="196.00" y="1135.50">start_thread</text>
+        </g>
+        <g>
+            <title>java_start (32 samples, 71.11%)</title>
+            <rect x="193" y="1109" width="839" height="15" fill="rgb(224,86,86)"/>
+            <text x="196.00" y="1119.50">java_start</text>
+        </g>
+        <g>
+            <title>JavaThread::run (32 samples, 71.11%)</title>
+            <rect x="193" y="1093" width="839" height="15" fill="rgb(203,203,60)"/>
+            <text x="196.00" y="1103.50">JavaThread::run</text>
+        </g>
+        <g>
+            <title>JavaThread::thread_main_inner (32 samples, 71.11%)</title>
+            <rect x="193" y="1077" width="839" height="15" fill="rgb(203,203,60)"/>
+            <text x="196.00" y="1087.50">JavaThread::thread_main_inner</text>
+        </g>
+        <g>
+            <title>thread_entry (32 samples, 71.11%)</title>
+            <rect x="193" y="1061" width="839" height="15" fill="rgb(232,97,97)"/>
+            <text x="196.00" y="1071.50">thread_entry</text>
+        </g>
+        <g>
+            <title>JavaCalls::call_virtual (32 samples, 71.11%)</title>
+            <rect x="193" y="1045" width="839" height="15" fill="rgb(203,203,60)"/>
+            <text x="196.00" y="1055.50">JavaCalls::call_virtual</text>
+        </g>
+        <g>
+            <title>JavaCalls::call_virtual (32 samples, 71.11%)</title>
+            <rect x="193" y="1029" width="839" height="15" fill="rgb(203,203,60)"/>
+            <text x="196.00" y="1039.50">JavaCalls::call_virtual</text>
+        </g>
+        <g>
+            <title>JavaCalls::call_helper (32 samples, 71.11%)</title>
+            <rect x="193" y="1013" width="839" height="15" fill="rgb(203,203,60)"/>
+            <text x="196.00" y="1023.50">JavaCalls::call_helper</text>
+        </g>
+        <g>
+            <title>call_stub (32 samples, 71.11%)</title>
+            <rect x="193" y="997" width="839" height="15" fill="rgb(79,226,79)"/>
+            <text x="196.00" y="1007.50">call_stub</text>
+        </g>
+        <g>
+            <title>Interpreter (32 samples, 71.11%)</title>
+            <rect x="193" y="981" width="839" height="15" fill="rgb(97,243,97)"/>
+            <text x="196.00" y="991.50">Interpreter</text>
+        </g>
+        <g>
+            <title>Interpreter (32 samples, 71.11%)</title>
+            <rect x="193" y="965" width="839" height="15" fill="rgb(97,243,97)"/>
+            <text x="196.00" y="975.50">Interpreter</text>
+        </g>
+        <g>
+            <title>io/netty/channel/nio/NioEventLoop:.run (32 samples, 71.11%)</title>
+            <rect x="193" y="949" width="839" height="15" fill="rgb(89,235,89)"/>
+            <text x="196.00" y="959.50">io/netty/channel/nio/NioEventLoop:.run</text>
+        </g>
+        <g>
+            <title>io/netty/channel/nio/NioEventLoop:.select (1 samples, 2.22%)</title>
+            <rect x="1006" y="933" width="26" height="15" fill="rgb(89,235,89)"/>
+            <text x="1009.00" y="943.50">i..</text>
+        </g>
+        <g>
+            <title>sun/nio/ch/SelectorImpl:.lockAndDoSelect (1 samples, 2.22%)</title>
+            <rect x="1006" y="917" width="26" height="15" fill="rgb(88,235,88)"/>
+            <text x="1009.00" y="927.50">s..</text>
+        </g>
+        <g>
+            <title>sun/nio/ch/EPollSelectorImpl:.doSelect (1 samples, 2.22%)</title>
+            <rect x="1006" y="901" width="26" height="15" fill="rgb(88,235,88)"/>
+            <text x="1009.00" y="911.50">s..</text>
+        </g>
+        <g>
+            <title>sun/nio/ch/EPollArrayWrapper:.poll (1 samples, 2.22%)</title>
+            <rect x="1006" y="885" width="26" height="15" fill="rgb(88,235,88)"/>
+            <text x="1009.00" y="895.50">s..</text>
+        </g>
+        <g>
+            <title>sun/nio/ch/EPollArrayWrapper:.epollWait (1 samples, 2.22%)</title>
+            <rect x="1006" y="869" width="26" height="15" fill="rgb(88,235,88)"/>
+            <text x="1009.00" y="879.50">s..</text>
+        </g>
+        <g>
+            <title>__libc_enable_asynccancel (1 samples, 2.22%)</title>
+            <rect x="1006" y="853" width="26" height="15" fill="rgb(236,103,103)"/>
+            <text x="1009.00" y="863.50">_..</text>
+        </g>
+        <g>
+            <title>__GI___ioctl (4 samples, 8.89%)</title>
+            <rect x="1032" y="1061" width="105" height="15" fill="rgb(228,91,91)"/>
+            <text x="1035.00" y="1071.50">__GI___ioctl</text>
+        </g>
+        <g>
+            <title>system_call_fastpath (4 samples, 8.89%)</title>
+            <rect x="1032" y="1045" width="105" height="15" fill="rgb(237,137,0)"/>
+            <text x="1035.00" y="1055.50">system_call_..</text>
+        </g>
+        <g>
+            <title>sys_ioctl (4 samples, 8.89%)</title>
+            <rect x="1032" y="1029" width="105" height="15" fill="rgb(237,137,0)"/>
+            <text x="1035.00" y="1039.50">sys_ioctl</text>
+        </g>
+        <g>
+            <title>do_vfs_ioctl (4 samples, 8.89%)</title>
+            <rect x="1032" y="1013" width="105" height="15" fill="rgb(243,143,0)"/>
+            <text x="1035.00" y="1023.50">do_vfs_ioctl</text>
+        </g>
+        <g>
+            <title>perf_ioctl (4 samples, 8.89%)</title>
+            <rect x="1032" y="997" width="105" height="15" fill="rgb(242,142,0)"/>
+            <text x="1035.00" y="1007.50">perf_ioctl</text>
+        </g>
+        <g>
+            <title>perf_event_for_each_child (4 samples, 8.89%)</title>
+            <rect x="1032" y="981" width="105" height="15" fill="rgb(242,142,0)"/>
+            <text x="1035.00" y="991.50">perf_event_f..</text>
+        </g>
+        <g>
+            <title>perf_event_enable (4 samples, 8.89%)</title>
+            <rect x="1032" y="965" width="105" height="15" fill="rgb(242,142,0)"/>
+            <text x="1035.00" y="975.50">perf_event_e..</text>
+        </g>
+        <g>
+            <title>cpu_function_call (4 samples, 8.89%)</title>
+            <rect x="1032" y="949" width="105" height="15" fill="rgb(223,123,0)"/>
+            <text x="1035.00" y="959.50">cpu_function..</text>
+        </g>
+        <g>
+            <title>smp_call_function_single (4 samples, 8.89%)</title>
+            <rect x="1032" y="933" width="105" height="15" fill="rgb(225,125,0)"/>
+            <text x="1035.00" y="943.50">smp_call_fun..</text>
+        </g>
+        <g>
+            <title>remote_function (4 samples, 8.89%)</title>
+            <rect x="1032" y="917" width="105" height="15" fill="rgb(242,142,0)"/>
+            <text x="1035.00" y="927.50">remote_funct..</text>
+        </g>
+        <g>
+            <title>__perf_event_enable (4 samples, 8.89%)</title>
+            <rect x="1032" y="901" width="105" height="15" fill="rgb(230,130,0)"/>
+            <text x="1035.00" y="911.50">__perf_event..</text>
+        </g>
+        <g>
+            <title>group_sched_in (4 samples, 8.89%)</title>
+            <rect x="1032" y="885" width="105" height="15" fill="rgb(239,139,0)"/>
+            <text x="1035.00" y="895.50">group_sched_..</text>
+        </g>
+        <g>
+            <title>x86_pmu_commit_txn (4 samples, 8.89%)</title>
+            <rect x="1032" y="869" width="105" height="15" fill="rgb(248,148,0)"/>
+            <text x="1035.00" y="879.50">x86_pmu_comm..</text>
+        </g>
+        <g>
+            <title>perf_pmu_enable (4 samples, 8.89%)</title>
+            <rect x="1032" y="853" width="105" height="15" fill="rgb(242,142,0)"/>
+            <text x="1035.00" y="863.50">perf_pmu_ena..</text>
+        </g>
+        <g>
+            <title>x86_pmu_enable (4 samples, 8.89%)</title>
+            <rect x="1032" y="837" width="105" height="15" fill="rgb(248,148,0)"/>
+            <text x="1035.00" y="847.50">x86_pmu_enab..</text>
+        </g>
+        <g>
+            <title>intel_pmu_enable_all (4 samples, 8.89%)</title>
+            <rect x="1032" y="821" width="105" height="15" fill="rgb(236,136,0)"/>
+            <text x="1035.00" y="831.50">intel_pmu_en..</text>
+        </g>
+        <g>
+            <title>native_write_msr_safe (4 samples, 8.89%)</title>
+            <rect x="1032" y="805" width="105" height="15" fill="rgb(234,134,0)"/>
+            <text x="1035.00" y="815.50">native_write..</text>
+        </g>
+        <g>
+            <title>perf (5 samples, 11.11%)</title>
+            <rect x="1032" y="1141" width="131" height="15" fill="rgb(244,114,114)"/>
+            <text x="1035.00" y="1151.50">perf</text>
+        </g>
+        <g>
+            <title>__libc_start_main (5 samples, 11.11%)</title>
+            <rect x="1032" y="1125" width="131" height="15" fill="rgb(236,103,103)"/>
+            <text x="1035.00" y="1135.50">__libc_start_main</text>
+        </g>
+        <g>
+            <title>[perf] (5 samples, 11.11%)</title>
+            <rect x="1032" y="1109" width="131" height="15" fill="rgb(246,118,118)"/>
+            <text x="1035.00" y="1119.50">[perf]</text>
+        </g>
+        <g>
+            <title>[perf] (5 samples, 11.11%)</title>
+            <rect x="1032" y="1093" width="131" height="15" fill="rgb(246,118,118)"/>
+            <text x="1035.00" y="1103.50">[perf]</text>
+        </g>
+        <g>
+            <title>[perf] (5 samples, 11.11%)</title>
+            <rect x="1032" y="1077" width="131" height="15" fill="rgb(246,118,118)"/>
+            <text x="1035.00" y="1087.50">[perf]</text>
+        </g>
+        <g>
+            <title>page_fault (1 samples, 2.22%)</title>
+            <rect x="1137" y="1061" width="26" height="15" fill="rgb(231,131,0)"/>
+            <text x="1140.00" y="1071.50">p..</text>
+        </g>
+        <g>
+            <title>all (45 samples, 100%)</title>
+            <rect x="10" y="1157" width="1180" height="15" fill="rgb(255,130,130)"/>
+            <text x="13.00" y="1167.50"></text>
+        </g>
+        <g>
+            <title>swapper (1 samples, 2.22%)</title>
+            <rect x="1163" y="1141" width="27" height="15" fill="rgb(233,99,99)"/>
+            <text x="1166.00" y="1151.50">s..</text>
+        </g>
+        <g>
+            <title>x86_64_start_kernel (1 samples, 2.22%)</title>
+            <rect x="1163" y="1125" width="27" height="15" fill="rgb(248,148,0)"/>
+            <text x="1166.00" y="1135.50">x..</text>
+        </g>
+        <g>
+            <title>x86_64_start_reservations (1 samples, 2.22%)</title>
+            <rect x="1163" y="1109" width="27" height="15" fill="rgb(248,148,0)"/>
+            <text x="1166.00" y="1119.50">x..</text>
+        </g>
+        <g>
+            <title>start_kernel (1 samples, 2.22%)</title>
+            <rect x="1163" y="1093" width="27" height="15" fill="rgb(234,134,0)"/>
+            <text x="1166.00" y="1103.50">s..</text>
+        </g>
+        <g>
+            <title>rest_init (1 samples, 2.22%)</title>
+            <rect x="1163" y="1077" width="27" height="15" fill="rgb(236,136,0)"/>
+            <text x="1166.00" y="1087.50">r..</text>
+        </g>
+        <g>
+            <title>cpu_startup_entry (1 samples, 2.22%)</title>
+            <rect x="1163" y="1061" width="27" height="15" fill="rgb(223,123,0)"/>
+            <text x="1166.00" y="1071.50">c..</text>
+        </g>
+        <g>
+            <title>rcu_idle_enter (1 samples, 2.22%)</title>
+            <rect x="1163" y="1045" width="27" height="15" fill="rgb(237,137,0)"/>
+            <text x="1166.00" y="1055.50">r..</text>
+        </g>
     </g>
 </svg>
