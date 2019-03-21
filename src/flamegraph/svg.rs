@@ -33,12 +33,9 @@ impl<'a> From<usize> for TextArgument<'a> {
 }
 
 pub(super) struct TextItem<'a, I> {
-    pub(super) color: &'a str,
-    pub(super) size: usize,
     pub(super) x: f64,
     pub(super) y: f64,
     pub(super) text: TextArgument<'a>,
-    pub(super) location: Option<&'a str>,
     pub(super) extra: I,
 }
 
@@ -114,9 +111,18 @@ where
     svg.write_event(Event::Start(
         BytesStart::borrowed_name(b"style").with_attributes(iter::once(("type", "text/css"))),
     ))?;
-    svg.write_event(Event::Text(BytesText::from_plain_str(
-        ".func_g:hover { stroke:black; stroke-width:0.5; cursor:pointer; }",
-    )))?;
+
+    let titlesize = &opt.font_size + 5;
+    svg.write_event(Event::Text(BytesText::from_escaped_str(&format!(
+        "
+text {{ font-family:{}; font-size:{}px; fill:rgb(0,0,0); }}
+#title {{ text-anchor:middle; font-size:{}px; }}
+{}",
+        &opt.font_type,
+        &opt.font_size,
+        titlesize,
+        include_str!("flamegraph.css")
+    ))))?;
     svg.write_event(Event::End(BytesEnd::borrowed(b"style")))?;
 
     svg.write_event(Event::Start(
@@ -161,15 +167,11 @@ var searchcolor = '{}';",
         svg,
         &mut buf,
         TextItem {
-            color: "rgb(0, 0, 0)",
-            size: opt.font_size + 5,
             x: (opt.image_width / 2) as f64,
             y: (opt.font_size * 2) as f64,
             text: (&*opt.title).into(),
-            location: Some("middle"),
-            extra: None,
+            extra: vec![("id", "title")],
         },
-        &opt.font_type,
     )?;
 
     if let Some(ref subtitle) = opt.subtitle {
@@ -177,15 +179,11 @@ var searchcolor = '{}';",
             svg,
             &mut buf,
             TextItem {
-                color: "rgb(160, 160, 160)",
-                size: opt.font_size,
                 x: (opt.image_width / 2) as f64,
                 y: (opt.font_size * 4) as f64,
                 text: (&**subtitle).into(),
-                location: Some("middle"),
-                extra: None,
+                extra: vec![("id", "subtitle")],
             },
-            &opt.font_type,
         )?;
     }
 
@@ -193,70 +191,44 @@ var searchcolor = '{}';",
         svg,
         &mut buf,
         TextItem {
-            color: "rgb(0, 0, 0)",
-            size: opt.font_size,
             x: super::XPAD as f64,
             y: (style_options.imageheight - (opt.ypad2() / 2)) as f64,
             text: " ".into(),
-            location: None,
             extra: iter::once(("id", "details")),
         },
-        &opt.font_type,
     )?;
 
     write_str(
         svg,
         &mut buf,
         TextItem {
-            color: "rgb(0, 0, 0)",
-            size: opt.font_size,
             x: super::XPAD as f64,
             y: (opt.font_size * 2) as f64,
             text: "Reset Zoom".into(),
-            location: None,
-            extra: vec![
-                ("id", "unzoom"),
-                ("onclick", "unzoom()"),
-                ("style", "opacity:0.0;cursor:pointer"),
-            ],
+            extra: vec![("id", "unzoom"), ("class", "hide")],
         },
-        &opt.font_type,
     )?;
 
     write_str(
         svg,
         &mut buf,
         TextItem {
-            color: "rgb(0, 0, 0)",
-            size: opt.font_size,
             x: (opt.image_width - super::XPAD - 100) as f64,
             y: (opt.font_size * 2) as f64,
             text: "Search".into(),
-            location: None,
-            extra: vec![
-                ("id", "search"),
-                ("onmouseover", "searchover()"),
-                ("onmouseout", "searchout()"),
-                ("onclick", "search_prompt()"),
-                ("style", "opacity:0.1;cursor:pointer"),
-            ],
+            extra: vec![("id", "search")],
         },
-        &opt.font_type,
     )?;
 
     write_str(
         svg,
         &mut buf,
         TextItem {
-            color: "rgb(0, 0, 0)",
-            size: opt.font_size,
             x: (opt.image_width - super::XPAD - 100) as f64,
             y: (style_options.imageheight - (opt.ypad2() / 2)) as f64,
             text: " ".into(),
-            location: None,
             extra: iter::once(("id", "matched")),
         },
-        &opt.font_type,
     )?;
 
     Ok(())
@@ -266,7 +238,6 @@ pub(super) fn write_str<'a, W, I>(
     svg: &mut Writer<W>,
     buf: &mut StrStack,
     item: TextItem<'a, I>,
-    font_type: &str,
 ) -> quick_xml::Result<usize>
 where
     W: Write,
@@ -274,14 +245,8 @@ where
 {
     let x = write!(buf, "{:.2}", item.x);
     let y = write!(buf, "{:.2}", item.y);
-    let fs = write!(buf, "{}", item.size);
-    let TextItem {
-        text,
-        extra,
-        location,
-        color,
-        ..
-    } = item;
+
+    let TextItem { text, extra, .. } = item;
 
     thread_local! {
         // reuse for all text elements to avoid allocations
@@ -292,12 +257,8 @@ where
             text.clear_attributes();
             text.extend_attributes(extra);
             text.extend_attributes(args!(
-                "text-anchor" => location.unwrap_or("left"),
                 "x" => &buf[x],
-                "y" => &buf[y],
-                "font-size" => &buf[fs],
-                "font-family" => font_type,
-                "fill" => color
+                "y" => &buf[y]
             ));
         } else {
             unreachable!("cache wrapper was of wrong type: {:?}", start_event);

@@ -1,45 +1,68 @@
-var details, searchbtn, matchedtxt, svg;
+"use strict";
+var details, searchbtn, unzoombtn, matchedtxt, svg, searching;
 function init(evt) {
     details = document.getElementById("details").firstChild;
     searchbtn = document.getElementById("search");
+    unzoombtn = document.getElementById("unzoom");
     matchedtxt = document.getElementById("matched");
     svg = document.getElementsByTagName("svg")[0];
     searching = 0;
 }
+
+window.addEventListener("click", function(e) {
+	var target = find_group(e.target);
+	if (target) {
+        if (target.nodeName == "a") {
+            if (e.ctrlKey === false) return;
+            e.preventDefault();
+        }
+        if (target.classList.contains("parent")) unzoom();
+        zoom(target);
+    }
+    else if (e.target.id == "unzoom") unzoom();
+    else if (e.target.id == "search") search_prompt();
+}, false)
+
 // mouse-over for info
-function s(node) {		// show
-    info = g_to_text(node);
-    details.nodeValue = nametype + " " + info;
-}
-function c() {			// clear
-    details.nodeValue = ' ';
-}
+// show
+window.addEventListener("mouseover", function(e) {
+	var target = find_group(e.target);
+	if (target) details.nodeValue = nametype + " " + g_to_text(target);
+}, false)
+// clear
+window.addEventListener("mouseout", function(e) {
+	var target = find_group(e.target);
+	if (target) details.nodeValue = ' ';
+}, false)
 // ctrl-F for search
 window.addEventListener("keydown",function (e) {
     if (e.keyCode === 114 || (e.ctrlKey && e.keyCode === 70)) {
         e.preventDefault();
         search_prompt();
     }
-})
+}, false)
 // functions
-function find_child(parent, name, attr) {
-    var children = parent.childNodes;
-    for (var i=0; i<children.length;i++) {
-        if (children[i].tagName == name)
-            return (attr != undefined) ? children[i].attributes[attr].value : children[i];
-    }
-    return;
+function find_child(node, selector) {
+	var children = node.querySelectorAll(selector);
+	if (children.length) return children[0];
+	return;
+}
+function find_group(node) {
+	var parent = node.parentElement;
+	if (!parent) return;
+	if (parent.id == "frames") return node;
+	return find_group(parent);
 }
 function orig_save(e, attr, val) {
-    if (e.attributes["_orig_"+attr] != undefined) return;
+    if (e.attributes["_orig_" + attr] != undefined) return;
     if (e.attributes[attr] == undefined) return;
     if (val == undefined) val = e.attributes[attr].value;
-    e.setAttribute("_orig_"+attr, val);
+    e.setAttribute("_orig_" + attr, val);
 }
 function orig_load(e, attr) {
     if (e.attributes["_orig_"+attr] == undefined) return;
-    e.attributes[attr].value = e.attributes["_orig_"+attr].value;
-    e.removeAttribute("_orig_"+attr);
+    e.attributes[attr].value = e.attributes["_orig_" + attr].value;
+    e.removeAttribute("_orig_" + attr);
 }
 function g_to_text(e) {
     var text = find_child(e, "title").firstChild.nodeValue;
@@ -54,11 +77,11 @@ function g_to_func(e) {
 function update_text(e) {
     var r = find_child(e, "rect");
     var t = find_child(e, "text");
-    var w = parseFloat(r.attributes["width"].value) -3;
+    var w = parseFloat(r.attributes.width.value) -3;
     var txt = find_child(e, "title").textContent.replace(/\\([^(]*\\)\$/,"");
-    t.attributes["x"].value = parseFloat(r.attributes["x"].value) +3;
+    t.attributes.x.value = parseFloat(r.attributes.x.value) + 3;
     // Smaller than this size won't fit anything
-    if (w < 2*fontsize*fontwidth) {
+    if (w < 2 * fontsize * fontwidth) {
         t.textContent = "";
         return;
     }
@@ -66,9 +89,9 @@ function update_text(e) {
     // Fit in full text width
     if (/^ *\$/.test(txt) || t.getSubStringLength(0, txt.length) < w)
         return;
-    for (var x=txt.length-2; x>0; x--) {
-        if (t.getSubStringLength(0, x+2) <= w) {
-            t.textContent = txt.substring(0,x) + "..";
+    for (var x = txt.length - 2; x > 0; x--) {
+        if (t.getSubStringLength(0, x + 2) <= w) {
+            t.textContent = txt.substring(0, x) + "..";
             return;
         }
     }
@@ -81,107 +104,104 @@ function zoom_reset(e) {
         orig_load(e, "width");
     }
     if (e.childNodes == undefined) return;
-    for(var i=0, c=e.childNodes; i<c.length; i++) {
+    for(var i = 0, c = e.childNodes; i < c.length; i++) {
         zoom_reset(c[i]);
     }
 }
 function zoom_child(e, x, ratio) {
     if (e.attributes != undefined) {
-        if (e.attributes["x"] != undefined) {
+        if (e.attributes.x != undefined) {
             orig_save(e, "x");
-            e.attributes["x"].value = (parseFloat(e.attributes["x"].value) - x - xpad) * ratio + xpad;
-            if(e.tagName == "text") e.attributes["x"].value = find_child(e.parentNode, "rect", "x") + 3;
+            e.attributes.x.value = (parseFloat(e.attributes.x.value) - x - xpad) * ratio + xpad;
+            if(e.tagName == "text")
+                e.attributes.x.value = find_child(e.parentNode, "rect[x]").attributes.x.value + 3;
         }
-        if (e.attributes["width"] != undefined) {
+        if (e.attributes.width != undefined) {
             orig_save(e, "width");
-            e.attributes["width"].value = parseFloat(e.attributes["width"].value) * ratio;
+            e.attributes.width.value = parseFloat(e.attributes.width.value) * ratio;
         }
     }
     if (e.childNodes == undefined) return;
-    for(var i=0, c=e.childNodes; i<c.length; i++) {
-        zoom_child(c[i], x-xpad, ratio);
+    for(var i = 0, c = e.childNodes; i < c.length; i++) {
+        zoom_child(c[i], x - xpad, ratio);
     }
 }
 function zoom_parent(e) {
     if (e.attributes) {
-        if (e.attributes["x"] != undefined) {
+        if (e.attributes.x != undefined) {
             orig_save(e, "x");
-            e.attributes["x"].value = xpad;
+            e.attributes.x.value = xpad;
         }
-        if (e.attributes["width"] != undefined) {
+        if (e.attributes.width != undefined) {
             orig_save(e, "width");
-            e.attributes["width"].value = parseInt(svg.width.baseVal.value) - (xpad*2);
+            e.attributes.width.value = parseInt(svg.width.baseVal.value) - (xpad*2);
         }
     }
     if (e.childNodes == undefined) return;
-    for(var i=0, c=e.childNodes; i<c.length; i++) {
+    for(var i = 0, c = e.childNodes; i < c.length; i++) {
         zoom_parent(c[i]);
     }
 }
 function zoom(node) {
     var attr = find_child(node, "rect").attributes;
-    var width = parseFloat(attr["width"].value);
-    var xmin = parseFloat(attr["x"].value);
+    var width = parseFloat(attr.width.value);
+    var xmin = parseFloat(attr.x.value);
     var xmax = parseFloat(xmin + width);
-    var ymin = parseFloat(attr["y"].value);
-    var ratio = (svg.width.baseVal.value - 2*xpad) / width;
+    var ymin = parseFloat(attr.y.value);
+    var ratio = (svg.width.baseVal.value - 2 * xpad) / width;
     // XXX: Workaround for JavaScript float issues (fix me)
     var fudge = 0.0001;
-    var unzoombtn = document.getElementById("unzoom");
-    unzoombtn.style["opacity"] = "1.0";
-    var el = document.getElementsByTagName("g");
-    for(var i=0;i<el.length;i++){
+    unzoombtn.classList.remove("hide");
+    var el = document.getElementById("frames").children;
+    for (var i = 0; i < el.length; i++) {
         var e = el[i];
         var a = find_child(e, "rect").attributes;
-        var ex = parseFloat(a["x"].value);
-        var ew = parseFloat(a["width"].value);
+        var ex = parseFloat(a.x.value);
+        var ew = parseFloat(a.width.value);
         // Is it an ancestor
         if (!inverted) {
-            var upstack = parseFloat(a["y"].value) > ymin;
+            var upstack = parseFloat(a.y.value) > ymin;
         } else {
-            var upstack = parseFloat(a["y"].value) < ymin;
+            var upstack = parseFloat(a.y.value) < ymin;
         }
         if (upstack) {
             // Direct ancestor
             if (ex <= xmin && (ex+ew+fudge) >= xmax) {
-                e.style["opacity"] = "0.5";
+                e.classList.add("parent");
                 zoom_parent(e);
-                e.onclick = function(e){unzoom(); zoom(this);};
                 update_text(e);
             }
             // not in current path
             else
-                e.style["display"] = "none";
+                e.classList.add("hide");
         }
         // Children maybe
         else {
             // no common path
             if (ex < xmin || ex + fudge >= xmax) {
-                e.style["display"] = "none";
+                e.classList.add("hide");
             }
             else {
                 zoom_child(e, xmin, ratio);
-                e.onclick = function(e){zoom(this);};
                 update_text(e);
             }
         }
     }
 }
 function unzoom() {
-    var unzoombtn = document.getElementById("unzoom");
-    unzoombtn.style["opacity"] = "0.0";
-    var el = document.getElementsByTagName("g");
-    for(i=0;i<el.length;i++) {
-        el[i].style["display"] = "block";
-        el[i].style["opacity"] = "1";
+    unzoombtn.classList.add("hide");
+    var el = document.getElementById("frames").children;
+    for(var i = 0; i < el.length; i++) {
+        el[i].classList.remove("parent");
+        el[i].classList.remove("hide");
         zoom_reset(el[i]);
         update_text(el[i]);
     }
 }
 // search
 function reset_search() {
-    var el = document.getElementsByTagName("rect");
-    for (var i=0; i < el.length; i++) {
+    var el = document.querySelectorAll("#frames rect");
+    for (var i = 0; i < el.length; i++) {
         orig_load(el[i], "fill")
     }
 }
@@ -195,41 +215,32 @@ function search_prompt() {
     } else {
         reset_search();
         searching = 0;
-        searchbtn.style["opacity"] = "0.1";
+        searchbtn.classList.remove("show");
         searchbtn.firstChild.nodeValue = "Search"
-        matchedtxt.style["opacity"] = "0.0";
+        matchedtxt.classList.add("hide");
         matchedtxt.firstChild.nodeValue = ""
     }
 }
 function search(term) {
     var re = new RegExp(term);
-    var el = document.getElementsByTagName("g");
+    var el = document.getElementById("frames").children;
     var matches = new Object();
     var maxwidth = 0;
     for (var i = 0; i < el.length; i++) {
         var e = el[i];
-        if (e.attributes["class"].value != "func_g")
-            continue;
         var func = g_to_func(e);
         var rect = find_child(e, "rect");
-        if (rect == null) {
-            // the rect might be wrapped in an anchor
-            // if nameattr href is being used
-            if (rect = find_child(e, "a")) {
-                rect = find_child(r, "rect");
-            }
-        }
         if (func == null || rect == null)
             continue;
         // Save max width. Only works as we have a root frame
-        var w = parseFloat(rect.attributes["width"].value);
+        var w = parseFloat(rect.attributes.width.value);
         if (w > maxwidth)
             maxwidth = w;
         if (func.match(re)) {
             // highlight
-            var x = parseFloat(rect.attributes["x"].value);
+            var x = parseFloat(rect.attributes.x.value);
             orig_save(rect, "fill");
-            rect.attributes["fill"].value = searchcolor;
+            rect.attributes.fill.value = searchcolor;
             // remember matches
             if (matches[x] == undefined) {
                 matches[x] = w;
@@ -244,8 +255,8 @@ function search(term) {
     }
     if (!searching)
         return;
-    searchbtn.style["opacity"] = "1.0";
-    searchbtn.firstChild.nodeValue = "Reset Search"
+    searchbtn.classList.add("show");
+    searchbtn.firstChild.nodeValue = "Reset Search";
     // calculate percent matched, excluding vertical overlap
     var count = 0;
     var lastx = -1;
@@ -274,21 +285,8 @@ function search(term) {
         }
     }
     // display matched percent
-    matchedtxt.style["opacity"] = "1.0";
-    pct = 100 * count / maxwidth;
-    if (pct == 100)
-        pct = "100"
-    else
-        pct = pct.toFixed(1)
+    matchedtxt.classList.remove("hide");
+    var pct = 100 * count / maxwidth;
+    if (pct != 100) pct = pct.toFixed(1);
     matchedtxt.firstChild.nodeValue = "Matched: " + pct + "%";
-}
-function searchover(e) {
-    searchbtn.style["opacity"] = "1.0";
-}
-function searchout(e) {
-    if (searching) {
-        searchbtn.style["opacity"] = "1.0";
-    } else {
-        searchbtn.style["opacity"] = "0.1";
-    }
 }
