@@ -61,15 +61,15 @@ struct Opt {
     subtitle: Option<String>,
 
     /// Width of image
-    #[structopt(long = "width", raw(default_value = "defaults::str::IMAGE_WIDTH"))]
+    #[structopt(long = "width", raw(default_value = "&defaults::str::IMAGE_WIDTH"))]
     image_width: usize,
 
     /// Height of each frame
-    #[structopt(long = "height", raw(default_value = "defaults::str::FRAME_HEIGHT"))]
+    #[structopt(long = "height", raw(default_value = "&defaults::str::FRAME_HEIGHT"))]
     frame_height: usize,
 
     /// Omit smaller functions (default 0.1 pixels)
-    #[structopt(long = "minwidth", raw(default_value = "defaults::str::MIN_WIDTH"))]
+    #[structopt(long = "minwidth", raw(default_value = "&defaults::str::MIN_WIDTH"))]
     min_width: f64,
 
     /// Font type
@@ -77,11 +77,11 @@ struct Opt {
     font_type: String,
 
     /// Font size
-    #[structopt(long = "fontsize", raw(default_value = "defaults::str::FONT_SIZE"))]
+    #[structopt(long = "fontsize", raw(default_value = "&defaults::str::FONT_SIZE"))]
     font_size: usize,
 
     /// Font width
-    #[structopt(long = "fontwidth", raw(default_value = "defaults::str::FONT_WIDTH"))]
+    #[structopt(long = "fontwidth", raw(default_value = "&defaults::str::FONT_WIDTH"))]
     font_width: f64,
 
     /// Count type label
@@ -101,7 +101,7 @@ struct Opt {
     negate: bool,
 
     /// Factor to scale sample counts by
-    #[structopt(long = "factor", raw(default_value = "defaults::str::FACTOR"))]
+    #[structopt(long = "factor", raw(default_value = "&defaults::str::FACTOR"))]
     factor: f64,
 
     /// Silence all log output

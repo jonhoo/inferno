@@ -131,6 +131,9 @@ extern crate pretty_assertions;
 #[macro_use]
 extern crate log;
 
+#[macro_use]
+extern crate lazy_static;
+
 /// Stack collapsing for various input formats.
 ///
 /// See the [crate-level documentation] for details.
