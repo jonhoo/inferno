@@ -4,6 +4,7 @@ use quick_xml::{
     Writer,
 };
 use std::borrow::Cow;
+use std::cell::RefCell;
 use std::io::prelude::*;
 use std::iter;
 use str_stack::StrStack;
@@ -86,7 +87,6 @@ pub(super) fn write_prelude<'a, W>(
     svg: &mut Writer<W>,
     style_options: &StyleOptions<'a>,
     opt: &Options,
-    cache_text: &mut Event,
 ) -> quick_xml::Result<()>
 where
     W: Write,
@@ -170,7 +170,6 @@ var searchcolor = '{}';",
             extra: None,
         },
         &opt.font_type,
-        cache_text,
     )?;
 
     if let Some(ref subtitle) = opt.subtitle {
@@ -187,7 +186,6 @@ var searchcolor = '{}';",
                 extra: None,
             },
             &opt.font_type,
-            cache_text,
         )?;
     }
 
@@ -204,7 +202,6 @@ var searchcolor = '{}';",
             extra: iter::once(("id", "details")),
         },
         &opt.font_type,
-        cache_text,
     )?;
 
     write_str(
@@ -224,7 +221,6 @@ var searchcolor = '{}';",
             ],
         },
         &opt.font_type,
-        cache_text,
     )?;
 
     write_str(
@@ -246,7 +242,6 @@ var searchcolor = '{}';",
             ],
         },
         &opt.font_type,
-        cache_text,
     )?;
 
     write_str(
@@ -262,7 +257,6 @@ var searchcolor = '{}';",
             extra: iter::once(("id", "matched")),
         },
         &opt.font_type,
-        cache_text,
     )?;
 
     Ok(())
@@ -273,7 +267,6 @@ pub(super) fn write_str<'a, W, I>(
     buf: &mut StrStack,
     item: TextItem<'a, I>,
     font_type: &str,
-    cache_text: &mut Event,
 ) -> quick_xml::Result<usize>
 where
     W: Write,
@@ -282,24 +275,37 @@ where
     let x = write!(buf, "{:.2}", item.x);
     let y = write!(buf, "{:.2}", item.y);
     let fs = write!(buf, "{}", item.size);
+    let TextItem {
+        text,
+        extra,
+        location,
+        color,
+        ..
+    } = item;
 
-    if let Event::Start(bytes_start) = cache_text {
-        bytes_start.clear_attributes();
-        bytes_start.extend_attributes(item.extra);
-        bytes_start.extend_attributes(args!(
-            "text-anchor" => item.location.unwrap_or("left"),
-            "x" => &buf[x],
-            "y" => &buf[y],
-            "font-size" => &buf[fs],
-            "font-family" => font_type,
-            "fill" => item.color
-        ));
-    } else {
-        unreachable!("cache wrapper was of wrong type: {:?}", cache_text);
-    }
-    svg.write_event(&cache_text)?;
+    thread_local! {
+        // reuse for all text elements to avoid allocations
+        static TEXT: RefCell<Event<'static>> = RefCell::new(Event::Start(BytesStart::owned_name("text")))
+    };
+    TEXT.with(|start_event| {
+        if let Event::Start(ref mut text) = *start_event.borrow_mut() {
+            text.clear_attributes();
+            text.extend_attributes(extra);
+            text.extend_attributes(args!(
+                "text-anchor" => location.unwrap_or("left"),
+                "x" => &buf[x],
+                "y" => &buf[y],
+                "font-size" => &buf[fs],
+                "font-family" => font_type,
+                "fill" => color
+            ));
+        } else {
+            unreachable!("cache wrapper was of wrong type: {:?}", start_event);
+        }
 
-    let s = match item.text {
+        svg.write_event(&*start_event.borrow())
+    })?;
+    let s = match text {
         TextArgument::String(ref s) => &*s,
         TextArgument::FromBuffer(i) => &buf[i],
     };
