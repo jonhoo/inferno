@@ -11,7 +11,7 @@
 	</linearGradient>
 </defs>
 <style type="text/css">
-	text { font-family:Verdana; font-size:12px; fill:rgb(0,0,0); }
+	text { font-family:"Verdana"; font-size:12px; fill:rgb(0,0,0); }
 	#search { opacity:0.1; cursor:pointer; }
 	#search:hover, #search.show { opacity:1; }
 	#subtitle { text-anchor:middle; font-color:rgb(160,160,160); }

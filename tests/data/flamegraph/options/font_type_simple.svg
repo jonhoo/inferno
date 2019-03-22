@@ -8,7 +8,7 @@
         </linearGradient>
     </defs>
     <style type="text/css">
-text { font-family:Andale Mono; font-size:12px; fill:rgb(0,0,0); }
+text { font-family:"Andale Mono"; font-size:12px; fill:rgb(0,0,0); }
 #title { text-anchor:middle; font-size:17px; }
 #search { opacity:0.1; cursor:pointer; }
 #search:hover, #search.show { opacity:1; }

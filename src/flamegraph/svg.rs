@@ -118,7 +118,7 @@ where
 text {{ font-family:{}; font-size:{}px; fill:rgb(0,0,0); }}
 #title {{ text-anchor:middle; font-size:{}px; }}
 {}",
-        &opt.font_type,
+        enquote('\"', &opt.font_type),
         &opt.font_size,
         titlesize,
         include_str!("flamegraph.css")
