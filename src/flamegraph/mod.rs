@@ -279,8 +279,8 @@ impl Default for Direction {
 
 struct FrameAttributes<'a> {
     title: &'a str,
+    id: Option<&'a str>,
     class: Option<&'a str>,
-    style: Option<&'a str>,
     g_extra: Option<&'a Vec<(String, String)>>,
     href: Option<&'a str>,
     target: &'a str,
@@ -292,8 +292,8 @@ fn override_or_add_attributes<'a>(
     attributes: Option<&'a attrs::FrameAttrs>,
 ) -> FrameAttributes<'a> {
     let mut title = title;
+    let mut id = None;
     let mut class = None;
-    let mut style = None;
     let mut g_extra = None;
     let mut href = None;
     let mut target = "_top";
@@ -301,11 +301,11 @@ fn override_or_add_attributes<'a>(
 
     // Handle any overridden or extra attributes.
     if let Some(attrs) = attributes {
+        if let Some(ref c) = attrs.g.id {
+            id = Some(c.as_str());
+        }
         if let Some(ref c) = attrs.g.class {
             class = Some(c.as_str());
-        }
-        if let Some(ref c) = attrs.g.style {
-            style = Some(c.as_str());
         }
         if let Some(ref t) = attrs.title {
             title = t.as_str();
@@ -322,8 +322,8 @@ fn override_or_add_attributes<'a>(
 
     FrameAttributes {
         title,
+        id,
         class,
-        style,
         g_extra,
         href,
         target,
@@ -560,43 +560,11 @@ where
         let frame_attributes = override_or_add_attributes(&buffer[info], frame_attributes);
         let href_is_some = frame_attributes.href.is_some();
 
-        if let Some(href) = frame_attributes.href {
-            if let Event::Start(ref mut a) = cache_a {
-                // clear the BytesStart
-                a.clear_attributes();
-
-                a.extend_attributes(args!(
-                    "xlink:href" => href,
-                    "target" => frame_attributes.target
-                ));
-                if let Some(extra) = frame_attributes.a_extra {
-                    a.extend_attributes(extra.iter().map(|(k, v)| (k.as_str(), v.as_str())));
-                }
-            } else {
-                unreachable!("cache wrapper was of wrong type: {:?}", cache_a);
-            }
-
+        if href_is_some {
+            write_container_attributes(&mut cache_a, &frame_attributes);
             svg.write_event(&cache_a)?;
         } else {
-            if let Event::Start(ref mut g) = cache_g {
-                // clear the BytesStart
-                g.clear_attributes();
-
-                if let Some(class) = frame_attributes.class {
-                    g.extend_attributes(std::iter::once(("class", class)));
-                }
-
-                // add optional attributes
-                if let Some(style) = frame_attributes.style {
-                    g.extend_attributes(std::iter::once(("style", style)));
-                }
-                if let Some(extra) = frame_attributes.g_extra {
-                    g.extend_attributes(extra.iter().map(|(k, v)| (k.as_str(), v.as_str())));
-                }
-            } else {
-                unreachable!("cache wrapper was of wrong type: {:?}", cache_g);
-            }
-
+            write_container_attributes(&mut cache_g, &frame_attributes);
             svg.write_event(&cache_g)?;
         }
 
@@ -682,6 +650,35 @@ where
     svg.write_event(Event::Eof)?;
 
     Ok(())
+}
+
+/// Writes atributes to the container, container could be g or a
+fn write_container_attributes(event: &mut Event, frame_attributes: &FrameAttributes) {
+    if let Event::Start(ref mut c) = event {
+        c.clear_attributes();
+
+        if let Some(href) = frame_attributes.href {
+            c.extend_attributes(args!(
+                "xlink:href" => href,
+                "target" => frame_attributes.target
+            ));
+            if let Some(extra) = frame_attributes.a_extra {
+                c.extend_attributes(extra.iter().map(|(k, v)| (k.as_str(), v.as_str())));
+            }
+        }
+
+        if let Some(id) = frame_attributes.id {
+            c.extend_attributes(std::iter::once(("id", id)));
+        }
+        if let Some(class) = frame_attributes.class {
+            c.extend_attributes(std::iter::once(("class", class)));
+        }
+        if let Some(extra) = frame_attributes.g_extra {
+            c.extend_attributes(extra.iter().map(|(k, v)| (k.as_str(), v.as_str())));
+        }
+    } else {
+        unreachable!("cache wrapper was of wrong type: {:?}", event);
+    }
 }
 
 /// Produce a flame graph from a reader that contains a sequence of folded stack lines.

@@ -43,7 +43,7 @@ var searchcolor = 'rgb(230,0,230)';]]>
             <rect x="10" y="149" width="109" height="15" fill="rgb(247,154,46)"/>
             <text x="13.00" y="159.50">__libc_start_..</text>
         </g>
-        <a xlink:href="https://github.com/jonhoo/inferno" target="_blank" rel="external" hreflang="en-us">
+        <a xlink:href="https://github.com/jonhoo/inferno" target="_blank" rel="external" hreflang="en-us" class="inferno" stroke-width="1" stroke="green">
             <title>foo</title>
             <rect x="10" y="133" width="109" height="15" fill="rgb(247,83,46)"/>
             <text x="13.00" y="143.50">main</text>
@@ -103,7 +103,7 @@ var searchcolor = 'rgb(230,0,230)';]]>
             <rect x="10" y="181" width="201" height="15" fill="rgb(226,95,23)"/>
             <text x="13.00" y="191.50">cksum</text>
         </g>
-        <a xlink:href="https://github.com/jonhoo/inferno" target="_blank" rel="external" hreflang="en-us">
+        <a xlink:href="https://github.com/jonhoo/inferno" target="_blank" rel="external" hreflang="en-us" class="inferno" stroke-width="1" stroke="green">
             <title>foo</title>
             <rect x="144" y="165" width="67" height="15" fill="rgb(247,83,46)"/>
             <text x="147.00" y="175.50">main</text>
@@ -128,7 +128,7 @@ var searchcolor = 'rgb(230,0,230)';]]>
             <rect x="211" y="181" width="979" height="15" fill="rgb(248,212,47)"/>
             <text x="214.00" y="191.50">noploop</text>
         </g>
-        <a xlink:href="https://github.com/jonhoo/inferno" target="_blank" rel="external" hreflang="en-us">
+        <a xlink:href="https://github.com/jonhoo/inferno" target="_blank" rel="external" hreflang="en-us" class="inferno" stroke-width="1" stroke="green">
             <title>foo</title>
             <rect x="219" y="165" width="971" height="15" fill="rgb(247,83,46)"/>
             <text x="222.00" y="175.50">main</text>
