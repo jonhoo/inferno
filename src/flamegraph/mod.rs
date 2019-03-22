@@ -481,6 +481,8 @@ where
     let mut cache_g = Event::Start({ BytesStart::owned_name("g") });
     let mut cache_a = Event::Start({ BytesStart::owned_name("a") });
     let mut cache_rect = Event::Empty(BytesStart::owned_name("rect"));
+    let cache_g_end = Event::End(BytesEnd::borrowed(b"g"));
+    let cache_a_end = Event::End(BytesEnd::borrowed(b"a"));
 
     // create frames container
     if let Event::Start(ref mut g) = cache_g {
@@ -558,25 +560,6 @@ where
         let frame_attributes = override_or_add_attributes(&buffer[info], frame_attributes);
         let href_is_some = frame_attributes.href.is_some();
 
-        if let Event::Start(ref mut g) = cache_g {
-            // clear the BytesStart
-            g.clear_attributes();
-
-            if let Some(class) = frame_attributes.class {
-                g.extend_attributes(std::iter::once(("class", class)));
-            }
-
-            // add optional attributes
-            if let Some(style) = frame_attributes.style {
-                g.extend_attributes(std::iter::once(("style", style)));
-            }
-            if let Some(extra) = frame_attributes.g_extra {
-                g.extend_attributes(extra.iter().map(|(k, v)| (k.as_str(), v.as_str())));
-            }
-        } else {
-            unreachable!("cache wrapper was of wrong type: {:?}", cache_g);
-        }
-
         if let Some(href) = frame_attributes.href {
             if let Event::Start(ref mut a) = cache_a {
                 // clear the BytesStart
@@ -595,6 +578,25 @@ where
 
             svg.write_event(&cache_a)?;
         } else {
+            if let Event::Start(ref mut g) = cache_g {
+                // clear the BytesStart
+                g.clear_attributes();
+
+                if let Some(class) = frame_attributes.class {
+                    g.extend_attributes(std::iter::once(("class", class)));
+                }
+
+                // add optional attributes
+                if let Some(style) = frame_attributes.style {
+                    g.extend_attributes(std::iter::once(("style", style)));
+                }
+                if let Some(extra) = frame_attributes.g_extra {
+                    g.extend_attributes(extra.iter().map(|(k, v)| (k.as_str(), v.as_str())));
+                }
+            } else {
+                unreachable!("cache wrapper was of wrong type: {:?}", cache_g);
+            }
+
             svg.write_event(&cache_g)?;
         }
 
@@ -669,13 +671,13 @@ where
 
         buffer.clear();
         if href_is_some {
-            svg.write_event(Event::End(BytesEnd::borrowed(b"a")))?;
+            svg.write_event(&cache_a_end)?;
         } else {
-            svg.write_event(Event::End(BytesEnd::borrowed(b"g")))?;
+            svg.write_event(&cache_g_end)?;
         }
     }
 
-    svg.write_event(Event::End(BytesEnd::borrowed(b"g")))?;
+    svg.write_event(&cache_g_end)?;
     svg.write_event(Event::End(BytesEnd::borrowed(b"svg")))?;
     svg.write_event(Event::Eof)?;
 
