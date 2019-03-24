@@ -3,10 +3,12 @@ extern crate pretty_assertions;
 
 extern crate inferno;
 
+use assert_cmd::prelude::*;
 use inferno::differential::{self, Options};
 use log::Level;
 use std::fs::{self, File};
 use std::io::{self, BufRead, BufReader, Cursor};
+use std::process::Command;
 
 fn test_diff_folded(
     infile1: &str,
@@ -186,4 +188,21 @@ fn diff_folded_should_log_warning_about_fractional_samples() {
             );
         },
     );
+}
+
+#[test]
+fn diff_folded_cli() {
+    let infile1 = "./tests/data/diff-folded/before.txt";
+    let infile2 = "./tests/data/diff-folded/after.txt";
+    let expected_file = "./tests/data/diff-folded/results/strip_hex.txt";
+
+    let output = Command::cargo_bin("inferno-diff-folded")
+        .unwrap()
+        .arg("--strip-hex")
+        .arg(infile1)
+        .arg(infile2)
+        .output()
+        .expect("failed to execute process");
+    let expected = BufReader::new(File::open(expected_file).unwrap());
+    compare_results(Cursor::new(output.stdout), expected, expected_file);
 }
