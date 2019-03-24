@@ -3,6 +3,7 @@ extern crate pretty_assertions;
 
 extern crate inferno;
 
+use assert_cmd::prelude::*;
 use inferno::flamegraph::{
     self, color::BackgroundColor, color::PaletteMap, Direction, Options, Palette,
 };
@@ -10,6 +11,7 @@ use log::Level;
 use std::fs::{self, File};
 use std::io::{self, BufRead, BufReader, Cursor};
 use std::path::{Path, PathBuf};
+use std::process::{Command, Stdio};
 use std::str::FromStr;
 
 fn test_flamegraph(
@@ -790,4 +792,56 @@ fn flamegraph_should_warn_about_bad_input_lines_with_reversed_stack_ordering() {
         },
         options,
     );
+}
+
+#[test]
+fn flamegraph_cli() {
+    let input_file = "./flamegraph/test/results/perf-vertx-stacks-01-collapsed-all.txt";
+    let expected_file =
+        "./tests/data/flamegraph/perf-vertx-stacks/perf-vertx-stacks-01-collapsed-all.svg";
+    // Test with file passed in
+    let output = Command::cargo_bin("inferno-flamegraph")
+        .unwrap()
+        .arg("--pretty-xml")
+        .arg("--no-javascript")
+        .arg("--hash")
+        .arg(input_file)
+        .output()
+        .expect("failed to execute process");
+    let expected = BufReader::new(File::open(expected_file).unwrap());
+    compare_results(Cursor::new(output.stdout), expected, expected_file);
+
+    // Test with STDIN
+    let mut child = Command::cargo_bin("inferno-flamegraph")
+        .unwrap()
+        .arg("--pretty-xml")
+        .arg("--no-javascript")
+        .arg("--hash")
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .spawn()
+        .expect("Failed to spawn child process");
+    let mut input = BufReader::new(File::open(input_file).unwrap());
+    let stdin = child.stdin.as_mut().expect("Failed to open stdin");
+    io::copy(&mut input, stdin).unwrap();
+    let output = child.wait_with_output().expect("Failed to read stdout");
+    let expected = BufReader::new(File::open(expected_file).unwrap());
+    compare_results(Cursor::new(output.stdout), expected, expected_file);
+
+    // Test with multiple files passed in
+    let input_file_part1 =
+        "./tests/data/flamegraph/multiple-inputs/perf-vertx-stacks-01-collapsed-all-unsorted-1.txt";
+    let input_file_part2 =
+        "./tests/data/flamegraph/multiple-inputs/perf-vertx-stacks-01-collapsed-all-unsorted-2.txt";
+    let output = Command::cargo_bin("inferno-flamegraph")
+        .unwrap()
+        .arg("--pretty-xml")
+        .arg("--no-javascript")
+        .arg("--hash")
+        .arg(input_file_part1)
+        .arg(input_file_part2)
+        .output()
+        .expect("failed to execute process");
+    let expected = BufReader::new(File::open(expected_file).unwrap());
+    compare_results(Cursor::new(output.stdout), expected, expected_file);
 }
