@@ -123,7 +123,7 @@ var searchcolor = 'rgb(230,0,230)';]]>
             <rect x="10" y="197" width="1180" height="15" fill="rgb(255,230,55)"/>
             <text x="13.00" y="207.50"></text>
         </g>
-        <g>
+        <g id="test">
             <title>noploop (276 samples, 82.88%)</title>
             <rect x="211" y="181" width="979" height="15" fill="rgb(248,212,47)"/>
             <text x="214.00" y="191.50">noploop</text>
