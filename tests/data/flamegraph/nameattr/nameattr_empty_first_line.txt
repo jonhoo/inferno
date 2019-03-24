@@ -1,3 +1,4 @@
 
 main	class=inferno	title=foo	g_extra=stroke-width="1" stroke="green"	href=https://github.com/jonhoo/inferno	target=_blank	a_extra=rel="external" hreflang="en-us"
 cksum	title=bar	class=flames
+noploop	id=test
