@@ -279,11 +279,8 @@ impl Default for Direction {
 
 struct FrameAttributes<'a> {
     title: &'a str,
-    class: &'a str,
-    onmouseover: &'a str,
-    onmouseout: &'a str,
-    onclick: &'a str,
-    style: Option<&'a str>,
+    id: Option<&'a str>,
+    class: Option<&'a str>,
     g_extra: Option<&'a Vec<(String, String)>>,
     href: Option<&'a str>,
     target: &'a str,
@@ -295,11 +292,8 @@ fn override_or_add_attributes<'a>(
     attributes: Option<&'a attrs::FrameAttrs>,
 ) -> FrameAttributes<'a> {
     let mut title = title;
-    let mut class = "func_g";
-    let mut onmouseover = "s(this)";
-    let mut onmouseout = "c()";
-    let mut onclick = "zoom(this)";
-    let mut style = None;
+    let mut id = None;
+    let mut class = None;
     let mut g_extra = None;
     let mut href = None;
     let mut target = "_top";
@@ -307,20 +301,11 @@ fn override_or_add_attributes<'a>(
 
     // Handle any overridden or extra attributes.
     if let Some(attrs) = attributes {
+        if let Some(ref c) = attrs.g.id {
+            id = Some(c.as_str());
+        }
         if let Some(ref c) = attrs.g.class {
-            class = c.as_str();
-        }
-        if let Some(ref c) = attrs.g.style {
-            style = Some(c.as_str());
-        }
-        if let Some(ref o) = attrs.g.onmouseover {
-            onmouseover = o.as_str();
-        }
-        if let Some(ref o) = attrs.g.onmouseout {
-            onmouseout = o.as_str();
-        }
-        if let Some(ref o) = attrs.g.onclick {
-            onclick = o.as_str();
+            class = Some(c.as_str());
         }
         if let Some(ref t) = attrs.title {
             title = t.as_str();
@@ -337,11 +322,8 @@ fn override_or_add_attributes<'a>(
 
     FrameAttributes {
         title,
+        id,
         class,
-        onmouseover,
-        onmouseout,
-        onclick,
-        style,
         g_extra,
         href,
         target,
@@ -448,15 +430,11 @@ where
             &mut svg,
             &mut buffer,
             svg::TextItem {
-                color: "black",
-                size: opt.font_size + 2,
                 x: (opt.image_width / 2) as f64,
                 y: (opt.font_size * 2) as f64,
                 text: "ERROR: No valid input provided to flamegraph".into(),
-                location: Some("middle"),
                 extra: None,
             },
-            &opt.font_type,
         )?;
         svg.write_event(Event::End(BytesEnd::borrowed(b"svg")))?;
         svg.write_event(Event::Eof)?;
@@ -503,6 +481,14 @@ where
     let mut cache_g = Event::Start({ BytesStart::owned_name("g") });
     let mut cache_a = Event::Start({ BytesStart::owned_name("a") });
     let mut cache_rect = Event::Empty(BytesStart::owned_name("rect"));
+    let cache_g_end = Event::End(BytesEnd::borrowed(b"g"));
+    let cache_a_end = Event::End(BytesEnd::borrowed(b"a"));
+
+    // create frames container
+    if let Event::Start(ref mut g) = cache_g {
+        g.extend_attributes(std::iter::once(("id", "frames")));
+    }
+    svg.write_event(&cache_g)?;
 
     // draw frames
     let mut samples_txt_buffer = num_format::Buffer::default();
@@ -574,54 +560,19 @@ where
         let frame_attributes = override_or_add_attributes(&buffer[info], frame_attributes);
         let href_is_some = frame_attributes.href.is_some();
 
-        if let Event::Start(ref mut g) = cache_g {
-            // clear the BytesStart
-            g.clear_attributes();
-
-            g.extend_attributes(args!(
-                "class" => frame_attributes.class,
-                "onmouseover" => frame_attributes.onmouseover,
-                "onmouseout" => frame_attributes.onmouseout,
-                "onclick" => frame_attributes.onclick
-            ));
-
-            // add optional attributes
-            if let Some(style) = frame_attributes.style {
-                g.extend_attributes(std::iter::once(("style", style)));
-            }
-            if let Some(extra) = frame_attributes.g_extra {
-                g.extend_attributes(extra.iter().map(|(k, v)| (k.as_str(), v.as_str())));
-            }
+        if href_is_some {
+            write_container_attributes(&mut cache_a, &frame_attributes);
+            svg.write_event(&cache_a)?;
         } else {
-            unreachable!("cache wrapper was of wrong type: {:?}", cache_g);
+            write_container_attributes(&mut cache_g, &frame_attributes);
+            svg.write_event(&cache_g)?;
         }
-
-        svg.write_event(&cache_g)?;
 
         svg.write_event(Event::Start(BytesStart::borrowed_name(b"title")))?;
         svg.write_event(Event::Text(BytesText::from_plain_str(
             frame_attributes.title,
         )))?;
         svg.write_event(Event::End(BytesEnd::borrowed(b"title")))?;
-
-        if let Some(href) = frame_attributes.href {
-            if let Event::Start(ref mut a) = cache_a {
-                // clear the BytesStart
-                a.clear_attributes();
-
-                a.extend_attributes(args!(
-                    "xlink:href" => href,
-                    "target" => frame_attributes.target
-                ));
-                if let Some(extra) = frame_attributes.a_extra {
-                    a.extend_attributes(extra.iter().map(|(k, v)| (k.as_str(), v.as_str())));
-                }
-            } else {
-                unreachable!("cache wrapper was of wrong type: {:?}", cache_a);
-            }
-
-            svg.write_event(&cache_a)?;
-        }
 
         // select the color of the rectangle
         let color = if frame.location.function == "--" {
@@ -679,28 +630,55 @@ where
             &mut svg,
             &mut buffer,
             svg::TextItem {
-                color: "rgb(0, 0, 0)",
-                size: opt.font_size,
                 x: rect.x1 as f64 + 3.0,
                 y: 3.0 + (rect.y1 + rect.y2) as f64 / 2.0,
                 text,
-                location: None,
                 extra: None,
             },
-            &opt.font_type,
         )?;
 
         buffer.clear();
         if href_is_some {
-            svg.write_event(Event::End(BytesEnd::borrowed(b"a")))?;
+            svg.write_event(&cache_a_end)?;
+        } else {
+            svg.write_event(&cache_g_end)?;
         }
-        svg.write_event(Event::End(BytesEnd::borrowed(b"g")))?;
     }
 
+    svg.write_event(&cache_g_end)?;
     svg.write_event(Event::End(BytesEnd::borrowed(b"svg")))?;
     svg.write_event(Event::Eof)?;
 
     Ok(())
+}
+
+/// Writes atributes to the container, container could be g or a
+fn write_container_attributes(event: &mut Event, frame_attributes: &FrameAttributes) {
+    if let Event::Start(ref mut c) = event {
+        c.clear_attributes();
+
+        if let Some(href) = frame_attributes.href {
+            c.extend_attributes(args!(
+                "xlink:href" => href,
+                "target" => frame_attributes.target
+            ));
+            if let Some(extra) = frame_attributes.a_extra {
+                c.extend_attributes(extra.iter().map(|(k, v)| (k.as_str(), v.as_str())));
+            }
+        }
+
+        if let Some(id) = frame_attributes.id {
+            c.extend_attributes(std::iter::once(("id", id)));
+        }
+        if let Some(class) = frame_attributes.class {
+            c.extend_attributes(std::iter::once(("class", class)));
+        }
+        if let Some(extra) = frame_attributes.g_extra {
+            c.extend_attributes(extra.iter().map(|(k, v)| (k.as_str(), v.as_str())));
+        }
+    } else {
+        unreachable!("cache wrapper was of wrong type: {:?}", event);
+    }
 }
 
 /// Produce a flame graph from a reader that contains a sequence of folded stack lines.

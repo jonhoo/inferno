@@ -7,7 +7,17 @@
             <stop stop-color="#eeeeb0" offset="95%"/>
         </linearGradient>
     </defs>
-    <style type="text/css">.func_g:hover { stroke:black; stroke-width:0.5; cursor:pointer; }</style>
+    <style type="text/css">
+text { font-family:"Verdana"; font-size:12px; fill:rgb(0,0,0); }
+#title { text-anchor:middle; font-size:17px; }
+#search { opacity:0.1; cursor:pointer; }
+#search:hover, #search.show { opacity:1; }
+#subtitle { text-anchor:middle; font-color:rgb(160,160,160); }
+#unzoom { cursor:pointer; }
+#frames > *:hover { stroke:black; stroke-width:0.5; cursor:pointer; }
+.hide { display:none; }
+.parent { opacity:0.5; }
+</style>
     <script type="text/ecmascript">
         <![CDATA[var nametype = 'Function:';
 var fontsize = 12;
@@ -17,69 +27,71 @@ var inverted = false;
 var searchcolor = 'rgb(230,0,230)';]]>
     </script>
     <rect x="0" y="0" width="1200" height="166" fill="url(#background)"/>
-    <text text-anchor="middle" x="600.00" y="24.00" font-size="17" font-family="Verdana" fill="rgb(0, 0, 0)">Flame Graph</text>
-    <text id="details" text-anchor="left" x="10.00" y="149.00" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)"> </text>
-    <text id="unzoom" onclick="unzoom()" style="opacity:0.0;cursor:pointer" text-anchor="left" x="10.00" y="24.00" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">Reset Zoom</text>
-    <text id="search" onmouseover="searchover()" onmouseout="searchout()" onclick="search_prompt()" style="opacity:0.1;cursor:pointer" text-anchor="left" x="1090.00" y="24.00" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">Search</text>
-    <text id="matched" text-anchor="left" x="1090.00" y="149.00" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)"> </text>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>_start (31,000 samples, 8.03%)</title>
-        <rect x="10" y="85" width="94" height="15" fill="rgb(239,139,37)"/>
-        <text text-anchor="left" x="13.00" y="95.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">_start</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>__libc_start_main (31,000 samples, 8.03%)</title>
-        <rect x="10" y="69" width="94" height="15" fill="rgb(247,154,46)"/>
-        <text text-anchor="left" x="13.00" y="79.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">__libc_star..</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>main (31,000 samples, 8.03%)</title>
-        <rect x="10" y="53" width="94" height="15" fill="rgb(247,83,46)"/>
-        <text text-anchor="left" x="13.00" y="63.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">main</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>cksum (31,000 samples, 8.03%)</title>
-        <rect x="10" y="37" width="94" height="15" fill="rgb(226,95,23)"/>
-        <text text-anchor="left" x="13.00" y="47.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">cksum</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>cksum (60,001 samples, 15.54%)</title>
-        <rect x="104" y="85" width="184" height="15" fill="rgb(226,95,23)"/>
-        <text text-anchor="left" x="107.00" y="95.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">cksum</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>cksum (110,001 samples, 28.50%)</title>
-        <rect x="10" y="101" width="336" height="15" fill="rgb(226,95,23)"/>
-        <text text-anchor="left" x="13.00" y="111.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">cksum</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>main (19,000 samples, 4.92%)</title>
-        <rect x="288" y="85" width="58" height="15" fill="rgb(247,83,46)"/>
-        <text text-anchor="left" x="291.00" y="95.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">main</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>cksum (19,000 samples, 4.92%)</title>
-        <rect x="288" y="69" width="58" height="15" fill="rgb(226,95,23)"/>
-        <text text-anchor="left" x="291.00" y="79.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">cksum</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>[unknown] (2,000 samples, 0.52%)</title>
-        <rect x="346" y="85" width="6" height="15" fill="rgb(242,180,40)"/>
-        <text text-anchor="left" x="349.00" y="95.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)"></text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>all (386,001 samples, 100%)</title>
-        <rect x="10" y="117" width="1180" height="15" fill="rgb(255,230,55)"/>
-        <text text-anchor="left" x="13.00" y="127.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)"></text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>noploop (276,000 samples, 71.50%)</title>
-        <rect x="346" y="101" width="844" height="15" fill="rgb(248,212,47)"/>
-        <text text-anchor="left" x="349.00" y="111.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">noploop</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>main (274,000 samples, 70.98%)</title>
-        <rect x="352" y="85" width="838" height="15" fill="rgb(247,83,46)"/>
-        <text text-anchor="left" x="355.00" y="95.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">main</text>
+    <text id="title" x="600.00" y="24.00">Flame Graph</text>
+    <text id="details" x="10.00" y="149.00"> </text>
+    <text id="unzoom" class="hide" x="10.00" y="24.00">Reset Zoom</text>
+    <text id="search" x="1090.00" y="24.00">Search</text>
+    <text id="matched" x="1090.00" y="149.00"> </text>
+    <g id="frames">
+        <g>
+            <title>_start (31,000 samples, 8.03%)</title>
+            <rect x="10" y="85" width="94" height="15" fill="rgb(239,139,37)"/>
+            <text x="13.00" y="95.50">_start</text>
+        </g>
+        <g>
+            <title>__libc_start_main (31,000 samples, 8.03%)</title>
+            <rect x="10" y="69" width="94" height="15" fill="rgb(247,154,46)"/>
+            <text x="13.00" y="79.50">__libc_star..</text>
+        </g>
+        <g>
+            <title>main (31,000 samples, 8.03%)</title>
+            <rect x="10" y="53" width="94" height="15" fill="rgb(247,83,46)"/>
+            <text x="13.00" y="63.50">main</text>
+        </g>
+        <g>
+            <title>cksum (31,000 samples, 8.03%)</title>
+            <rect x="10" y="37" width="94" height="15" fill="rgb(226,95,23)"/>
+            <text x="13.00" y="47.50">cksum</text>
+        </g>
+        <g>
+            <title>cksum (60,001 samples, 15.54%)</title>
+            <rect x="104" y="85" width="184" height="15" fill="rgb(226,95,23)"/>
+            <text x="107.00" y="95.50">cksum</text>
+        </g>
+        <g>
+            <title>cksum (110,001 samples, 28.50%)</title>
+            <rect x="10" y="101" width="336" height="15" fill="rgb(226,95,23)"/>
+            <text x="13.00" y="111.50">cksum</text>
+        </g>
+        <g>
+            <title>main (19,000 samples, 4.92%)</title>
+            <rect x="288" y="85" width="58" height="15" fill="rgb(247,83,46)"/>
+            <text x="291.00" y="95.50">main</text>
+        </g>
+        <g>
+            <title>cksum (19,000 samples, 4.92%)</title>
+            <rect x="288" y="69" width="58" height="15" fill="rgb(226,95,23)"/>
+            <text x="291.00" y="79.50">cksum</text>
+        </g>
+        <g>
+            <title>[unknown] (2,000 samples, 0.52%)</title>
+            <rect x="346" y="85" width="6" height="15" fill="rgb(242,180,40)"/>
+            <text x="349.00" y="95.50"></text>
+        </g>
+        <g>
+            <title>all (386,001 samples, 100%)</title>
+            <rect x="10" y="117" width="1180" height="15" fill="rgb(255,230,55)"/>
+            <text x="13.00" y="127.50"></text>
+        </g>
+        <g>
+            <title>noploop (276,000 samples, 71.50%)</title>
+            <rect x="346" y="101" width="844" height="15" fill="rgb(248,212,47)"/>
+            <text x="349.00" y="111.50">noploop</text>
+        </g>
+        <g>
+            <title>main (274,000 samples, 70.98%)</title>
+            <rect x="352" y="85" width="838" height="15" fill="rgb(247,83,46)"/>
+            <text x="355.00" y="95.50">main</text>
+        </g>
     </g>
 </svg>

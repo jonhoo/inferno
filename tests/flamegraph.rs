@@ -457,6 +457,22 @@ fn flamegraph_grey_frames() {
 }
 
 #[test]
+fn flamegraph_example_perf_stacks() {
+    let input_file = "./tests/data/collapse-perf/results/example-perf-stacks-collapsed.txt";
+    let expected_result_file =
+        "./tests/data/flamegraph/example-perf-stacks/example-perf-stacks.svg";
+    let palette_file = "./tests/data/flamegraph/example-perf-stacks/palette.map";
+    let mut palette_map = load_palette_map_file(palette_file);
+
+    let options = flamegraph::Options {
+        palette_map: Some(&mut palette_map),
+        ..Default::default()
+    };
+
+    test_flamegraph(input_file, expected_result_file, options).unwrap();
+}
+
+#[test]
 fn flamegraph_default_options() {
     let input_file =
         "./tests/data/flamegraph/differential/perf-cycles-instructions-01-collapsed-all-diff.txt";
@@ -629,22 +645,6 @@ fn flamegraph_font_type_simple() {
 
     let options = flamegraph::Options {
         font_type: "Andale Mono".to_owned(),
-        ..Default::default()
-    };
-
-    test_flamegraph(input_file, expected_result_file, options).unwrap();
-}
-
-#[test]
-fn flamegraph_example_perf_stacks() {
-    let input_file = "./tests/data/collapse-perf/results/example-perf-stacks-collapsed.txt";
-    let expected_result_file =
-        "./tests/data/flamegraph/example-perf-stacks/example-perf-stacks.svg";
-    let palette_file = "./tests/data/flamegraph/example-perf-stacks/palette.map";
-    let mut palette_map = load_palette_map_file(palette_file);
-
-    let options = flamegraph::Options {
-        palette_map: Some(&mut palette_map),
         ..Default::default()
     };
 

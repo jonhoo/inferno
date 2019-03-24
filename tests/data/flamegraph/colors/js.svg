@@ -7,7 +7,17 @@
             <stop stop-color="#e0ffe0" offset="95%"/>
         </linearGradient>
     </defs>
-    <style type="text/css">.func_g:hover { stroke:black; stroke-width:0.5; cursor:pointer; }</style>
+    <style type="text/css">
+text { font-family:"Verdana"; font-size:12px; fill:rgb(0,0,0); }
+#title { text-anchor:middle; font-size:17px; }
+#search { opacity:0.1; cursor:pointer; }
+#search:hover, #search.show { opacity:1; }
+#subtitle { text-anchor:middle; font-color:rgb(160,160,160); }
+#unzoom { cursor:pointer; }
+#frames > *:hover { stroke:black; stroke-width:0.5; cursor:pointer; }
+.hide { display:none; }
+.parent { opacity:0.5; }
+</style>
     <script type="text/ecmascript">
         <![CDATA[var nametype = 'Function:';
 var fontsize = 12;
@@ -17,114 +27,116 @@ var inverted = false;
 var searchcolor = 'rgb(230,0,230)';]]>
     </script>
     <rect x="0" y="0" width="1200" height="390" fill="url(#background)"/>
-    <text text-anchor="middle" x="600.00" y="24.00" font-size="17" font-family="Verdana" fill="rgb(0, 0, 0)">Flame Graph</text>
-    <text id="details" text-anchor="left" x="10.00" y="373.00" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)"> </text>
-    <text id="unzoom" onclick="unzoom()" style="opacity:0.0;cursor:pointer" text-anchor="left" x="10.00" y="24.00" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">Reset Zoom</text>
-    <text id="search" onmouseover="searchover()" onmouseout="searchout()" onclick="search_prompt()" style="opacity:0.1;cursor:pointer" text-anchor="left" x="1090.00" y="24.00" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">Search</text>
-    <text id="matched" text-anchor="left" x="1090.00" y="373.00" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)"> </text>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>RegExp:\bFoo ?Bar (1 samples, 50.00%)</title>
-        <rect x="10" y="69" width="590" height="15" fill="rgb(97,208,208)"/>
-        <text text-anchor="left" x="13.00" y="79.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">RegExp:\bFoo ?Bar</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>all (2 samples, 100%)</title>
-        <rect x="10" y="341" width="1180" height="15" fill="rgb(255,130,130)"/>
-        <text text-anchor="left" x="13.00" y="351.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)"></text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>node-v011 (2 samples, 100.00%)</title>
-        <rect x="10" y="325" width="1180" height="15" fill="rgb(250,123,123)"/>
-        <text text-anchor="left" x="13.00" y="335.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">node-v011</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>__libc_start_main (2 samples, 100.00%)</title>
-        <rect x="10" y="309" width="1180" height="15" fill="rgb(236,103,103)"/>
-        <text text-anchor="left" x="13.00" y="319.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">__libc_start_main</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>node::Start (2 samples, 100.00%)</title>
-        <rect x="10" y="293" width="1180" height="15" fill="rgb(225,225,68)"/>
-        <text text-anchor="left" x="13.00" y="303.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">node::Start</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>uv_run (2 samples, 100.00%)</title>
-        <rect x="10" y="277" width="1180" height="15" fill="rgb(223,84,84)"/>
-        <text text-anchor="left" x="13.00" y="287.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">uv_run</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>uv__io_poll (2 samples, 100.00%)</title>
-        <rect x="10" y="261" width="1180" height="15" fill="rgb(223,84,84)"/>
-        <text text-anchor="left" x="13.00" y="271.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">uv__io_poll</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>uv__async_io (2 samples, 100.00%)</title>
-        <rect x="10" y="245" width="1180" height="15" fill="rgb(223,84,84)"/>
-        <text text-anchor="left" x="13.00" y="255.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">uv__async_io</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>uv__async_event (2 samples, 100.00%)</title>
-        <rect x="10" y="229" width="1180" height="15" fill="rgb(223,84,84)"/>
-        <text text-anchor="left" x="13.00" y="239.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">uv__async_event</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>uv__work_done (2 samples, 100.00%)</title>
-        <rect x="10" y="213" width="1180" height="15" fill="rgb(223,84,84)"/>
-        <text text-anchor="left" x="13.00" y="223.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">uv__work_done</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>node::After (2 samples, 100.00%)</title>
-        <rect x="10" y="197" width="1180" height="15" fill="rgb(225,225,68)"/>
-        <text text-anchor="left" x="13.00" y="207.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">node::After</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>v8::Function::Call (2 samples, 100.00%)</title>
-        <rect x="10" y="181" width="1180" height="15" fill="rgb(205,205,61)"/>
-        <text text-anchor="left" x="13.00" y="191.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">v8::Function::Call</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>v8::internal::Execution::Call (2 samples, 100.00%)</title>
-        <rect x="10" y="165" width="1180" height="15" fill="rgb(205,205,61)"/>
-        <text text-anchor="left" x="13.00" y="175.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">v8::internal::Execution::Call</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>v8::internal::Invoke (2 samples, 100.00%)</title>
-        <rect x="10" y="149" width="1180" height="15" fill="rgb(205,205,61)"/>
-        <text text-anchor="left" x="13.00" y="159.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">v8::internal::Invoke</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>Stub:JSEntryStub (2 samples, 100.00%)</title>
-        <rect x="10" y="133" width="1180" height="15" fill="rgb(88,200,200)"/>
-        <text text-anchor="left" x="13.00" y="143.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">Stub:JSEntryStub</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>Builtin:A builtin from the snapshot (2 samples, 100.00%)</title>
-        <rect x="10" y="117" width="1180" height="15" fill="rgb(80,193,193)"/>
-        <text text-anchor="left" x="13.00" y="127.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">Builtin:A builtin from the snapshot</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>LazyCompile:_tickDomainCallback node.js:387 (2 samples, 100.00%)</title>
-        <rect x="10" y="101" width="1180" height="15" fill="rgb(83,196,196)"/>
-        <text text-anchor="left" x="13.00" y="111.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">LazyCompile:_tickDomainCallback node.js:387</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>LazyCompile:*Async$consumeFunctionBuffer /apps/node/webapp/node_modules/xxxxx/js/main/async.js:39 (2 samples, 100.00%)</title>
-        <rect x="10" y="85" width="1180" height="15" fill="rgb(83,231,83)"/>
-        <text text-anchor="left" x="13.00" y="95.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">LazyCompile:*Async$consumeFunctionBuffer /apps/node/webapp/node_modules/xxxxx/js/main/async.js:39</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>v8::internal::Execution::Call (1 samples, 50.00%)</title>
-        <rect x="600" y="69" width="590" height="15" fill="rgb(205,205,61)"/>
-        <text text-anchor="left" x="603.00" y="79.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">v8::internal::Execution::Call</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>LazyCompile:~body_0 evalmachine.&lt;anonymous&gt;:1 (1 samples, 50.00%)</title>
-        <rect x="600" y="53" width="590" height="15" fill="rgb(83,196,196)"/>
-        <text text-anchor="left" x="603.00" y="63.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">LazyCompile:~body_0 evalmachine.&lt;anonymous&gt;:1</text>
-    </g>
-    <g class="func_g" onmouseover="s(this)" onmouseout="c()" onclick="zoom(this)">
-        <title>RegExp:[&amp;&lt;&gt;\\] (1 samples, 50.00%)</title>
-        <rect x="600" y="37" width="590" height="15" fill="rgb(97,208,208)"/>
-        <text text-anchor="left" x="603.00" y="47.50" font-size="12" font-family="Verdana" fill="rgb(0, 0, 0)">RegExp:[&amp;&lt;&gt;\\]</text>
+    <text id="title" x="600.00" y="24.00">Flame Graph</text>
+    <text id="details" x="10.00" y="373.00"> </text>
+    <text id="unzoom" class="hide" x="10.00" y="24.00">Reset Zoom</text>
+    <text id="search" x="1090.00" y="24.00">Search</text>
+    <text id="matched" x="1090.00" y="373.00"> </text>
+    <g id="frames">
+        <g>
+            <title>RegExp:\bFoo ?Bar (1 samples, 50.00%)</title>
+            <rect x="10" y="69" width="590" height="15" fill="rgb(97,208,208)"/>
+            <text x="13.00" y="79.50">RegExp:\bFoo ?Bar</text>
+        </g>
+        <g>
+            <title>all (2 samples, 100%)</title>
+            <rect x="10" y="341" width="1180" height="15" fill="rgb(255,130,130)"/>
+            <text x="13.00" y="351.50"></text>
+        </g>
+        <g>
+            <title>node-v011 (2 samples, 100.00%)</title>
+            <rect x="10" y="325" width="1180" height="15" fill="rgb(250,123,123)"/>
+            <text x="13.00" y="335.50">node-v011</text>
+        </g>
+        <g>
+            <title>__libc_start_main (2 samples, 100.00%)</title>
+            <rect x="10" y="309" width="1180" height="15" fill="rgb(236,103,103)"/>
+            <text x="13.00" y="319.50">__libc_start_main</text>
+        </g>
+        <g>
+            <title>node::Start (2 samples, 100.00%)</title>
+            <rect x="10" y="293" width="1180" height="15" fill="rgb(225,225,68)"/>
+            <text x="13.00" y="303.50">node::Start</text>
+        </g>
+        <g>
+            <title>uv_run (2 samples, 100.00%)</title>
+            <rect x="10" y="277" width="1180" height="15" fill="rgb(223,84,84)"/>
+            <text x="13.00" y="287.50">uv_run</text>
+        </g>
+        <g>
+            <title>uv__io_poll (2 samples, 100.00%)</title>
+            <rect x="10" y="261" width="1180" height="15" fill="rgb(223,84,84)"/>
+            <text x="13.00" y="271.50">uv__io_poll</text>
+        </g>
+        <g>
+            <title>uv__async_io (2 samples, 100.00%)</title>
+            <rect x="10" y="245" width="1180" height="15" fill="rgb(223,84,84)"/>
+            <text x="13.00" y="255.50">uv__async_io</text>
+        </g>
+        <g>
+            <title>uv__async_event (2 samples, 100.00%)</title>
+            <rect x="10" y="229" width="1180" height="15" fill="rgb(223,84,84)"/>
+            <text x="13.00" y="239.50">uv__async_event</text>
+        </g>
+        <g>
+            <title>uv__work_done (2 samples, 100.00%)</title>
+            <rect x="10" y="213" width="1180" height="15" fill="rgb(223,84,84)"/>
+            <text x="13.00" y="223.50">uv__work_done</text>
+        </g>
+        <g>
+            <title>node::After (2 samples, 100.00%)</title>
+            <rect x="10" y="197" width="1180" height="15" fill="rgb(225,225,68)"/>
+            <text x="13.00" y="207.50">node::After</text>
+        </g>
+        <g>
+            <title>v8::Function::Call (2 samples, 100.00%)</title>
+            <rect x="10" y="181" width="1180" height="15" fill="rgb(205,205,61)"/>
+            <text x="13.00" y="191.50">v8::Function::Call</text>
+        </g>
+        <g>
+            <title>v8::internal::Execution::Call (2 samples, 100.00%)</title>
+            <rect x="10" y="165" width="1180" height="15" fill="rgb(205,205,61)"/>
+            <text x="13.00" y="175.50">v8::internal::Execution::Call</text>
+        </g>
+        <g>
+            <title>v8::internal::Invoke (2 samples, 100.00%)</title>
+            <rect x="10" y="149" width="1180" height="15" fill="rgb(205,205,61)"/>
+            <text x="13.00" y="159.50">v8::internal::Invoke</text>
+        </g>
+        <g>
+            <title>Stub:JSEntryStub (2 samples, 100.00%)</title>
+            <rect x="10" y="133" width="1180" height="15" fill="rgb(88,200,200)"/>
+            <text x="13.00" y="143.50">Stub:JSEntryStub</text>
+        </g>
+        <g>
+            <title>Builtin:A builtin from the snapshot (2 samples, 100.00%)</title>
+            <rect x="10" y="117" width="1180" height="15" fill="rgb(80,193,193)"/>
+            <text x="13.00" y="127.50">Builtin:A builtin from the snapshot</text>
+        </g>
+        <g>
+            <title>LazyCompile:_tickDomainCallback node.js:387 (2 samples, 100.00%)</title>
+            <rect x="10" y="101" width="1180" height="15" fill="rgb(83,196,196)"/>
+            <text x="13.00" y="111.50">LazyCompile:_tickDomainCallback node.js:387</text>
+        </g>
+        <g>
+            <title>LazyCompile:*Async$consumeFunctionBuffer /apps/node/webapp/node_modules/xxxxx/js/main/async.js:39 (2 samples, 100.00%)</title>
+            <rect x="10" y="85" width="1180" height="15" fill="rgb(83,231,83)"/>
+            <text x="13.00" y="95.50">LazyCompile:*Async$consumeFunctionBuffer /apps/node/webapp/node_modules/xxxxx/js/main/async.js:39</text>
+        </g>
+        <g>
+            <title>v8::internal::Execution::Call (1 samples, 50.00%)</title>
+            <rect x="600" y="69" width="590" height="15" fill="rgb(205,205,61)"/>
+            <text x="603.00" y="79.50">v8::internal::Execution::Call</text>
+        </g>
+        <g>
+            <title>LazyCompile:~body_0 evalmachine.&lt;anonymous&gt;:1 (1 samples, 50.00%)</title>
+            <rect x="600" y="53" width="590" height="15" fill="rgb(83,196,196)"/>
+            <text x="603.00" y="63.50">LazyCompile:~body_0 evalmachine.&lt;anonymous&gt;:1</text>
+        </g>
+        <g>
+            <title>RegExp:[&amp;&lt;&gt;\\] (1 samples, 50.00%)</title>
+            <rect x="600" y="37" width="590" height="15" fill="rgb(97,208,208)"/>
+            <text x="603.00" y="47.50">RegExp:[&amp;&lt;&gt;\\]</text>
+        </g>
     </g>
 </svg>

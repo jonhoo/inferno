@@ -61,11 +61,8 @@ impl FuncFrameAttrsMap {
                 }
                 match name {
                     "title" => funcattrs.title = Some(value.to_string()),
+                    "id" => funcattrs.g.id = Some(value.to_string()),
                     "class" => funcattrs.g.class = Some(value.to_string()),
-                    "style" => funcattrs.g.style = Some(value.to_string()),
-                    "onmouseover" => funcattrs.g.onmouseover = Some(value.to_string()),
-                    "onmouseout" => funcattrs.g.onmouseout = Some(value.to_string()),
-                    "onclick" => funcattrs.g.onclick = Some(value.to_string()),
                     "href" => funcattrs.a.href = Some(value.to_string()),
                     "target" => funcattrs.a.target = Some(value.to_string()),
                     "g_extra" => parse_extra_attrs(&mut funcattrs.g.extra, value),
@@ -99,20 +96,11 @@ pub(super) struct FrameAttrs {
 /// Any of them set to `None` will get the default value.
 #[derive(PartialEq, Eq, Debug, Default)]
 pub(super) struct GElementAttrs {
-    /// Defaults to "func_g"
+    /// Will not be included if None
     pub(super) class: Option<String>,
 
     /// Will not be included if None
-    pub(super) style: Option<String>,
-
-    /// Defaults to "s(this)"
-    pub(super) onmouseover: Option<String>,
-
-    /// Defaults to "c()"
-    pub(super) onmouseout: Option<String>,
-
-    /// Defaults to "zoom(this)"
-    pub(super) onclick: Option<String>,
+    pub(super) id: Option<String>,
 
     /// Extra attributes to include
     pub(super) extra: Vec<(String, String)>,
@@ -194,10 +182,6 @@ mod test {
             "title=foo title",
             // With quotes
             r#"class="foo class""#,
-            r#"style="foo style""#,
-            "onmouseover=foo_onmouseover()",
-            "onmouseout=foo_onmouseout()",
-            "onclick=foo_onclick()",
             // gextra1 without quotes, gextra2 with quotes
             r#"g_extra=gextra1=gextra1 gextra2="foo gextra2""#,
             "href=foo href",
@@ -210,7 +194,6 @@ mod test {
         let bar = vec![
             "bar",
             "class=bar class",
-            "onmouseover=bar_onmouseover()",
             "href=bar href",
             // With an invalid attribute that has no value
             // This gets skipped and logged.
@@ -236,11 +219,8 @@ mod test {
             FrameAttrs {
                 title: Some("foo title".to_owned()),
                 g: GElementAttrs {
+                    id: None,
                     class: Some("foo class".to_owned()),
-                    style: Some("foo style".to_owned()),
-                    onmouseover: Some("foo_onmouseover()".to_owned()),
-                    onmouseout: Some("foo_onmouseout()".to_owned()),
-                    onclick: Some("foo_onclick()".to_owned()),
                     extra: foo_g_extra,
                 },
                 a: AElementAttrs {
@@ -261,11 +241,8 @@ mod test {
             FrameAttrs {
                 title: None,
                 g: GElementAttrs {
+                    id: None,
                     class: Some("bar class".to_owned()),
-                    style: None,
-                    onmouseover: Some("bar_onmouseover()".to_owned()),
-                    onmouseout: None,
-                    onclick: None,
                     extra: Vec::default(),
                 },
                 a: AElementAttrs {
