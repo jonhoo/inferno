@@ -102,24 +102,30 @@ It requires [hyperfine](https://github.com/sharkdp/hyperfine), and you
 must make sure you also check out Inferno's
 [submodules](https://github.blog/2016-02-01-working-with-submodules/).
 
-### Collapsing benchmarks
+### Benchmarks
 
 Inferno includes [criterion](https://github.com/bheisler/criterion.rs)
-benchmarks of its stack collapser implementations in [`benches/`](benches/).
-Criterion saves its results in `target/criterion/`, and uses that to
-recognize changes in performance, which should make it easy to detect
-performance regressions while developing bugfixes and improvements.
+benchmarkss in [`benches/`](benches/). Criterion saves its results in
+`target/criterion/`, and uses that to recognize changes in performance,
+which should make it easy to detect performance regressions while
+developing bugfixes and improvements.
 
 You can run the benchmarks with `cargo bench`. Some results (YMMV):
 
 My desktop computer (AMD Ryzen 5 2600X) gets:
 
 ```
-collapse/perf           time:   [14.978 ms 14.987 ms 14.996 ms]
-                        thrpt:  [199.64 MiB/s 199.76 MiB/s 199.88 MiB/s]
+collapse/perf           time:   [14.856 ms 14.863 ms 14.871 ms]
+                        thrpt:  [201.31 MiB/s 201.42 MiB/s 201.52 MiB/s]
 
-collapse/dtrace         time:   [9.8128 ms 9.8169 ms 9.8213 ms]
-                        thrpt:  [134.24 MiB/s 134.30 MiB/s 134.36 MiB/s]
+collapse/dtrace         time:   [6.1230 ms 6.1297 ms 6.1385 ms]
+                        thrpt:  [214.78 MiB/s 215.09 MiB/s 215.32 MiB/s]
+
+flamegraph/dtrace       time:   [898.19 us 898.67 us 899.17 us]
+                        thrpt:  [84.490 MiB/s 84.537 MiB/s 84.582 MiB/s]
+
+flamegraph/perf         time:   [3.0850 ms 3.0862 ms 3.0876 ms]
+                        thrpt:  [199.68 MiB/s 199.76 MiB/s 199.84 MiB/s]
 ```
 
 My laptop (Intel Core i7-8650U) get:
