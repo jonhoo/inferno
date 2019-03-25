@@ -9,7 +9,7 @@ pub mod color;
 mod merge;
 mod svg;
 
-pub use attrs::FuncFrameAttrsMap;
+pub use attrs::{FrameAttrs, FuncFrameAttrsMap};
 pub use color::Palette;
 
 use crate::flamegraph::color::{Color, SearchColor};
@@ -277,60 +277,6 @@ impl Default for Direction {
     }
 }
 
-struct FrameAttributes<'a> {
-    title: &'a str,
-    id: Option<&'a str>,
-    class: Option<&'a str>,
-    g_extra: Option<&'a Vec<(String, String)>>,
-    href: Option<&'a str>,
-    target: &'a str,
-    a_extra: Option<&'a Vec<(String, String)>>,
-}
-
-fn override_or_add_attributes<'a>(
-    title: &'a str,
-    attributes: Option<&'a attrs::FrameAttrs>,
-) -> FrameAttributes<'a> {
-    let mut title = title;
-    let mut id = None;
-    let mut class = None;
-    let mut g_extra = None;
-    let mut href = None;
-    let mut target = "_top";
-    let mut a_extra = None;
-
-    // Handle any overridden or extra attributes.
-    if let Some(attrs) = attributes {
-        if let Some(ref c) = attrs.g.id {
-            id = Some(c.as_str());
-        }
-        if let Some(ref c) = attrs.g.class {
-            class = Some(c.as_str());
-        }
-        if let Some(ref t) = attrs.title {
-            title = t.as_str();
-        }
-        g_extra = Some(&attrs.g.extra);
-        if let Some(ref h) = attrs.a.href {
-            href = Some(h.as_str());
-        }
-        if let Some(ref t) = attrs.a.target {
-            target = t.as_str();
-        }
-        a_extra = Some(&attrs.a.extra);
-    }
-
-    FrameAttributes {
-        title,
-        id,
-        class,
-        g_extra,
-        href,
-        target,
-        a_extra,
-    }
-}
-
 struct Rectangle {
     x1: usize,
     y1: usize,
@@ -557,21 +503,28 @@ where
         let frame_attributes = opt
             .func_frameattrs
             .frameattrs_for_func(frame.location.function);
-        let frame_attributes = override_or_add_attributes(&buffer[info], frame_attributes);
-        let href_is_some = frame_attributes.href.is_some();
 
-        if href_is_some {
-            write_container_attributes(&mut cache_a, &frame_attributes);
-            svg.write_event(&cache_a)?;
-        } else {
-            write_container_attributes(&mut cache_g, &frame_attributes);
+        let mut has_href = false;
+        let mut title = &buffer[info];
+        if let Some(frame_attributes) = frame_attributes {
+            if frame_attributes.attrs.contains_key("xlink:href") {
+                write_container_attributes(&mut cache_a, &frame_attributes);
+                svg.write_event(&cache_a)?;
+                has_href = true;
+            } else {
+                write_container_attributes(&mut cache_g, &frame_attributes);
+                svg.write_event(&cache_g)?;
+            }
+            if let Some(ref t) = frame_attributes.title {
+                title = t.as_str();
+            }
+        } else if let Event::Start(ref mut c) = cache_g {
+            c.clear_attributes();
             svg.write_event(&cache_g)?;
         }
 
         svg.write_event(Event::Start(BytesStart::borrowed_name(b"title")))?;
-        svg.write_event(Event::Text(BytesText::from_plain_str(
-            frame_attributes.title,
-        )))?;
+        svg.write_event(Event::Text(BytesText::from_plain_str(title)))?;
         svg.write_event(Event::End(BytesEnd::borrowed(b"title")))?;
 
         // select the color of the rectangle
@@ -638,7 +591,7 @@ where
         )?;
 
         buffer.clear();
-        if href_is_some {
+        if has_href {
             svg.write_event(&cache_a_end)?;
         } else {
             svg.write_event(&cache_g_end)?;
@@ -653,29 +606,15 @@ where
 }
 
 /// Writes atributes to the container, container could be g or a
-fn write_container_attributes(event: &mut Event, frame_attributes: &FrameAttributes) {
+fn write_container_attributes(event: &mut Event, frame_attributes: &FrameAttrs) {
     if let Event::Start(ref mut c) = event {
         c.clear_attributes();
-
-        if let Some(href) = frame_attributes.href {
-            c.extend_attributes(args!(
-                "xlink:href" => href,
-                "target" => frame_attributes.target
-            ));
-            if let Some(extra) = frame_attributes.a_extra {
-                c.extend_attributes(extra.iter().map(|(k, v)| (k.as_str(), v.as_str())));
-            }
-        }
-
-        if let Some(id) = frame_attributes.id {
-            c.extend_attributes(std::iter::once(("id", id)));
-        }
-        if let Some(class) = frame_attributes.class {
-            c.extend_attributes(std::iter::once(("class", class)));
-        }
-        if let Some(extra) = frame_attributes.g_extra {
-            c.extend_attributes(extra.iter().map(|(k, v)| (k.as_str(), v.as_str())));
-        }
+        c.extend_attributes(
+            frame_attributes
+                .attrs
+                .iter()
+                .map(|(k, v)| (k.as_str(), v.as_str())),
+        );
     } else {
         unreachable!("cache wrapper was of wrong type: {:?}", event);
     }

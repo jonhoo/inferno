@@ -233,6 +233,40 @@ fn flamegraph_nameattr_empty_attribute() {
 }
 
 #[test]
+fn flamegraph_nameattr_duplicate_attributes() {
+    let input_file = "./flamegraph/test/results/perf-cycles-instructions-01-collapsed-all.txt";
+    let expected_result_file = "./tests/data/flamegraph/nameattr/nameattr_duplicate_attributes.svg";
+    let nameattr_file = "./tests/data/flamegraph/nameattr/nameattr_duplicate_attributes.txt";
+
+    let options = flamegraph::Options {
+        hash: true,
+        func_frameattrs: flamegraph::FuncFrameAttrsMap::from_file(&PathBuf::from(nameattr_file))
+            .unwrap(),
+        ..Default::default()
+    };
+
+    test_flamegraph(input_file, expected_result_file, options).unwrap();
+}
+
+#[test]
+fn flamegraph_nameattr_should_warn_about_duplicate_attributes() {
+    testing_logger::setup();
+    let nameattr_file = "./tests/data/flamegraph/nameattr/nameattr_duplicate_attributes.txt";
+    let _ = flamegraph::FuncFrameAttrsMap::from_file(&PathBuf::from(nameattr_file));
+    testing_logger::validate(|captured_logs| {
+        let nwarnings = captured_logs
+            .into_iter()
+            .filter(|log| log.body.starts_with("duplicate attribute") && log.level == Level::Warn)
+            .count();
+        assert_eq!(
+            nwarnings, 3,
+            "invalid attribute warning logged {} times, but should be logged exactly once",
+            nwarnings
+        );
+    });
+}
+
+#[test]
 fn flamegraph_nameattr_should_warn_about_invalid_attribute() {
     testing_logger::setup();
     let nameattr_file = "./tests/data/flamegraph/nameattr/nameattr_invalid_attribute.txt";
