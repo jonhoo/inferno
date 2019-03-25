@@ -115,11 +115,11 @@ You can run the benchmarks with `cargo bench`. Some results (YMMV):
 My desktop computer (AMD Ryzen 5 2600X) gets:
 
 ```
-collapse/perf           time:   [14.856 ms 14.863 ms 14.871 ms]
-                        thrpt:  [201.31 MiB/s 201.42 MiB/s 201.52 MiB/s]
-
 collapse/dtrace         time:   [6.1230 ms 6.1297 ms 6.1385 ms]
                         thrpt:  [214.78 MiB/s 215.09 MiB/s 215.32 MiB/s]
+
+collapse/perf           time:   [14.856 ms 14.863 ms 14.871 ms]
+                        thrpt:  [201.31 MiB/s 201.42 MiB/s 201.52 MiB/s]
 
 flamegraph/dtrace       time:   [898.19 us 898.67 us 899.17 us]
                         thrpt:  [84.490 MiB/s 84.537 MiB/s 84.582 MiB/s]
@@ -131,11 +131,17 @@ flamegraph/perf         time:   [3.0850 ms 3.0862 ms 3.0876 ms]
 My laptop (Intel Core i7-8650U) get:
 
 ```
-collapse/perf           time:   [13.548 ms 13.573 ms 13.603 ms]
-                        thrpt:  [220.07 MiB/s 220.56 MiB/s 220.97 MiB/s]
+collapse/dtrace         time:   [5.1843 ms 5.1845 ms 5.1848 ms]
+                        thrpt:  [254.29 MiB/s 254.30 MiB/s 254.31 MiB/s]
 
-collapse/dtrace         time:   [9.1285 ms 9.1403 ms 9.1534 ms]
-                        thrpt:  [144.04 MiB/s 144.24 MiB/s 144.43 MiB/s]
+collapse/perf           time:   [12.956 ms 12.956 ms 12.957 ms]
+                        thrpt:  [231.06 MiB/s 231.07 MiB/s 231.07 MiB/s]
+
+flamegraph/dtrace       time:   [854.91 us 855.12 us 855.39 us]
+                        thrpt:  [88.814 MiB/s 88.842 MiB/s 88.864 MiB/s]
+
+flamegraph/perf         time:   [2.9885 ms 2.9888 ms 2.9892 ms]
+                        thrpt:  [206.25 MiB/s 206.27 MiB/s 206.30 MiB/s]
 ```
 
 ## License
