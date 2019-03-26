@@ -1,3 +1,5 @@
+use fnv::FnvHashMap;
+use std::collections::hash_map::Entry;
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::{self, BufRead, BufReader};
@@ -60,15 +62,25 @@ impl FuncFrameAttrsMap {
                     value = &value[1..value.len() - 1];
                 }
                 match name {
-                    "title" => funcattrs.title = Some(value.to_string()),
-                    "id" => funcattrs.g.id = Some(value.to_string()),
-                    "class" => funcattrs.g.class = Some(value.to_string()),
-                    "href" => funcattrs.a.href = Some(value.to_string()),
-                    "target" => funcattrs.a.target = Some(value.to_string()),
-                    "g_extra" => parse_extra_attrs(&mut funcattrs.g.extra, value),
-                    "a_extra" => parse_extra_attrs(&mut funcattrs.a.extra, value),
+                    "title" => {
+                        funcattrs.title = Some(value.to_string());
+                    }
+                    "href" => {
+                        funcattrs.add_attr(func, "xlink:href".to_string(), value.to_string());
+                    }
+                    "id" | "class" | "target" => {
+                        funcattrs.add_attr(func, name.to_string(), value.to_string());
+                    }
+                    "g_extra" | "a_extra" => funcattrs.parse_extra_attrs(func, value),
                     _ => warn!("invalid attribute {} found for {}", name, func),
                 }
+            }
+
+            if funcattrs.attrs.contains_key("xlink:href") && !funcattrs.attrs.contains_key("target")
+            {
+                funcattrs
+                    .attrs
+                    .insert("target".to_string(), "_top".to_string());
             }
         }
 
@@ -88,39 +100,30 @@ pub(super) struct FrameAttrs {
     /// If set to None, the title is dynamically generated based on the function name.
     pub(super) title: Option<String>,
 
-    pub(super) g: GElementAttrs,
-    pub(super) a: AElementAttrs,
+    pub(super) attrs: FnvHashMap<String, String>,
 }
 
-/// Attributes to set on the SVG `g` element.
-/// Any of them set to `None` will get the default value.
-#[derive(PartialEq, Eq, Debug, Default)]
-pub(super) struct GElementAttrs {
-    /// Will not be included if None
-    pub(super) class: Option<String>,
+impl FrameAttrs {
+    fn add_attr(&mut self, func: &str, name: String, value: String) {
+        match self.attrs.entry(name) {
+            Entry::Occupied(mut e) => {
+                warn!(
+                    "duplicate attribute `{}` in nameattr file for `{}`; replacing value \"{}\" with \"{}\"",
+                    e.key(), func, e.get(), value
+                );
+                e.insert(value);
+            }
+            Entry::Vacant(e) => {
+                e.insert(value);
+            }
+        };
+    }
 
-    /// Will not be included if None
-    pub(super) id: Option<String>,
-
-    /// Extra attributes to include
-    pub(super) extra: Vec<(String, String)>,
-}
-
-/// Attributes to set on the SVG `a` element
-#[derive(PartialEq, Eq, Debug, Default)]
-pub(super) struct AElementAttrs {
-    /// If set to None the `a` tag will not be added
-    pub(super) href: Option<String>,
-
-    /// Defaults to "_top"
-    pub(super) target: Option<String>,
-
-    /// Extra attributes to include
-    pub(super) extra: Vec<(String, String)>,
-}
-
-fn parse_extra_attrs(attrs: &mut Vec<(String, String)>, s: &str) {
-    attrs.extend(AttrIter { s });
+    fn parse_extra_attrs(&mut self, func: &str, s: &str) {
+        AttrIter { s }.for_each(|(name, value)| {
+            self.add_attr(func, name, value);
+        });
+    }
 }
 
 struct AttrIter<'a> {
@@ -173,6 +176,8 @@ impl<'a> Iterator for AttrIter<'a> {
 #[cfg(test)]
 mod test {
     use super::*;
+    use fnv::FnvHashMap;
+    use maplit::{convert_args, hashmap};
 
     #[test]
     fn func_frame_attrs_map_from_reader() {
@@ -205,51 +210,41 @@ mod test {
         let r = s.as_bytes();
 
         let mut expected_inner = HashMap::new();
-        let foo_g_extra: Vec<(String, String)> = vec![
-            ("gextra1".to_owned(), "gextra1".to_owned()),
-            ("gextra2".to_owned(), "foo gextra2".to_owned()),
-        ];
-        let foo_a_extra: Vec<(String, String)> = vec![
-            ("aextra1".to_owned(), "foo aextra1".to_owned()),
-            ("aextra2".to_owned(), "foo aextra2".to_owned()),
-        ];
+        let foo_attrs: FnvHashMap<String, String> = convert_args!(hashmap!(
+            "class" => "foo class",
+            "xlink:href" => "foo href",
+            "target" => "foo target",
+            "gextra1" => "gextra1",
+            "gextra2" => "foo gextra2",
+            "aextra1" => "foo aextra1",
+            "aextra2" => "foo aextra2",
+        ))
+        .into_iter()
+        .collect();
 
         expected_inner.insert(
             "foo".to_owned(),
             FrameAttrs {
                 title: Some("foo title".to_owned()),
-                g: GElementAttrs {
-                    id: None,
-                    class: Some("foo class".to_owned()),
-                    extra: foo_g_extra,
-                },
-                a: AElementAttrs {
-                    href: Some("foo href".to_owned()),
-                    target: Some("foo target".to_owned()),
-                    extra: foo_a_extra,
-                },
+                attrs: foo_attrs,
             },
         );
 
-        let bar_a_extra: Vec<(String, String)> = vec![
-            ("aextra1".to_owned(), "foo".to_owned()),
-            ("aextra2".to_owned(), "bar".to_owned()),
-        ];
+        let bar_attrs: FnvHashMap<String, String> = convert_args!(hashmap!(
+            "class" => "bar class",
+            "xlink:href" => "bar href",
+            "aextra1" => "foo",
+            "aextra2" => "bar",
+            "target" => "_top",
+        ))
+        .into_iter()
+        .collect();
 
         expected_inner.insert(
             "bar".to_owned(),
             FrameAttrs {
                 title: None,
-                g: GElementAttrs {
-                    id: None,
-                    class: Some("bar class".to_owned()),
-                    extra: Vec::default(),
-                },
-                a: AElementAttrs {
-                    href: Some("bar href".to_owned()),
-                    target: None,
-                    extra: bar_a_extra,
-                },
+                attrs: bar_attrs,
             },
         );
 
