@@ -709,10 +709,10 @@ fn filled_rectangle<W: Write>(
     color: Color,
     cache_rect: &mut Event,
 ) -> quick_xml::Result<usize> {
-    let x = write!(buffer, "{}", rect.x1);
-    let y = write!(buffer, "{}", rect.y1);
-    let width = write!(buffer, "{}", rect.width());
-    let height = write!(buffer, "{}", rect.height());
+    let x = write_usize(buffer, rect.x1);
+    let y = write_usize(buffer, rect.y1);
+    let width = write_usize(buffer, rect.width());
+    let height = write_usize(buffer, rect.height());
     let color = write!(buffer, "rgb({},{},{})", color.r, color.g, color.b);
 
     if let Event::Empty(bytes_start) = cache_rect {
@@ -729,4 +729,11 @@ fn filled_rectangle<W: Write>(
         unreachable!("cache wrapper was of wrong type: {:?}", cache_rect);
     }
     svg.write_event(&cache_rect)
+}
+
+fn write_usize(buffer: &mut StrStack, value: usize) -> usize {
+    let mut writer = buffer.writer();
+    // OK to unwrap here because this `fmt::Write` implementation never returns an error.
+    itoa::fmt(&mut writer, value).unwrap();
+    writer.finish()
 }
