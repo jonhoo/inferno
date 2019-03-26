@@ -43,8 +43,6 @@ macro_rules! flamegraph_benchmarks {
 }
 
 flamegraph_benchmarks! {
-    dtrace: ("tests/data/collapse-dtrace/results/dtrace-example.txt", Default::default()),
-    perf: ("tests/data/collapse-perf/results/example-perf-stacks-collapsed.txt", Default::default()),
     dtrace_reverse: ("tests/data/collapse-dtrace/results/dtrace-example.txt",
                      Options { reverse_stack_order: true, ..Default::default() }),
     perf_reverse: ("tests/data/collapse-perf/results/example-perf-stacks-collapsed.txt",
