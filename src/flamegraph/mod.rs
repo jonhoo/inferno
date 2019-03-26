@@ -9,10 +9,11 @@ pub mod color;
 mod merge;
 mod svg;
 
-pub use attrs::{FrameAttrs, FuncFrameAttrsMap};
+pub use attrs::FuncFrameAttrsMap;
 pub use color::Palette;
 
 use crate::flamegraph::color::{Color, SearchColor};
+use attrs::FrameAttrs;
 use num_format::Locale;
 use quick_xml::{
     events::{BytesEnd, BytesStart, BytesText, Event},

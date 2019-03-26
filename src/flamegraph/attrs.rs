@@ -95,7 +95,7 @@ impl FuncFrameAttrsMap {
 
 /// Attributes to set on the SVG elements of a frame
 #[derive(PartialEq, Eq, Debug, Default)]
-pub struct FrameAttrs {
+pub(super) struct FrameAttrs {
     /// The text to include in the `title` element.
     /// If set to None, the title is dynamically generated based on the function name.
     pub(super) title: Option<String>,
