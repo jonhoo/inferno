@@ -75,6 +75,13 @@ impl FuncFrameAttrsMap {
                     _ => warn!("invalid attribute {} found for {}", name, func),
                 }
             }
+
+            if funcattrs.attrs.contains_key("xlink:href") && !funcattrs.attrs.contains_key("target")
+            {
+                funcattrs
+                    .attrs
+                    .insert("target".to_string(), "_top".to_string());
+            }
         }
 
         Ok(funcattr_map)
@@ -225,6 +232,7 @@ mod test {
             "xlink:href".to_owned() => "bar href".to_owned(),
             "aextra1".to_owned() => "foo".to_owned(),
             "aextra2".to_owned() => "bar".to_owned(),
+            "target".to_owned() => "_top".to_owned(),
         ];
 
         expected_inner.insert(
