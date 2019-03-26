@@ -733,6 +733,7 @@ fn filled_rectangle<W: Write>(
 
 fn write_usize(buffer: &mut StrStack, value: usize) -> usize {
     let mut writer = buffer.writer();
+    // OK to unwrap here because this `fmt::Write` implementation never returns an error.
     itoa::fmt(&mut writer, value).unwrap();
     writer.finish()
 }
