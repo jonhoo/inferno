@@ -177,6 +177,7 @@ impl<'a> Iterator for AttrIter<'a> {
 mod test {
     use super::*;
     use fnv::FnvHashMap;
+    use maplit::{convert_args, hashmap};
 
     #[test]
     fn func_frame_attrs_map_from_reader() {
@@ -209,14 +210,17 @@ mod test {
         let r = s.as_bytes();
 
         let mut expected_inner = HashMap::new();
-        let mut foo_attrs = FnvHashMap::default();
-        foo_attrs.insert("class".to_owned(), "foo class".to_owned());
-        foo_attrs.insert("xlink:href".to_owned(), "foo href".to_owned());
-        foo_attrs.insert("target".to_owned(), "foo target".to_owned());
-        foo_attrs.insert("gextra1".to_owned(), "gextra1".to_owned());
-        foo_attrs.insert("gextra2".to_owned(), "foo gextra2".to_owned());
-        foo_attrs.insert("aextra1".to_owned(), "foo aextra1".to_owned());
-        foo_attrs.insert("aextra2".to_owned(), "foo aextra2".to_owned());
+        let foo_attrs: FnvHashMap<String, String> = convert_args!(hashmap!(
+            "class" => "foo class",
+            "xlink:href" => "foo href",
+            "target" => "foo target",
+            "gextra1" => "gextra1",
+            "gextra2" => "foo gextra2",
+            "aextra1" => "foo aextra1",
+            "aextra2" => "foo aextra2",
+        ))
+        .into_iter()
+        .collect();
 
         expected_inner.insert(
             "foo".to_owned(),
@@ -226,12 +230,15 @@ mod test {
             },
         );
 
-        let mut bar_attrs = FnvHashMap::default();
-        bar_attrs.insert("class".to_owned(), "bar class".to_owned());
-        bar_attrs.insert("xlink:href".to_owned(), "bar href".to_owned());
-        bar_attrs.insert("aextra1".to_owned(), "foo".to_owned());
-        bar_attrs.insert("aextra2".to_owned(), "bar".to_owned());
-        bar_attrs.insert("target".to_owned(), "_top".to_owned());
+        let bar_attrs: FnvHashMap<String, String> = convert_args!(hashmap!(
+            "class" => "bar class",
+            "xlink:href" => "bar href",
+            "aextra1" => "foo",
+            "aextra2" => "bar",
+            "target" => "_top",
+        ))
+        .into_iter()
+        .collect();
 
         expected_inner.insert(
             "bar".to_owned(),
