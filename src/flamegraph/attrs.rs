@@ -1,5 +1,5 @@
-use indexmap::map::Entry;
-use indexmap::IndexMap;
+use fnv::FnvHashMap;
+use std::collections::hash_map::Entry;
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::{self, BufRead, BufReader};
@@ -100,7 +100,7 @@ pub(super) struct FrameAttrs {
     /// If set to None, the title is dynamically generated based on the function name.
     pub(super) title: Option<String>,
 
-    pub(super) attrs: IndexMap<String, String>,
+    pub(super) attrs: FnvHashMap<String, String>,
 }
 
 impl FrameAttrs {
@@ -176,7 +176,7 @@ impl<'a> Iterator for AttrIter<'a> {
 #[cfg(test)]
 mod test {
     use super::*;
-    use indexmap::{indexmap, IndexMap};
+    use fnv::FnvHashMap;
 
     #[test]
     fn func_frame_attrs_map_from_reader() {
@@ -209,15 +209,14 @@ mod test {
         let r = s.as_bytes();
 
         let mut expected_inner = HashMap::new();
-        let foo_attrs: IndexMap<String, String> = indexmap! {
-            "class".to_owned() => "foo class".to_owned(),
-            "xlink:href".to_owned() => "foo href".to_owned(),
-            "target".to_owned() => "foo target".to_owned(),
-            "gextra1".to_owned() => "gextra1".to_owned(),
-            "gextra2".to_owned() => "foo gextra2".to_owned(),
-            "aextra1".to_owned() => "foo aextra1".to_owned(),
-            "aextra2".to_owned() => "foo aextra2".to_owned(),
-        };
+        let mut foo_attrs = FnvHashMap::default();
+        foo_attrs.insert("class".to_owned(), "foo class".to_owned());
+        foo_attrs.insert("xlink:href".to_owned(), "foo href".to_owned());
+        foo_attrs.insert("target".to_owned(), "foo target".to_owned());
+        foo_attrs.insert("gextra1".to_owned(), "gextra1".to_owned());
+        foo_attrs.insert("gextra2".to_owned(), "foo gextra2".to_owned());
+        foo_attrs.insert("aextra1".to_owned(), "foo aextra1".to_owned());
+        foo_attrs.insert("aextra2".to_owned(), "foo aextra2".to_owned());
 
         expected_inner.insert(
             "foo".to_owned(),
@@ -227,13 +226,12 @@ mod test {
             },
         );
 
-        let bar_attrs: IndexMap<String, String> = indexmap![
-            "class".to_owned() => "bar class".to_owned(),
-            "xlink:href".to_owned() => "bar href".to_owned(),
-            "aextra1".to_owned() => "foo".to_owned(),
-            "aextra2".to_owned() => "bar".to_owned(),
-            "target".to_owned() => "_top".to_owned(),
-        ];
+        let mut bar_attrs = FnvHashMap::default();
+        bar_attrs.insert("class".to_owned(), "bar class".to_owned());
+        bar_attrs.insert("xlink:href".to_owned(), "bar href".to_owned());
+        bar_attrs.insert("aextra1".to_owned(), "foo".to_owned());
+        bar_attrs.insert("aextra2".to_owned(), "bar".to_owned());
+        bar_attrs.insert("target".to_owned(), "_top".to_owned());
 
         expected_inner.insert(
             "bar".to_owned(),
