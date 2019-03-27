@@ -1,14 +1,10 @@
-#[macro_use]
-extern crate pretty_assertions;
-
-extern crate inferno;
-
 mod collapse_common;
 
 use assert_cmd::prelude::*;
 use collapse_common::*;
 use inferno::collapse::dtrace::{Folder, Options};
 use log::Level;
+use pretty_assertions::assert_eq;
 use std::fs::File;
 use std::io::{self, BufReader, Cursor};
 use std::process::{Command, Stdio};

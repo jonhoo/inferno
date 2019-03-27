@@ -1,13 +1,9 @@
-#[macro_use]
-extern crate pretty_assertions;
-
-extern crate inferno;
-
 use assert_cmd::prelude::*;
 use inferno::flamegraph::{
     self, color::BackgroundColor, color::PaletteMap, Direction, Options, Palette,
 };
 use log::Level;
+use pretty_assertions::assert_eq;
 use std::fs::{self, File};
 use std::io::{self, BufRead, BufReader, Cursor};
 use std::path::{Path, PathBuf};
@@ -17,7 +13,7 @@ use std::str::FromStr;
 fn test_flamegraph(
     input_file: &str,
     expected_result_file: &str,
-    options: Options,
+    options: Options<'_>,
 ) -> quick_xml::Result<()> {
     test_flamegraph_multiple_files(
         vec![PathBuf::from_str(input_file).unwrap()],
@@ -29,7 +25,7 @@ fn test_flamegraph(
 fn test_flamegraph_multiple_files(
     input_files: Vec<PathBuf>,
     expected_result_file: &str,
-    mut options: Options,
+    mut options: Options<'_>,
 ) -> quick_xml::Result<()> {
     // Always pretty print XML to make it easier to find differences when tests fail.
     options.pretty_xml = true;
@@ -111,7 +107,7 @@ where
 fn test_flamegraph_logs_with_options<F>(
     input_file: &str,
     asserter: F,
-    mut options: flamegraph::Options,
+    mut options: flamegraph::Options<'_>,
 ) where
     F: Fn(&Vec<testing_logger::CapturedLog>),
 {

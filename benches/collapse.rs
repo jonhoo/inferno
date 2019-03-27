@@ -1,6 +1,3 @@
-extern crate criterion;
-extern crate inferno;
-
 use criterion::*;
 use inferno::collapse::dtrace;
 use inferno::collapse::perf;

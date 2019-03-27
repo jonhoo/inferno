@@ -1,6 +1,3 @@
-extern crate criterion;
-extern crate inferno;
-
 use criterion::*;
 use inferno::flamegraph::{self, Options};
 use std::fs::File;

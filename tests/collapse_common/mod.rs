@@ -1,4 +1,4 @@
-extern crate inferno;
+use inferno;
 
 use inferno::collapse::Collapse;
 use libflate::gzip::Decoder;
