@@ -241,6 +241,7 @@ fn save_consistent_palette_if_needed(
 mod tests {
     use super::Opt;
     use inferno::flamegraph::{color, Direction, Options, Palette};
+    use pretty_assertions::assert_eq;
     use std::path::PathBuf;
     use std::str::FromStr;
     use structopt::StructOpt;

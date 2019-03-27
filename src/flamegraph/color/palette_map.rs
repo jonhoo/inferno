@@ -171,6 +171,7 @@ fn parse_rgb_string(s: &str) -> Option<Color> {
 mod tests {
     use crate::flamegraph::color::palette_map::{parse_line, PaletteMap};
     use crate::flamegraph::color::Color;
+    use pretty_assertions::assert_eq;
     use std::io::Cursor;
 
     macro_rules! color {

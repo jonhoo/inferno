@@ -249,6 +249,7 @@ impl Folder {
 }
 
 #[cfg(test)]
+use pretty_assertions::assert_eq;
 #[test]
 fn cpp_test() {
     let probe = "TestClass::TestClass2(const char*)[__1cJTestClass2t6Mpkc_v_]";
