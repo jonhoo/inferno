@@ -2,11 +2,11 @@ extern crate criterion;
 extern crate inferno;
 
 use criterion::*;
-use inferno::flamegraph;
+use inferno::flamegraph::{self, Options};
 use std::fs::File;
 use std::io::{self, BufReader, Read};
 
-fn flamegraph_benchmark(c: &mut Criterion, id: &str, infile: &str) {
+fn flamegraph_benchmark(c: &mut Criterion, id: &str, infile: &str, mut opt: Options<'static>) {
     let mut f = File::open(infile).expect("file not found");
 
     let mut bytes = Vec::new();
@@ -19,8 +19,7 @@ fn flamegraph_benchmark(c: &mut Criterion, id: &str, infile: &str) {
             move |b, data| {
                 b.iter(|| {
                     let reader = BufReader::new(data.as_slice());
-                    let _folder =
-                        flamegraph::from_reader(&mut Default::default(), reader, io::sink());
+                    let _folder = flamegraph::from_reader(&mut opt, reader, io::sink());
                 })
             },
             vec![bytes],
@@ -30,11 +29,11 @@ fn flamegraph_benchmark(c: &mut Criterion, id: &str, infile: &str) {
 }
 
 macro_rules! flamegraph_benchmarks {
-    ($($name:ident : $infile:expr),*) => {
+    ($($name:ident : ($infile:expr, $opt:expr)),*) => {
         $(
             fn $name(c: &mut Criterion) {
                 let id = stringify!($name);
-                flamegraph_benchmark(c, id, $infile);
+                flamegraph_benchmark(c, id, $infile, $opt);
             }
         )*
 
@@ -44,6 +43,6 @@ macro_rules! flamegraph_benchmarks {
 }
 
 flamegraph_benchmarks! {
-    dtrace: "tests/data/collapse-dtrace/results/dtrace-example.txt",
-    perf: "tests/data/collapse-perf/results/example-perf-stacks-collapsed.txt"
+    flamegraph: ("tests/data/collapse-perf/results/example-perf-stacks-collapsed.txt",
+                     Options { reverse_stack_order: true, ..Default::default() })
 }
