@@ -1,4 +1,5 @@
 use crate::flamegraph::color::Color;
+use log::warn;
 use std::collections::HashMap;
 use std::fs::File;
 use std::fs::OpenOptions;

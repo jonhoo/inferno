@@ -1,5 +1,3 @@
-use inferno;
-
 use inferno::collapse::Collapse;
 use libflate::gzip::Decoder;
 use std::fs::{self, File};

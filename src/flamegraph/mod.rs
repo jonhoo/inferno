@@ -14,6 +14,7 @@ pub use color::Palette;
 
 use crate::flamegraph::color::{Color, SearchColor};
 use attrs::FrameAttrs;
+use log::{error, warn};
 use num_format::Locale;
 use quick_xml::{
     events::{BytesEnd, BytesStart, BytesText, Event},
@@ -51,6 +52,7 @@ pub mod defaults {
 
             #[doc(hidden)]
             pub mod str {
+                use lazy_static::lazy_static;
             $(
                 lazy_static! {
                     pub static ref $name: String = ($val).to_string();

@@ -2,7 +2,6 @@ mod collapse_common;
 
 use assert_cmd::prelude::*;
 use collapse_common::*;
-use inferno;
 use inferno::collapse::perf::{Folder, Options};
 use log::Level;
 use pretty_assertions::assert_eq;
