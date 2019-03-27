@@ -428,8 +428,10 @@ where
     let mut cache_g = Event::Start({ BytesStart::owned_name("g") });
     let mut cache_a = Event::Start({ BytesStart::owned_name("a") });
     let mut cache_rect = Event::Empty(BytesStart::owned_name("rect"));
+    let cache_title = Event::Start({ BytesStart::owned_name("title") });
     let cache_g_end = Event::End(BytesEnd::borrowed(b"g"));
     let cache_a_end = Event::End(BytesEnd::borrowed(b"a"));
+    let cache_title_end = Event::End(BytesEnd::borrowed(b"title"));
 
     // create frames container
     if let Event::Start(ref mut g) = cache_g {
@@ -524,9 +526,9 @@ where
             svg.write_event(&cache_g)?;
         }
 
-        svg.write_event(Event::Start(BytesStart::borrowed_name(b"title")))?;
+        svg.write_event(&cache_title)?;
         svg.write_event(Event::Text(BytesText::from_plain_str(title)))?;
-        svg.write_event(Event::End(BytesEnd::borrowed(b"title")))?;
+        svg.write_event(&cache_title_end)?;
 
         // select the color of the rectangle
         let color = if frame.location.function == "--" {
