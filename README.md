@@ -115,17 +115,14 @@ You can run the benchmarks with `cargo bench`. Some results (YMMV):
 My desktop computer (AMD Ryzen 5 2600X) gets:
 
 ```
-collapse/dtrace         time:   [6.1230 ms 6.1297 ms 6.1385 ms]
-                        thrpt:  [214.78 MiB/s 215.09 MiB/s 215.32 MiB/s]
+collapse/dtrace         time:   [6.0078 ms 6.0145 ms 6.0213 ms]
+                        thrpt:  [218.96 MiB/s 219.21 MiB/s 219.45 MiB/s]
 
 collapse/perf           time:   [14.856 ms 14.863 ms 14.871 ms]
                         thrpt:  [201.31 MiB/s 201.42 MiB/s 201.52 MiB/s]
 
-flamegraph/dtrace       time:   [898.19 us 898.67 us 899.17 us]
-                        thrpt:  [84.490 MiB/s 84.537 MiB/s 84.582 MiB/s]
-
-flamegraph/perf         time:   [3.0850 ms 3.0862 ms 3.0876 ms]
-                        thrpt:  [199.68 MiB/s 199.76 MiB/s 199.84 MiB/s]
+flamegraph              time:   [21.511 ms 21.521 ms 21.531 ms]
+                        thrpt:  [28.634 MiB/s 28.647 MiB/s 28.660 MiB/s]
 ```
 
 My laptop (Intel Core i7-8650U) get:
