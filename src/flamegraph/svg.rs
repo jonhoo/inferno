@@ -1,4 +1,5 @@
 use super::{Direction, Options};
+use lazy_static::lazy_static;
 use quick_xml::{
     events::{BytesEnd, BytesStart, BytesText, Event},
     Writer,
@@ -248,6 +249,10 @@ where
 
     let TextItem { text, extra, .. } = item;
 
+    lazy_static! {
+        static ref TEXT_END: Event<'static> = Event::End(BytesEnd::borrowed(b"text"));
+    }
+
     thread_local! {
         // reuse for all text elements to avoid allocations
         static TEXT: RefCell<Event<'static>> = RefCell::new(Event::Start(BytesStart::owned_name("text")))
@@ -271,7 +276,7 @@ where
         TextArgument::FromBuffer(i) => &buf[i],
     };
     svg.write_event(Event::Text(BytesText::from_plain_str(s)))?;
-    svg.write_event(Event::End(BytesEnd::borrowed(b"text")))
+    svg.write_event(&*TEXT_END)
 }
 
 // Imported from the `enquote` crate @ 1.0.3.
