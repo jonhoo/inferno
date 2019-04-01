@@ -1,11 +1,7 @@
-#[macro_use]
-extern crate pretty_assertions;
-
-extern crate inferno;
-
 use assert_cmd::prelude::*;
 use inferno::differential::{self, Options};
 use log::Level;
+use pretty_assertions::assert_eq;
 use std::fs::{self, File};
 use std::io::{self, BufRead, BufReader, Cursor};
 use std::process::Command;

@@ -14,6 +14,7 @@ pub use color::Palette;
 
 use crate::flamegraph::color::{Color, SearchColor};
 use attrs::FrameAttrs;
+use log::{error, warn};
 use num_format::Locale;
 use quick_xml::{
     events::{BytesEnd, BytesStart, BytesText, Event},
@@ -51,6 +52,7 @@ pub mod defaults {
 
             #[doc(hidden)]
             pub mod str {
+                use lazy_static::lazy_static;
             $(
                 lazy_static! {
                     pub static ref $name: String = ($val).to_string();
@@ -309,7 +311,7 @@ impl Rectangle {
 ///
 /// [differential flame graph]: http://www.brendangregg.com/blog/2014-11-09/differential-flame-graphs.html
 #[allow(clippy::cyclomatic_complexity)]
-pub fn from_lines<'a, I, W>(opt: &mut Options, lines: I, writer: W) -> quick_xml::Result<()>
+pub fn from_lines<'a, I, W>(opt: &mut Options<'_>, lines: I, writer: W) -> quick_xml::Result<()>
 where
     I: IntoIterator<Item = &'a str>,
     W: Write,
@@ -556,7 +558,7 @@ where
 
         let fitchars =
             (rect.width() as f64 / (opt.font_size as f64 * opt.font_width)).trunc() as usize;
-        let text: svg::TextArgument = if fitchars >= 3 {
+        let text: svg::TextArgument<'_> = if fitchars >= 3 {
             // room for one char plus two dots
             let f = deannotate(&frame.location.function);
 
@@ -607,7 +609,7 @@ where
 }
 
 /// Writes atributes to the container, container could be g or a
-fn write_container_attributes(event: &mut Event, frame_attributes: &FrameAttrs) {
+fn write_container_attributes(event: &mut Event<'_>, frame_attributes: &FrameAttrs) {
     if let Event::Start(ref mut c) = event {
         c.clear_attributes();
         c.extend_attributes(
@@ -626,7 +628,7 @@ fn write_container_attributes(event: &mut Event, frame_attributes: &FrameAttrs) 
 /// See [`from_sorted_lines`] for the expected format of each line.
 ///
 /// The resulting flame graph will be written out to `writer` in SVG format.
-pub fn from_reader<R, W>(opt: &mut Options, reader: R, writer: W) -> quick_xml::Result<()>
+pub fn from_reader<R, W>(opt: &mut Options<'_>, reader: R, writer: W) -> quick_xml::Result<()>
 where
     R: Read,
     W: Write,
@@ -639,7 +641,7 @@ where
 /// See [`from_sorted_lines`] for the expected format of each line.
 ///
 /// The resulting flame graph will be written out to `writer` in SVG format.
-pub fn from_readers<R, W>(opt: &mut Options, readers: R, writer: W) -> quick_xml::Result<()>
+pub fn from_readers<R, W>(opt: &mut Options<'_>, readers: R, writer: W) -> quick_xml::Result<()>
 where
     R: IntoIterator,
     R::Item: Read,
@@ -659,7 +661,7 @@ where
 ///
 /// If files is empty, STDIN will be used as input.
 pub fn from_files<W: Write>(
-    opt: &mut Options,
+    opt: &mut Options<'_>,
     files: &[PathBuf],
     writer: W,
 ) -> quick_xml::Result<()> {
@@ -673,7 +675,7 @@ pub fn from_files<W: Write>(
     } else {
         let stdin = io::stdin();
         let mut stdin_added = false;
-        let mut readers: Vec<Box<Read>> = Vec::with_capacity(files.len());
+        let mut readers: Vec<Box<dyn Read>> = Vec::with_capacity(files.len());
         for infile in files.iter() {
             if infile.to_str() == Some("-") {
                 if !stdin_added {
@@ -707,7 +709,7 @@ fn filled_rectangle<W: Write>(
     buffer: &mut StrStack,
     rect: &Rectangle,
     color: Color,
-    cache_rect: &mut Event,
+    cache_rect: &mut Event<'_>,
 ) -> quick_xml::Result<usize> {
     let x = write_usize(buffer, rect.x1);
     let y = write_usize(buffer, rect.y1);

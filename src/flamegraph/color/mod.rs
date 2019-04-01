@@ -405,6 +405,7 @@ mod tests {
     use super::namehash;
     use super::parse_flat_bgcolor;
     use super::Color;
+    use pretty_assertions::assert_eq;
 
     #[test]
     fn bgcolor_parse_test() {

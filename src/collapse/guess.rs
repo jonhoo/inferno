@@ -1,5 +1,6 @@
 use super::Collapse;
 use super::{dtrace, perf};
+use log::{error, info};
 use std::io::prelude::*;
 use std::io::{self, Cursor};
 

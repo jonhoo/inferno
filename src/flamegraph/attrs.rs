@@ -1,4 +1,5 @@
 use fnv::FnvHashMap;
+use log::warn;
 use std::collections::hash_map::Entry;
 use std::collections::HashMap;
 use std::fs::File;
@@ -178,6 +179,7 @@ mod test {
     use super::*;
     use fnv::FnvHashMap;
     use maplit::{convert_args, hashmap};
+    use pretty_assertions::assert_eq;
 
     #[test]
     fn func_frame_attrs_map_from_reader() {

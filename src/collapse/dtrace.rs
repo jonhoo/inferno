@@ -1,5 +1,6 @@
 use super::Collapse;
 use hashbrown::HashMap;
+use log::warn;
 use std::collections::VecDeque;
 use std::io;
 use std::io::prelude::*;
@@ -248,6 +249,7 @@ impl Folder {
 }
 
 #[cfg(test)]
+use pretty_assertions::assert_eq;
 #[test]
 fn cpp_test() {
     let probe = "TestClass::TestClass2(const char*)[__1cJTestClass2t6Mpkc_v_]";
