@@ -25,7 +25,7 @@ cli = ["structopt", "env_logger"]
 
 [dependencies]
 log = "0.4"
-quick-xml = "0.13.3"
+quick-xml = { version = "0.14", default-features = false }
 num-format = { version = "0.4", default-features = false }
 str_stack = "0.1"
 hashbrown = "0.1"
