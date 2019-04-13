@@ -15,6 +15,8 @@ if: type != push OR (tag IS blank AND branch = master)
 jobs:
   allow_failures:
     - rust: nightly
+    # Temporary ignored: see PR#123: https://github.com/jonhoo/inferno/pull/123/files
+    - os: windows
   include:
     - stage: check # do a pre-screen to make sure this is even worth testing
       script: cargo check --all-targets
