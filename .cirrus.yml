@@ -1,0 +1,26 @@
+task:
+  name: stable-x86_64-unknown-freebsd
+  freebsd_instance:
+    matrix:
+      - image: freebsd-12-0-release-amd64
+      - image: freebsd-11-2-release-amd64
+  env:
+    RUST_BACKTRACE: 1
+  setup_script:
+    - pkg install -y curl git
+    - curl https://sh.rustup.rs -sSf --output rustup.sh
+    - sh rustup.sh -y
+    - . $HOME/.cargo/env
+    - rustup component add rustfmt
+  submodule_script:
+    - git submodule sync --recursive
+    - git submodule update --init --recursive
+  check_script:
+    - . $HOME/.cargo/env
+    - cargo check --all-targets
+  build_script:
+    - . $HOME/.cargo/env
+    - cargo build --all-targets --verbose
+  test_script:
+    - . $HOME/.cargo/env
+    - cargo test --no-fail-fast --verbose --all -- --nocapture
