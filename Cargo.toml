@@ -17,6 +17,7 @@ exclude = ["/tests/**", "/flamegraph/**", "/*.perf"]
 
 [badges]
 travis-ci = { repository = "jonhoo/inferno" }
+cirrus-ci = { repository = "jonhoo/inferno" }
 codecov = { repository = "jonhoo/inferno", branch = "master", service = "github" }
 
 [features]

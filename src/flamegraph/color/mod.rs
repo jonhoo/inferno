@@ -287,7 +287,7 @@ fn namehash<I: Iterator<Item = u8>>(mut name: I) -> f32 {
 
 macro_rules! t {
     ($b:expr, $a:expr, $x:expr) => {
-        $b + ($a as f32 * $x) as u8
+        $b + ($a * $x) as u8
     };
 }
 
@@ -311,16 +311,20 @@ fn rgb_components_for_palette(palette: Palette, name: &str, v1: f32, v2: f32, v3
     };
 
     match basic_palette {
-        BasicPalette::Hot => color!(t!(205, 50, v3), t!(0, 230, v1), t!(0, 55, v2)),
-        BasicPalette::Mem => color!(t!(0, 0, v3), t!(190, 50, v2), t!(0, 210, v1)),
-        BasicPalette::Io => color!(t!(80, 60, v1), t!(80, 60, v1), t!(190, 55, v2)),
-        BasicPalette::Red => color!(t!(200, 55, v1), t!(50, 80, v1), t!(50, 80, v1)),
-        BasicPalette::Green => color!(t!(50, 60, v1), t!(200, 55, v1), t!(50, 60, v1)),
-        BasicPalette::Blue => color!(t!(80, 60, v1), t!(80, 60, v1), t!(205, 50, v1)),
-        BasicPalette::Yellow => color!(t!(175, 55, v1), t!(175, 55, v1), t!(50, 20, v1)),
-        BasicPalette::Purple => color!(t!(190, 65, v1), t!(80, 60, v1), t!(190, 65, v1)),
-        BasicPalette::Aqua => color!(t!(50, 60, v1), t!(165, 55, v1), t!(165, 55, v1)),
-        BasicPalette::Orange => color!(t!(190, 65, v1), t!(90, 65, v1), t!(0, 0, v1)),
+        BasicPalette::Hot => color!(t!(205, 50_f32, v3), t!(0, 230_f32, v1), t!(0, 55_f32, v2)),
+        BasicPalette::Mem => color!(t!(0, 0_f32, v3), t!(190, 50_f32, v2), t!(0, 210_f32, v1)),
+        BasicPalette::Io => color!(t!(80, 60_f32, v1), t!(80, 60_f32, v1), t!(190, 55_f32, v2)),
+        BasicPalette::Red => color!(t!(200, 55_f32, v1), t!(50, 80_f32, v1), t!(50, 80_f32, v1)),
+        BasicPalette::Green => color!(t!(50, 60_f32, v1), t!(200, 55_f32, v1), t!(50, 60_f32, v1)),
+        BasicPalette::Blue => color!(t!(80, 60_f32, v1), t!(80, 60_f32, v1), t!(205, 50_f32, v1)),
+        BasicPalette::Yellow => {
+            color!(t!(175, 55_f32, v1), t!(175, 55_f32, v1), t!(50, 20_f32, v1))
+        }
+        BasicPalette::Purple => {
+            color!(t!(190, 65_f32, v1), t!(80, 60_f32, v1), t!(190, 65_f32, v1))
+        }
+        BasicPalette::Aqua => color!(t!(50, 60_f32, v1), t!(165, 55_f32, v1), t!(165, 55_f32, v1)),
+        BasicPalette::Orange => color!(t!(190, 65_f32, v1), t!(90, 65_f32, v1), t!(0, 0_f32, v1)),
     }
 }
 
