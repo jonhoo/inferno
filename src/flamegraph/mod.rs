@@ -310,7 +310,7 @@ impl Rectangle {
 /// The resulting flame graph will be written out to `writer` in SVG format.
 ///
 /// [differential flame graph]: http://www.brendangregg.com/blog/2014-11-09/differential-flame-graphs.html
-#[allow(clippy::cyclomatic_complexity)]
+#[allow(clippy::cognitive_complexity)]
 pub fn from_lines<'a, I, W>(opt: &mut Options<'_>, lines: I, writer: W) -> quick_xml::Result<()>
 where
     I: IntoIterator<Item = &'a str>,
