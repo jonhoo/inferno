@@ -7,32 +7,57 @@ function init(evt) {
     matchedtxt = document.getElementById("matched");
     svg = document.getElementsByTagName("svg")[0];
     searching = 0;
+
+    // use GET parameters to restore a flamegraphs state.
+    var params = get_params();
+    if (params.x && params.y)
+        zoom(find_group(document.querySelector('[x="' + params.x + '"][y="' + params.y + '"]')));
+    if (params.s)
+        search(params.s);
 }
 
+// event listeners
 window.addEventListener("click", function(e) {
-	var target = find_group(e.target);
-	if (target) {
+    var target = find_group(e.target);
+    if (target) {
         if (target.nodeName == "a") {
             if (e.ctrlKey === false) return;
             e.preventDefault();
         }
         if (target.classList.contains("parent")) unzoom();
         zoom(target);
+
+        // set parameters for zoom state
+        var el = target.querySelector("rect");
+        if (el && el.attributes && el.attributes.y && el.attributes._orig_x) {
+            var params = get_params()
+            params.x = el.attributes._orig_x.value;
+            params.y = el.attributes.y.value;
+            history.replaceState(null, null, parse_params(params));
+        }
     }
-    else if (e.target.id == "unzoom") unzoom();
+    else if (e.target.id == "unzoom") {
+        unzoom();
+
+        // remove zoom state
+        var params = get_params();
+        if (params.x) delete params.x;
+        if (params.y) delete params.y;
+        history.replaceState(null, null, parse_params(params));
+    }
     else if (e.target.id == "search") search_prompt();
 }, false)
 
 // mouse-over for info
 // show
 window.addEventListener("mouseover", function(e) {
-	var target = find_group(e.target);
-	if (target) details.nodeValue = nametype + " " + g_to_text(target);
+    var target = find_group(e.target);
+    if (target) details.nodeValue = nametype + " " + g_to_text(target);
 }, false)
 // clear
 window.addEventListener("mouseout", function(e) {
-	var target = find_group(e.target);
-	if (target) details.nodeValue = ' ';
+    var target = find_group(e.target);
+    if (target) details.nodeValue = ' ';
 }, false)
 // ctrl-F for search
 window.addEventListener("keydown",function (e) {
@@ -42,16 +67,37 @@ window.addEventListener("keydown",function (e) {
     }
 }, false)
 // functions
+function get_params() {
+    var params = {};
+    var paramsarr = window.location.search.substr(1).split('&');
+    for (var i = 0; i < paramsarr.length; ++i) {
+        var tmp = paramsarr[i].split("=");
+        if (!tmp[0] || !tmp[1]) continue;
+        params[tmp[0]]  = decodeURIComponent(tmp[1]);
+    }
+    return params;
+}
+function parse_params(params) {
+    var uri = "?";
+    for (var key in params) {
+        uri += key + '=' + encodeURIComponent(params[key]) + '&';
+    }
+    if (uri.slice(-1) == "&")
+        uri = uri.substring(0, uri.length - 1);
+    if (uri == '?')
+        uri = window.location.href.split('?')[0];
+    return uri;
+}
 function find_child(node, selector) {
-	var children = node.querySelectorAll(selector);
-	if (children.length) return children[0];
-	return;
+    var children = node.querySelectorAll(selector);
+    if (children.length) return children[0];
+    return;
 }
 function find_group(node) {
-	var parent = node.parentElement;
-	if (!parent) return;
-	if (parent.id == "frames") return node;
-	return find_group(parent);
+    var parent = node.parentElement;
+    if (!parent) return;
+    if (parent.id == "frames") return node;
+    return find_group(parent);
 }
 function orig_save(e, attr, val) {
     if (e.attributes["_orig_" + attr] != undefined) return;
@@ -204,6 +250,9 @@ function reset_search() {
     for (var i = 0; i < el.length; i++) {
         orig_load(el[i], "fill")
     }
+    var params = get_params();
+    delete params.s;
+    history.replaceState(null, null, parse_params(params));
 }
 function search_prompt() {
     if (!searching) {
@@ -255,6 +304,10 @@ function search(term) {
     }
     if (!searching)
         return;
+    var params = get_params();
+    params.s = term;
+    history.replaceState(null, null, parse_params(params));
+
     searchbtn.classList.add("show");
     searchbtn.firstChild.nodeValue = "Reset Search";
     // calculate percent matched, excluding vertical overlap
@@ -274,7 +327,7 @@ function search(term) {
     // Step through frames saving only the biggest bottom-up frames
     // thanks to the sort order. This relies on the tree property
     // where children are always smaller than their parents.
-    var fudge = 0.0001;	// JavaScript floating point
+    var fudge = 0.0001;    // JavaScript floating point
     for (var k in keys) {
         var x = parseFloat(keys[k]);
         var w = matches[keys[k]];
