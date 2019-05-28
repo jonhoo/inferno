@@ -1,6 +1,6 @@
+use fnv::FnvHashMap;
 use indexmap::map::Entry;
 use log::warn;
-use std::collections::HashMap;
 use std::fs::File;
 use std::io::{self, BufRead, BufReader};
 use std::path::PathBuf;
@@ -19,7 +19,7 @@ macro_rules! unwrap_or_continue {
 
 /// Provides a way to customize the attributes on the SVG elements for a frame.
 #[derive(PartialEq, Eq, Debug, Default)]
-pub struct FuncFrameAttrsMap(HashMap<String, FrameAttrs>);
+pub struct FuncFrameAttrsMap(FnvHashMap<String, FrameAttrs>);
 
 impl FuncFrameAttrsMap {
     /// Parse frame attributes from a file.
@@ -212,7 +212,7 @@ mod test {
         let s = vec![foo, bar].join("\n");
         let r = s.as_bytes();
 
-        let mut expected_inner = HashMap::new();
+        let mut expected_inner = FnvHashMap::default();
         let foo_attrs: AttrMap<String, String> = convert_args!(hashmap!(
             "class" => "foo class",
             "xlink:href" => "foo href",

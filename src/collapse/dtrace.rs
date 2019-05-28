@@ -1,6 +1,7 @@
 use super::Collapse;
+use fnv::FnvHashMap;
 use log::warn;
-use std::collections::{VecDeque, HashMap};
+use std::collections::VecDeque;
 use std::io;
 use std::io::prelude::*;
 
@@ -23,7 +24,7 @@ pub struct Folder {
     stack: VecDeque<String>,
 
     /// Number of times each call stack has been seen.
-    occurrences: HashMap<String, usize>,
+    occurrences: FnvHashMap<String, usize>,
 
     /// Keep track of stack string size while we consume a stack
     stack_str_size: usize,
@@ -114,7 +115,7 @@ impl From<Options> for Folder {
     fn from(opt: Options) -> Self {
         Self {
             stack: VecDeque::default(),
-            occurrences: HashMap::with_capacity(512),
+            occurrences: FnvHashMap::with_capacity_and_hasher(512, fnv::FnvBuildHasher::default()),
             cache_inlines: Vec::new(),
             opt,
             stack_str_size: 0,

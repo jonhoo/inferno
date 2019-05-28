@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use fnv::FnvHashMap as HashMap;
 use log::warn;
 use std::fs::File;
 use std::io;
@@ -46,7 +46,7 @@ where
     R2: BufRead,
     W: Write,
 {
-    let mut stack_counts = HashMap::new();
+    let mut stack_counts = HashMap::default();
     let total1 = parse_stack_counts(opt, &mut stack_counts, before, true)?;
     let total2 = parse_stack_counts(opt, &mut stack_counts, after, false)?;
     if opt.normalize && total1 != total2 {

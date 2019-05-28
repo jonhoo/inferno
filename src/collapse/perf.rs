@@ -1,6 +1,7 @@
 use super::Collapse;
+use fnv::FnvHashMap;
 use log::warn;
-use std::collections::{VecDeque, HashMap};
+use std::collections::VecDeque;
 use std::io;
 use std::io::prelude::*;
 
@@ -70,7 +71,7 @@ pub struct Folder {
     cache_line: Vec<String>,
 
     /// Number of times each call stack has been seen.
-    occurrences: HashMap<String, usize>,
+    occurrences: FnvHashMap<String, usize>,
 
     /// Current comm name.
     ///
@@ -159,7 +160,7 @@ impl From<Options> for Folder {
             skip_stack: false,
             stack: VecDeque::default(),
             cache_line: Vec::default(),
-            occurrences: HashMap::with_capacity(512),
+            occurrences: FnvHashMap::with_capacity_and_hasher(512, fnv::FnvBuildHasher::default()),
             pname: String::new(),
             event_filtering: EventFilterState::None,
             opt,
