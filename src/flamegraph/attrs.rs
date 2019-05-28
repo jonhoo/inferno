@@ -1,10 +1,11 @@
-use fnv::FnvHashMap;
+use indexmap::map::Entry;
 use log::warn;
-use std::collections::hash_map::Entry;
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::{self, BufRead, BufReader};
 use std::path::PathBuf;
+
+type AttrMap<K, V> = indexmap::IndexMap<K, V, fnv::FnvBuildHasher>;
 
 macro_rules! unwrap_or_continue {
     ($e:expr) => {{
@@ -101,7 +102,7 @@ pub(super) struct FrameAttrs {
     /// If set to None, the title is dynamically generated based on the function name.
     pub(super) title: Option<String>,
 
-    pub(super) attrs: FnvHashMap<String, String>,
+    pub(super) attrs: AttrMap<String, String>,
 }
 
 impl FrameAttrs {
@@ -212,7 +213,7 @@ mod test {
         let r = s.as_bytes();
 
         let mut expected_inner = HashMap::new();
-        let foo_attrs: FnvHashMap<String, String> = convert_args!(hashmap!(
+        let foo_attrs: AttrMap<String, String> = convert_args!(hashmap!(
             "class" => "foo class",
             "xlink:href" => "foo href",
             "target" => "foo target",
@@ -232,7 +233,7 @@ mod test {
             },
         );
 
-        let bar_attrs: FnvHashMap<String, String> = convert_args!(hashmap!(
+        let bar_attrs: AttrMap<String, String> = convert_args!(hashmap!(
             "class" => "bar class",
             "xlink:href" => "bar href",
             "aextra1" => "foo",
