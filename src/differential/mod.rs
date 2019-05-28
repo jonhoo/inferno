@@ -1,4 +1,4 @@
-use fnv::FnvHashMap as HashMap;
+use fnv::FnvHashMap;
 use log::warn;
 use std::fs::File;
 use std::io;
@@ -46,7 +46,7 @@ where
     R2: BufRead,
     W: Write,
 {
-    let mut stack_counts = HashMap::default();
+    let mut stack_counts = FnvHashMap::default();
     let total1 = parse_stack_counts(opt, &mut stack_counts, before, true)?;
     let total2 = parse_stack_counts(opt, &mut stack_counts, after, false)?;
     if opt.normalize && total1 != total2 {
@@ -82,7 +82,7 @@ where
 // Populate stack_counts based on lines from the reader and returns the sum of the sample counts.
 fn parse_stack_counts<R>(
     opt: Options,
-    stack_counts: &mut HashMap<String, Counts>,
+    stack_counts: &mut FnvHashMap<String, Counts>,
     mut reader: R,
     is_first: bool,
 ) -> io::Result<usize>
@@ -119,7 +119,7 @@ where
 
 // Write three-column lines with the folded stack trace and two value columns,
 // one for each profile.
-fn write_stacks<W>(stack_counts: &HashMap<String, Counts>, mut writer: W) -> io::Result<()>
+fn write_stacks<W>(stack_counts: &FnvHashMap<String, Counts>, mut writer: W) -> io::Result<()>
 where
     W: Write,
 {
