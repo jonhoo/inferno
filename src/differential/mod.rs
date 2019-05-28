@@ -1,4 +1,4 @@
-use hashbrown::HashMap;
+use std::collections::HashMap;
 use log::warn;
 use std::fs::File;
 use std::io;
