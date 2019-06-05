@@ -1,3 +1,5 @@
+mod common;
+
 use std::fs::{self, File};
 use std::io::{self, BufRead, BufReader, Cursor};
 use std::process::Command;
@@ -6,6 +8,8 @@ use assert_cmd::prelude::*;
 use inferno::differential::{self, Options};
 use log::Level;
 use pretty_assertions::assert_eq;
+
+use common::test_logger::{self, CapturedLog};
 
 fn test_diff_folded(
     infile1: &str,
@@ -80,7 +84,7 @@ where
 
 fn test_diff_folded_logs<F>(infile1: &str, infile2: &str, asserter: F)
 where
-    F: Fn(&Vec<testing_logger::CapturedLog>),
+    F: Fn(&Vec<CapturedLog>),
 {
     test_diff_folded_logs_with_options(infile1, infile2, asserter, Default::default());
 }
@@ -91,14 +95,14 @@ fn test_diff_folded_logs_with_options<F>(
     asserter: F,
     options: Options,
 ) where
-    F: Fn(&Vec<testing_logger::CapturedLog>),
+    F: Fn(&Vec<CapturedLog>),
 {
-    testing_logger::setup();
+    test_logger::init();
     let r1 = BufReader::new(File::open(infile1).unwrap());
     let r2 = BufReader::new(File::open(infile2).unwrap());
     let sink = io::sink();
     let _ = differential::from_readers(options, r1, r2, sink);
-    testing_logger::validate(asserter);
+    test_logger::validate(asserter);
 }
 
 #[test]

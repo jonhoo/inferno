@@ -1,4 +1,4 @@
-mod collapse_common;
+mod common;
 
 use std::fs::File;
 use std::io::{self, BufReader, Cursor};
@@ -10,22 +10,31 @@ use inferno::collapse::perf::{Folder, Options};
 use log::Level;
 use pretty_assertions::assert_eq;
 
-use self::collapse_common::*;
+use common::collapse::*;
+use common::test_logger::CapturedLog;
 
-fn test_collapse_perf(test_file: &str, expected_file: &str, options: Options) -> io::Result<()> {
-    test_collapse(Folder::from(options), test_file, expected_file)
+fn test_collapse_perf(
+    test_file: &str,
+    expected_file: &str,
+    mut options: Options,
+) -> io::Result<()> {
+    options.nthreads = 1;
+    test_collapse(Folder::from(options.clone()), test_file, expected_file)?;
+    options.nthreads = 4;
+    test_collapse(Folder::from(options), test_file, expected_file)?;
+    Ok(())
 }
 
 fn test_collapse_perf_logs<F>(input_file: &str, asserter: F)
 where
-    F: Fn(&Vec<testing_logger::CapturedLog>),
+    F: Fn(&Vec<CapturedLog>),
 {
     test_collapse_perf_logs_with_options(input_file, asserter, Options::default());
 }
 
 fn test_collapse_perf_logs_with_options<F>(input_file: &str, asserter: F, options: Options)
 where
-    F: Fn(&Vec<testing_logger::CapturedLog>),
+    F: Fn(&Vec<CapturedLog>),
 {
     test_collapse_logs(Folder::from(options), input_file, asserter);
 }
@@ -85,13 +94,14 @@ macro_rules! collapse_perf_tests_inner {
             let test_path = Path::new($dir);
             let results_path = test_path.join("results");
 
-            test_collapse_perf(
-                test_path.join(test_file).to_str().unwrap(),
-                results_path.join(result_file).to_str().unwrap(),
-                options_from_vec(options),
-            )
+            let test_full_path = test_path.join(&test_file);
+            let results_full_path = results_path.join(&result_file);
 
-                .unwrap()
+            test_collapse_perf(
+                test_full_path.to_str().unwrap(),
+                results_full_path.to_str().unwrap(),
+                options_from_vec(options),
+            ).unwrap();
         }
     )*
     }

@@ -1,4 +1,4 @@
-mod collapse_common;
+mod common;
 
 use std::fs::File;
 use std::io::{self, BufReader, Cursor};
@@ -9,17 +9,18 @@ use inferno::collapse::guess::Folder;
 use log::Level;
 use pretty_assertions::assert_eq;
 
-use self::collapse_common::*;
+use common::collapse::*;
+use common::test_logger::CapturedLog;
 
 fn test_collapse_guess(test_file: &str, expected_file: &str) -> io::Result<()> {
-    test_collapse(Folder {}, test_file, expected_file)
+    test_collapse(Folder::default(), test_file, expected_file)
 }
 
 fn test_collapse_guess_logs<F>(input_file: &str, asserter: F)
 where
-    F: Fn(&Vec<testing_logger::CapturedLog>),
+    F: Fn(&Vec<CapturedLog>),
 {
-    test_collapse_logs(Folder {}, input_file, asserter);
+    test_collapse_logs(Folder::default(), input_file, asserter);
 }
 
 #[test]
@@ -69,6 +70,7 @@ fn collapse_guess_unknown_format_should_log_error() {
     test_collapse_guess_logs(
         "./tests/data/collapse-guess/unknown-format.txt",
         |captured_logs| {
+            println!("{:?}", captured_logs);
             let nerrors = captured_logs
                 .into_iter()
                 .filter(|log| {

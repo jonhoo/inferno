@@ -5,15 +5,35 @@ use log::{error, info};
 
 use super::{dtrace, perf, Collapse};
 
+///////////////////////////////////////////////////////////////////////////////
+
 const LINES_PER_ITERATION: usize = 10;
+
+///////////////////////////////////////////////////////////////////////////////
 
 /// A collapser that tries to find an appropriate implementation of `Collapse`
 /// based on the input, then delegates to that collapser if one is found.
 ///
 /// If no applicable collapser is found, an error will be logged and
 /// nothing will be written.
-#[derive(Default)]
-pub struct Folder {}
+pub struct Folder {
+    nthreads: usize,
+}
+
+impl Folder {
+    /// Constructs a new `guess::Folder`.
+    pub fn new(nthreads: usize) -> Self {
+        Self { nthreads }
+    }
+}
+
+impl Default for Folder {
+    fn default() -> Self {
+        Self {
+            nthreads: num_cpus::get(),
+        }
+    }
+}
 
 impl Collapse for Folder {
     fn collapse<R, W>(&mut self, mut reader: R, writer: W) -> io::Result<()>
@@ -21,8 +41,16 @@ impl Collapse for Folder {
         R: io::BufRead,
         W: io::Write,
     {
-        let mut perf = perf::Folder::from(perf::Options::default());
-        let mut dtrace = dtrace::Folder::from(dtrace::Options::default());
+        let mut dtrace = {
+            let mut options = dtrace::Options::default();
+            options.nthreads = self.nthreads;
+            dtrace::Folder::from(options)
+        };
+        let mut perf = {
+            let mut options = perf::Options::default();
+            options.nthreads = self.nthreads;
+            perf::Folder::from(options)
+        };
 
         // Each Collapse impl gets its own flag in this array.
         // It gets set to true when the impl has been ruled out.

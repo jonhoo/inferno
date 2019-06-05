@@ -1,4 +1,4 @@
-mod collapse_common;
+mod common;
 
 use std::fs::File;
 use std::io::{self, BufReader, Cursor};
@@ -9,22 +9,31 @@ use inferno::collapse::dtrace::{Folder, Options};
 use log::Level;
 use pretty_assertions::assert_eq;
 
-use self::collapse_common::*;
+use common::collapse::*;
+use common::test_logger::CapturedLog;
 
-fn test_collapse_dtrace(test_file: &str, expected_file: &str, options: Options) -> io::Result<()> {
-    test_collapse(Folder::from(options), test_file, expected_file)
+fn test_collapse_dtrace(
+    test_file: &str,
+    expected_file: &str,
+    mut options: Options,
+) -> io::Result<()> {
+    options.nthreads = 1;
+    test_collapse(Folder::from(options.clone()), test_file, expected_file)?;
+    options.nthreads = 4;
+    test_collapse(Folder::from(options), test_file, expected_file)?;
+    Ok(())
 }
 
 fn test_collapse_dtrace_logs<F>(input_file: &str, asserter: F)
 where
-    F: Fn(&Vec<testing_logger::CapturedLog>),
+    F: Fn(&Vec<CapturedLog>),
 {
     test_collapse_dtrace_logs_with_options(input_file, asserter, Options::default());
 }
 
 fn test_collapse_dtrace_logs_with_options<F>(input_file: &str, asserter: F, options: Options)
 where
-    F: Fn(&Vec<testing_logger::CapturedLog>),
+    F: Fn(&Vec<CapturedLog>),
 {
     test_collapse_logs(Folder::from(options), input_file, asserter);
 }
@@ -45,6 +54,7 @@ fn collapse_dtrace_compare_to_upstream_with_offsets() {
         result_file,
         Options {
             includeoffset: true,
+            nthreads: 1,
         },
     )
     .unwrap()
@@ -78,6 +88,7 @@ fn collapse_dtrace_compare_to_flamegraph_bug() {
         result_file,
         Options {
             includeoffset: true,
+            nthreads: 1,
         },
     )
     .unwrap()

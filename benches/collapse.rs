@@ -5,6 +5,9 @@ use criterion::*;
 use inferno::collapse::{dtrace, perf, Collapse};
 use libflate::gzip::Decoder;
 
+const INFILE_DTRACE: &str = "flamegraph/example-dtrace-stacks.txt";
+const INFILE_PERF: &str = "flamegraph/example-perf-stacks.txt.gz";
+
 fn collapse_benchmark<C>(c: &mut Criterion, mut collapser: C, id: &str, infile: &str)
 where
     C: 'static + Collapse,
@@ -31,29 +34,50 @@ where
             },
             vec![bytes],
         )
+        .sample_size(100)
         .throughput(|bytes| Throughput::Bytes(bytes.len() as u32)),
     );
 }
 
-fn dtrace(c: &mut Criterion) {
-    let infile = "flamegraph/example-dtrace-stacks.txt";
+fn dtrace_single(c: &mut Criterion) {
+    let mut options = dtrace::Options::default();
+    options.nthreads = 1;
     collapse_benchmark(
         c,
-        dtrace::Folder::from(dtrace::Options::default()),
-        "dtrace",
-        infile,
+        dtrace::Folder::from(options),
+        "dtrace_single",
+        INFILE_DTRACE,
     );
 }
 
-fn perf(c: &mut Criterion) {
-    let infile = "flamegraph/example-perf-stacks.txt.gz";
+fn dtrace_multi(c: &mut Criterion) {
+    let mut options = dtrace::Options::default();
+    options.nthreads = num_cpus::get();
     collapse_benchmark(
         c,
-        perf::Folder::from(perf::Options::default()),
-        "perf",
-        infile,
+        dtrace::Folder::from(options),
+        "dtrace_multi",
+        INFILE_DTRACE,
     );
 }
 
-criterion_group!(benches, dtrace, perf);
+fn perf_single(c: &mut Criterion) {
+    let mut options = perf::Options::default();
+    options.nthreads = 1;
+    collapse_benchmark(c, perf::Folder::from(options), "perf_single", INFILE_PERF);
+}
+
+fn perf_multi(c: &mut Criterion) {
+    let mut options = perf::Options::default();
+    options.nthreads = num_cpus::get();
+    collapse_benchmark(c, perf::Folder::from(options), "perf_multi", INFILE_PERF);
+}
+
+criterion_group!(
+    benches,
+    dtrace_single,
+    dtrace_multi,
+    perf_single,
+    perf_multi
+);
 criterion_main!(benches);

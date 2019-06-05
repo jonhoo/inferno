@@ -22,6 +22,10 @@ struct Opt {
     #[structopt(long = "includeoffset")]
     includeoffset: bool,
 
+    /// Number of threads to use; defaults to number of logical cores on your machine
+    #[structopt(short = "n", long = "nthreads", value_name = "NTHREADS")]
+    nthreads: Option<usize>,
+
     /// Silence all log output
     #[structopt(short = "q", long = "quiet")]
     quiet: bool,
@@ -31,6 +35,7 @@ struct Opt {
     verbose: usize,
 
     /// perf script output file, or STDIN if not specified
+    #[structopt(value_name = "INFILE")]
     infile: Option<PathBuf>,
 }
 
@@ -40,6 +45,7 @@ impl Opt {
             self.infile,
             Options {
                 includeoffset: self.includeoffset,
+                nthreads: self.nthreads.unwrap_or_else(|| num_cpus::get()),
             },
         )
     }

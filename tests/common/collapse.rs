@@ -4,7 +4,9 @@ use std::io::{self, BufRead, BufReader, Cursor};
 use inferno::collapse::Collapse;
 use libflate::gzip::Decoder;
 
-pub(crate) fn test_collapse<C>(
+use super::test_logger::{self, CapturedLog};
+
+pub fn test_collapse<C>(
     mut collapser: C,
     test_filename: &str,
     expected_filename: &str,
@@ -58,18 +60,18 @@ where
     Ok(return_value)
 }
 
-pub(crate) fn test_collapse_logs<C, F>(mut collapser: C, input_file: &str, asserter: F)
+pub fn test_collapse_logs<C, F>(mut collapser: C, input_file: &str, asserter: F)
 where
     C: Collapse,
-    F: Fn(&Vec<testing_logger::CapturedLog>),
+    F: Fn(&Vec<CapturedLog>),
 {
-    testing_logger::setup();
+    test_logger::init();
     let r = BufReader::new(File::open(input_file).unwrap());
     collapser.collapse(r, std::io::sink()).unwrap();
-    testing_logger::validate(asserter);
+    test_logger::validate(asserter);
 }
 
-pub(crate) fn compare_results<R, E>(result: R, mut expected: E, expected_file: &str)
+pub fn compare_results<R, E>(result: R, mut expected: E, expected_file: &str)
 where
     R: BufRead,
     E: BufRead,
