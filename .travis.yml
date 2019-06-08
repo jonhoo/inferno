@@ -6,6 +6,7 @@ rust:
   - beta
   - nightly
 os: linux
+script: cargo test --no-fail-fast --verbose --all -- --test-threads=1
 
 # always test things that aren't pushes (like PRs)
 # never test tags or pushes to non-master branches (wait for PR)

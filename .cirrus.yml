@@ -23,4 +23,4 @@ task:
     - cargo build --all-targets --verbose
   test_script:
     - . $HOME/.cargo/env
-    - cargo test --no-fail-fast --verbose --all -- --nocapture
+    - cargo test --no-fail-fast --verbose --all -- --test-threads=1 --nocapture
