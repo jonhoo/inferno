@@ -237,7 +237,7 @@ impl Folder {
             if line.is_empty() {
                 continue;
             }
-            if let Ok(_) = line.parse::<usize>() {
+            if line.parse::<usize>().is_ok() {
                 stack_indices.push(byte_index);
             }
         }

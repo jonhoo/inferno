@@ -75,7 +75,7 @@ impl Opt {
                 annotate_jit: self.annotate_jit || self.annotate_all,
                 annotate_kernel: self.annotate_kernel || self.annotate_all,
                 event_filter: self.event_filter,
-                nthreads: self.nthreads.unwrap_or_else(|| num_cpus::get()),
+                nthreads: self.nthreads.unwrap_or_else(num_cpus::get),
             },
         )
     }

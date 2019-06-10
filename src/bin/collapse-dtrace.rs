@@ -45,7 +45,7 @@ impl Opt {
             self.infile,
             Options {
                 includeoffset: self.includeoffset,
-                nthreads: self.nthreads.unwrap_or_else(|| num_cpus::get()),
+                nthreads: self.nthreads.unwrap_or_else(num_cpus::get),
             },
         )
     }

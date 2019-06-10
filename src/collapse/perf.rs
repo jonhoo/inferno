@@ -509,7 +509,7 @@ impl Folder {
     fn identify_stack_locations<'a>(
         event_filter_state: &'a mut EventFilterState,
     ) -> impl FnOnce(io::BufReader<&[u8]>) -> io::Result<Vec<usize>> + 'a {
-        let func = move |mut reader: io::BufReader<&[u8]>| -> io::Result<Vec<usize>> {
+        move |mut reader: io::BufReader<&[u8]>| -> io::Result<Vec<usize>> {
             let mut byte_index = 0;
             let mut line = String::with_capacity(CAPACITY_LINE_BUFFER);
             let mut stack_indices = vec![0];
@@ -535,8 +535,7 @@ impl Folder {
                 }
             }
             Ok(stack_indices)
-        };
-        func
+        }
     }
 }
 

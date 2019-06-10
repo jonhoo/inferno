@@ -48,6 +48,6 @@ fn main() -> io::Result<()> {
         .init();
     }
 
-    let mut guess = Folder::new(opt.nthreads.unwrap_or_else(|| num_cpus::get()));
+    let mut guess = Folder::new(opt.nthreads.unwrap_or_else(num_cpus::get));
     guess.collapse_file(opt.infile.as_ref(), io::stdout().lock())
 }

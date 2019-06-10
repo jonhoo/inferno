@@ -240,7 +240,7 @@ impl Input {
                 if *n == 0 {
                     break;
                 }
-                indices.push(stack_indices.get(count).map(|x| *x).unwrap());
+                indices.push(stack_indices.get(count).cloned().unwrap());
                 count += *n;
             }
 
@@ -253,7 +253,7 @@ impl Input {
         })
     }
 
-    fn chunks<'a>(&'a self) -> Chunks<'a> {
+    fn chunks(&self) -> Chunks {
         Chunks {
             current_index: 0,
             data: &self.inner[..],
