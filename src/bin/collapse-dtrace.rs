@@ -1,10 +1,10 @@
-use env_logger::Env;
 use std::io;
 use std::path::PathBuf;
-use structopt::StructOpt;
 
+use env_logger::Env;
 use inferno::collapse::dtrace::{Folder, Options};
 use inferno::collapse::Collapse;
+use structopt::StructOpt;
 
 #[derive(Debug, StructOpt)]
 #[structopt(

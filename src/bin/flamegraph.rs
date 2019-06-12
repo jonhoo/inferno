@@ -1,12 +1,10 @@
-use env_logger::Env;
 use std::io;
 use std::path::{Path, PathBuf};
-use structopt::StructOpt;
 
-use inferno::flamegraph::{
-    self, color::BackgroundColor, color::PaletteMap, color::SearchColor, defaults, Direction,
-    FuncFrameAttrsMap, Options, Palette,
-};
+use env_logger::Env;
+use inferno::flamegraph::color::{BackgroundColor, PaletteMap, SearchColor};
+use inferno::flamegraph::{self, defaults, Direction, FuncFrameAttrsMap, Options, Palette};
+use structopt::StructOpt;
 
 #[derive(Debug, StructOpt)]
 #[structopt(name = "inferno-flamegraph", author = "")]

@@ -1,10 +1,9 @@
-use criterion::*;
-use inferno::collapse::dtrace;
-use inferno::collapse::perf;
-use inferno::collapse::Collapse;
-use libflate::gzip::Decoder;
 use std::fs::File;
 use std::io::{self, BufReader, Read};
+
+use criterion::*;
+use inferno::collapse::{dtrace, perf, Collapse};
+use libflate::gzip::Decoder;
 
 fn collapse_benchmark<C>(c: &mut Criterion, mut collapser: C, id: &str, infile: &str)
 where

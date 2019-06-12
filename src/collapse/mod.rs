@@ -1,12 +1,12 @@
-/// Attempts to use whichever Collapse implementation is appropriate for a given input
-pub mod guess;
-
 /// Stack collapsing for the output of [`dtrace`](https://www.joyent.com/dtrace).
 ///
 /// See the [crate-level documentation] for details.
 ///
 ///   [crate-level documentation]: ../../index.html
 pub mod dtrace;
+
+/// Attempts to use whichever Collapse implementation is appropriate for a given input
+pub mod guess;
 
 /// Stack collapsing for the output of [`perf script`](https://linux.die.net/man/1/perf-script).
 ///

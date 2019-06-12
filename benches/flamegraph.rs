@@ -1,7 +1,8 @@
-use criterion::*;
-use inferno::flamegraph::{self, Options};
 use std::fs::File;
 use std::io::{self, BufReader, Read};
+
+use criterion::*;
+use inferno::flamegraph::{self, Options};
 
 fn flamegraph_benchmark(c: &mut Criterion, id: &str, infile: &str, mut opt: Options<'static>) {
     let mut f = File::open(infile).expect("file not found");

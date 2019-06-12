@@ -1,13 +1,15 @@
 mod collapse_common;
 
-use assert_cmd::prelude::*;
-use collapse_common::*;
-use inferno::collapse::guess::Folder;
-use log::Level;
-use pretty_assertions::assert_eq;
 use std::fs::File;
 use std::io::{self, BufReader, Cursor};
 use std::process::{Command, Stdio};
+
+use assert_cmd::prelude::*;
+use inferno::collapse::guess::Folder;
+use log::Level;
+use pretty_assertions::assert_eq;
+
+use self::collapse_common::*;
 
 fn test_collapse_guess(test_file: &str, expected_file: &str) -> io::Result<()> {
     test_collapse(Folder {}, test_file, expected_file)

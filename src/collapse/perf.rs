@@ -1,9 +1,11 @@
-use super::Collapse;
-use fnv::FnvHashMap;
-use log::warn;
 use std::collections::VecDeque;
 use std::io;
 use std::io::prelude::*;
+
+use fnv::FnvHashMap;
+use log::warn;
+
+use super::Collapse;
 
 const TIDY_GENERIC: bool = true;
 const TIDY_JAVA: bool = true;

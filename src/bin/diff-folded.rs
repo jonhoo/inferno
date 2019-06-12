@@ -1,9 +1,9 @@
-use env_logger::Env;
 use std::io;
 use std::path::PathBuf;
-use structopt::StructOpt;
 
+use env_logger::Env;
 use inferno::differential::{self, Options};
+use structopt::StructOpt;
 
 #[derive(Debug, StructOpt)]
 #[structopt(

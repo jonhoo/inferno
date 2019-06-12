@@ -1,7 +1,8 @@
-use log::warn;
 use std::collections::HashMap;
 use std::io;
 use std::iter;
+
+use log::warn;
 
 #[derive(Debug, PartialEq, Eq, Hash)]
 pub(super) struct Frame<'a> {

@@ -1,9 +1,10 @@
-use fnv::FnvHashMap;
-use indexmap::map::Entry;
-use log::warn;
 use std::fs::File;
 use std::io::{self, BufRead, BufReader};
 use std::path::PathBuf;
+
+use fnv::FnvHashMap;
+use indexmap::map::Entry;
+use log::warn;
 
 type AttrMap<K, V> = indexmap::IndexMap<K, V, fnv::FnvBuildHasher>;
 

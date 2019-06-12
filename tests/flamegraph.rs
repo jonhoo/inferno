@@ -1,14 +1,14 @@
-use assert_cmd::prelude::*;
-use inferno::flamegraph::{
-    self, color::BackgroundColor, color::PaletteMap, Direction, Options, Palette,
-};
-use log::Level;
-use pretty_assertions::assert_eq;
 use std::fs::{self, File};
 use std::io::{self, BufRead, BufReader, Cursor};
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::str::FromStr;
+
+use assert_cmd::prelude::*;
+use inferno::flamegraph::color::{BackgroundColor, PaletteMap};
+use inferno::flamegraph::{self, Direction, Options, Palette};
+use log::Level;
+use pretty_assertions::assert_eq;
 
 fn test_flamegraph(
     input_file: &str,

@@ -1,9 +1,11 @@
-use super::Collapse;
-use fnv::FnvHashMap;
-use log::warn;
 use std::collections::VecDeque;
 use std::io;
 use std::io::prelude::*;
+
+use fnv::FnvHashMap;
+use log::warn;
+
+use super::Collapse;
 
 /// Settings that change how frames are named from the incoming stack traces.
 ///

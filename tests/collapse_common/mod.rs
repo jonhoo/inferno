@@ -1,7 +1,8 @@
-use inferno::collapse::Collapse;
-use libflate::gzip::Decoder;
 use std::fs::{self, File};
 use std::io::{self, BufRead, BufReader, Cursor};
+
+use inferno::collapse::Collapse;
+use libflate::gzip::Decoder;
 
 pub(crate) fn test_collapse<C>(
     mut collapser: C,

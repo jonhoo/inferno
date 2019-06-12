@@ -1,8 +1,9 @@
-use super::Collapse;
-use super::{dtrace, perf};
-use log::{error, info};
 use std::io::prelude::*;
 use std::io::{self, Cursor};
+
+use log::{error, info};
+
+use super::{dtrace, perf, Collapse};
 
 const LINES_PER_ITERATION: usize = 10;
 

@@ -131,16 +131,16 @@
 ///   [crate-level documentation]: ../index.html
 pub mod collapse;
 
-/// Tools for producing flame graphs from folded stack traces.
-///
-/// See the [crate-level documentation] for details.
-///
-///   [crate-level documentation]: ../index.html
-pub mod flamegraph;
-
 /// Tool for creating an output required to generate differential flame graphs.
 ///
 /// See the [crate-level documentation] for details.
 ///
 ///   [crate-level documentation]: ../index.html
 pub mod differential;
+
+/// Tools for producing flame graphs from folded stack traces.
+///
+/// See the [crate-level documentation] for details.
+///
+///   [crate-level documentation]: ../index.html
+pub mod flamegraph;

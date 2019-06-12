@@ -1,13 +1,15 @@
 mod collapse_common;
 
-use assert_cmd::prelude::*;
-use collapse_common::*;
-use inferno::collapse::dtrace::{Folder, Options};
-use log::Level;
-use pretty_assertions::assert_eq;
 use std::fs::File;
 use std::io::{self, BufReader, Cursor};
 use std::process::{Command, Stdio};
+
+use assert_cmd::prelude::*;
+use inferno::collapse::dtrace::{Folder, Options};
+use log::Level;
+use pretty_assertions::assert_eq;
+
+use self::collapse_common::*;
 
 fn test_collapse_dtrace(test_file: &str, expected_file: &str, options: Options) -> io::Result<()> {
     test_collapse(Folder::from(options), test_file, expected_file)
