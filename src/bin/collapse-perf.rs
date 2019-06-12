@@ -18,31 +18,31 @@ use structopt::StructOpt;
     If you save this output add --header on Linux >= 3.14 to include perf info."
 )]
 struct Opt {
-    /// all annotations (--kernel --jit)
+    /// All annotations (--kernel --jit)
     #[structopt(long = "all")]
     annotate_all: bool,
 
-    /// annotate jit functions with a _[j]
+    /// Annotate jit functions with a _[j]
     #[structopt(long = "jit")]
     annotate_jit: bool,
 
-    /// annotate kernel functions with a _[k]
+    /// Annotate kernel functions with a _[k]
     #[structopt(long = "kernel")]
     annotate_kernel: bool,
 
-    /// event name filter, defaults to first encountered event
+    /// Event name filter, defaults to first encountered event
     #[structopt(long = "event-filter", value_name = "EVENT")]
     event_filter: Option<String>,
 
-    /// include raw addresses where symbols can't be found
+    /// Include raw addresses where symbols can't be found
     #[structopt(long = "addrs")]
     include_addrs: bool,
 
-    /// include PID with process names [1]
+    /// Include PID with process names [1]
     #[structopt(long = "pid")]
     include_pid: bool,
 
-    /// include TID and PID with process names [1]
+    /// Include TID and PID with process names [1]
     #[structopt(long = "tid")]
     include_tid: bool,
 
