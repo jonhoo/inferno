@@ -18,6 +18,10 @@ use structopt::StructOpt;
     "
 )]
 struct Opt {
+    /// Include offsets
+    #[structopt(long = "includeoffset")]
+    includeoffset: bool,
+
     /// Silence all log output
     #[structopt(short = "q", long = "quiet")]
     quiet: bool,
@@ -25,10 +29,6 @@ struct Opt {
     /// Verbose logging mode (-v, -vv, -vvv)
     #[structopt(short = "v", long = "verbose", parse(from_occurrences))]
     verbose: usize,
-
-    /// Include offsets
-    #[structopt(long = "includeoffset")]
-    includeoffset: bool,
 
     /// perf script output file, or STDIN if not specified
     infile: Option<PathBuf>,

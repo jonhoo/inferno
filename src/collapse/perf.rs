@@ -15,19 +15,6 @@ const TIDY_JAVA: bool = true;
 /// All options default to off.
 #[derive(Clone, Debug, Default)]
 pub struct Options {
-    /// Include PID in the root frame.
-    ///
-    /// If disabled, the root frame is given the name of the profiled process.
-    pub include_pid: bool,
-
-    /// Include TID and PID in the root frame.
-    ///
-    /// Implies `include_pid`.
-    pub include_tid: bool,
-
-    /// Include raw addresses (e.g., `0xbfff0836`) where symbols can't be found.
-    pub include_addrs: bool,
-
     /// Annotate JIT functions with a `_[j]` suffix.
     pub annotate_jit: bool,
 
@@ -38,6 +25,19 @@ pub struct Options {
     ///
     /// If this option is set to `None`, it will be set to the first encountered event type.
     pub event_filter: Option<String>,
+
+    /// Include raw addresses (e.g., `0xbfff0836`) where symbols can't be found.
+    pub include_addrs: bool,
+
+    /// Include PID in the root frame.
+    ///
+    /// If disabled, the root frame is given the name of the profiled process.
+    pub include_pid: bool,
+
+    /// Include TID and PID in the root frame.
+    ///
+    /// Implies `include_pid`.
+    pub include_tid: bool,
 }
 
 #[derive(Copy, Clone, Debug)]
@@ -59,18 +59,14 @@ impl Default for EventFilterState {
 /// `perf::Folder::from(options)`.
 #[derive(Default)]
 pub struct Folder {
-    /// All lines until the next empty line are stack lines.
-    in_event: bool,
-
-    /// Skip all stack lines in this event.
-    skip_stack: bool,
-
-    /// Function entries on the stack in this entry thus far.
-    stack: VecDeque<String>,
-
     /// General String cache that can be used while processing lines.
     /// Currently only used to keep track of functions for Java inlining.
     cache_line: Vec<String>,
+
+    event_filtering: EventFilterState,
+
+    /// All lines until the next empty line are stack lines.
+    in_event: bool,
 
     /// Number of times each call stack has been seen.
     occurrences: FnvHashMap<String, usize>,
@@ -80,7 +76,11 @@ pub struct Folder {
     /// Called pname after original stackcollapse-perf source.
     pname: String,
 
-    event_filtering: EventFilterState,
+    /// Skip all stack lines in this event.
+    skip_stack: bool,
+
+    /// Function entries on the stack in this entry thus far.
+    stack: VecDeque<String>,
 
     opt: Options,
 }
@@ -158,13 +158,13 @@ impl From<Options> for Folder {
     fn from(mut opt: Options) -> Self {
         opt.include_pid = opt.include_pid || opt.include_tid;
         Self {
-            in_event: false,
-            skip_stack: false,
-            stack: VecDeque::default(),
             cache_line: Vec::default(),
+            event_filtering: EventFilterState::None,
+            in_event: false,
             occurrences: FnvHashMap::with_capacity_and_hasher(512, fnv::FnvBuildHasher::default()),
             pname: String::new(),
-            event_filtering: EventFilterState::None,
+            skip_stack: false,
+            stack: VecDeque::default(),
             opt,
         }
     }

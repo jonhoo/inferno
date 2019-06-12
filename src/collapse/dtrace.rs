@@ -22,17 +22,17 @@ pub struct Options {
 /// `dtrace::Folder::from(options)`.
 #[derive(Default)]
 pub struct Folder {
-    /// Function entries on the stack in this entry thus far.
-    stack: VecDeque<String>,
+    /// Vector for processing java stuff
+    cache_inlines: Vec<String>,
 
     /// Number of times each call stack has been seen.
     occurrences: FnvHashMap<String, usize>,
 
+    /// Function entries on the stack in this entry thus far.
+    stack: VecDeque<String>,
+
     /// Keep track of stack string size while we consume a stack
     stack_str_size: usize,
-
-    /// Vector for processing java stuff
-    cache_inlines: Vec<String>,
 
     opt: Options,
 }
@@ -116,11 +116,11 @@ impl Collapse for Folder {
 impl From<Options> for Folder {
     fn from(opt: Options) -> Self {
         Self {
-            stack: VecDeque::default(),
-            occurrences: FnvHashMap::with_capacity_and_hasher(512, fnv::FnvBuildHasher::default()),
             cache_inlines: Vec::new(),
-            opt,
+            occurrences: FnvHashMap::with_capacity_and_hasher(512, fnv::FnvBuildHasher::default()),
+            stack: VecDeque::default(),
             stack_str_size: 0,
+            opt,
         }
     }
 }
