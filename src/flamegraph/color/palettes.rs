@@ -100,3 +100,70 @@ pub(super) mod wakeup {
         BasicPalette::Aqua
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::flamegraph::color::BasicPalette;
+
+    struct TestData {
+        input: String,
+        output: BasicPalette,
+    }
+
+    #[test]
+    fn perl_mod_resolves() {
+        use super::perl::resolve;
+
+        let test_names = [
+            TestData {
+                input: String::from(" "),
+                output: BasicPalette::Red,
+            },
+            TestData {
+                input: String::from(""),
+                output: BasicPalette::Red,
+            },
+            TestData {
+                input: String::from("something"),
+                output: BasicPalette::Red,
+            },
+            TestData {
+                input: String::from("somethingpl"),
+                output: BasicPalette::Red,
+            },
+            TestData {
+                input: String::from("something/_[k]"),
+                output: BasicPalette::Orange,
+            },
+            TestData {
+                input: String::from("something_[k]"),
+                output: BasicPalette::Orange,
+            },
+            TestData {
+                input: String::from("some::thing"),
+                output: BasicPalette::Yellow,
+            },
+            TestData {
+                input: String::from("some/ai.pl"),
+                output: BasicPalette::Green,
+            },
+            TestData {
+                input: String::from("someai.pl"),
+                output: BasicPalette::Green,
+            },
+            TestData {
+                input: String::from("something/Perl"),
+                output: BasicPalette::Green,
+            },
+            TestData {
+                input: String::from("somethingPerl"),
+                output: BasicPalette::Green,
+            },
+        ];
+
+        for item in test_names.iter() {
+            let resolved_color = resolve(&item.input);
+            assert_eq!(resolved_color, item.output)
+        }
+    }
+}
