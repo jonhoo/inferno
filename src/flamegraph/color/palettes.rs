@@ -100,6 +100,7 @@ pub(super) mod wakeup {
         BasicPalette::Aqua
     }
 }
+
 #[cfg(test)]
 mod tests {
     use crate::flamegraph::color::BasicPalette;
