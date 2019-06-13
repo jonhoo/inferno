@@ -100,7 +100,6 @@ pub(super) mod wakeup {
         BasicPalette::Aqua
     }
 }
-
 #[cfg(test)]
 mod tests {
     use crate::flamegraph::color::BasicPalette;
@@ -164,6 +163,50 @@ mod tests {
         for item in test_names.iter() {
             let resolved_color = resolve(&item.input);
             assert_eq!(resolved_color, item.output)
+        }
+    }
+
+    #[test]
+    fn js_returns_correct() {
+        use super::js;
+
+        let test_data = [
+            TestData {
+                input: String::from(" "),
+                output: BasicPalette::Green,
+            },
+            TestData {
+                input: String::from("something_[k]"),
+                output: BasicPalette::Orange,
+            },
+            TestData {
+                input: String::from("something/_[j]"),
+                output: BasicPalette::Green,
+            },
+            TestData {
+                input: String::from("something_[j]"),
+                output: BasicPalette::Aqua,
+            },
+            TestData {
+                input: String::from("some::thing"),
+                output: BasicPalette::Yellow,
+            },
+            TestData {
+                input: String::from("some:thing"),
+                output: BasicPalette::Aqua,
+            },
+            TestData {
+                input: String::from("some/ai.js"),
+                output: BasicPalette::Green,
+            },
+            TestData {
+                input: String::from("someai.js"),
+                output: BasicPalette::Red,
+            },
+        ];
+        for elem in test_data.iter() {
+            let result = js::resolve(&elem.input);
+            assert_eq!(result, elem.output);
         }
     }
 }
