@@ -111,6 +111,222 @@ mod tests {
     }
 
     #[test]
+    fn java_mod_resolves() {
+        use super::java::resolve;
+
+        let test_names = [
+            TestData {
+                input: String::from("_[k]"),
+                output: BasicPalette::Orange,
+            },
+            TestData {
+                input: String::from("_[j]_[k]"),
+                output: BasicPalette::Orange,
+            },
+            TestData {
+                input: String::from("_[]_[k]"),
+                output: BasicPalette::Orange,
+            },
+            TestData {
+                input: String::from("_[j]"),
+                output: BasicPalette::Green,
+            },
+            TestData {
+                input: String::from("_[k]_[j]"),
+                output: BasicPalette::Green,
+            },
+            TestData {
+                input: String::from("_[]_[j]"),
+                output: BasicPalette::Green,
+            },
+            TestData {
+                input: String::from("_[i]"),
+                output: BasicPalette::Aqua,
+            },
+            TestData {
+                input: String::from("_[j]_[i]"),
+                output: BasicPalette::Aqua,
+            },
+            TestData {
+                input: String::from("_[]_[i]"),
+                output: BasicPalette::Aqua,
+            },
+            TestData {
+                input: String::from("_[j]_[]"),
+                output: BasicPalette::Red,
+            },
+            TestData {
+                input: String::from("_[j]_[jj]"),
+                output: BasicPalette::Red,
+            },
+            TestData {
+                input: String::from("_[jk]"),
+                output: BasicPalette::Red,
+            },
+            TestData {
+                input: String::from("_[i]blah"),
+                output: BasicPalette::Red,
+            },
+            TestData {
+                input: String::from("java/"),
+                output: BasicPalette::Green,
+            },
+            TestData {
+                input: String::from("java/somestuff"),
+                output: BasicPalette::Green,
+            },
+            TestData {
+                input: String::from("javax/"),
+                output: BasicPalette::Green,
+            },
+            TestData {
+                input: String::from("javax/somestuff"),
+                output: BasicPalette::Green,
+            },
+            TestData {
+                input: String::from("jdk/"),
+                output: BasicPalette::Green,
+            },
+            TestData {
+                input: String::from("jdk/somestuff"),
+                output: BasicPalette::Green,
+            },
+            TestData {
+                input: String::from("net/"),
+                output: BasicPalette::Green,
+            },
+            TestData {
+                input: String::from("net/somestuff"),
+                output: BasicPalette::Green,
+            },
+            TestData {
+                input: String::from("org/"),
+                output: BasicPalette::Green,
+            },
+            TestData {
+                input: String::from("org/somestuff"),
+                output: BasicPalette::Green,
+            },
+            TestData {
+                input: String::from("com/"),
+                output: BasicPalette::Green,
+            },
+            TestData {
+                input: String::from("com/somestuff"),
+                output: BasicPalette::Green,
+            },
+            TestData {
+                input: String::from("io/"),
+                output: BasicPalette::Green,
+            },
+            TestData {
+                input: String::from("io/somestuff"),
+                output: BasicPalette::Green,
+            },
+            TestData {
+                input: String::from("sun/"),
+                output: BasicPalette::Green,
+            },
+            TestData {
+                input: String::from("sun/somestuff"),
+                output: BasicPalette::Green,
+            },
+            TestData {
+                input: String::from("Ljava/"),
+                output: BasicPalette::Green,
+            },
+            TestData {
+                input: String::from("Ljavax/"),
+                output: BasicPalette::Green,
+            },
+            TestData {
+                input: String::from("Ljdk/"),
+                output: BasicPalette::Green,
+            },
+            TestData {
+                input: String::from("Lnet/"),
+                output: BasicPalette::Green,
+            },
+            TestData {
+                input: String::from("Lorg/"),
+                output: BasicPalette::Green,
+            },
+            TestData {
+                input: String::from("Lcom/"),
+                output: BasicPalette::Green,
+            },
+            TestData {
+                input: String::from("Lio/"),
+                output: BasicPalette::Green,
+            },
+            TestData {
+                input: String::from("Lsun/"),
+                output: BasicPalette::Green,
+            },
+            TestData {
+                input: String::from("jdk/_[ki]"),
+                output: BasicPalette::Green,
+            },
+            TestData {
+                input: String::from("jdk/::[ki]"),
+                output: BasicPalette::Green,
+            },
+            TestData {
+                input: String::from("Ajdk/_[ki]"),
+                output: BasicPalette::Red,
+            },
+            TestData {
+                input: String::from("Ajdk/::[ki]"),
+                output: BasicPalette::Yellow,
+            },
+            TestData {
+                input: String::from("jdk::[ki]"),
+                output: BasicPalette::Yellow,
+            },
+            TestData {
+                input: String::from("::[ki]"),
+                output: BasicPalette::Yellow,
+            },
+            TestData {
+                input: String::from("::"),
+                output: BasicPalette::Yellow,
+            },
+            TestData {
+                input: String::from("some::st_[jk]uff"),
+                output: BasicPalette::Yellow,
+            },
+            TestData {
+                input: String::from("jdk"),
+                output: BasicPalette::Red,
+            },
+            TestData {
+                input: String::from("Ljdk"),
+                output: BasicPalette::Red,
+            },
+            TestData {
+                input: String::from(" "),
+                output: BasicPalette::Red,
+            },
+            TestData {
+                input: String::from(""),
+                output: BasicPalette::Red,
+            },
+            TestData {
+                input: String::from("something"),
+                output: BasicPalette::Red,
+            },
+            TestData {
+                input: String::from("some:thing"),
+                output: BasicPalette::Red,
+            },
+        ];
+
+        for item in test_names.iter() {
+            let resolved_color = resolve(&item.input);
+            assert_eq!(resolved_color, item.output)
+        }
+    }
+    #[test]
     fn perl_mod_resolves() {
         use super::perl::resolve;
 
