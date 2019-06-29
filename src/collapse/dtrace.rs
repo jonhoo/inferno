@@ -3,7 +3,7 @@ use std::io::{self, prelude::*};
 
 use log::warn;
 
-use super::{Collapse, Input, Occurrences, CAPACITY_INPUT_BUFFER, CAPACITY_LINE_BUFFER};
+use super::{Collapse, Input, Occurrences, CAPACITY_INPUT_BUFFER};
 
 /// Settings that change how frames are named from the incoming stack traces.
 ///
@@ -121,7 +121,7 @@ impl Folder {
     where
         R: io::BufRead,
     {
-        let mut line = String::with_capacity(CAPACITY_LINE_BUFFER);
+        let mut line = String::new();
 
         // skip header lines -- first empty line marks start of data
         loop {
@@ -207,7 +207,7 @@ impl Folder {
     // See `crate::collapse::Input::new`.
     fn identify_stack_locations(mut reader: io::BufReader<&[u8]>) -> io::Result<Vec<usize>> {
         let mut byte_index = 0;
-        let mut line = String::with_capacity(CAPACITY_LINE_BUFFER);
+        let mut line = String::new();
         let mut stack_indices = vec![0];
         loop {
             line.clear();

@@ -26,7 +26,6 @@ use chashmap::CHashMap;
 use fnv::FnvHashMap;
 
 const CAPACITY_INPUT_BUFFER: usize = 1024 * 1024 * 1024;
-const CAPACITY_LINE_BUFFER: usize = 1024;
 const CAPACITY_HASHMAP: usize = 512;
 const READER_CAPACITY: usize = 128 * 1024;
 

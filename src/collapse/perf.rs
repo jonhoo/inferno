@@ -4,7 +4,7 @@ use std::mem;
 
 use log::warn;
 
-use crate::collapse::{Collapse, Input, Occurrences, CAPACITY_INPUT_BUFFER, CAPACITY_LINE_BUFFER};
+use crate::collapse::{Collapse, Input, Occurrences, CAPACITY_INPUT_BUFFER};
 
 const TIDY_GENERIC: bool = true;
 const TIDY_JAVA: bool = true;
@@ -500,7 +500,7 @@ impl Folder {
     ) -> impl FnOnce(io::BufReader<&[u8]>) -> io::Result<Vec<usize>> + 'a {
         move |mut reader: io::BufReader<&[u8]>| -> io::Result<Vec<usize>> {
             let mut byte_index = 0;
-            let mut line = String::with_capacity(CAPACITY_LINE_BUFFER);
+            let mut line = String::new();
             let mut stack_indices = vec![0];
             loop {
                 line.clear();
