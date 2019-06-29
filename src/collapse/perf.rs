@@ -136,9 +136,7 @@ impl Collapse for Folder {
             self.collapse_multi_threaded(reader)?;
         }
 
-        self.occurrences.write(writer)?;
-
-        Ok(())
+        self.occurrences.write(writer)
     }
 
     // Check if the input has an event line followed by a stack line.
@@ -191,7 +189,7 @@ impl Folder {
         loop {
             line.clear();
             if reader.read_line(&mut line)? == 0 {
-                break;
+                return Ok(());
             }
             if line.starts_with('#') {
                 continue;
@@ -205,7 +203,6 @@ impl Folder {
                 self.on_event_line(line)
             }
         }
-        Ok(())
     }
 
     fn collapse_multi_threaded<R>(&mut self, mut reader: R) -> io::Result<()>
@@ -267,11 +264,9 @@ impl Folder {
                 receiver.recv().unwrap()?;
                 handle.join().unwrap();
             }
-            Ok::<_, io::Error>(())
+            Ok(())
         })
-        .unwrap()?;
-
-        Ok(())
+        .unwrap()
     }
 
     fn event_line_parts(line: &str) -> Option<(&str, &str, &str)> {

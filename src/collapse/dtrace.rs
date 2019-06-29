@@ -195,11 +195,9 @@ impl Folder {
                 receiver.recv().unwrap()?;
                 handle.join().unwrap();
             }
-            Ok::<_, io::Error>(())
+            Ok(())
         })
-        .unwrap()?;
-
-        Ok(())
+        .unwrap()
     }
 
     // When collapsing using multiple threads, this function is run once
