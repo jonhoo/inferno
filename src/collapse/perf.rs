@@ -623,7 +623,6 @@ pub(super) enum EventFilterState {
 }
 
 impl EventFilterState {
-    #[inline(always)]
     fn is_none(&self) -> bool {
         match self {
             EventFilterState::None => true,
