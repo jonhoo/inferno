@@ -726,14 +726,14 @@ mod tests {
             let mut s = String::new();
             infile.read_to_string(&mut s)?;
 
-            for n in 0..MAX_THREADS {
-                let mut options = Options::default();
-                options.nthreads = 1;
-                let mut folder = Folder::from(options);
-                let mut writer = Vec::new();
-                folder.collapse(io::BufReader::new(s.as_bytes()), &mut writer)?;
-                let expected = std::str::from_utf8(&writer[..]).unwrap();
+            let mut options = Options::default();
+            options.nthreads = 1;
+            let mut folder = Folder::from(options);
+            let mut writer = Vec::new();
+            folder.collapse(io::BufReader::new(s.as_bytes()), &mut writer)?;
+            let expected = std::str::from_utf8(&writer[..]).unwrap();
 
+            for n in 0..MAX_THREADS {
                 let mut options = Options::default();
                 options.nthreads = n;
                 let mut folder = Folder::from(options);
