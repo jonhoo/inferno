@@ -198,9 +198,9 @@ impl Folder {
             if line.is_empty() {
                 self.after_event();
             } else if self.in_event {
-                self.on_stack_line(line)
+                self.on_stack_line(line);
             } else {
-                self.on_event_line(line)
+                self.on_event_line(line);
             }
         }
     }
