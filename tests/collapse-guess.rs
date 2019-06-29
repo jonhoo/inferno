@@ -70,7 +70,6 @@ fn collapse_guess_unknown_format_should_log_error() {
     test_collapse_guess_logs(
         "./tests/data/collapse-guess/unknown-format.txt",
         |captured_logs| {
-            println!("{:?}", captured_logs);
             let nerrors = captured_logs
                 .into_iter()
                 .filter(|log| {
