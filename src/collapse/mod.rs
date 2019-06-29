@@ -27,8 +27,7 @@ use fnv::FnvHashMap;
 
 const CAPACITY_INPUT_BUFFER: usize = 1024 * 1024 * 1024;
 const CAPACITY_LINE_BUFFER: usize = 1024;
-const CAPACITY_MULTI_THREADED_HASHMAP: usize = 64;
-const CAPACITY_SINGLE_THREADED_HASHMAP: usize = 512;
+const CAPACITY_HASHMAP: usize = 512;
 const READER_CAPACITY: usize = 128 * 1024;
 
 /// The abstract behavior of stack collapsing.
@@ -93,12 +92,12 @@ impl Occurrences {
     fn new(nthreads: usize) -> Self {
         if nthreads <= 1 {
             let map = FnvHashMap::with_capacity_and_hasher(
-                CAPACITY_SINGLE_THREADED_HASHMAP,
+                CAPACITY_HASHMAP,
                 fnv::FnvBuildHasher::default(),
             );
             Occurrences::SingleThreaded(map)
         } else {
-            let map = CHashMap::with_capacity(CAPACITY_MULTI_THREADED_HASHMAP);
+            let map = CHashMap::with_capacity(CAPACITY_HASHMAP);
             let arc = Arc::new(map);
             Occurrences::MultiThreaded(arc)
         }
@@ -147,10 +146,7 @@ impl Occurrences {
                         ))
                     }
                 };
-                let map = mem::replace(
-                    map,
-                    CHashMap::with_capacity(CAPACITY_MULTI_THREADED_HASHMAP),
-                );
+                let map = mem::replace(map, CHashMap::with_capacity(CAPACITY_HASHMAP));
                 let mut contents: Vec<_> = map.into_iter().collect();
                 contents.sort();
                 for (key, value) in contents {
