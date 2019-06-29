@@ -212,8 +212,8 @@ impl Folder {
     where
         R: io::BufRead,
     {
-        debug_assert!(self.occurrences.is_concurrent());
-        debug_assert!(self.nthreads > 1);
+        assert!(self.occurrences.is_concurrent());
+        assert!(self.nthreads > 1);
 
         let mut buf = Vec::with_capacity(CAPACITY_INPUT_BUFFER);
         reader.read_to_end(&mut buf)?;
