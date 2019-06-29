@@ -9,7 +9,7 @@ use super::{Collapse, Input, Occurrences, CAPACITY_INPUT_BUFFER, CAPACITY_LINE_B
 ///
 /// All options default to off, expect nthreads, which defaults to the number
 /// of logical cores on your machine.
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Debug)]
 pub struct Options {
     /// Include function offset (except leafs)
     pub includeoffset: bool,
@@ -172,7 +172,7 @@ impl Folder {
             let (sender, receiver) = crossbeam::channel::bounded(input.nthreads());
             for chunk in input.chunks() {
                 let occurrences = self.occurrences.clone();
-                let opt = self.opt;
+                let opt = self.opt.clone();
                 let sender = sender.clone();
 
                 let handle = scope.spawn(move |_| {
