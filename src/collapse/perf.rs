@@ -6,12 +6,8 @@ use log::warn;
 
 use crate::collapse::{Collapse, Input, Occurrences, CAPACITY_INPUT_BUFFER, CAPACITY_LINE_BUFFER};
 
-///////////////////////////////////////////////////////////////////////////////
-
 const TIDY_GENERIC: bool = true;
 const TIDY_JAVA: bool = true;
-
-///////////////////////////////////////////////////////////////////////////////
 
 /// Settings that change how frames are named from the incoming stack traces.
 ///
@@ -60,8 +56,6 @@ impl Default for Options {
         }
     }
 }
-
-///////////////////////////////////////////////////////////////////////////////
 
 /// A stack collapser for the output of `perf script`.
 ///
@@ -539,8 +533,6 @@ impl Folder {
     }
 }
 
-///////////////////////////////////////////////////////////////////////////////
-
 // massage function name to be nicer
 // NOTE: ignoring https://github.com/jvm-profiling-tools/perf-map-agent/pull/35
 fn with_module_fallback(module: &str, func: &str, pc: &str, include_addrs: bool) -> String {
@@ -628,8 +620,6 @@ fn tidy_java(mut func: String) -> String {
     func
 }
 
-///////////////////////////////////////////////////////////////////////////////
-
 #[derive(Clone, Debug)]
 pub(super) enum EventFilterState {
     None,
@@ -661,8 +651,6 @@ impl From<Option<String>> for EventFilterState {
         }
     }
 }
-
-///////////////////////////////////////////////////////////////////////
 
 #[cfg(test)]
 mod tests {

@@ -5,8 +5,6 @@ use log::warn;
 
 use super::{Collapse, Input, Occurrences, CAPACITY_INPUT_BUFFER, CAPACITY_LINE_BUFFER};
 
-///////////////////////////////////////////////////////////////////////////////
-
 /// Settings that change how frames are named from the incoming stack traces.
 ///
 /// All options default to off, expect nthreads, which defaults to the number
@@ -28,8 +26,6 @@ impl Default for Options {
         }
     }
 }
-
-///////////////////////////////////////////////////////////////////////////////
 
 /// A stack collapser for the output of dtrace `ustrace()`.
 ///
@@ -358,8 +354,6 @@ impl Folder {
         self.stack.clear();
     }
 }
-
-///////////////////////////////////////////////////////////////////////////////
 
 #[cfg(test)]
 mod tests {

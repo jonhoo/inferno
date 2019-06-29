@@ -15,8 +15,6 @@ pub mod guess;
 ///   [crate-level documentation]: ../../index.html
 pub mod perf;
 
-///////////////////////////////////////////////////////////////////////////////
-
 use std::cmp;
 use std::fs::File;
 use std::io::{self, Write};
@@ -27,15 +25,11 @@ use std::sync::Arc;
 use chashmap::CHashMap;
 use fnv::FnvHashMap;
 
-///////////////////////////////////////////////////////////////////////////////
-
 const CAPACITY_INPUT_BUFFER: usize = 1024 * 1024 * 1024;
 const CAPACITY_LINE_BUFFER: usize = 1024;
 const CAPACITY_MULTI_THREADED_HASHMAP: usize = 64;
 const CAPACITY_SINGLE_THREADED_HASHMAP: usize = 512;
 const READER_CAPACITY: usize = 128 * 1024;
-
-///////////////////////////////////////////////////////////////////////////////
 
 /// The abstract behavior of stack collapsing.
 ///
@@ -85,8 +79,6 @@ pub trait Collapse {
     /// - `Some(false)` means "no, this implementation definitely won't work"
     fn is_applicable(&mut self, input: &str) -> Option<bool>;
 }
-
-///////////////////////////////////////////////////////////////////////
 
 /// Occurrences is a HashMap, which uses:
 /// * Fnv if single-threaded
@@ -170,8 +162,6 @@ impl Occurrences {
     }
 }
 
-///////////////////////////////////////////////////////////////////////////////
-
 struct Chunks<'a> {
     current_index: usize,
     data: &'a [u8],
@@ -193,8 +183,6 @@ impl<'a> Iterator for Chunks<'a> {
         Some(chunk)
     }
 }
-
-///////////////////////////////////////////////////////////////////////////////
 
 /// Representation of input data that can be chunked up and shared
 /// across threads easily.
