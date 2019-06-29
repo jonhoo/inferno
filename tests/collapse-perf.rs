@@ -20,7 +20,7 @@ fn test_collapse_perf(
 ) -> io::Result<()> {
     options.nthreads = 1;
     test_collapse(Folder::from(options.clone()), test_file, expected_file)?;
-    options.nthreads = 4;
+    options.nthreads = 2;
     test_collapse(Folder::from(options), test_file, expected_file)?;
     Ok(())
 }
