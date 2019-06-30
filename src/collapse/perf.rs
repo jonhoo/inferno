@@ -107,12 +107,7 @@ pub struct Folder {
     stack: VecDeque<String>,
 
     // Options...
-    annotate_jit: bool,
-    annotate_kernel: bool,
-    include_addrs: bool,
-    include_pid: bool,
-    include_tid: bool,
-    nthreads: usize,
+    opt: Options,
 }
 
 impl From<Options> for Folder {
@@ -120,19 +115,13 @@ impl From<Options> for Folder {
         opt.include_pid = opt.include_pid || opt.include_tid;
         Self {
             cache_line: Vec::default(),
-            event_filter: opt.event_filter,
+            event_filter: opt.event_filter.clone(),
             in_event: false,
             occurrences: Occurrences::new(opt.nthreads),
             skip_stack: false,
             stack: VecDeque::default(),
             pname: String::default(),
-
-            annotate_jit: opt.annotate_jit,
-            annotate_kernel: opt.annotate_kernel,
-            include_addrs: opt.include_addrs,
-            include_pid: opt.include_pid,
-            include_tid: opt.include_tid,
-            nthreads: opt.nthreads,
+            opt,
         }
     }
 }
@@ -149,7 +138,7 @@ impl Collapse for Folder {
         R: BufRead,
         W: Write,
     {
-        if self.nthreads <= 1 {
+        if self.opt.nthreads <= 1 {
             self.collapse_single_threaded(reader)?;
         } else {
             self.collapse_multi_threaded(reader)?;
@@ -229,14 +218,14 @@ impl Folder {
         R: io::BufRead,
     {
         assert!(self.occurrences.is_concurrent());
-        assert!(self.nthreads > 1);
+        assert!(self.opt.nthreads > 1);
 
         let mut buf = Vec::with_capacity(CAPACITY_INPUT_BUFFER);
         reader.read_to_end(&mut buf)?;
 
         let mut input = Input::new(
             buf,
-            self.nthreads,
+            self.opt.nthreads,
             Self::identify_stack_locations(&mut self.event_filter),
         )?;
 
@@ -246,12 +235,7 @@ impl Folder {
             for chunk in input.chunks() {
                 let event_filter = self.event_filter.clone();
                 let occurrences = self.occurrences.clone();
-
-                let annotate_jit = self.annotate_jit;
-                let annotate_kernel = self.annotate_kernel;
-                let include_addrs = self.include_addrs;
-                let include_pid = self.include_pid;
-                let include_tid = self.include_tid;
+                let opt = self.opt.clone();
 
                 let sender = sender.clone();
 
@@ -265,14 +249,7 @@ impl Folder {
                         skip_stack: false,
                         stack: VecDeque::default(),
                         pname: String::new(),
-
-                        // options
-                        annotate_jit,
-                        annotate_kernel,
-                        include_addrs,
-                        include_pid,
-                        include_tid,
-                        nthreads: 1,
+                        opt,
                     };
                     let result = folder.collapse_single_threaded(chunk);
                     sender.send(result).unwrap();
@@ -362,12 +339,12 @@ impl Folder {
 
             // XXX: re-use existing memory in pname if possible
             self.pname = comm.replace(' ', "_");
-            if self.include_tid {
+            if self.opt.include_tid {
                 self.pname.push_str("-");
                 self.pname.push_str(pid);
                 self.pname.push_str("/");
                 self.pname.push_str(tid);
-            } else if self.include_pid {
+            } else if self.opt.include_pid {
                 self.pname.push_str("-");
                 self.pname.push_str(pid);
             }
@@ -429,7 +406,7 @@ impl Folder {
             // rest are annotated with "_[i]" to mark them as inlined.
             // See https://github.com/brendangregg/FlameGraph/pull/89.
             for func in rawfunc.split("->") {
-                let mut func = with_module_fallback(module, func, pc, self.include_addrs);
+                let mut func = with_module_fallback(module, func, pc, self.opt.include_addrs);
                 if TIDY_GENERIC {
                     func = tidy_generic(func);
                 }
@@ -452,12 +429,12 @@ impl Folder {
                 //     7f722d142778 Ljava/io/PrintStream;::print (/tmp/perf-19982.map)
                 if !self.cache_line.is_empty() {
                     func.push_str("_[i]"); // inlined
-                } else if self.annotate_kernel
+                } else if self.opt.annotate_kernel
                     && (module.starts_with('[') || module.ends_with("vmlinux"))
                     && module != "[unknown]"
                 {
                     func.push_str("_[k]"); // kernel
-                } else if self.annotate_jit
+                } else if self.opt.annotate_jit
                     && module.starts_with("/tmp/perf-")
                     && module.ends_with(".map")
                 {
