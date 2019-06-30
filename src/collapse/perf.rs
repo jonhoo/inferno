@@ -14,11 +14,11 @@ mod logging {
     }
 
     pub(super) fn weird_event_line(line: &str) {
-        warn!("weird event line: {}", line);
+        warn!("Weird event line: {}", line);
     }
 
     pub(super) fn weird_stack_line(line: &str) {
-        warn!("weird stack line: {}", line);
+        warn!("Weird stack line: {}", line);
     }
 }
 
