@@ -1,13 +1,26 @@
 use std::collections::VecDeque;
 use std::io::{self, prelude::*, BufRead};
-use std::mem;
-
-use log::warn;
 
 use crate::collapse::{Collapse, Input, Occurrences, CAPACITY_INPUT_BUFFER};
 
 const TIDY_GENERIC: bool = true;
 const TIDY_JAVA: bool = true;
+
+mod logging {
+    use log::{info, warn};
+
+    pub(super) fn filtering_for_events_of_type(ty: &str) {
+        info!("Filtering for events of type: {}", ty);
+    }
+
+    pub(super) fn weird_event_line(line: &str) {
+        warn!("weird event line: {}", line);
+    }
+
+    pub(super) fn weird_stack_line(line: &str) {
+        warn!("weird stack line: {}", line);
+    }
+}
 
 /// Settings that change how frames are named from the incoming stack traces.
 ///
@@ -67,7 +80,14 @@ pub struct Folder {
     /// Currently only used to keep track of functions for Java inlining.
     cache_line: Vec<String>,
 
-    event_filter_state: EventFilterState,
+    /// Similar to, but different from, the `event_filter` field on `Options`.
+    ///
+    /// * The `event_filter` field on `Options` represents the user-provided configuration and
+    ///   thus never changes.
+    /// * This field, however, is part of the state of the Folder and may change as the Folder
+    ///   processes data. More specifically, if this field starts as `None`, it **will** change to
+    ///   `Some(...)` when the Folder encounters it's first event.
+    event_filter: Option<String>,
 
     /// All lines until the next empty line are stack lines.
     in_event: bool,
@@ -98,10 +118,9 @@ pub struct Folder {
 impl From<Options> for Folder {
     fn from(mut opt: Options) -> Self {
         opt.include_pid = opt.include_pid || opt.include_tid;
-        let event_filter_state = EventFilterState::from(opt.event_filter);
         Self {
             cache_line: Vec::default(),
-            event_filter_state,
+            event_filter: opt.event_filter,
             in_event: false,
             occurrences: Occurrences::new(opt.nthreads),
             skip_stack: false,
@@ -218,14 +237,14 @@ impl Folder {
         let mut input = Input::new(
             buf,
             self.nthreads,
-            Self::identify_stack_locations(&mut self.event_filter_state),
+            Self::identify_stack_locations(&mut self.event_filter),
         )?;
 
         crossbeam::thread::scope(|scope| {
             let mut handles = Vec::with_capacity(input.nthreads());
             let (sender, receiver) = crossbeam::channel::bounded(input.nthreads());
             for chunk in input.chunks() {
-                let event_filter_state = self.event_filter_state.clone();
+                let event_filter = self.event_filter.clone();
                 let occurrences = self.occurrences.clone();
 
                 let annotate_jit = self.annotate_jit;
@@ -240,7 +259,7 @@ impl Folder {
                     let mut folder = Folder {
                         // state
                         cache_line: Vec::default(),
-                        event_filter_state,
+                        event_filter,
                         in_event: false,
                         occurrences,
                         skip_stack: false,
@@ -323,24 +342,15 @@ impl Folder {
                 if event.ends_with(':') {
                     let event = &event[..(event.len() - 1)];
 
-                    match self.event_filter_state {
-                        EventFilterState::None => {
+                    match self.event_filter {
+                        None => {
                             // By default only show events of the first encountered
                             // event type. Merging together different types, such as
                             // instructions and cycles, produces misleading results.
-                            self.event_filter_state =
-                                EventFilterState::Defaulted(event.to_string());
+                            logging::filtering_for_events_of_type(event);
+                            self.event_filter = Some(event.to_string());
                         }
-                        EventFilterState::Defaulted(ref mut s) => {
-                            if event != s {
-                                warn!("Filtering for events of type: {}", event);
-                                let s = mem::replace(s, String::new());
-                                self.event_filter_state = EventFilterState::Warned(s);
-                                self.skip_stack = true;
-                                return;
-                            }
-                        }
-                        EventFilterState::Warned(ref s) => {
+                        Some(ref s) => {
                             if event != s {
                                 self.skip_stack = true;
                                 return;
@@ -362,7 +372,7 @@ impl Folder {
                 self.pname.push_str(pid);
             }
         } else {
-            warn!("weird event line: {}", line);
+            logging::weird_event_line(line);
             self.in_event = false;
         }
     }
@@ -461,7 +471,7 @@ impl Folder {
                 self.stack.push_front(func);
             }
         } else {
-            warn!("weird stack line: {}", line);
+            logging::weird_stack_line(line);
         }
     }
 
@@ -496,7 +506,7 @@ impl Folder {
     /// spread accross the multiple cores. It should return a vector with the locations (byte
     /// indices) of the start of each stack. See `crate::collapse::Input::new`.
     fn identify_stack_locations<'a>(
-        event_filter_state: &'a mut EventFilterState,
+        event_filter: &'a mut Option<String>,
     ) -> impl FnOnce(io::BufReader<&[u8]>) -> io::Result<Vec<usize>> + 'a {
         move |mut reader: io::BufReader<&[u8]>| -> io::Result<Vec<usize>> {
             let mut byte_index = 0;
@@ -514,11 +524,12 @@ impl Folder {
                     stack_indices.push(byte_index);
                     continue;
                 }
-                if event_filter_state.is_none() {
+                if event_filter.is_none() {
                     if let Some(event) = line.rsplitn(2, ' ').next() {
                         if event.ends_with(':') {
                             let event = &event[..(event.len() - 1)];
-                            *event_filter_state = EventFilterState::Defaulted(event.to_string());
+                            logging::filtering_for_events_of_type(event);
+                            *event_filter = Some(event.to_string());
                         }
                     }
                 }
@@ -615,37 +626,6 @@ fn tidy_java(mut func: String) -> String {
     func
 }
 
-#[derive(Clone, Debug)]
-pub(super) enum EventFilterState {
-    None,
-    Defaulted(String),
-    Warned(String),
-}
-
-impl EventFilterState {
-    fn is_none(&self) -> bool {
-        match self {
-            EventFilterState::None => true,
-            _ => false,
-        }
-    }
-}
-
-impl Default for EventFilterState {
-    fn default() -> Self {
-        EventFilterState::None
-    }
-}
-
-impl From<Option<String>> for EventFilterState {
-    fn from(value: Option<String>) -> Self {
-        match value {
-            Some(s) => EventFilterState::Defaulted(s),
-            None => EventFilterState::None,
-        }
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use std::fs::File;
@@ -703,11 +683,11 @@ mod tests {
             infile.read_to_end(&mut expected)?;
 
             for n in 0..MAX_THREADS {
-                let mut event_filter_state = EventFilterState::None;
+                let mut event_filter = None;
                 let input = Input::new(
                     expected.clone(),
                     n,
-                    Folder::identify_stack_locations(&mut event_filter_state),
+                    Folder::identify_stack_locations(&mut event_filter),
                 )?;
                 let mut actual: Vec<u8> = Vec::new();
                 for chunk in input.chunks() {
