@@ -37,7 +37,6 @@ lazy_static = "1.3.0"
 fnv = "1.0.3"
 itoa = "0.4.3"
 indexmap = "1.0"
-symbolic-common = "6.1.3"
 symbolic-demangle = "6.1.3"
 
 [dev-dependencies]
