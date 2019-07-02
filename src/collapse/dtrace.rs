@@ -188,7 +188,7 @@ impl Folder {
         }
 
         let frame = if frame.is_empty() {
-            Cow::Owned("-".to_owned())
+            Cow::Borrowed("-")
         } else if self.opt.demangle {
             let mut parts = frame.split('`');
             if let (Some(pname), Some(func)) = (parts.next(), parts.next()) {
