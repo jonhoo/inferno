@@ -148,7 +148,7 @@ impl Folder {
         let mut could_be_cpp = false;
         let mut has_semicolon = false;
         let mut last_offset = line.len();
-        // This seems risly but dtrace stacks are c-strings as can be seen in the function
+        // This seems risky, but dtrace stacks are c-strings as can be seen in the function
         // responsible for printing them:
         // https://github.com/opendtrace/opendtrace/blob/1a03ea5576a9219a43f28b4f159ff8a4b1f9a9fd/lib/libdtrace/common/dt_consume.c#L1331
         let bytes = line.as_bytes();
@@ -167,6 +167,21 @@ impl Folder {
             has_semicolon,
             &line[..last_offset],
         )
+    }
+
+    fn demangle<'a>(&self, frame: &'a str) -> Cow<'a, str> {
+        let mut parts = frame.splitn(2, '`');
+        if let (Some(pname), Some(func)) = (parts.next(), parts.next()) {
+            if self.opt.includeoffset {
+                let mut parts = func.rsplitn(2, '+');
+                if let (Some(offset), Some(func)) = (parts.next(), parts.next()) {
+                    return Cow::Owned(format!("{}`{}+{}", pname, demangle(func), offset));
+                }
+            }
+            return Cow::Owned(format!("{}`{}", pname, demangle(func)));
+        }
+
+        Cow::Borrowed(frame)
     }
 
     // we have a stack line that shows one stack entry from the preceeding event, like:
@@ -190,12 +205,7 @@ impl Folder {
         let frame = if frame.is_empty() {
             Cow::Borrowed("-")
         } else if self.opt.demangle {
-            let mut parts = frame.split('`');
-            if let (Some(pname), Some(func)) = (parts.next(), parts.next()) {
-                Cow::Owned(format!("{}`{}", pname, demangle(func)))
-            } else {
-                Cow::Borrowed(frame)
-            }
+            self.demangle(frame)
         } else {
             Cow::Borrowed(frame)
         };

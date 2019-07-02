@@ -126,6 +126,21 @@ fn collapse_dtrace_demangle() {
 }
 
 #[test]
+fn collapse_dtrace_demangle_includeoffset() {
+    let test_file = "./tests/data/collapse-dtrace/mangled.txt";
+    let result_file = "./tests/data/collapse-dtrace/results/demangled_with_offsets.txt";
+    test_collapse_dtrace(
+        test_file,
+        result_file,
+        Options {
+            includeoffset: true,
+            demangle: true,
+        },
+    )
+    .unwrap()
+}
+
+#[test]
 fn collapse_dtrace_cli() {
     let input_file = "./flamegraph/example-dtrace-stacks.txt";
     let expected_file = "./tests/data/collapse-dtrace/results/dtrace-example.txt";
