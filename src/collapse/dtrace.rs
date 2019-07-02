@@ -1,6 +1,7 @@
 use super::Collapse;
 use fnv::FnvHashMap;
 use log::warn;
+use std::borrow::Cow;
 use std::collections::VecDeque;
 use std::io;
 use std::io::prelude::*;
@@ -12,6 +13,9 @@ use std::io::prelude::*;
 pub struct Options {
     /// include function offset (except leafs)
     pub includeoffset: bool,
+
+    /// Demangle function names
+    pub demangle: bool,
 }
 
 /// A stack collapser for the output of dtrace `ustrace()`.
@@ -143,7 +147,7 @@ impl Folder {
         let mut could_be_cpp = false;
         let mut has_semicolon = false;
         let mut last_offset = line.len();
-        // This seems risly but dtrace stacks are c-strings as can be seen in the function
+        // This seems risky, but dtrace stacks are c-strings as can be seen in the function
         // responsible for printing them:
         // https://github.com/opendtrace/opendtrace/blob/1a03ea5576a9219a43f28b4f159ff8a4b1f9a9fd/lib/libdtrace/common/dt_consume.c#L1331
         let bytes = line.as_bytes();
@@ -164,6 +168,26 @@ impl Folder {
         )
     }
 
+    fn demangle<'a>(&self, frame: &'a str) -> Cow<'a, str> {
+        let mut parts = frame.splitn(2, '`');
+        if let (Some(pname), Some(func)) = (parts.next(), parts.next()) {
+            if self.opt.includeoffset {
+                let mut parts = func.rsplitn(2, '+');
+                if let (Some(offset), Some(func)) = (parts.next(), parts.next()) {
+                    return Cow::Owned(format!(
+                        "{}`{}+{}",
+                        pname,
+                        symbolic_demangle::demangle(func),
+                        offset
+                    ));
+                }
+            }
+            return Cow::Owned(format!("{}`{}", pname, symbolic_demangle::demangle(func)));
+        }
+
+        Cow::Borrowed(frame)
+    }
+
     // we have a stack line that shows one stack entry from the preceeding event, like:
     //
     //     unix`tsc_gethrtimeunscaled+0x21
@@ -182,8 +206,12 @@ impl Folder {
             frame = Self::uncpp(frame);
         }
 
-        if frame.is_empty() {
-            frame = "-";
+        let frame = if frame.is_empty() {
+            Cow::Borrowed("-")
+        } else if self.opt.demangle {
+            self.demangle(frame)
+        } else {
+            Cow::Borrowed(frame)
         };
 
         if has_inlines {
@@ -207,7 +235,7 @@ impl Folder {
         } else if has_semicolon {
             self.stack.push_front(frame.replace(';', ":"))
         } else {
-            self.stack.push_front(frame.to_owned())
+            self.stack.push_front(frame.to_string())
         }
     }
 
@@ -231,6 +259,7 @@ impl Folder {
                 stack_str.push_str(&e);
             }
         }
+
         // count it!
         *self.occurrences.entry(stack_str).or_insert(0) += count;
         // reset for the next event

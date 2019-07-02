@@ -30,6 +30,10 @@ struct Opt {
     #[structopt(long = "includeoffset")]
     includeoffset: bool,
 
+    /// Demangle function names
+    #[structopt(long = "demangle")]
+    demangle: bool,
+
     /// perf script output file, or STDIN if not specified
     infile: Option<PathBuf>,
 }
@@ -40,6 +44,7 @@ impl Opt {
             self.infile,
             Options {
                 includeoffset: self.includeoffset,
+                demangle: self.demangle,
             },
         )
     }

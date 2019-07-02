@@ -7,6 +7,7 @@ pub(crate) fn test_collapse<C>(
     mut collapser: C,
     test_filename: &str,
     expected_filename: &str,
+    strip_quotes: bool,
 ) -> io::Result<()>
 where
     C: Collapse,
@@ -53,7 +54,7 @@ where
         eprintln!("test output in {}", tm.display());
     }
     // and then compare
-    compare_results(result, expected, expected_filename);
+    compare_results(result, expected, expected_filename, strip_quotes);
     Ok(return_value)
 }
 
@@ -68,16 +69,23 @@ where
     testing_logger::validate(asserter);
 }
 
-pub(crate) fn compare_results<R, E>(result: R, mut expected: E, expected_file: &str)
-where
+pub(crate) fn compare_results<R, E>(
+    result: R,
+    mut expected: E,
+    expected_file: &str,
+    strip_quotes: bool,
+) where
     R: BufRead,
     E: BufRead,
 {
     let mut buf = String::new();
     let mut line_num = 1;
     for line in result.lines() {
-        // Strip out " and ' since perl version does.
-        let line = line.unwrap().replace("\"", "").replace("'", "");
+        let line = if strip_quotes {
+            line.unwrap().replace("\"", "").replace("'", "")
+        } else {
+            line.unwrap()
+        };
         if expected.read_line(&mut buf).unwrap() == 0 {
             panic!(
                 "\noutput has more lines than expected result file: {}",

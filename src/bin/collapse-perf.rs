@@ -54,6 +54,10 @@ struct Opt {
     #[structopt(short = "v", long = "verbose", parse(from_occurrences))]
     verbose: usize,
 
+    /// Demangle function names
+    #[structopt(long = "demangle")]
+    demangle: bool,
+
     /// perf script output file, or STDIN if not specified
     infile: Option<PathBuf>,
 }
@@ -69,6 +73,7 @@ impl Opt {
                 annotate_jit: self.annotate_jit || self.annotate_all,
                 annotate_kernel: self.annotate_kernel || self.annotate_all,
                 event_filter: self.event_filter,
+                demangle: self.demangle,
             },
         )
     }
