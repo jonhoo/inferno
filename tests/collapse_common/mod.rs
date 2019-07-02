@@ -69,8 +69,12 @@ where
     testing_logger::validate(asserter);
 }
 
-pub(crate) fn compare_results<R, E>(result: R, mut expected: E, expected_file: &str, strip_quotes: bool)
-where
+pub(crate) fn compare_results<R, E>(
+    result: R,
+    mut expected: E,
+    expected_file: &str,
+    strip_quotes: bool,
+) where
     R: BufRead,
     E: BufRead,
 {
