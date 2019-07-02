@@ -5,7 +5,6 @@ use std::borrow::Cow;
 use std::collections::VecDeque;
 use std::io;
 use std::io::prelude::*;
-use symbolic_demangle::demangle;
 
 /// Settings that change how frames are named from the incoming stack traces.
 ///
@@ -175,10 +174,15 @@ impl Folder {
             if self.opt.includeoffset {
                 let mut parts = func.rsplitn(2, '+');
                 if let (Some(offset), Some(func)) = (parts.next(), parts.next()) {
-                    return Cow::Owned(format!("{}`{}+{}", pname, demangle(func), offset));
+                    return Cow::Owned(format!(
+                        "{}`{}+{}",
+                        pname,
+                        symbolic_demangle::demangle(func),
+                        offset
+                    ));
                 }
             }
-            return Cow::Owned(format!("{}`{}", pname, demangle(func)));
+            return Cow::Owned(format!("{}`{}", pname, symbolic_demangle::demangle(func)));
         }
 
         Cow::Borrowed(frame)
