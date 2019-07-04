@@ -280,7 +280,10 @@ impl Folder {
         let pc = line.next()?.trim_end();
         let mut line = line.next()?.rsplitn(2, ' ');
         let mut module = line.next()?;
-        // module is always wrapped in (), so remove those
+        // module should always be wrapped in (), so remove those
+        if !module.starts_with('(') || !module.ends_with(')') {
+            return None;
+        }
         module = &module[1..(module.len() - 1)];
         let rawfunc = match line.next()?.trim() {
             // Sometimes there are two spaces betwen the pc and the (, like:

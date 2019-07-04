@@ -65,6 +65,11 @@ path = "src/bin/collapse-dtrace.rs"
 required-features = ["cli"]
 
 [[bin]]
+name = "inferno-collapse-sample"
+path = "src/bin/collapse-sample.rs"
+required-features = ["cli"]
+
+[[bin]]
 name = "inferno-collapse-guess"
 path = "src/bin/collapse-guess.rs"
 required-features = ["cli"]

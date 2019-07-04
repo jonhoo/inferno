@@ -63,6 +63,13 @@ fn collapse_guess_perf_java_inline() {
 }
 
 #[test]
+fn collapse_guess_sample() {
+    let test_file = "./tests/data/collapse-sample/sample.txt";
+    let result_file = "./tests/data/collapse-sample/results/sample-default.txt";
+    test_collapse_guess(test_file, result_file).unwrap()
+}
+
+#[test]
 fn collapse_guess_unknown_format_should_log_error() {
     test_collapse_guess_logs(
         "./tests/data/collapse-guess/unknown-format.txt",

@@ -1,6 +1,7 @@
 use criterion::*;
 use inferno::collapse::dtrace;
 use inferno::collapse::perf;
+use inferno::collapse::sample;
 use inferno::collapse::Collapse;
 use libflate::gzip::Decoder;
 use std::fs::File;
@@ -56,5 +57,15 @@ fn perf(c: &mut Criterion) {
     );
 }
 
-criterion_group!(benches, dtrace, perf);
+fn sample(c: &mut Criterion) {
+    let infile = "tests/data/collapse-sample/sample.txt";
+    collapse_benchmark(
+        c,
+        sample::Folder::from(sample::Options::default()),
+        "sample",
+        infile,
+    );
+}
+
+criterion_group!(benches, dtrace, perf, sample);
 criterion_main!(benches);

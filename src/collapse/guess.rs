@@ -1,5 +1,5 @@
 use super::Collapse;
-use super::{dtrace, perf};
+use super::{dtrace, perf, sample};
 use log::{error, info};
 use std::io::prelude::*;
 use std::io::{self, Cursor};
@@ -22,10 +22,11 @@ impl Collapse for Folder {
     {
         let mut perf = perf::Folder::from(perf::Options::default());
         let mut dtrace = dtrace::Folder::from(dtrace::Options::default());
+        let mut sample = sample::Folder::from(sample::Options::default());
 
         // Each Collapse impl gets its own flag in this array.
         // It gets set to true when the impl has been ruled out.
-        let mut not_applicable = [false; 2];
+        let mut not_applicable = [false; 3];
 
         let mut buffer = String::new();
         loop {
@@ -57,6 +58,7 @@ impl Collapse for Folder {
             }
             try_collapse_impl!(perf, 0);
             try_collapse_impl!(dtrace, 1);
+            try_collapse_impl!(sample, 2);
 
             if eof {
                 break;
