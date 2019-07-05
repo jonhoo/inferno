@@ -182,6 +182,10 @@ impl Folder {
             let depth = indent_chars / 2 + 1;
 
             if depth <= prev_depth {
+                // Each sampled function will be a leaf node in the call tree.
+                // If the depth of this line is less than the previous one,
+                // it means the previous line was a leaf node and we should
+                // write out the stack and pop it back to one before the current depth.
                 self.write_stack(writer)?;
                 for _ in 0..=prev_depth - depth {
                     self.stack.pop();
@@ -192,6 +196,9 @@ impl Folder {
 
             if let Some((samples, func, module)) = self.line_parts(&line[4 + indent_chars..]) {
                 if let Ok(samples) = samples.parse::<usize>() {
+                    // The sample counts of the direct children of a non-leaf entry will always
+                    // add up to that node's sample count so we only need to keep track of the
+                    // sample count at the top of the stack.
                     self.current_samples = samples;
                     // sample doesn't properly demangle Rust symbols, so fix those.
                     let func = fix_partially_demangled_rust_symbol(func);
