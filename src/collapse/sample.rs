@@ -1,3 +1,4 @@
+use super::util::fix_partially_demangled_rust_symbol;
 use super::Collapse;
 use log::{error, warn};
 use std::io;
@@ -131,13 +132,18 @@ impl Folder {
         let mut line = line.trim_start().splitn(2, ' ');
         let time = line.next()?.trim_end();
         let line = line.next()?;
-        let mut line = line.splitn(2, "(in ");
-        let func = line.next()?.trim_end();
+
+        let func = match line.find('(') {
+            Some(open) => &line[..open],
+            None => line,
+        }
+        .trim_end();
 
         let mut module = "";
         if !self.opt.no_modules {
             // Modules are shown with "(in libfoo.dylib)" or "(in AppKit)".
             // We've arleady split on "(in " above.
+            let mut line = line.rsplitn(2, "(in ");
             if let Some(line) = line.next() {
                 if let Some(close) = line.find(')') {
                     module = &line[..close];
@@ -187,8 +193,10 @@ impl Folder {
             if let Some((samples, func, module)) = self.line_parts(&line[4 + indent_chars..]) {
                 if let Ok(samples) = samples.parse::<usize>() {
                     self.current_samples = samples;
+                    // sample doesn't properly demangle Rust symbols, so fix those.
+                    let func = fix_partially_demangled_rust_symbol(func);
                     if module.is_empty() {
-                        self.stack.push(func.to_owned());
+                        self.stack.push(func.to_string());
                     } else {
                         self.stack.push(format!("{}`{}", module, func));
                     }

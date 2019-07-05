@@ -22,6 +22,8 @@ pub mod perf;
 ///   [crate-level documentation]: ../../index.html
 pub mod sample;
 
+pub(crate) mod util;
+
 use std::fs::File;
 use std::io::{self, Write};
 use std::path::Path;
