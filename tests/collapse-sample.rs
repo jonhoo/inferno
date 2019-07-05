@@ -230,6 +230,8 @@ fn collapse_sample_cli() {
     let expected = BufReader::new(File::open(expected_file).unwrap());
     compare_results(Cursor::new(output.stdout), expected, expected_file, false);
 
+    println!("collapse_sample_cli: ran with input file");
+
     // Test with STDIN
     let mut child = Command::cargo_bin("inferno-collapse-sample")
         .unwrap()
@@ -239,8 +241,11 @@ fn collapse_sample_cli() {
         .expect("Failed to spawn child process");
     let mut input = BufReader::new(File::open(input_file).unwrap());
     let stdin = child.stdin.as_mut().expect("Failed to open stdin");
+    println!("collapse_sample_cli: start copying input file to STDIN");
     io::copy(&mut input, stdin).unwrap();
+    println!("collapse_sample_cli: finished copying input file to STDIN");
     let output = child.wait_with_output().expect("Failed to read stdout");
+    println!("collapse_sample_cli: received output from STDOUT");
     let expected = BufReader::new(File::open(expected_file).unwrap());
     compare_results(Cursor::new(output.stdout), expected, expected_file, false);
 }
