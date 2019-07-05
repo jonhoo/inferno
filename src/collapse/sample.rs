@@ -139,7 +139,7 @@ impl Folder {
             // Modules are shown with "(in libfoo.dylib)" or "(in AppKit)".
             // We've arleady split on "(in " above.
             if let Some(line) = line.next() {
-                if let Some(close) = line.find(")") {
+                if let Some(close) = line.find(')') {
                     module = &line[..close];
                 }
 
