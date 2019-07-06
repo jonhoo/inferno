@@ -37,13 +37,7 @@ pub struct Folder {
 }
 
 impl From<Options> for Folder {
-    fn from(mut opt: Options) -> Self {
-        if opt.nstacks_per_job == 0 {
-            opt.nstacks_per_job = 1;
-        }
-        if opt.nthreads == 0 {
-            opt.nthreads = 1;
-        }
+    fn from(opt: Options) -> Self {
         Self { opt }
     }
 }
