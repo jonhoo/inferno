@@ -18,7 +18,8 @@ fn is_rust_hash(s: &str) -> bool {
 /// Non-Rust symobols, or Rust symbols that are already demangled, will be returned unchanged.
 ///
 /// Based on code in https://github.com/alexcrichton/rustc-demangle/blob/master/src/legacy.rs
-pub(crate) fn fix_partially_demangled_rust_symbol<'a>(symbol: &'a str) -> Cow<'a, str> {
+#[allow(clippy::cognitive_complexity)]
+pub(crate) fn fix_partially_demangled_rust_symbol(symbol: &str) -> Cow<str> {
     // If there's no trailing Rust hash just return the symbol as is.
     if symbol.len() < RUST_HASH_LENGTH || !is_rust_hash(&symbol[symbol.len() - RUST_HASH_LENGTH..])
     {
