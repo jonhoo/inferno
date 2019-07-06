@@ -231,8 +231,7 @@ impl Folder {
             }
 
             // State for the loop...
-            let buf_capacity = 1024 * self.opt.nstacks_per_job;
-            let mut buf = Vec::with_capacity(buf_capacity);
+            let mut buf = Vec::new();
             let (mut index, mut njobs, mut nstacks) = (0, 0, 0);
 
             // The loop...
