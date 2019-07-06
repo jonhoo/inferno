@@ -111,6 +111,13 @@ fn collapse_dtrace_scope_with_no_argument_list() {
 }
 
 #[test]
+fn collapse_dtrace_rust_names() {
+    let test_file = "./tests/data/collapse-dtrace/rust-names.txt";
+    let result_file = "./tests/data/collapse-dtrace/results/rust-names.txt";
+    test_collapse_dtrace(test_file, result_file, Options::default()).unwrap()
+}
+
+#[test]
 fn collapse_dtrace_demangle() {
     let test_file = "./tests/data/collapse-dtrace/mangled.txt";
     let result_file = "./tests/data/collapse-dtrace/results/demangled.txt";
