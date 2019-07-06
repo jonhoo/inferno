@@ -3,8 +3,14 @@ use std::path::PathBuf;
 
 use env_logger::Env;
 use inferno::collapse::dtrace::{Folder, Options};
-use inferno::collapse::Collapse;
+use inferno::collapse::{Collapse, DEFAULT_NSTACKS, DEFAULT_NTHREADS};
+use lazy_static::lazy_static;
 use structopt::StructOpt;
+
+lazy_static! {
+    static ref NSTACKS: String = format!("{}", DEFAULT_NSTACKS);
+    static ref NTHREADS: String = format!("{}", *DEFAULT_NTHREADS);
+}
 
 #[derive(Debug, StructOpt)]
 #[structopt(
@@ -33,12 +39,17 @@ struct Opt {
 
     // Options...
     /// Number of stacks per job sent to threadpool (only used if nthreads > 1)
-    #[structopt(long = "nstacks", default_value = "20", value_name = "UINT")]
+    #[structopt(long = "nstacks", raw(default_value = "&NSTACKS"), value_name = "UINT")]
     nstacks: usize,
 
-    /// Number of threads to use [default: number of logical cores on your machine]
-    #[structopt(short = "n", long = "nthreads", value_name = "UINT")]
-    nthreads: Option<usize>,
+    /// Number of threads to use.
+    #[structopt(
+        short = "n",
+        long = "nthreads",
+        raw(default_value = "&NTHREADS"),
+        value_name = "UINT"
+    )]
+    nthreads: usize,
 
     // Args...
     /// Dtrace script output file, or STDIN if not specified
@@ -53,7 +64,7 @@ impl Opt {
             Options {
                 includeoffset: self._includeoffset,
                 nstacks_per_job: self.nstacks,
-                nthreads: self.nthreads.unwrap_or_else(num_cpus::get),
+                nthreads: self.nthreads,
             },
         )
     }

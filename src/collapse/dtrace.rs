@@ -5,7 +5,7 @@ use std::mem;
 use crossbeam::channel;
 use log::warn;
 
-use crate::collapse::{Collapse, Occurrences};
+use crate::collapse::{Collapse, Occurrences, DEFAULT_NSTACKS, DEFAULT_NTHREADS};
 
 /// Dtrace folder configuration options.
 #[derive(Clone, Debug)]
@@ -25,8 +25,8 @@ impl Default for Options {
     fn default() -> Self {
         Self {
             includeoffset: false,
-            nstacks_per_job: 20,
-            nthreads: num_cpus::get(),
+            nstacks_per_job: DEFAULT_NSTACKS,
+            nthreads: *DEFAULT_NTHREADS,
         }
     }
 }

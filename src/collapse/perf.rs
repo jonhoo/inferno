@@ -4,7 +4,7 @@ use std::mem;
 
 use crossbeam::channel;
 
-use crate::collapse::{Collapse, Occurrences};
+use crate::collapse::{Collapse, Occurrences, DEFAULT_NSTACKS, DEFAULT_NTHREADS};
 
 const TIDY_GENERIC: bool = true;
 const TIDY_JAVA: bool = true;
@@ -66,8 +66,8 @@ impl Default for Options {
             include_addrs: false,
             include_pid: false,
             include_tid: false,
-            nstacks_per_job: 20,
-            nthreads: num_cpus::get(),
+            nstacks_per_job: DEFAULT_NSTACKS,
+            nthreads: *DEFAULT_NTHREADS,
         }
     }
 }

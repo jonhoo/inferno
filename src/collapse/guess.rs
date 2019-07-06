@@ -3,7 +3,7 @@ use std::io::{self, Cursor};
 
 use log::{error, info};
 
-use crate::collapse::{dtrace, perf, Collapse};
+use crate::collapse::{dtrace, perf, Collapse, DEFAULT_NSTACKS, DEFAULT_NTHREADS};
 
 const LINES_PER_ITERATION: usize = 10;
 
@@ -21,8 +21,8 @@ pub struct Options {
 impl Default for Options {
     fn default() -> Self {
         Self {
-            nstacks_per_job: 20,
-            nthreads: num_cpus::get(),
+            nstacks_per_job: DEFAULT_NSTACKS,
+            nthreads: *DEFAULT_NTHREADS,
         }
     }
 }

@@ -23,9 +23,17 @@ use std::sync::Arc;
 
 use chashmap::CHashMap;
 use fnv::FnvHashMap;
+use lazy_static::lazy_static;
+
+lazy_static! {
+    #[doc(hidden)]
+    pub static ref DEFAULT_NTHREADS: usize = num_cpus::get();
+}
 
 const CAPACITY_HASHMAP: usize = 512;
 const CAPACITY_READER: usize = 128 * 1024;
+#[doc(hidden)]
+pub const DEFAULT_NSTACKS: usize = 20;
 
 /// The abstract behavior of stack collapsing.
 ///
