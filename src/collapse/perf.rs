@@ -258,7 +258,7 @@ impl Folder {
             // only be known once we've started looking over the input data. They must wait on this;
             // therefore we set up a channel to be able to communicate what the event filter state
             // should be as soon as we know it and make the first thing each thread does be waiting
-            // on this receiving information from this channel.
+            // on receiving information from this channel.
             let (tx_event_filter, rx_event_filter) = channel::bounded(self.opt.nthreads);
 
             // If we know what the event filter state should be without having to look at the data

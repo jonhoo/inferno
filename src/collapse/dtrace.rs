@@ -257,7 +257,7 @@ impl Folder {
                     // If we've seen enough stacks to make up a slice...
                     if nstacks == self.opt.nstacks_per_job {
                         // Send it.
-                        let chunk = mem::replace(&mut buf, Vec::with_capacity(buf_capacity));
+                        let chunk = mem::replace(&mut buf, Vec::new());
                         tx_input.send(Message::Job(chunk)).unwrap();
                         njobs += 1;
                         // Reset the state; mark the beginning of the next slice.
