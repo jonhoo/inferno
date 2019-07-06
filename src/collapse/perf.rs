@@ -280,8 +280,17 @@ impl Folder {
         let pc = line.next()?.trim_end();
         let mut line = line.next()?.rsplitn(2, ' ');
         let mut module = line.next()?;
-        // module is always wrapped in (), so remove those
+
+        // Module should always be wrapped in (), so remove those if they exist.
+        // We first check for their existence because it's possible this is being
+        // called from `is_applicable` on a non-perf profile. This both prevents
+        // a panic if `module.len() < 1` and helps detect whether or not we're
+        // parsing a `perf` profile and not something else.
+        if !module.starts_with('(') || !module.ends_with(')') {
+            return None;
+        }
         module = &module[1..(module.len() - 1)];
+
         let rawfunc = match line.next()?.trim() {
             // Sometimes there are two spaces betwen the pc and the (, like:
             //     7f1e2215d058  (/lib/x86_64-linux-gnu/libc-2.15.so)

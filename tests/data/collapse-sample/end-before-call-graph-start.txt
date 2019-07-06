@@ -1,0 +1,18 @@
+Analysis of sampling rg (pid 64751) every 1 millisecond
+Process:         rg [64751]
+Path:            /usr/local/Cellar/ripgrep/11.0.1/bin/rg
+Load Address:    0x103746000
+Identifier:      rg
+Version:         0
+Code Type:       X86-64
+Parent Process:  zsh [50523]
+
+Date/Time:       2019-07-04 10:21:28.347 -0600
+Launch Time:     2019-07-04 10:21:15.470 -0600
+OS Version:      Mac OS X 10.14.5 (18F203)
+Report Version:  7
+Analysis Tool:   /usr/bin/sample
+
+Physical footprint:         227.5M
+Physical footprint (peak):  227.5M
+----

@@ -1,0 +1,34 @@
+Analysis of sampling rg (pid 64751) every 1 millisecond
+Process:         rg [64751]
+Path:            /usr/local/Cellar/ripgrep/11.0.1/bin/rg
+Load Address:    0x103746000
+Identifier:      rg
+Version:         0
+Code Type:       X86-64
+Parent Process:  zsh [50523]
+
+Date/Time:       2019-07-04 10:21:28.347 -0600
+Launch Time:     2019-07-04 10:21:15.470 -0600
+OS Version:      Mac OS X 10.14.5 (18F203)
+Report Version:  7
+Analysis Tool:   /usr/bin/sample
+
+Physical footprint:         227.5M
+Physical footprint (peak):  227.5M
+----
+
+Call graph:
+    825 Thread_15758523   DispatchQueue_1: com.apple.main-thread  (serial)
+    + 825 start  (in libdyld.dylib) + 1  [0x7fff737cf3d5]
+    +   825 main  (in rg) + 41  [0x10384b549]
+    +     825 std::rt::lang_start_internal::hd2693a01169d6aa1  (in rg) + 334  [0x103a0db1e]
+    +       825 __rust_maybe_catch_panic  (in rg) + 31  [0x103a230cf]
+    +         825 std::panicking::try::do_call::hab896c32750930ec (.llvm.7886897009887049720)  (in rg) + 24  [0x103a22258]
+    +           825 std::rt::lang_start::_$u7b$$u7b$closure$u7d$$u7d$::h7cd9ec399e9db3f7  (in rg) + 6  [0x10381bb66]
+    +             825 rg::main::h6909bd3a32e27a08  (in rg) + 34  [0x1038445a2]
+    +               825 rg::try_main::h1b50b8f6fd4186a2  (in rg) + 13818  [0x103847c3a]
+    +                 825 ignore::walk::WalkParallel::run::h9c94d86e305a5f70  (in rg) + 3616  [0x1037cb520]
+    +                   825 _$LT$std..thread..JoinHandle$LT$T$GT$$GT$::join::hca6aa63e512626da  (in rg) + 72  [0x103837e88]
+    +                     825 std::sys::unix::thread::Thread::join::h9bc404ce70591d96  (in rg) + 16  [0x103a10800]
+    +                       825 _pthread_join  (in libsystem_pthread.dylib) + 358  [0x7fff739c76de]
+    +                         825 __ulock_wait  (in libsystem_kernel.dylib) + 10  [0x7fff739069de]

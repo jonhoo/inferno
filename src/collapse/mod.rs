@@ -15,6 +15,15 @@ pub mod dtrace;
 ///   [crate-level documentation]: ../../index.html
 pub mod perf;
 
+/// Stack collapsing for the output of [`sample`](https://gist.github.com/loderunner/36724cc9ee8db66db305#profiling-with-sample) on macOS.
+///
+/// See the [crate-level documentation] for details.
+///
+///   [crate-level documentation]: ../../index.html
+pub mod sample;
+
+pub(crate) mod util;
+
 use std::fs::File;
 use std::io::{self, Write};
 use std::path::Path;
