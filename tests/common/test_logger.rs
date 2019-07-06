@@ -1,3 +1,15 @@
+// Before this crate's collapsers were capable of working across multiple threads, we were using
+// the `testing_logger` crate (https://crates.io/crates/testing_logger) to help test log messages.
+// This crate used a thread-local variable to store captured logs for inspection. As our logging
+// started occurring not just on the main thread, but also on worker threads, we could not longer
+// properly test our logs with this crate. The code below is similar to the `testing_logger` crate,
+// but stores captured logs in a global variable protected by a mutex instead of in a thread-local
+// variable; so it works in a multi-threaded environment. The only caveat is, to work properly, we
+// must run tests with the `test-threads` flag set to 1 (i.e. `cargo test -- --test-threads=1`) so
+// that one test does not interfere with another test running at the same time. In the future, we
+// may swap out our logging implementation for a more robust one, in which case the `test-threads=1`
+// limitation would no longer be necessary, but that work is not yet complete.
+
 use std::ops::Deref;
 use std::sync::{Arc, Mutex, Once};
 

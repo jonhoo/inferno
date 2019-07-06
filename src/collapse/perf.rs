@@ -2,48 +2,58 @@ use std::collections::VecDeque;
 use std::io::{self, prelude::*, BufRead};
 use std::mem;
 
-use log::warn;
+use crossbeam::channel;
 
-use crate::collapse::{Collapse, Input, Occurrences, CAPACITY_INPUT_BUFFER, CAPACITY_LINE_BUFFER};
-
-///////////////////////////////////////////////////////////////////////////////
+use crate::collapse::{Collapse, Occurrences};
 
 const TIDY_GENERIC: bool = true;
 const TIDY_JAVA: bool = true;
 
-///////////////////////////////////////////////////////////////////////////////
+mod logging {
+    use log::{info, warn};
 
-/// Settings that change how frames are named from the incoming stack traces.
-///
-/// All options default to off, expect nthreads, which defaults to the number
-/// of logical cores on your machine.
+    pub(super) fn filtering_for_events_of_type(event: &str) {
+        info!("filtering for events of type: {}", event);
+    }
+
+    pub(super) fn weird_event_line(line: &str) {
+        warn!("weird event line: {}", line);
+    }
+
+    pub(super) fn weird_stack_line(line: &str) {
+        warn!("weird stack line: {}", line);
+    }
+}
+
+/// Perf folder configuration options.
 #[derive(Clone, Debug)]
 pub struct Options {
-    /// Annotate JIT functions with a `_[j]` suffix.
+    /// Annotate JIT functions with a `_[j]` suffix. Default is `false`.
     pub annotate_jit: bool,
 
-    /// Annotate kernel functions with a `_[k]` suffix.
+    /// Annotate kernel functions with a `_[k]` suffix. Default is `false`.
     pub annotate_kernel: bool,
 
-    /// Only consider samples of the given event type (see `perf list`).
-    ///
-    /// If this option is set to `None`, it will be set to the first encountered event type.
+    /// Only consider samples of the given event type (see `perf list`). If this option is
+    /// set to `None`, it will be set to the first encountered event type. Default is `None`.
     pub event_filter: Option<String>,
 
     /// Include raw addresses (e.g., `0xbfff0836`) where symbols can't be found.
+    /// Default is `false`.
     pub include_addrs: bool,
 
-    /// Include PID in the root frame.
-    ///
-    /// If disabled, the root frame is given the name of the profiled process.
+    /// Include PID in the root frame. If disabled, the root frame is given the name of the
+    /// profiled process. Default is `false`.
     pub include_pid: bool,
 
-    /// Include TID and PID in the root frame.
-    ///
-    /// Implies `include_pid`.
+    /// Include TID and PID in the root frame. Implies `include_pid`. Default is `false`.
     pub include_tid: bool,
 
-    /// The number of threads to use.
+    /// The number of stacks in each job sent to the threadpool (if using multiple threads).
+    /// Default is `20`.
+    pub nstacks_per_job: usize,
+
+    /// The number of threads to use. Default is the number of logical cores on your machine.
     pub nthreads: usize,
 }
 
@@ -56,12 +66,11 @@ impl Default for Options {
             include_addrs: false,
             include_pid: false,
             include_tid: false,
+            nstacks_per_job: 20,
             nthreads: num_cpus::get(),
         }
     }
 }
-
-///////////////////////////////////////////////////////////////////////////////
 
 /// A stack collapser for the output of `perf script`.
 ///
@@ -69,11 +78,17 @@ impl Default for Options {
 /// `perf::Folder::from(options)`.
 pub struct Folder {
     // State...
-    /// General String cache that can be used while processing lines.
-    /// Currently only used to keep track of functions for Java inlining.
+    /// General String cache that can be used while processing lines. Currently only used to keep
+    /// track of functions for Java inlining.
     cache_line: Vec<String>,
 
-    event_filter_state: EventFilterState,
+    /// Similar to, but different from, the `event_filter` field on `Options`
+    ///
+    /// * Field on `Options` represents user's provided configuration and will never change.
+    /// * This field, on the other hand, although initially set to the user's provided
+    ///   configuration, represents state and may change as data is processed. In particular, it can
+    ///   change from `None` initially to `Some(...)` as data is processed.
+    event_filter: Option<String>,
 
     /// All lines until the next empty line are stack lines.
     in_event: bool,
@@ -93,33 +108,31 @@ pub struct Folder {
     stack: VecDeque<String>,
 
     // Options...
-    annotate_jit: bool,
-    annotate_kernel: bool,
-    include_addrs: bool,
-    include_pid: bool,
-    include_tid: bool,
-    nthreads: usize,
+    opt: Options,
 }
 
 impl From<Options> for Folder {
     fn from(mut opt: Options) -> Self {
-        opt.include_pid = opt.include_pid || opt.include_tid;
-        let event_filter_state = EventFilterState::from(opt.event_filter);
+        if opt.nstacks_per_job == 0 {
+            opt.nstacks_per_job = 1;
+        }
+        if opt.nthreads == 0 {
+            opt.nthreads = 1;
+        }
+        let occurrences = if opt.nthreads < 2 {
+            Occurrences::new_single_threaded()
+        } else {
+            Occurrences::new_multi_threaded()
+        };
         Self {
             cache_line: Vec::default(),
-            event_filter_state,
+            event_filter: opt.event_filter.clone(),
             in_event: false,
-            occurrences: Occurrences::new(opt.nthreads),
+            occurrences,
+            pname: String::default(),
             skip_stack: false,
             stack: VecDeque::default(),
-            pname: String::default(),
-
-            annotate_jit: opt.annotate_jit,
-            annotate_kernel: opt.annotate_kernel,
-            include_addrs: opt.include_addrs,
-            include_pid: opt.include_pid,
-            include_tid: opt.include_tid,
-            nthreads: opt.nthreads,
+            opt,
         }
     }
 }
@@ -136,13 +149,21 @@ impl Collapse for Folder {
         R: BufRead,
         W: Write,
     {
-        if self.nthreads <= 1 {
+        // Do collapsing...
+        if self.opt.nthreads < 2 {
             self.collapse_single_threaded(reader)?;
         } else {
             self.collapse_multi_threaded(reader)?;
         }
 
+        // Write results...
         self.occurrences.write(writer)?;
+
+        // Reset state...
+        self.in_event = false;
+        self.pname.clear();
+        self.skip_stack = false;
+        self.stack.clear();
 
         Ok(())
     }
@@ -206,9 +227,9 @@ impl Folder {
             if line.is_empty() {
                 self.after_event();
             } else if self.in_event {
-                self.on_stack_line(line)
+                self.on_stack_line(line);
             } else {
-                self.on_event_line(line)
+                self.on_event_line(line);
             }
         }
         Ok(())
@@ -218,66 +239,163 @@ impl Folder {
     where
         R: io::BufRead,
     {
-        debug_assert!(self.occurrences.is_concurrent());
-        debug_assert!(self.nthreads > 1);
+        // Invariants of this function for crate's authors to keep in mind...
+        assert!(self.occurrences.is_concurrent());
+        assert!(self.opt.nstacks_per_job > 0);
+        assert!(self.opt.nthreads > 1);
 
-        let mut buf = Vec::with_capacity(CAPACITY_INPUT_BUFFER);
-        reader.read_to_end(&mut buf)?;
-
-        let mut input = Input::new(
-            buf,
-            self.nthreads,
-            Self::identify_stack_locations(&mut self.event_filter_state),
-        )?;
+        // Type used below for sending data to the threadpool...
+        enum Message {
+            Job(Vec<u8>),
+            Shutdown,
+        }
 
         crossbeam::thread::scope(|scope| {
-            let mut handles = Vec::with_capacity(input.nthreads());
-            let (sender, receiver) = crossbeam::channel::bounded(input.nthreads());
-            for chunk in input.chunks() {
-                let event_filter_state = self.event_filter_state.clone();
+            // A `Folder` must always have an event filter, yet the user can choose `None` for
+            // his/her event filter option. When the user chooses `None`, this means "set the event
+            // filter to the first event we come across in the data." In a multithreaded context,
+            // the consequences of this are, when the user has chosen `None` for the event filter
+            // option, the initial state of each Folder on each thread needs information that can
+            // only be known once we've started looking over the input data. They must wait on this;
+            // therefore we set up a channel to be able to communicate what the event filter state
+            // should be as soon as we know it and make the first thing each thread does be waiting
+            // on this receiving information from this channel.
+            let (tx_event_filter, rx_event_filter) = channel::bounded(self.opt.nthreads);
+
+            // If we know what the event filter state should be without having to look at the data
+            // (because the user provided it), send this information down the channel immediately.
+            if self.event_filter.is_some() {
+                for _ in 0..self.opt.nthreads {
+                    tx_event_filter.send(self.event_filter.clone()).unwrap();
+                }
+            }
+
+            // Spin up the threadpool / worker threads.
+            let (tx_input, rx_input) = channel::unbounded();
+            let (tx_output, rx_output) = channel::unbounded();
+            let mut handles = Vec::with_capacity(self.opt.nthreads);
+            for _ in 0..self.opt.nthreads {
+                let rx_event_filter = rx_event_filter.clone();
+                let rx_input = rx_input.clone();
+                let tx_output = tx_output.clone();
+
                 let occurrences = self.occurrences.clone();
-
-                let annotate_jit = self.annotate_jit;
-                let annotate_kernel = self.annotate_kernel;
-                let include_addrs = self.include_addrs;
-                let include_pid = self.include_pid;
-                let include_tid = self.include_tid;
-
-                let sender = sender.clone();
+                let opt = self.opt.clone();
 
                 let handle = scope.spawn(move |_| {
+                    // Don't do anything until we know what the event filter should be
+                    let event_filter = rx_event_filter.recv().unwrap();
                     let mut folder = Folder {
-                        // state
                         cache_line: Vec::default(),
-                        event_filter_state,
+                        event_filter,
                         in_event: false,
                         occurrences,
+                        pname: String::default(),
                         skip_stack: false,
                         stack: VecDeque::default(),
-                        pname: String::new(),
-
-                        // options
-                        annotate_jit,
-                        annotate_kernel,
-                        include_addrs,
-                        include_pid,
-                        include_tid,
-                        nthreads: 1,
+                        opt,
                     };
-                    let result = folder.collapse_single_threaded(chunk);
-                    sender.send(result).unwrap();
+                    loop {
+                        // Receive the data...
+                        let data = match rx_input.recv().unwrap() {
+                            Message::Job(data) => data,
+                            Message::Shutdown => return,
+                        };
+                        // Process the data...
+                        let result = folder.collapse_single_threaded(&data[..]);
+                        // Send the result...
+                        tx_output.send(result).unwrap();
+                        // Prepare for the next round...
+                        folder.in_event = false;
+                        folder.pname.clear();
+                        folder.skip_stack = false;
+                        folder.stack.clear();
+                    }
                 });
                 handles.push(handle);
             }
+
+            // On the main thread, start running over the input data in order to figure out how to
+            // chunk it up to be sent to the worker threads. After having seen `opt.nstacks_per_job`
+            // number of stacks, send a slice of the input data that includes those stacks off to
+            // the threadpool.
+            //
+            // In addition, if the user didn't provide an event filter, send the event filter to the
+            // worker threads as soon as we learn what it is.
+
+            // State for the loop...
+            let mut buf = Vec::new();
+            let (mut index, mut njobs, mut nstacks) = (0, 0, 0);
+
+            // The loop...
+            loop {
+                let n = reader.read_until(b'\n', &mut buf)?;
+
+                // If we're at the end of the data...
+                if n == 0 {
+                    // Send the last slice.
+                    tx_input.send(Message::Job(buf)).unwrap();
+                    njobs += 1;
+                    // Exit the loop.
+                    break;
+                }
+
+                let line = &buf[index..index + n];
+                index += n;
+
+                // If we've reached the end of a stack...
+                if line.iter().all(|b| (*b as char).is_whitespace()) {
+                    // Count it
+                    nstacks += 1;
+                    // If we've seen enough stacks to make up a slice...
+                    if nstacks == self.opt.nstacks_per_job {
+                        // Send it.
+                        let chunk = mem::replace(&mut buf, Vec::new());
+                        tx_input.send(Message::Job(chunk)).unwrap();
+                        njobs += 1;
+                        // Reset the state; mark the beginning of the next slice.
+                        index = 0;
+                        nstacks = 0;
+                    }
+                    continue;
+                }
+
+                // If we don't know the event filter (because the user didn't provide it) look for
+                // it; if we find it, send it to the threads, which need it to get started.
+                if self.event_filter.is_none() {
+                    let line = std::str::from_utf8(line)
+                        .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))?
+                        .trim_end();
+                    if let Some(event) = line.rsplitn(2, ' ').next() {
+                        if event.ends_with(':') {
+                            let event = &event[..(event.len() - 1)];
+                            logging::filtering_for_events_of_type(event);
+                            self.event_filter = Some(event.to_string());
+                            for _ in 0..self.opt.nthreads {
+                                tx_event_filter.send(self.event_filter.clone()).unwrap();
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Wait until all the jobs have been completed and ensure none resulted in an error;
+            // if any did, propogate it.
+            for _ in 0..njobs {
+                rx_output.recv().unwrap()?;
+            }
+
+            // Shutown the threapool
+            for _ in &handles {
+                tx_input.send(Message::Shutdown).unwrap();
+            }
             for handle in handles {
-                receiver.recv().unwrap()?;
                 handle.join().unwrap();
             }
-            Ok::<_, io::Error>(())
-        })
-        .unwrap()?;
 
-        Ok(())
+            Ok(())
+        })
+        .unwrap()
     }
 
     fn event_line_parts(line: &str) -> Option<(&str, &str, &str)> {
@@ -334,24 +452,15 @@ impl Folder {
                 if event.ends_with(':') {
                     let event = &event[..(event.len() - 1)];
 
-                    match self.event_filter_state {
-                        EventFilterState::None => {
-                            // By default only show events of the first encountered
-                            // event type. Merging together different types, such as
-                            // instructions and cycles, produces misleading results.
-                            self.event_filter_state =
-                                EventFilterState::Defaulted(event.to_string());
+                    match self.event_filter {
+                        None => {
+                            // By default only show events of the first encountered event type.
+                            // Merging together different types, such as instructions and cycles,
+                            // produces misleading results.
+                            logging::filtering_for_events_of_type(event);
+                            self.event_filter = Some(event.to_string());
                         }
-                        EventFilterState::Defaulted(ref mut s) => {
-                            if event != s {
-                                warn!("Filtering for events of type: {}", event);
-                                let s = mem::replace(s, String::new());
-                                self.event_filter_state = EventFilterState::Warned(s);
-                                self.skip_stack = true;
-                                return;
-                            }
-                        }
-                        EventFilterState::Warned(ref s) => {
+                        Some(ref s) => {
                             if event != s {
                                 self.skip_stack = true;
                                 return;
@@ -363,17 +472,17 @@ impl Folder {
 
             // XXX: re-use existing memory in pname if possible
             self.pname = comm.replace(' ', "_");
-            if self.include_tid {
+            if self.opt.include_tid {
                 self.pname.push_str("-");
                 self.pname.push_str(pid);
                 self.pname.push_str("/");
                 self.pname.push_str(tid);
-            } else if self.include_pid {
+            } else if self.opt.include_pid {
                 self.pname.push_str("-");
                 self.pname.push_str(pid);
             }
         } else {
-            warn!("weird event line: {}", line);
+            logging::weird_event_line(line);
             self.in_event = false;
         }
     }
@@ -426,11 +535,11 @@ impl Folder {
                 return;
             }
 
-            // Support Java inlining by splitting on "->". After the first func, the
-            // rest are annotated with "_[i]" to mark them as inlined.
+            // Support Java inlining by splitting on "->". After the first func, the rest are
+            // annotated with "_[i]" to mark them as inlined.
             // See https://github.com/brendangregg/FlameGraph/pull/89.
             for func in rawfunc.split("->") {
-                let mut func = with_module_fallback(module, func, pc, self.include_addrs);
+                let mut func = with_module_fallback(module, func, pc, self.opt.include_addrs);
                 if TIDY_GENERIC {
                     func = tidy_generic(func);
                 }
@@ -453,12 +562,12 @@ impl Folder {
                 //     7f722d142778 Ljava/io/PrintStream;::print (/tmp/perf-19982.map)
                 if !self.cache_line.is_empty() {
                     func.push_str("_[i]"); // inlined
-                } else if self.annotate_kernel
+                } else if self.opt.annotate_kernel
                     && (module.starts_with('[') || module.ends_with("vmlinux"))
                     && module != "[unknown]"
                 {
                     func.push_str("_[k]"); // kernel
-                } else if self.annotate_jit
+                } else if self.opt.annotate_jit
                     && module.starts_with("/tmp/perf-")
                     && module.ends_with(".map")
                 {
@@ -472,7 +581,7 @@ impl Folder {
                 self.stack.push_front(func);
             }
         } else {
-            warn!("weird stack line: {}", line);
+            logging::weird_stack_line(line);
         }
     }
 
@@ -501,45 +610,7 @@ impl Folder {
         self.skip_stack = false;
         self.stack.clear();
     }
-
-    /// The closure returned by this static method is what runs upfront when multiple cores are used
-    /// in order to identify how the input data can be cut up into multiple pieces in order to be
-    /// spread accross the multiple cores. It should return a vector with the locations (byte
-    /// indices) of the start of each stack. See `crate::collapse::Input::new`.
-    fn identify_stack_locations<'a>(
-        event_filter_state: &'a mut EventFilterState,
-    ) -> impl FnOnce(io::BufReader<&[u8]>) -> io::Result<Vec<usize>> + 'a {
-        move |mut reader: io::BufReader<&[u8]>| -> io::Result<Vec<usize>> {
-            let mut byte_index = 0;
-            let mut line = String::with_capacity(CAPACITY_LINE_BUFFER);
-            let mut stack_indices = vec![0];
-            loop {
-                line.clear();
-                let n = reader.read_line(&mut line).unwrap();
-                if n == 0 {
-                    break;
-                }
-                byte_index += n;
-                let line = line.trim_end();
-                if line.is_empty() {
-                    stack_indices.push(byte_index);
-                    continue;
-                }
-                if event_filter_state.is_none() {
-                    if let Some(event) = line.rsplitn(2, ' ').next() {
-                        if event.ends_with(':') {
-                            let event = &event[..(event.len() - 1)];
-                            *event_filter_state = EventFilterState::Defaulted(event.to_string());
-                        }
-                    }
-                }
-            }
-            Ok(stack_indices)
-        }
-    }
 }
-
-///////////////////////////////////////////////////////////////////////////////
 
 // massage function name to be nicer
 // NOTE: ignoring https://github.com/jvm-profiling-tools/perf-map-agent/pull/35
@@ -628,139 +699,253 @@ fn tidy_java(mut func: String) -> String {
     func
 }
 
-///////////////////////////////////////////////////////////////////////////////
-
-#[derive(Clone, Debug)]
-pub(super) enum EventFilterState {
-    None,
-    Defaulted(String),
-    Warned(String),
-}
-
-impl EventFilterState {
-    #[inline(always)]
-    fn is_none(&self) -> bool {
-        match self {
-            EventFilterState::None => true,
-            _ => false,
-        }
-    }
-}
-
-impl Default for EventFilterState {
-    fn default() -> Self {
-        EventFilterState::None
-    }
-}
-
-impl From<Option<String>> for EventFilterState {
-    fn from(value: Option<String>) -> Self {
-        match value {
-            Some(s) => EventFilterState::Defaulted(s),
-            None => EventFilterState::None,
-        }
-    }
-}
-
-///////////////////////////////////////////////////////////////////////
-
 #[cfg(test)]
 mod tests {
-    use std::fs::File;
-    use std::io::Read;
+    use std::collections::HashMap;
+    use std::fmt;
+    use std::io::Write;
     use std::path::{Path, PathBuf};
+    use std::time::Instant;
 
     use lazy_static::lazy_static;
     use pretty_assertions::assert_eq;
+    use rand::{Rng, SeedableRng};
 
     use super::*;
-
-    const MAX_THREADS: usize = 16;
+    use crate::collapse::tests::read_inputs;
 
     lazy_static! {
         static ref INPUT: Vec<PathBuf> = {
-            let mut input = [
-                "perf-cycles-instructions-01.txt",
-                "perf-dd-stacks-01.txt",
-                "perf-funcab-cmd-01.txt",
-                "perf-funcab-pid-01.txt",
-                "perf-iperf-stacks-pidtid-01.txt",
-                "perf-java-faults-01.txt",
-                "perf-java-stacks-01.txt",
-                "perf-java-stacks-02.txt",
-                "perf-js-stacks-01.txt",
-                "perf-mirageos-stacks-01.txt",
-                "perf-numa-stacks-01.txt",
-                "perf-rust-Yamakaky-dcpu.txt",
-                "perf-vertx-stacks-01.txt",
+            [
+                "./flamegraph/example-perf-stacks.txt.gz",
+                "./flamegraph/test/perf-cycles-instructions-01.txt",
+                "./flamegraph/test/perf-dd-stacks-01.txt",
+                "./flamegraph/test/perf-funcab-cmd-01.txt",
+                "./flamegraph/test/perf-funcab-pid-01.txt",
+                "./flamegraph/test/perf-iperf-stacks-pidtid-01.txt",
+                "./flamegraph/test/perf-java-faults-01.txt",
+                "./flamegraph/test/perf-java-stacks-01.txt",
+                "./flamegraph/test/perf-java-stacks-02.txt",
+                "./flamegraph/test/perf-js-stacks-01.txt",
+                "./flamegraph/test/perf-mirageos-stacks-01.txt",
+                "./flamegraph/test/perf-numa-stacks-01.txt",
+                "./flamegraph/test/perf-rust-Yamakaky-dcpu.txt",
+                "./flamegraph/test/perf-vertx-stacks-01.txt",
+                "./tests/data/collapse-perf/empty-line.txt",
+                "./tests/data/collapse-perf/go-stacks.txt",
+                "./tests/data/collapse-perf/java-inline.txt",
+                "./tests/data/collapse-perf/weird-stack-line.txt",
             ]
             .into_iter()
-            .map(|s| Path::new("./flamegraph/test").join(s))
-            .collect::<Vec<_>>();
-
-            input.extend(
-                [
-                    "empty-line.txt",
-                    "go-stacks.txt",
-                    "java-inline.txt",
-                    "weird-stack-line.txt",
-                ]
-                .into_iter()
-                .map(|s| Path::new("./tests/data/collapse-perf").join(s)),
-            );
-
-            input
+            .map(PathBuf::from)
+            .collect::<Vec<_>>()
         };
     }
 
     #[test]
-    fn test_input_indices() -> io::Result<()> {
-        for path in INPUT.iter() {
-            let mut infile = File::open(path)?;
-            let mut expected = Vec::new();
-            infile.read_to_end(&mut expected)?;
+    #[ignore]
+    /// Fuzz test the multithreaded collapser.
+    ///
+    /// Command: `cargo test fuzz_collapse_perf --release -- --ignored --nocapture`
+    fn fuzz_collapse_perf_multi_threaded() -> io::Result<()> {
+        let seed = rand::thread_rng().gen::<u64>();
+        println!("Random seed: {}", seed);
+        let mut rng = rand::rngs::SmallRng::seed_from_u64(seed);
 
-            for n in 0..MAX_THREADS {
-                let mut event_filter_state = EventFilterState::None;
-                let input = Input::new(
-                    expected.clone(),
-                    n,
-                    Folder::identify_stack_locations(&mut event_filter_state),
-                )?;
-                let mut actual: Vec<u8> = Vec::new();
-                for chunk in input.chunks() {
-                    actual.extend(chunk);
+        let mut buf_actual = Vec::new();
+        let mut buf_expected = Vec::new();
+        let mut count = 0;
+
+        let inputs = read_inputs(&INPUT)?;
+
+        loop {
+            let options = Options {
+                annotate_jit: rng.gen(),
+                annotate_kernel: rng.gen(),
+                event_filter: None,
+                include_addrs: rng.gen(),
+                include_pid: rng.gen(),
+                include_tid: rng.gen(),
+                nstacks_per_job: rng.gen_range(0, 100 + 1),
+                nthreads: rng.gen_range(2, 32 + 1),
+            };
+
+            for (path, input) in inputs.iter() {
+                buf_actual.clear();
+                buf_expected.clear();
+
+                let mut folder = {
+                    let mut options = options.clone();
+                    options.nthreads = 1;
+                    Folder::from(options)
+                };
+                folder.collapse(&input[..], &mut buf_expected)?;
+                let expected = std::str::from_utf8(&buf_expected[..]).unwrap();
+
+                let mut folder = Folder::from(options.clone());
+                folder.collapse(&input[..], &mut buf_actual)?;
+                let actual = std::str::from_utf8(&buf_actual[..]).unwrap();
+
+                if actual != expected {
+                    eprintln!(
+                        "Failed on file: {}\noptions: {:#?}\n",
+                        path.display(),
+                        options
+                    );
+                    assert_eq!(actual, expected);
                 }
-                assert_eq!(actual, expected);
+            }
+
+            count += 1;
+            if count % 10 == 0 {
+                println!("Successfully ran {} fuzz tests.", count);
             }
         }
-        Ok(())
     }
 
+    /// Varies the nstacks_per_job parameter and outputs the 10 fastests configurations by file
+    ///
+    /// Command: `cargo test vary_nstacks --release -- --ignored --nocapture`
     #[test]
-    fn test_collapse_perf_multi_threaded() -> io::Result<()> {
-        for path in INPUT.iter() {
-            let mut infile = File::open(path)?;
-            let mut s = String::new();
-            infile.read_to_string(&mut s)?;
+    #[ignore]
+    fn vary_nstacks_per_job() -> io::Result<()> {
+        const MIN_LINES: usize = 2000;
+        const NSAMPLES: usize = 100;
+        const WARMUP_SECS: usize = 5;
 
-            for n in 0..MAX_THREADS {
-                let mut options = Options::default();
-                options.nthreads = 1;
-                let mut folder = Folder::from(options);
-                let mut writer = Vec::new();
-                folder.collapse(io::BufReader::new(s.as_bytes()), &mut writer)?;
-                let expected = std::str::from_utf8(&writer[..]).unwrap();
+        let _stdout = io::stdout();
+        let _stderr = io::stdout();
 
-                let mut options = Options::default();
-                options.nthreads = n;
-                let mut folder = Folder::from(options);
-                let mut writer = Vec::new();
-                folder.collapse(io::BufReader::new(s.as_bytes()), &mut writer)?;
-                let actual = std::str::from_utf8(&writer[..]).unwrap();
+        let mut stdout = _stdout.lock();
+        let _stderr = _stderr.lock();
 
-                assert_eq!(actual, expected);
+        struct Foo<'a> {
+            path: &'a Path,
+            nlines: usize,
+            nstacks: usize,
+            results: HashMap<usize, u64>,
+        }
+
+        impl<'a> Foo<'a> {
+            fn new(
+                folder: &mut Folder,
+                path: &'a Path,
+                bytes: &[u8],
+                stdout: &mut io::StdoutLock,
+            ) -> io::Result<Option<Self>> {
+                let mut throwaway_buffer = Vec::new();
+
+                let (nlines, nstacks) = count_lines_and_stacks(&bytes);
+                if nlines < MIN_LINES {
+                    return Ok(None);
+                }
+
+                let mut results = HashMap::default();
+                for nstacks_per_job in 1..=nstacks {
+                    let mut durations = Vec::new();
+                    for _ in 0..NSAMPLES {
+                        throwaway_buffer.clear();
+                        let now = Instant::now();
+                        folder.collapse(&bytes[..], &mut throwaway_buffer)?;
+                        durations.push(now.elapsed().as_nanos());
+                    }
+                    let avg_duration =
+                        (durations.iter().sum::<u128>() as f64 / durations.len() as f64) as u64;
+                    results.insert(nstacks_per_job, avg_duration);
+                    stdout.write(&[b'.'])?;
+                    stdout.flush()?;
+                }
+                Ok(Some(Self {
+                    path,
+                    nlines,
+                    nstacks,
+                    results,
+                }))
             }
+        }
+
+        impl<'a> fmt::Display for Foo<'a> {
+            fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+                writeln!(
+                    f,
+                    "{} (nstacks: {}, lines: {})",
+                    self.path.display(),
+                    self.nstacks,
+                    self.nlines
+                )?;
+                let default_duration = self.results[&Options::default().nstacks_per_job];
+                let mut results = self.results.iter().collect::<Vec<_>>();
+                results.sort_by(|(_, d1), (_, d2)| (**d1).cmp(*d2));
+                for (nstacks_per_job, duration) in results.iter().take(10) {
+                    writeln!(
+                        f,
+                        "    nstacks_per_job: {:>4} (% of total: {:>3.0}%) | time: {:.0}% of default",
+                        nstacks_per_job,
+                        (**nstacks_per_job as f32 / self.nstacks as f32) * 100.0,
+                        **duration as f64 / default_duration as f64 * 100.0,
+                    )?;
+                }
+                writeln!(f)?;
+                Ok(())
+            }
+        }
+
+        fn count_lines_and_stacks(bytes: &[u8]) -> (usize, usize) {
+            let mut reader = io::BufReader::new(bytes);
+            let mut line = String::new();
+
+            let (mut nlines, mut nstacks) = (0, 0);
+            loop {
+                line.clear();
+                let n = reader.read_line(&mut line).unwrap();
+                if n == 0 {
+                    nstacks += 1;
+                    break;
+                }
+                nlines += 1;
+                if line.trim().is_empty() {
+                    nstacks += 1;
+                }
+            }
+            (nlines, nstacks)
+        }
+
+        let inputs = read_inputs(&INPUT)?;
+
+        let mut throwaway_buffer = Vec::new();
+        let mut folder = Folder::default();
+
+        // Warmup
+        let now = Instant::now();
+        stdout.write_fmt(format_args!(
+            "# Warming up for approximately {} seconds.\n",
+            WARMUP_SECS
+        ))?;
+        stdout.flush()?;
+        while now.elapsed() < std::time::Duration::from_secs(WARMUP_SECS as u64) {
+            for (_, bytes) in inputs.iter() {
+                throwaway_buffer.clear();
+                folder.collapse(&bytes[..], &mut throwaway_buffer)?;
+            }
+        }
+
+        // Time
+        let mut foos = Vec::new();
+        for (path, bytes) in &inputs {
+            stdout.write_fmt(format_args!("# {} ", path.display()))?;
+            stdout.flush()?;
+            if let Some(foo) = Foo::new(&mut folder, path, bytes, &mut stdout)? {
+                foos.push(foo);
+            }
+            stdout.write(&[b'\n'])?;
+            stdout.flush()?;
+        }
+        stdout.write(&[b'\n'])?;
+        stdout.flush()?;
+        foos.sort_by(|a, b| b.nstacks.cmp(&a.nstacks));
+        for foo in foos {
+            stdout.write_fmt(format_args!("{}", foo))?;
+            stdout.flush()?;
         }
 
         Ok(())

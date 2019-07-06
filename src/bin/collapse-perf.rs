@@ -18,38 +18,30 @@ use structopt::StructOpt;
     If you save this output add --header on Linux >= 3.14 to include perf info."
 )]
 struct Opt {
+    // Flags...
+    /// Include raw addresses where symbols can't be found
+    #[structopt(long = "addrs")]
+    _addrs: bool,
+
     /// All annotations (--kernel --jit)
     #[structopt(long = "all")]
-    annotate_all: bool,
+    _all: bool,
 
     /// Annotate jit functions with a _[j]
     #[structopt(long = "jit")]
-    annotate_jit: bool,
+    _jit: bool,
 
     /// Annotate kernel functions with a _[k]
     #[structopt(long = "kernel")]
-    annotate_kernel: bool,
+    _kernel: bool,
 
-    /// Event name filter; defaults to first encountered event
-    #[structopt(long = "event-filter", value_name = "EVENT")]
-    event_filter: Option<String>,
-
-    /// Include raw addresses where symbols can't be found
-    #[structopt(long = "addrs")]
-    include_addrs: bool,
-
-    /// Include PID with process names [1]
+    /// Include PID with process names
     #[structopt(long = "pid")]
-    include_pid: bool,
+    _pid: bool,
 
-    /// Include TID and PID with process names [1]
+    /// Include TID and PID with process names
     #[structopt(long = "tid")]
-    include_tid: bool,
-
-    /// Number of threads to use; defaults to number of logical
-    /// cores on your machine
-    #[structopt(short = "n", long = "nthreads", value_name = "NTHREADS")]
-    nthreads: Option<usize>,
+    _tid: bool,
 
     /// Silence all log output
     #[structopt(short = "q", long = "quiet")]
@@ -59,8 +51,22 @@ struct Opt {
     #[structopt(short = "v", long = "verbose", parse(from_occurrences))]
     verbose: usize,
 
+    // Options...
+    /// Event filter [default: first encountered event]
+    #[structopt(long = "event-filter", value_name = "STRING")]
+    event_filter: Option<String>,
+
+    /// Number of stacks per job sent to threadpool (only used if nthreads > 1)
+    #[structopt(long = "nstacks", default_value = "20", value_name = "UINT")]
+    nstacks: usize,
+
+    /// Number of threads to use [default: number of logical cores on your machine]
+    #[structopt(short = "n", long = "nthreads", value_name = "UINT")]
+    nthreads: Option<usize>,
+
+    // Args...
     /// Perf script output file, or STDIN if not specified
-    #[structopt(value_name = "INFILE")]
+    #[structopt(value_name = "PATH")]
     infile: Option<PathBuf>,
 }
 
@@ -69,13 +75,14 @@ impl Opt {
         (
             self.infile,
             Options {
-                include_pid: self.include_pid,
-                include_tid: self.include_tid,
-                include_addrs: self.include_addrs,
-                annotate_jit: self.annotate_jit || self.annotate_all,
-                annotate_kernel: self.annotate_kernel || self.annotate_all,
+                include_pid: self._pid,
+                include_tid: self._tid,
+                include_addrs: self._addrs,
+                annotate_jit: self._jit || self._all,
+                annotate_kernel: self._kernel || self._all,
                 event_filter: self.event_filter,
                 nthreads: self.nthreads.unwrap_or_else(num_cpus::get),
+                nstacks_per_job: self.nstacks,
             },
         )
     }

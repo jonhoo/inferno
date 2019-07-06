@@ -3,13 +3,29 @@ use std::io::{self, Cursor};
 
 use log::{error, info};
 
-use super::{dtrace, perf, Collapse};
-
-///////////////////////////////////////////////////////////////////////////////
+use crate::collapse::{dtrace, perf, Collapse};
 
 const LINES_PER_ITERATION: usize = 10;
 
-///////////////////////////////////////////////////////////////////////////////
+/// Folder configuration options.
+#[derive(Clone, Debug)]
+pub struct Options {
+    /// The number of stacks in each job sent to the threadpool (if using multiple threads).
+    /// Default is 20.
+    pub nstacks_per_job: usize,
+
+    /// The number of threads to use. Default is the number of logical cores on your machine.
+    pub nthreads: usize,
+}
+
+impl Default for Options {
+    fn default() -> Self {
+        Self {
+            nstacks_per_job: 20,
+            nthreads: num_cpus::get(),
+        }
+    }
+}
 
 /// A collapser that tries to find an appropriate implementation of `Collapse`
 /// based on the input, then delegates to that collapser if one is found.
@@ -17,21 +33,24 @@ const LINES_PER_ITERATION: usize = 10;
 /// If no applicable collapser is found, an error will be logged and
 /// nothing will be written.
 pub struct Folder {
-    nthreads: usize,
+    opt: Options,
 }
 
-impl Folder {
-    /// Constructs a new `guess::Folder`.
-    pub fn new(nthreads: usize) -> Self {
-        Self { nthreads }
+impl From<Options> for Folder {
+    fn from(mut opt: Options) -> Self {
+        if opt.nstacks_per_job == 0 {
+            opt.nstacks_per_job = 1;
+        }
+        if opt.nthreads == 0 {
+            opt.nthreads = 1;
+        }
+        Self { opt }
     }
 }
 
 impl Default for Folder {
     fn default() -> Self {
-        Self {
-            nthreads: num_cpus::get(),
-        }
+        Options::default().into()
     }
 }
 
@@ -43,12 +62,14 @@ impl Collapse for Folder {
     {
         let mut dtrace = {
             let mut options = dtrace::Options::default();
-            options.nthreads = self.nthreads;
+            options.nstacks_per_job = self.opt.nstacks_per_job;
+            options.nthreads = self.opt.nthreads;
             dtrace::Folder::from(options)
         };
         let mut perf = {
             let mut options = perf::Options::default();
-            options.nthreads = self.nthreads;
+            options.nstacks_per_job = self.opt.nstacks_per_job;
+            options.nthreads = self.opt.nthreads;
             perf::Folder::from(options)
         };
 

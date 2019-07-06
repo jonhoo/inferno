@@ -15,9 +15,6 @@ pub mod guess;
 ///   [crate-level documentation]: ../../index.html
 pub mod perf;
 
-///////////////////////////////////////////////////////////////////////////////
-
-use std::cmp;
 use std::fs::File;
 use std::io::{self, Write};
 use std::mem;
@@ -27,15 +24,8 @@ use std::sync::Arc;
 use chashmap::CHashMap;
 use fnv::FnvHashMap;
 
-///////////////////////////////////////////////////////////////////////////////
-
-const CAPACITY_INPUT_BUFFER: usize = 1024 * 1024 * 1024;
-const CAPACITY_LINE_BUFFER: usize = 1024;
-const CAPACITY_MULTI_THREADED_HASHMAP: usize = 64;
-const CAPACITY_SINGLE_THREADED_HASHMAP: usize = 512;
-const READER_CAPACITY: usize = 128 * 1024;
-
-///////////////////////////////////////////////////////////////////////////////
+const CAPACITY_HASHMAP: usize = 512;
+const CAPACITY_READER: usize = 128 * 1024;
 
 /// The abstract behavior of stack collapsing.
 ///
@@ -56,8 +46,8 @@ pub trait Collapse {
         R: io::BufRead,
         W: io::Write;
 
-    /// Collapses the contents of a file (or of STDIN if `infile` is `None`) and writes folded
-    /// stack lines to provided `writer`.
+    /// Collapses the contents of the provided file (or of STDIN if `infile` is `None`) and
+    /// writes folded stack lines to provided `writer`.
     fn collapse_file<P, W>(&mut self, infile: Option<P>, writer: W) -> io::Result<()>
     where
         P: AsRef<Path>,
@@ -66,13 +56,13 @@ pub trait Collapse {
         match infile {
             Some(ref path) => {
                 let file = File::open(path)?;
-                let reader = io::BufReader::with_capacity(READER_CAPACITY, file);
+                let reader = io::BufReader::with_capacity(CAPACITY_READER, file);
                 self.collapse(reader, writer)
             }
             None => {
                 let stdio = io::stdin();
                 let stdio_guard = stdio.lock();
-                let reader = io::BufReader::with_capacity(READER_CAPACITY, stdio_guard);
+                let reader = io::BufReader::with_capacity(CAPACITY_READER, stdio_guard);
                 self.collapse(reader, writer)
             }
         }
@@ -86,43 +76,37 @@ pub trait Collapse {
     fn is_applicable(&mut self, input: &str) -> Option<bool>;
 }
 
-///////////////////////////////////////////////////////////////////////
-
 /// Occurrences is a HashMap, which uses:
 /// * Fnv if single-threaded
 /// * CHashMap if multi-threaded
-#[derive(Clone)]
-enum Occurrences {
+#[derive(Clone, Debug)]
+pub(crate) enum Occurrences {
     SingleThreaded(FnvHashMap<String, usize>),
     MultiThreaded(Arc<CHashMap<String, usize>>),
 }
 
 impl Occurrences {
-    fn new(nthreads: usize) -> Self {
-        if nthreads <= 1 {
-            let map = FnvHashMap::with_capacity_and_hasher(
-                CAPACITY_SINGLE_THREADED_HASHMAP,
-                fnv::FnvBuildHasher::default(),
-            );
-            Occurrences::SingleThreaded(map)
-        } else {
-            let map = CHashMap::with_capacity(CAPACITY_MULTI_THREADED_HASHMAP);
-            let arc = Arc::new(map);
-            Occurrences::MultiThreaded(arc)
-        }
+    pub(crate) fn new_single_threaded() -> Self {
+        let map =
+            FnvHashMap::with_capacity_and_hasher(CAPACITY_HASHMAP, fnv::FnvBuildHasher::default());
+        Occurrences::SingleThreaded(map)
     }
 
-    fn add(&mut self, key: String, count: usize) {
+    pub(crate) fn new_multi_threaded() -> Self {
+        let map = CHashMap::with_capacity(CAPACITY_HASHMAP);
+        let arc = Arc::new(map);
+        Occurrences::MultiThreaded(arc)
+    }
+
+    pub(crate) fn add(&mut self, key: String, count: usize) {
         use self::Occurrences::*;
         match self {
             SingleThreaded(map) => *map.entry(key).or_insert(0) += count,
-            MultiThreaded(arc) => {
-                arc.upsert(key, || count, |v| *v += count);
-            }
+            MultiThreaded(arc) => arc.upsert(key, || count, |v| *v += count),
         }
     }
 
-    fn is_concurrent(&self) -> bool {
+    pub(crate) fn is_concurrent(&self) -> bool {
         use self::Occurrences::*;
         match self {
             SingleThreaded(_) => false,
@@ -130,7 +114,7 @@ impl Occurrences {
         }
     }
 
-    fn write<W>(&mut self, mut writer: W) -> io::Result<()>
+    pub(crate) fn write<W>(&mut self, mut writer: W) -> io::Result<()>
     where
         W: io::Write,
     {
@@ -146,19 +130,13 @@ impl Occurrences {
             MultiThreaded(ref mut arc) => {
                 let map = match Arc::get_mut(arc) {
                     Some(map) => map,
-                    None => {
-                        return Err(io::Error::new(
-                            io::ErrorKind::Other,
-                            "Attempting to drain contents of a concurrent \
-                             hashmap when more than one thread has access to it, \
-                             which is not allowed.",
-                        ))
-                    }
+                    None => panic!(
+                        "Attempting to drain the contents of a concurrent HashMap \
+                         when more than one thread has access to it, which is \
+                         not allowed."
+                    ),
                 };
-                let map = mem::replace(
-                    map,
-                    CHashMap::with_capacity(CAPACITY_MULTI_THREADED_HASHMAP),
-                );
+                let map = mem::replace(map, CHashMap::with_capacity(CAPACITY_HASHMAP));
                 let mut contents: Vec<_> = map.into_iter().collect();
                 contents.sort();
                 for (key, value) in contents {
@@ -170,98 +148,35 @@ impl Occurrences {
     }
 }
 
-///////////////////////////////////////////////////////////////////////////////
+#[cfg(test)]
+mod tests {
+    use std::collections::HashMap;
+    use std::fs::File;
+    use std::io::{self, Read};
+    use std::path::{Path, PathBuf};
 
-struct Chunks<'a> {
-    current_index: usize,
-    data: &'a [u8],
-    indices: &'a [usize],
-}
+    use libflate::gzip::Decoder;
 
-impl<'a> Iterator for Chunks<'a> {
-    type Item = &'a [u8];
-
-    fn next(&mut self) -> Option<Self::Item> {
-        let chunk = {
-            let start = self.indices.get(self.current_index)?;
-            match self.indices.get(self.current_index + 1) {
-                Some(end) => &self.data[*start..*end],
-                None => &self.data[*start..],
-            }
-        };
-        self.current_index += 1;
-        Some(chunk)
-    }
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-/// Representation of input data that can be chunked up and shared
-/// across threads easily.
-struct Input {
-    /// Vector of byte indices representing the start of each chunk
-    indices: Vec<usize>,
-    /// The original data
-    inner: Vec<u8>,
-}
-
-impl Input {
-    fn new<F>(data: Vec<u8>, mut nthreads: usize, func: F) -> io::Result<Self>
+    pub(crate) fn read_inputs<P>(inputs: &[P]) -> io::Result<HashMap<PathBuf, Vec<u8>>>
     where
-        F: FnOnce(io::BufReader<&[u8]>) -> io::Result<Vec<usize>>,
+        P: AsRef<Path>,
     {
-        let reader = io::BufReader::new(&data[..]);
-
-        if nthreads == 0 {
-            nthreads = 1;
-        }
-
-        // Used the passed in closure to determine the
-        // starting locations (byte indices) of each stack
-        let stack_indices = func(reader)?;
-
-        // If there are fewer stacks then threads, cut the number
-        // of threads down to the number of stacks.
-        nthreads = cmp::min(nthreads, stack_indices.len());
-
-        // Determine starting locations (byte indices) of each chunk
-        let indices = {
-            let mut count = 0;
-            let mut stacks_per_thread = vec![0; nthreads];
-            while count < stack_indices.len() {
-                let index = count % nthreads;
-                stacks_per_thread[index] += 1;
-                count += 1;
-            }
-
-            let mut count = 0;
-            let mut indices = Vec::with_capacity(nthreads);
-            for n in &stacks_per_thread {
-                if *n == 0 {
-                    break;
+        let mut map = HashMap::default();
+        for path in inputs.iter() {
+            let path = path.as_ref();
+            let bytes = {
+                let mut buf = Vec::new();
+                let mut file = File::open(path)?;
+                if path.to_str().unwrap().ends_with(".gz") {
+                    let mut reader = Decoder::new(file)?;
+                    reader.read_to_end(&mut buf)?;
+                } else {
+                    file.read_to_end(&mut buf)?;
                 }
-                indices.push(stack_indices.get(count).cloned().unwrap());
-                count += *n;
-            }
-
-            indices
-        };
-
-        Ok(Self {
-            indices,
-            inner: data,
-        })
-    }
-
-    fn chunks(&self) -> Chunks {
-        Chunks {
-            current_index: 0,
-            data: &self.inner[..],
-            indices: &self.indices[..],
+                buf
+            };
+            map.insert(path.to_path_buf(), bytes);
         }
-    }
-
-    fn nthreads(&mut self) -> usize {
-        self.indices.len()
+        Ok(map)
     }
 }

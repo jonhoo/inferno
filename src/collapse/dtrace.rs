@@ -1,22 +1,23 @@
 use std::collections::VecDeque;
 use std::io::{self, prelude::*};
+use std::mem;
 
+use crossbeam::channel;
 use log::warn;
 
-use super::{Collapse, Input, Occurrences, CAPACITY_INPUT_BUFFER, CAPACITY_LINE_BUFFER};
+use crate::collapse::{Collapse, Occurrences};
 
-///////////////////////////////////////////////////////////////////////////////
-
-/// Settings that change how frames are named from the incoming stack traces.
-///
-/// All options default to off, expect nthreads, which defaults to the number
-/// of logical cores on your machine.
-#[derive(Copy, Clone, Debug)]
+/// Dtrace folder configuration options.
+#[derive(Clone, Debug)]
 pub struct Options {
-    /// Include function offset (except leafs)
+    /// Include function offset (except leafs). Default is `false`.
     pub includeoffset: bool,
 
-    /// The number of threads to use.
+    /// The number of stacks in each job sent to the threadpool (if using multiple threads).
+    /// Default is `20`.
+    pub nstacks_per_job: usize,
+
+    /// The number of threads to use. Default is the number of logical cores on your machine.
     pub nthreads: usize,
 }
 
@@ -24,12 +25,11 @@ impl Default for Options {
     fn default() -> Self {
         Self {
             includeoffset: false,
+            nstacks_per_job: 20,
             nthreads: num_cpus::get(),
         }
     }
 }
-
-///////////////////////////////////////////////////////////////////////////////
 
 /// A stack collapser for the output of dtrace `ustrace()`.
 ///
@@ -52,10 +52,21 @@ pub struct Folder {
 }
 
 impl From<Options> for Folder {
-    fn from(opt: Options) -> Self {
+    fn from(mut opt: Options) -> Self {
+        if opt.nstacks_per_job == 0 {
+            opt.nstacks_per_job = 1;
+        }
+        if opt.nthreads == 0 {
+            opt.nthreads = 1;
+        }
+        let occurrences = if opt.nthreads < 2 {
+            Occurrences::new_single_threaded()
+        } else {
+            Occurrences::new_multi_threaded()
+        };
         Self {
             cache_inlines: Vec::new(),
-            occurrences: Occurrences::new(opt.nthreads),
+            occurrences,
             stack: VecDeque::default(),
             stack_str_size: 0,
             opt,
@@ -65,23 +76,45 @@ impl From<Options> for Folder {
 
 impl Default for Folder {
     fn default() -> Self {
-        let options = Options::default();
-        Folder::from(options)
+        Options::default().into()
     }
 }
 
 impl Collapse for Folder {
-    fn collapse<R, W>(&mut self, reader: R, writer: W) -> io::Result<()>
+    fn collapse<R, W>(&mut self, mut reader: R, writer: W) -> io::Result<()>
     where
         R: io::BufRead,
         W: io::Write,
     {
-        if self.opt.nthreads <= 1 {
+        // skip header lines -- first empty line marks start of data
+        let mut line = String::new();
+        loop {
+            line.clear();
+            if reader.read_line(&mut line)? == 0 {
+                // We reached the end :( this should not happen.
+                warn!("File ended while skipping headers");
+                return Ok(());
+            };
+            if line.trim().is_empty() {
+                break;
+            }
+        }
+
+        // Do collapsing...
+        if self.opt.nthreads < 2 {
             self.collapse_single_threaded(reader)?;
         } else {
             self.collapse_multi_threaded(reader)?;
         }
-        self.occurrences.write(writer)
+
+        // Write results...
+        self.occurrences.write(writer)?;
+
+        // Reset state...
+        self.stack.clear();
+        self.stack_str_size = 0;
+
+        Ok(())
     }
 
     fn is_applicable(&mut self, input: &str) -> Option<bool> {
@@ -125,20 +158,7 @@ impl Folder {
     where
         R: io::BufRead,
     {
-        let mut line = String::with_capacity(CAPACITY_LINE_BUFFER);
-
-        // skip header lines -- first empty line marks start of data
-        loop {
-            line.clear();
-            if reader.read_line(&mut line)? == 0 {
-                // We reached the end :( this should not happen.
-                warn!("File ended while skipping headers");
-                return Ok(());
-            };
-            if line.trim().is_empty() {
-                break;
-            }
-        }
+        let mut line = String::new();
         loop {
             line.clear();
 
@@ -163,84 +183,108 @@ impl Folder {
     where
         R: io::BufRead,
     {
-        debug_assert!(self.occurrences.is_concurrent());
-        debug_assert!(self.opt.nthreads > 1);
+        assert!(self.occurrences.is_concurrent());
+        assert!(self.opt.nstacks_per_job > 0);
+        assert!(self.opt.nthreads > 1);
 
-        let mut buf = Vec::with_capacity(CAPACITY_INPUT_BUFFER);
-        reader.read_to_end(&mut buf)?;
-
-        let mut input = Input::new(buf, self.opt.nthreads, Self::identify_stack_locations)?;
+        enum Message {
+            Job(Vec<u8>),
+            Shutdown,
+        }
 
         crossbeam::thread::scope(|scope| {
-            let mut handles = Vec::with_capacity(input.nthreads());
-            let (sender, receiver) = crossbeam::channel::bounded(input.nthreads());
-            for chunk in input.chunks() {
+            // Spin up the threadpool / worker threads.
+            let (tx_input, rx_input) = channel::unbounded();
+            let (tx_output, rx_output) = channel::unbounded();
+            let mut handles = Vec::with_capacity(self.opt.nthreads);
+            for _ in 0..self.opt.nthreads {
+                let rx_input = rx_input.clone();
+                let tx_output = tx_output.clone();
+
                 let occurrences = self.occurrences.clone();
-                let opt = self.opt;
-                let sender = sender.clone();
+                let opt = self.opt.clone();
 
                 let handle = scope.spawn(move |_| {
                     let mut folder = Folder {
-                        // state
-                        cache_inlines: Vec::new(),
+                        cache_inlines: Vec::default(),
                         occurrences,
                         stack: VecDeque::default(),
                         stack_str_size: 0,
-
-                        // options
                         opt,
                     };
-                    let result = folder.collapse_single_threaded(chunk);
-                    sender.send(result).unwrap();
+                    loop {
+                        // Receive the data...
+                        let data = match rx_input.recv().unwrap() {
+                            Message::Job(data) => data,
+                            Message::Shutdown => return,
+                        };
+                        // Process the data...
+                        let result = folder.collapse_single_threaded(&data[..]);
+                        // Send the result...
+                        tx_output.send(result).unwrap();
+                        // Prepare for the next round...
+                        folder.stack.clear();
+                        folder.stack_str_size = 0;
+                    }
                 });
                 handles.push(handle);
             }
+
+            // State for the loop...
+            let buf_capacity = 1024 * self.opt.nstacks_per_job;
+            let mut buf = Vec::with_capacity(buf_capacity);
+            let (mut index, mut njobs, mut nstacks) = (0, 0, 0);
+
+            // The loop...
+            loop {
+                // First, read some data into the `utils::Buffer`.
+                let n = reader.read_until(b'\n', &mut buf)?;
+
+                // If we're at the end of the data...
+                if n == 0 {
+                    // Send the last slice.
+                    tx_input.send(Message::Job(buf)).unwrap();
+                    njobs += 1;
+                    // Exit the loop.
+                    break;
+                }
+
+                let line = &buf[index..index + n];
+                index += n;
+
+                if is_end_of_stack(line) {
+                    // It's the end of a stack; count it
+                    nstacks += 1;
+                    // If we've seen enough stacks to make up a slice...
+                    if nstacks == self.opt.nstacks_per_job {
+                        // Send it.
+                        let chunk = mem::replace(&mut buf, Vec::with_capacity(buf_capacity));
+                        tx_input.send(Message::Job(chunk)).unwrap();
+                        njobs += 1;
+                        // Reset the state; mark the beginning of the next slice.
+                        index = 0;
+                        nstacks = 0;
+                    }
+                }
+            }
+
+            // Wait until all the jobs have been completed and ensure
+            // none resulted in an error; if any did, propogate it.
+            for _ in 0..njobs {
+                rx_output.recv().unwrap()?;
+            }
+
+            // Shutown the threapool
+            for _ in &handles {
+                tx_input.send(Message::Shutdown).unwrap();
+            }
             for handle in handles {
-                receiver.recv().unwrap()?;
                 handle.join().unwrap();
             }
-            Ok::<_, io::Error>(())
+
+            Ok(())
         })
-        .unwrap()?;
-
-        Ok(())
-    }
-
-    // When collapsing using multiple threads, this function is run once
-    // upfront in order to determine the locations (byte indices) of each
-    // stack in the input data so that the input data can later be broken up
-    // into pieces in order to be allocated across multiple threads.
-    // See `crate::collapse::Input::new`.
-    fn identify_stack_locations(mut reader: io::BufReader<&[u8]>) -> io::Result<Vec<usize>> {
-        let mut byte_index = 0;
-        let mut line = String::with_capacity(CAPACITY_LINE_BUFFER);
-        let mut stack_indices = vec![0];
-        loop {
-            line.clear();
-            let n = reader.read_line(&mut line).unwrap();
-            if n == 0 {
-                return Ok(stack_indices);
-            }
-            byte_index += n;
-            if line.trim().is_empty() {
-                break;
-            }
-        }
-        loop {
-            line.clear();
-            let n = reader.read_line(&mut line).unwrap();
-            if n == 0 {
-                return Ok(stack_indices);
-            }
-            byte_index += n;
-            let line = line.trim();
-            if line.is_empty() {
-                continue;
-            }
-            if line.parse::<usize>().is_ok() {
-                stack_indices.push(byte_index);
-            }
-        }
+        .unwrap()
     }
 
     // This function approximates the Perl regex s/(::.*)[(<].*/$1/
@@ -359,45 +403,73 @@ impl Folder {
     }
 }
 
-///////////////////////////////////////////////////////////////////////////////
+fn is_end_of_stack(line: &[u8]) -> bool {
+    enum State {
+        Start,
+        Middle,
+        End,
+    }
+    let mut state = State::Start;
+    for b in line {
+        let b = *b;
+        let c = b as char;
+        match state {
+            State::Start => {
+                if c.is_whitespace() {
+                    continue;
+                }
+                if b > 47 && b < 58 {
+                    state = State::Middle;
+                    continue;
+                }
+                return false;
+            }
+            State::Middle => {
+                if b > 47 && b < 58 {
+                    continue;
+                }
+                if c.is_whitespace() {
+                    state = State::End;
+                    continue;
+                }
+                return false;
+            }
+            State::End => {
+                if c.is_whitespace() {
+                    continue;
+                }
+                return false;
+            }
+        }
+    }
+    true
+}
 
 #[cfg(test)]
 mod tests {
-    use std::fs::File;
-    use std::path::{Path, PathBuf};
+    use std::path::PathBuf;
 
+    use lazy_static::lazy_static;
     use pretty_assertions::assert_eq;
+    use rand::{Rng, SeedableRng};
 
     use super::*;
+    use crate::collapse::tests::read_inputs;
 
-    #[test]
-    fn test_input_indices() -> io::Result<()> {
-        let input = [
-            "flamegraph-bug.txt",
-            "hex-addresses.txt",
-            "java.txt",
-            "only-header-lines.txt",
-            "scope_with_no_argument_list.txt",
-        ]
-        .into_iter()
-        .map(|s| Path::new("./tests/data/collapse-dtrace").join(s))
-        .collect::<Vec<PathBuf>>();
-
-        for path in input.iter() {
-            let mut infile = File::open(path)?;
-            let mut expected = Vec::new();
-            infile.read_to_end(&mut expected)?;
-
-            for n in 0..16 {
-                let input = Input::new(expected.clone(), n, Folder::identify_stack_locations)?;
-                let mut actual: Vec<u8> = Vec::new();
-                for chunk in input.chunks() {
-                    actual.extend(chunk);
-                }
-                assert_eq!(actual, expected);
-            }
-        }
-        Ok(())
+    lazy_static! {
+        static ref INPUT: Vec<PathBuf> = {
+            [
+                "./flamegraph/example-dtrace-stacks.txt",
+                "./tests/data/collapse-dtrace/flamegraph-bug.txt",
+                "./tests/data/collapse-dtrace/hex-addresses.txt",
+                "./tests/data/collapse-dtrace/java.txt",
+                "./tests/data/collapse-dtrace/only-header-lines.txt",
+                "./tests/data/collapse-dtrace/scope_with_no_argument_list.txt",
+            ]
+            .into_iter()
+            .map(PathBuf::from)
+            .collect::<Vec<_>>()
+        };
     }
 
     #[test]
@@ -418,4 +490,61 @@ mod tests {
             Folder::uncpp(probe)
         );
     }
+
+    #[test]
+    #[ignore]
+    /// Fuzz test the multithreaded collapser.
+    ///
+    /// Command: `cargo test fuzz_collapse_dtrace --release -- --ignored --nocapture`
+    fn fuzz_collapse_dtrace_multi_threaded() -> io::Result<()> {
+        let seed = rand::thread_rng().gen::<u64>();
+        println!("Random seed: {}", seed);
+        let mut rng = rand::rngs::SmallRng::seed_from_u64(seed);
+
+        let mut buf_actual = Vec::new();
+        let mut buf_expected = Vec::new();
+        let mut count = 0;
+
+        let inputs = read_inputs(&INPUT)?;
+
+        loop {
+            let options = Options {
+                includeoffset: rng.gen(),
+                nstacks_per_job: rng.gen_range(0, 100 + 1),
+                nthreads: rng.gen_range(2, 32 + 1),
+            };
+
+            for (path, input) in inputs.iter() {
+                buf_actual.clear();
+                buf_expected.clear();
+
+                let mut folder = {
+                    let mut options = options.clone();
+                    options.nthreads = 1;
+                    Folder::from(options)
+                };
+                folder.collapse(&input[..], &mut buf_expected)?;
+                let expected = std::str::from_utf8(&buf_expected[..]).unwrap();
+
+                let mut folder = Folder::from(options.clone());
+                folder.collapse(&input[..], &mut buf_actual)?;
+                let actual = std::str::from_utf8(&buf_actual[..]).unwrap();
+
+                if actual != expected {
+                    eprintln!(
+                        "Failed on file: {}\noptions: {:#?}\n",
+                        path.display(),
+                        options
+                    );
+                    assert_eq!(actual, expected);
+                }
+            }
+
+            count += 1;
+            if count % 10 == 0 {
+                println!("Successfully ran {} fuzz tests.", count);
+            }
+        }
+    }
+
 }

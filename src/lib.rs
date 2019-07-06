@@ -123,6 +123,10 @@
 //!   [differential flame graphs]: http://www.brendangregg.com/blog/2014-11-09/differential-flame-graphs.html
 
 #![deny(missing_docs)]
+#![cfg_attr(all(test, feature = "nightly"), feature(test))]
+
+#[cfg(all(test, feature = "nightly"))]
+extern crate test;
 
 /// Stack collapsing for various input formats.
 ///

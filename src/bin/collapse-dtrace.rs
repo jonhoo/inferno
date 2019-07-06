@@ -18,13 +18,10 @@ use structopt::StructOpt;
     "
 )]
 struct Opt {
+    // Flags...
     /// Include offsets
     #[structopt(long = "includeoffset")]
-    includeoffset: bool,
-
-    /// Number of threads to use; defaults to number of logical cores on your machine
-    #[structopt(short = "n", long = "nthreads", value_name = "NTHREADS")]
-    nthreads: Option<usize>,
+    _includeoffset: bool,
 
     /// Silence all log output
     #[structopt(short = "q", long = "quiet")]
@@ -34,8 +31,18 @@ struct Opt {
     #[structopt(short = "v", long = "verbose", parse(from_occurrences))]
     verbose: usize,
 
-    /// perf script output file, or STDIN if not specified
-    #[structopt(value_name = "INFILE")]
+    // Options...
+    /// Number of stacks per job sent to threadpool (only used if nthreads > 1)
+    #[structopt(long = "nstacks", default_value = "20", value_name = "UINT")]
+    nstacks: usize,
+
+    /// Number of threads to use [default: number of logical cores on your machine]
+    #[structopt(short = "n", long = "nthreads", value_name = "UINT")]
+    nthreads: Option<usize>,
+
+    // Args...
+    /// Dtrace script output file, or STDIN if not specified
+    #[structopt(value_name = "PATH")]
     infile: Option<PathBuf>,
 }
 
@@ -44,7 +51,8 @@ impl Opt {
         (
             self.infile,
             Options {
-                includeoffset: self.includeoffset,
+                includeoffset: self._includeoffset,
+                nstacks_per_job: self.nstacks,
                 nthreads: self.nthreads.unwrap_or_else(num_cpus::get),
             },
         )

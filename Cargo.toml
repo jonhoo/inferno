@@ -47,6 +47,7 @@ criterion = "0.2"
 libflate = "0.1"
 maplit = "1.0.1"
 pretty_assertions = "0.6"
+rand = "0.6"
 
 [profile.release]
 debug = true

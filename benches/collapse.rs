@@ -28,8 +28,7 @@ where
             id,
             move |b, data| {
                 b.iter(|| {
-                    let reader = BufReader::new(data.as_slice());
-                    let _folder = collapser.collapse(reader, io::sink());
+                    let _folder = collapser.collapse(data.as_slice(), io::sink());
                 })
             },
             vec![bytes],

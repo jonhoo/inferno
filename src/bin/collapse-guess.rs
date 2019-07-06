@@ -2,7 +2,7 @@ use std::io;
 use std::path::PathBuf;
 
 use env_logger::Env;
-use inferno::collapse::guess::Folder;
+use inferno::collapse::guess::{Folder, Options};
 use inferno::collapse::Collapse;
 use structopt::StructOpt;
 
@@ -15,11 +15,6 @@ use structopt::StructOpt;
                   "
 )]
 struct Opt {
-    /// Number of threads to use; defaults to number of logical
-    /// cores on your machine
-    #[structopt(short = "n", long = "nthreads", value_name = "NTHREADS")]
-    nthreads: Option<usize>,
-
     /// Silence all log output
     #[structopt(short = "q", long = "quiet")]
     quiet: bool,
@@ -28,9 +23,29 @@ struct Opt {
     #[structopt(short = "v", long = "verbose", parse(from_occurrences))]
     verbose: usize,
 
+    /// Number of stacks per job sent to threadpool (only used if nthreads > 1)
+    #[structopt(long = "nstacks", default_value = "10", value_name = "UINT")]
+    nstacks: usize,
+
+    /// Number of threads to use [default: number of logical cores on your machine]
+    #[structopt(short = "n", long = "nthreads", value_name = "UINT")]
+    nthreads: Option<usize>,
+
     /// Input file, or STDIN if not specified
-    #[structopt(value_name = "INFILE")]
+    #[structopt(value_name = "PATH")]
     infile: Option<PathBuf>,
+}
+
+impl Opt {
+    fn into_parts(self) -> (Option<PathBuf>, Options) {
+        (
+            self.infile,
+            Options {
+                nstacks_per_job: self.nstacks,
+                nthreads: self.nthreads.unwrap_or_else(num_cpus::get),
+            },
+        )
+    }
 }
 
 fn main() -> io::Result<()> {
@@ -48,6 +63,6 @@ fn main() -> io::Result<()> {
         .init();
     }
 
-    let mut guess = Folder::new(opt.nthreads.unwrap_or_else(num_cpus::get));
-    guess.collapse_file(opt.infile.as_ref(), io::stdout().lock())
+    let (infile, options) = opt.into_parts();
+    Folder::from(options).collapse_file(infile.as_ref(), io::stdout().lock())
 }
