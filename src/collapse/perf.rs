@@ -12,16 +12,16 @@ const TIDY_JAVA: bool = true;
 mod logging {
     use log::{info, warn};
 
-    pub(super) fn filtering_for_events_of_type(event: &str) {
-        info!("filtering for events of type: {}", event);
+    pub(super) fn filtering_for_events_of_type(ty: &str) {
+        info!("Filtering for events of type: {}", ty);
     }
 
     pub(super) fn weird_event_line(line: &str) {
-        warn!("weird event line: {}", line);
+        warn!("Weird event line: {}", line);
     }
 
     pub(super) fn weird_stack_line(line: &str) {
-        warn!("weird stack line: {}", line);
+        warn!("Weird stack line: {}", line);
     }
 }
 
@@ -124,6 +124,7 @@ impl From<Options> for Folder {
         } else {
             Occurrences::new_multi_threaded()
         };
+        opt.include_pid = opt.include_pid || opt.include_tid;
         Self {
             cache_line: Vec::default(),
             event_filter: opt.event_filter.clone(),
@@ -149,7 +150,6 @@ impl Collapse for Folder {
         R: BufRead,
         W: Write,
     {
-        // Do collapsing...
         if self.opt.nthreads < 2 {
             self.collapse_single_threaded(reader)?;
         } else {
@@ -218,7 +218,7 @@ impl Folder {
         loop {
             line.clear();
             if reader.read_line(&mut line)? == 0 {
-                break;
+                return Ok(());
             }
             if line.starts_with('#') {
                 continue;
@@ -232,7 +232,6 @@ impl Folder {
                 self.on_event_line(line);
             }
         }
-        Ok(())
     }
 
     fn collapse_multi_threaded<R>(&mut self, mut reader: R) -> io::Result<()>

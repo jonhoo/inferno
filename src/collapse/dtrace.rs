@@ -268,16 +268,14 @@ impl Folder {
                 }
             }
 
-            // Wait until all the jobs have been completed and ensure
-            // none resulted in an error; if any did, propogate it.
             for _ in 0..njobs {
                 rx_output.recv().unwrap()?;
             }
 
-            // Shutown the threapool
             for _ in &handles {
                 tx_input.send(Message::Shutdown).unwrap();
             }
+
             for handle in handles {
                 handle.join().unwrap();
             }

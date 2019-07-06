@@ -20,7 +20,7 @@ fn test_collapse_perf(
 ) -> io::Result<()> {
     options.nthreads = 1;
     test_collapse(Folder::from(options.clone()), test_file, expected_file)?;
-    options.nthreads = 4;
+    options.nthreads = 2;
     test_collapse(Folder::from(options), test_file, expected_file)?;
     Ok(())
 }
@@ -235,7 +235,7 @@ fn collapse_perf_should_warn_about_empty_input_lines() {
             let nwarnings = captured_logs
                 .into_iter()
                 .filter(|log| {
-                    log.body.starts_with("weird event line: ") && log.level == Level::Warn
+                    log.body.starts_with("Weird event line: ") && log.level == Level::Warn
                 })
                 .count();
             assert_eq!(
@@ -255,7 +255,7 @@ fn collapse_perf_should_warn_about_weird_input_lines() {
             let nwarnings = captured_logs
                 .into_iter()
                 .filter(|log| {
-                    log.body.starts_with("weird stack line: ") && log.level == Level::Warn
+                    log.body.starts_with("Weird stack line: ") && log.level == Level::Warn
                 })
                 .count();
             assert_eq!(
