@@ -490,6 +490,32 @@ mod tests {
     }
 
     #[test]
+    fn test_collapse_dtrace_multi_threaded() -> io::Result<()> {
+        const MAX_THREADS: usize = 16;
+        for (_, bytes) in read_inputs(&INPUT)? {
+            let mut options = Options::default();
+            options.nthreads = 1;
+            let mut folder = Folder::from(options);
+            let mut writer = Vec::new();
+            folder.collapse(io::BufReader::new(&bytes[..]), &mut writer)?;
+            let expected = std::str::from_utf8(&writer[..]).unwrap();
+
+            for n in 2..=MAX_THREADS {
+                let mut options = Options::default();
+                options.nthreads = n;
+                let mut folder = Folder::from(options);
+                let mut writer = Vec::new();
+                folder.collapse(io::BufReader::new(&bytes[..]), &mut writer)?;
+                let actual = std::str::from_utf8(&writer[..]).unwrap();
+
+                assert_eq!(actual, expected);
+            }
+        }
+
+        Ok(())
+    }
+
+    #[test]
     #[ignore]
     /// Fuzz test the multithreaded collapser.
     ///
