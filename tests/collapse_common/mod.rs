@@ -1,9 +1,7 @@
 use inferno::collapse::Collapse;
 use libflate::gzip::Decoder;
 use std::fs::{self, File};
-use std::io::{self, BufRead, BufReader, Cursor, Read};
-use std::process::{self, Child};
-use std::thread;
+use std::io::{self, BufRead, BufReader, Cursor};
 
 pub(crate) fn test_collapse<C>(
     mut collapser: C,
@@ -105,42 +103,4 @@ pub(crate) fn compare_results<R, E>(
             expected_file, line_num
         )
     }
-}
-
-/// If `input`, write it to `child`'s stdin while also reading `child`'s
-/// stdout and stderr, then wait on `child` and return its status and output.
-///
-/// This is a modified version of `std::process::Child::wait_with_output`.
-pub(crate) fn wait_with_input_output<R: Read + Send + 'static>(
-    mut child: Child,
-    mut input: R,
-) -> io::Result<process::Output> {
-    let stdin = child
-        .stdin
-        .take()
-        .map(|mut stdin| thread::spawn(move || io::copy(&mut input, &mut stdin)));
-
-    fn read<R>(mut input: R) -> thread::JoinHandle<io::Result<Vec<u8>>>
-    where
-        R: Read + Send + 'static,
-    {
-        thread::spawn(move || {
-            let mut ret = Vec::new();
-            input.read_to_end(&mut ret).map(|_| ret)
-        })
-    }
-
-    // Finish writing stdin before waiting, because waiting drops stdin.
-    stdin.and_then(|t| t.join().unwrap().ok());
-    let stdout = child.stdout.take().map(read);
-    let stderr = child.stderr.take().map(read);
-    let status = child.wait()?;
-    let stdout = stdout.and_then(|t| t.join().unwrap().ok());
-    let stderr = stderr.and_then(|t| t.join().unwrap().ok());
-
-    Ok(process::Output {
-        status: status,
-        stdout: stdout.unwrap_or_default(),
-        stderr: stderr.unwrap_or_default(),
-    })
 }

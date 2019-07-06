@@ -230,15 +230,17 @@ fn collapse_sample_cli() {
     let expected = BufReader::new(File::open(expected_file).unwrap());
     compare_results(Cursor::new(output.stdout), expected, expected_file, false);
 
-    let input = BufReader::new(File::open(input_file).unwrap());
     // Test with STDIN
-    let output = Command::cargo_bin("inferno-collapse-sample")
+    let mut child = Command::cargo_bin("inferno-collapse-sample")
         .unwrap()
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .spawn()
-        .and_then(|child| wait_with_input_output(child, input))
         .expect("Failed to spawn child process");
+    let mut input = BufReader::new(File::open(input_file).unwrap());
+    let stdin = child.stdin.as_mut().expect("Failed to open stdin");
+    io::copy(&mut input, stdin).unwrap();
+    let output = child.wait_with_output().expect("Failed to read stdout");
     let expected = BufReader::new(File::open(expected_file).unwrap());
     compare_results(Cursor::new(output.stdout), expected, expected_file, false);
 }
