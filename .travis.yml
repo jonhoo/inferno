@@ -24,7 +24,6 @@ jobs:
       os: osx
     - rust: stable
       os: windows
-      script: cargo test -- --test-threads=1 --nocapture
     - stage: lint # we lint on beta to future-proof
       name: "Rust: beta, rustfmt"
       rust: beta
