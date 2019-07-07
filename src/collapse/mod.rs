@@ -163,10 +163,10 @@ impl Occurrences {
     }
 }
 
-fn smallest_multiple_of_two_larger_than(n: usize) -> usize {
-    let mut output = 2;
+fn smallest_power_of_two_larger_than(n: usize) -> usize {
+    let mut output = 1024;
     while output < n {
-        output *= 2;
+        output <<= 1;
     }
     output
 }

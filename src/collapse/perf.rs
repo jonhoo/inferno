@@ -333,7 +333,7 @@ impl Folder {
             // worker threads as soon as we learn what it is.
 
             // State for the loop...
-            let buf_capacity = collapse::smallest_multiple_of_two_larger_than(
+            let buf_capacity = collapse::smallest_power_of_two_larger_than(
                 collapse::GUESS_NBYTES_PER_STACK * self.opt.nstacks_per_job,
             );
             let mut buf = Vec::with_capacity(buf_capacity);
