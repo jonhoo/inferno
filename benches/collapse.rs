@@ -77,6 +77,7 @@ criterion_group!(
     dtrace_single,
     dtrace_multi,
     perf_single,
-    perf_multi
+    perf_multi,
 );
+
 criterion_main!(benches);

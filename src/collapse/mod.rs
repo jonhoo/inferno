@@ -33,7 +33,8 @@ lazy_static! {
 const CAPACITY_HASHMAP: usize = 512;
 const CAPACITY_READER: usize = 128 * 1024;
 #[doc(hidden)]
-pub const DEFAULT_NSTACKS: usize = 20;
+pub const DEFAULT_NSTACKS: usize = 100;
+const GUESS_NBYTES_PER_STACK: usize = 1024;
 
 /// The abstract behavior of stack collapsing.
 ///
@@ -82,31 +83,37 @@ pub trait Collapse {
     /// - `Some(true)` means "yes, this implementation should work with this string"
     /// - `Some(false)` means "no, this implementation definitely won't work"
     fn is_applicable(&mut self, input: &str) -> Option<bool>;
+
+    #[cfg(test)]
+    fn set_nstacks_per_job(&mut self, n: usize);
+
+    #[cfg(test)]
+    fn set_nthreads(&mut self, n: usize);
 }
 
 /// Occurrences is a HashMap, which uses:
 /// * Fnv if single-threaded
 /// * CHashMap if multi-threaded
 #[derive(Clone, Debug)]
-pub(crate) enum Occurrences {
+enum Occurrences {
     SingleThreaded(FnvHashMap<String, usize>),
     MultiThreaded(Arc<CHashMap<String, usize>>),
 }
 
 impl Occurrences {
-    pub(crate) fn new_single_threaded() -> Self {
+    fn new_single_threaded() -> Self {
         let map =
             FnvHashMap::with_capacity_and_hasher(CAPACITY_HASHMAP, fnv::FnvBuildHasher::default());
         Occurrences::SingleThreaded(map)
     }
 
-    pub(crate) fn new_multi_threaded() -> Self {
+    fn new_multi_threaded() -> Self {
         let map = CHashMap::with_capacity(CAPACITY_HASHMAP);
         let arc = Arc::new(map);
         Occurrences::MultiThreaded(arc)
     }
 
-    pub(crate) fn add(&mut self, key: String, count: usize) {
+    fn add(&mut self, key: String, count: usize) {
         use self::Occurrences::*;
         match self {
             SingleThreaded(map) => *map.entry(key).or_insert(0) += count,
@@ -114,7 +121,7 @@ impl Occurrences {
         }
     }
 
-    pub(crate) fn is_concurrent(&self) -> bool {
+    fn is_concurrent(&self) -> bool {
         use self::Occurrences::*;
         match self {
             SingleThreaded(_) => false,
@@ -122,7 +129,7 @@ impl Occurrences {
         }
     }
 
-    pub(crate) fn write<W>(&mut self, mut writer: W) -> io::Result<()>
+    fn write<W>(&mut self, mut writer: W) -> io::Result<()>
     where
         W: io::Write,
     {
@@ -156,14 +163,26 @@ impl Occurrences {
     }
 }
 
+fn smallest_multiple_of_two_larger_than(n: usize) -> usize {
+    let mut output = 2;
+    while output < n {
+        output *= 2;
+    }
+    output
+}
+
 #[cfg(test)]
-mod tests {
+mod tests_common {
     use std::collections::HashMap;
+    use std::fmt;
     use std::fs::File;
-    use std::io::{self, Read};
+    use std::io::{self, BufRead, Read};
     use std::path::{Path, PathBuf};
+    use std::time::Instant;
 
     use libflate::gzip::Decoder;
+
+    use super::*;
 
     pub(crate) fn read_inputs<P>(inputs: &[P]) -> io::Result<HashMap<PathBuf, Vec<u8>>>
     where
@@ -187,4 +206,181 @@ mod tests {
         }
         Ok(map)
     }
+
+    pub(crate) fn test_collapse_multi<C, P>(folder: &mut C, inputs: &[P]) -> io::Result<()>
+    where
+        C: Collapse,
+        P: AsRef<Path>,
+    {
+        const MAX_THREADS: usize = 16;
+        for (_, bytes) in read_inputs(inputs)? {
+            folder.set_nthreads(1);
+            let mut writer = Vec::new();
+            folder.collapse(&bytes[..], &mut writer)?;
+            let expected = std::str::from_utf8(&writer[..]).unwrap();
+
+            for n in 2..=MAX_THREADS {
+                folder.set_nthreads(n);
+                let mut writer = Vec::new();
+                folder.collapse(&bytes[..], &mut writer)?;
+                let actual = std::str::from_utf8(&writer[..]).unwrap();
+
+                assert_eq!(actual, expected);
+            }
+        }
+
+        Ok(())
+    }
+
+    pub(crate) fn bench_nstacks<C, P>(folder: &mut C, inputs: &[P]) -> io::Result<()>
+    where
+        C: Collapse,
+        P: AsRef<Path>,
+    {
+        const MIN_LINES: usize = 2000;
+        const NSAMPLES: usize = 100;
+        const WARMUP_SECS: usize = 5;
+
+        let _stdout = io::stdout();
+        let _stderr = io::stdout();
+
+        let mut stdout = _stdout.lock();
+        let _stderr = _stderr.lock();
+
+        struct Foo<'a> {
+            path: &'a Path,
+            nlines: usize,
+            nstacks: usize,
+            results: HashMap<usize, u64>,
+        }
+
+        impl<'a> Foo<'a> {
+            fn new<C>(
+                folder: &mut C,
+                path: &'a Path,
+                bytes: &[u8],
+                stdout: &mut io::StdoutLock,
+            ) -> io::Result<Option<Self>>
+            where
+                C: Collapse,
+            {
+                let (nlines, nstacks) = count_lines_and_stacks(&bytes);
+                if nlines < MIN_LINES {
+                    return Ok(None);
+                }
+
+                let mut results = HashMap::default();
+                let iter = vec![1, DEFAULT_NSTACKS]
+                    .into_iter()
+                    .chain((10..=nstacks).step_by(10));
+                for nstacks_per_job in iter {
+                    folder.set_nstacks_per_job(nstacks_per_job);
+                    let mut durations = Vec::new();
+                    for _ in 0..NSAMPLES {
+                        let mut throwaway_buffer = Vec::new();
+                        let now = Instant::now();
+                        folder.collapse(&bytes[..], &mut throwaway_buffer)?;
+                        durations.push(now.elapsed().as_nanos());
+                    }
+                    let avg_duration =
+                        (durations.iter().sum::<u128>() as f64 / durations.len() as f64) as u64;
+                    results.insert(nstacks_per_job, avg_duration);
+                    stdout.write(&[b'.'])?;
+                    stdout.flush()?;
+                }
+                Ok(Some(Self {
+                    path,
+                    nlines,
+                    nstacks,
+                    results,
+                }))
+            }
+        }
+
+        impl<'a> fmt::Display for Foo<'a> {
+            fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+                writeln!(
+                    f,
+                    "{} (nstacks: {}, lines: {})",
+                    self.path.display(),
+                    self.nstacks,
+                    self.nlines
+                )?;
+                let default_duration = self.results[&DEFAULT_NSTACKS];
+                let mut results = self.results.iter().collect::<Vec<_>>();
+                results.sort_by(|(_, d1), (_, d2)| (**d1).cmp(*d2));
+                for (nstacks_per_job, duration) in results.iter().take(10) {
+                    writeln!(
+                        f,
+                        "    nstacks_per_job: {:>4} (% of total: {:>3.0}%) | time: {:.0}% of default",
+                        nstacks_per_job,
+                        (**nstacks_per_job as f32 / self.nstacks as f32) * 100.0,
+                        **duration as f64 / default_duration as f64 * 100.0,
+                    )?;
+                }
+                writeln!(f)?;
+                Ok(())
+            }
+        }
+
+        fn count_lines_and_stacks(bytes: &[u8]) -> (usize, usize) {
+            let mut reader = io::BufReader::new(bytes);
+            let mut line = String::new();
+
+            let (mut nlines, mut nstacks) = (0, 0);
+            loop {
+                line.clear();
+                let n = reader.read_line(&mut line).unwrap();
+                if n == 0 {
+                    nstacks += 1;
+                    break;
+                }
+                nlines += 1;
+                if line.trim().is_empty() {
+                    nstacks += 1;
+                }
+            }
+            (nlines, nstacks)
+        }
+
+        let inputs = read_inputs(inputs)?;
+
+        let mut throwaway_buffer = Vec::new();
+
+        // Warmup
+        let now = Instant::now();
+        stdout.write_fmt(format_args!(
+            "# Warming up for approximately {} seconds.\n",
+            WARMUP_SECS
+        ))?;
+        stdout.flush()?;
+        while now.elapsed() < std::time::Duration::from_secs(WARMUP_SECS as u64) {
+            for (_, bytes) in inputs.iter() {
+                throwaway_buffer.clear();
+                folder.collapse(&bytes[..], &mut throwaway_buffer)?;
+            }
+        }
+
+        // Time
+        let mut foos = Vec::new();
+        for (path, bytes) in &inputs {
+            stdout.write_fmt(format_args!("# {} ", path.display()))?;
+            stdout.flush()?;
+            if let Some(foo) = Foo::new(folder, path, bytes, &mut stdout)? {
+                foos.push(foo);
+            }
+            stdout.write(&[b'\n'])?;
+            stdout.flush()?;
+        }
+        stdout.write(&[b'\n'])?;
+        stdout.flush()?;
+        foos.sort_by(|a, b| b.nstacks.cmp(&a.nstacks));
+        for foo in foos {
+            stdout.write_fmt(format_args!("{}", foo))?;
+            stdout.flush()?;
+        }
+
+        Ok(())
+    }
+
 }

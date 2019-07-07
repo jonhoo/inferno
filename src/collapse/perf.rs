@@ -4,7 +4,7 @@ use std::mem;
 
 use crossbeam::channel;
 
-use crate::collapse::{Collapse, Occurrences, DEFAULT_NSTACKS, DEFAULT_NTHREADS};
+use crate::collapse::{self, Collapse, Occurrences};
 
 const TIDY_GENERIC: bool = true;
 const TIDY_JAVA: bool = true;
@@ -50,7 +50,7 @@ pub struct Options {
     pub include_tid: bool,
 
     /// The number of stacks in each job sent to the threadpool (if using multiple threads).
-    /// Default is `20`.
+    /// Default is `100`.
     pub nstacks_per_job: usize,
 
     /// The number of threads to use. Default is the number of logical cores on your machine.
@@ -66,8 +66,8 @@ impl Default for Options {
             include_addrs: false,
             include_pid: false,
             include_tid: false,
-            nstacks_per_job: DEFAULT_NSTACKS,
-            nthreads: *DEFAULT_NTHREADS,
+            nstacks_per_job: collapse::DEFAULT_NSTACKS,
+            nthreads: *collapse::DEFAULT_NTHREADS,
         }
     }
 }
@@ -207,6 +207,16 @@ impl Collapse for Folder {
         }
         None
     }
+
+    #[cfg(test)]
+    fn set_nstacks_per_job(&mut self, n: usize) {
+        self.opt.nstacks_per_job = n;
+    }
+
+    #[cfg(test)]
+    fn set_nthreads(&mut self, n: usize) {
+        self.opt.nthreads = n;
+    }
 }
 
 impl Folder {
@@ -323,7 +333,10 @@ impl Folder {
             // worker threads as soon as we learn what it is.
 
             // State for the loop...
-            let mut buf = Vec::new();
+            let buf_capacity = collapse::smallest_multiple_of_two_larger_than(
+                collapse::GUESS_NBYTES_PER_STACK * self.opt.nstacks_per_job,
+            );
+            let mut buf = Vec::with_capacity(buf_capacity);
             let (mut index, mut njobs, mut nstacks) = (0, 0, 0);
 
             // The loop...
@@ -349,7 +362,7 @@ impl Folder {
                     // If we've seen enough stacks to make up a slice...
                     if nstacks == self.opt.nstacks_per_job {
                         // Send it.
-                        let chunk = mem::replace(&mut buf, Vec::new());
+                        let chunk = mem::replace(&mut buf, Vec::with_capacity(buf_capacity));
                         tx_input.send(Message::Job(chunk)).unwrap();
                         njobs += 1;
                         // Reset the state; mark the beginning of the next slice.
@@ -700,18 +713,14 @@ fn tidy_java(mut func: String) -> String {
 
 #[cfg(test)]
 mod tests {
-    use std::collections::HashMap;
-    use std::fmt;
-    use std::io::Write;
-    use std::path::{Path, PathBuf};
-    use std::time::Instant;
+    use std::path::PathBuf;
 
     use lazy_static::lazy_static;
     use pretty_assertions::assert_eq;
     use rand::{Rng, SeedableRng};
 
     use super::*;
-    use crate::collapse::tests::read_inputs;
+    use crate::collapse::tests_common;
 
     lazy_static! {
         static ref INPUT: Vec<PathBuf> = {
@@ -742,29 +751,19 @@ mod tests {
     }
 
     #[test]
-    fn test_collapse_perf_multi_threaded() -> io::Result<()> {
-        const MAX_THREADS: usize = 16;
-        for (_, bytes) in read_inputs(&INPUT)? {
-            let mut options = Options::default();
-            options.nthreads = 1;
-            let mut folder = Folder::from(options);
-            let mut writer = Vec::new();
-            folder.collapse(io::BufReader::new(&bytes[..]), &mut writer)?;
-            let expected = std::str::from_utf8(&writer[..]).unwrap();
+    fn test_collapse_multi_perf() -> io::Result<()> {
+        let mut folder = Folder::default();
+        tests_common::test_collapse_multi(&mut folder, &INPUT)
+    }
 
-            for n in 2..=MAX_THREADS {
-                let mut options = Options::default();
-                options.nthreads = n;
-                let mut folder = Folder::from(options);
-                let mut writer = Vec::new();
-                folder.collapse(io::BufReader::new(&bytes[..]), &mut writer)?;
-                let actual = std::str::from_utf8(&writer[..]).unwrap();
-
-                assert_eq!(actual, expected);
-            }
-        }
-
-        Ok(())
+    /// Varies the nstacks_per_job parameter and outputs the 10 fastests configurations by file.
+    ///
+    /// Command: `cargo test bench_nstacks_perf --release -- --ignored --nocapture`
+    #[test]
+    #[ignore]
+    fn bench_nstacks_perf() -> io::Result<()> {
+        let mut folder = Folder::default();
+        tests_common::bench_nstacks(&mut folder, &INPUT)
     }
 
     #[test]
@@ -772,7 +771,7 @@ mod tests {
     /// Fuzz test the multithreaded collapser.
     ///
     /// Command: `cargo test fuzz_collapse_perf --release -- --ignored --nocapture`
-    fn fuzz_collapse_perf_multi_threaded() -> io::Result<()> {
+    fn fuzz_collapse_perf() -> io::Result<()> {
         let seed = rand::thread_rng().gen::<u64>();
         println!("Random seed: {}", seed);
         let mut rng = rand::rngs::SmallRng::seed_from_u64(seed);
@@ -781,7 +780,7 @@ mod tests {
         let mut buf_expected = Vec::new();
         let mut count = 0;
 
-        let inputs = read_inputs(&INPUT)?;
+        let inputs = tests_common::read_inputs(&INPUT)?;
 
         loop {
             let options = Options {
@@ -828,151 +827,4 @@ mod tests {
         }
     }
 
-    /// Varies the nstacks_per_job parameter and outputs the 10 fastests configurations by file
-    ///
-    /// Command: `cargo test vary_nstacks --release -- --ignored --nocapture`
-    #[test]
-    #[ignore]
-    fn vary_nstacks_per_job() -> io::Result<()> {
-        const MIN_LINES: usize = 2000;
-        const NSAMPLES: usize = 100;
-        const WARMUP_SECS: usize = 5;
-
-        let _stdout = io::stdout();
-        let _stderr = io::stdout();
-
-        let mut stdout = _stdout.lock();
-        let _stderr = _stderr.lock();
-
-        struct Foo<'a> {
-            path: &'a Path,
-            nlines: usize,
-            nstacks: usize,
-            results: HashMap<usize, u64>,
-        }
-
-        impl<'a> Foo<'a> {
-            fn new(
-                folder: &mut Folder,
-                path: &'a Path,
-                bytes: &[u8],
-                stdout: &mut io::StdoutLock,
-            ) -> io::Result<Option<Self>> {
-                let mut throwaway_buffer = Vec::new();
-
-                let (nlines, nstacks) = count_lines_and_stacks(&bytes);
-                if nlines < MIN_LINES {
-                    return Ok(None);
-                }
-
-                let mut results = HashMap::default();
-                for nstacks_per_job in 1..=nstacks {
-                    let mut durations = Vec::new();
-                    for _ in 0..NSAMPLES {
-                        throwaway_buffer.clear();
-                        let now = Instant::now();
-                        folder.collapse(&bytes[..], &mut throwaway_buffer)?;
-                        durations.push(now.elapsed().as_nanos());
-                    }
-                    let avg_duration =
-                        (durations.iter().sum::<u128>() as f64 / durations.len() as f64) as u64;
-                    results.insert(nstacks_per_job, avg_duration);
-                    stdout.write(&[b'.'])?;
-                    stdout.flush()?;
-                }
-                Ok(Some(Self {
-                    path,
-                    nlines,
-                    nstacks,
-                    results,
-                }))
-            }
-        }
-
-        impl<'a> fmt::Display for Foo<'a> {
-            fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-                writeln!(
-                    f,
-                    "{} (nstacks: {}, lines: {})",
-                    self.path.display(),
-                    self.nstacks,
-                    self.nlines
-                )?;
-                let default_duration = self.results[&Options::default().nstacks_per_job];
-                let mut results = self.results.iter().collect::<Vec<_>>();
-                results.sort_by(|(_, d1), (_, d2)| (**d1).cmp(*d2));
-                for (nstacks_per_job, duration) in results.iter().take(10) {
-                    writeln!(
-                        f,
-                        "    nstacks_per_job: {:>4} (% of total: {:>3.0}%) | time: {:.0}% of default",
-                        nstacks_per_job,
-                        (**nstacks_per_job as f32 / self.nstacks as f32) * 100.0,
-                        **duration as f64 / default_duration as f64 * 100.0,
-                    )?;
-                }
-                writeln!(f)?;
-                Ok(())
-            }
-        }
-
-        fn count_lines_and_stacks(bytes: &[u8]) -> (usize, usize) {
-            let mut reader = io::BufReader::new(bytes);
-            let mut line = String::new();
-
-            let (mut nlines, mut nstacks) = (0, 0);
-            loop {
-                line.clear();
-                let n = reader.read_line(&mut line).unwrap();
-                if n == 0 {
-                    nstacks += 1;
-                    break;
-                }
-                nlines += 1;
-                if line.trim().is_empty() {
-                    nstacks += 1;
-                }
-            }
-            (nlines, nstacks)
-        }
-
-        let inputs = read_inputs(&INPUT)?;
-
-        let mut throwaway_buffer = Vec::new();
-        let mut folder = Folder::default();
-
-        // Warmup
-        let now = Instant::now();
-        stdout.write_fmt(format_args!(
-            "# Warming up for approximately {} seconds.\n",
-            WARMUP_SECS
-        ))?;
-        stdout.flush()?;
-        while now.elapsed() < std::time::Duration::from_secs(WARMUP_SECS as u64) {
-            for (_, bytes) in inputs.iter() {
-                throwaway_buffer.clear();
-                folder.collapse(&bytes[..], &mut throwaway_buffer)?;
-            }
-        }
-
-        // Time
-        let mut foos = Vec::new();
-        for (path, bytes) in &inputs {
-            stdout.write_fmt(format_args!("# {} ", path.display()))?;
-            stdout.flush()?;
-            if let Some(foo) = Foo::new(&mut folder, path, bytes, &mut stdout)? {
-                foos.push(foo);
-            }
-            stdout.write(&[b'\n'])?;
-            stdout.flush()?;
-        }
-        stdout.write(&[b'\n'])?;
-        stdout.flush()?;
-        foos.sort_by(|a, b| b.nstacks.cmp(&a.nstacks));
-        for foo in foos {
-            stdout.write_fmt(format_args!("{}", foo))?;
-            stdout.flush()?;
-        }
-
-        Ok(())
-    }
 }

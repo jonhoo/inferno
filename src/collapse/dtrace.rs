@@ -5,7 +5,7 @@ use std::mem;
 use crossbeam::channel;
 use log::warn;
 
-use crate::collapse::{Collapse, Occurrences, DEFAULT_NSTACKS, DEFAULT_NTHREADS};
+use crate::collapse::{self, Collapse, Occurrences};
 
 /// Dtrace folder configuration options.
 #[derive(Clone, Debug)]
@@ -14,7 +14,7 @@ pub struct Options {
     pub includeoffset: bool,
 
     /// The number of stacks in each job sent to the threadpool (if using multiple threads).
-    /// Default is `20`.
+    /// Default is `100`.
     pub nstacks_per_job: usize,
 
     /// The number of threads to use. Default is the number of logical cores on your machine.
@@ -25,8 +25,8 @@ impl Default for Options {
     fn default() -> Self {
         Self {
             includeoffset: false,
-            nstacks_per_job: DEFAULT_NSTACKS,
-            nthreads: *DEFAULT_NTHREADS,
+            nstacks_per_job: collapse::DEFAULT_NSTACKS,
+            nthreads: *collapse::DEFAULT_NTHREADS,
         }
     }
 }
@@ -151,6 +151,16 @@ impl Collapse for Folder {
 
         None
     }
+
+    #[cfg(test)]
+    fn set_nstacks_per_job(&mut self, n: usize) {
+        self.opt.nstacks_per_job = n;
+    }
+
+    #[cfg(test)]
+    fn set_nthreads(&mut self, n: usize) {
+        self.opt.nthreads = n;
+    }
 }
 
 impl Folder {
@@ -231,7 +241,10 @@ impl Folder {
             }
 
             // State for the loop...
-            let mut buf = Vec::new();
+            let buf_capacity = collapse::smallest_multiple_of_two_larger_than(
+                collapse::GUESS_NBYTES_PER_STACK * self.opt.nstacks_per_job,
+            );
+            let mut buf = Vec::with_capacity(buf_capacity);
             let (mut index, mut njobs, mut nstacks) = (0, 0, 0);
 
             // The loop...
@@ -257,7 +270,7 @@ impl Folder {
                     // If we've seen enough stacks to make up a slice...
                     if nstacks == self.opt.nstacks_per_job {
                         // Send it.
-                        let chunk = mem::replace(&mut buf, Vec::new());
+                        let chunk = mem::replace(&mut buf, Vec::with_capacity(buf_capacity));
                         tx_input.send(Message::Job(chunk)).unwrap();
                         njobs += 1;
                         // Reset the state; mark the beginning of the next slice.
@@ -451,7 +464,7 @@ mod tests {
     use rand::{Rng, SeedableRng};
 
     use super::*;
-    use crate::collapse::tests::read_inputs;
+    use crate::collapse::tests_common;
 
     lazy_static! {
         static ref INPUT: Vec<PathBuf> = {
@@ -489,29 +502,19 @@ mod tests {
     }
 
     #[test]
-    fn test_collapse_dtrace_multi_threaded() -> io::Result<()> {
-        const MAX_THREADS: usize = 16;
-        for (_, bytes) in read_inputs(&INPUT)? {
-            let mut options = Options::default();
-            options.nthreads = 1;
-            let mut folder = Folder::from(options);
-            let mut writer = Vec::new();
-            folder.collapse(io::BufReader::new(&bytes[..]), &mut writer)?;
-            let expected = std::str::from_utf8(&writer[..]).unwrap();
+    fn test_collapse_multi_dtrace() -> io::Result<()> {
+        let mut folder = Folder::default();
+        tests_common::test_collapse_multi(&mut folder, &INPUT)
+    }
 
-            for n in 2..=MAX_THREADS {
-                let mut options = Options::default();
-                options.nthreads = n;
-                let mut folder = Folder::from(options);
-                let mut writer = Vec::new();
-                folder.collapse(io::BufReader::new(&bytes[..]), &mut writer)?;
-                let actual = std::str::from_utf8(&writer[..]).unwrap();
-
-                assert_eq!(actual, expected);
-            }
-        }
-
-        Ok(())
+    /// Varies the nstacks_per_job parameter and outputs the 10 fastests configurations by file.
+    ///
+    /// Command: `cargo test bench_nstacks_dtrace --release -- --ignored --nocapture`
+    #[test]
+    #[ignore]
+    fn bench_nstacks_dtrace() -> io::Result<()> {
+        let mut folder = Folder::default();
+        tests_common::bench_nstacks(&mut folder, &INPUT)
     }
 
     #[test]
@@ -519,7 +522,7 @@ mod tests {
     /// Fuzz test the multithreaded collapser.
     ///
     /// Command: `cargo test fuzz_collapse_dtrace --release -- --ignored --nocapture`
-    fn fuzz_collapse_dtrace_multi_threaded() -> io::Result<()> {
+    fn fuzz_collapse_dtrace() -> io::Result<()> {
         let seed = rand::thread_rng().gen::<u64>();
         println!("Random seed: {}", seed);
         let mut rng = rand::rngs::SmallRng::seed_from_u64(seed);
@@ -528,7 +531,7 @@ mod tests {
         let mut buf_expected = Vec::new();
         let mut count = 0;
 
-        let inputs = read_inputs(&INPUT)?;
+        let inputs = tests_common::read_inputs(&INPUT)?;
 
         loop {
             let options = Options {

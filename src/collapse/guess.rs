@@ -3,7 +3,7 @@ use std::io::{self, Cursor};
 
 use log::{error, info};
 
-use crate::collapse::{dtrace, perf, Collapse, DEFAULT_NSTACKS, DEFAULT_NTHREADS};
+use crate::collapse::{self, dtrace, perf, Collapse};
 
 const LINES_PER_ITERATION: usize = 10;
 
@@ -11,7 +11,7 @@ const LINES_PER_ITERATION: usize = 10;
 #[derive(Clone, Debug)]
 pub struct Options {
     /// The number of stacks in each job sent to the threadpool (if using multiple threads).
-    /// Default is 20.
+    /// Default is `100`.
     pub nstacks_per_job: usize,
 
     /// The number of threads to use. Default is the number of logical cores on your machine.
@@ -21,8 +21,8 @@ pub struct Options {
 impl Default for Options {
     fn default() -> Self {
         Self {
-            nstacks_per_job: DEFAULT_NSTACKS,
-            nthreads: *DEFAULT_NTHREADS,
+            nstacks_per_job: collapse::DEFAULT_NSTACKS,
+            nthreads: *collapse::DEFAULT_NTHREADS,
         }
     }
 }
@@ -114,5 +114,68 @@ impl Collapse for Folder {
 
     fn is_applicable(&mut self, _line: &str) -> Option<bool> {
         unreachable!()
+    }
+
+    #[cfg(test)]
+    fn set_nstacks_per_job(&mut self, n: usize) {
+        self.opt.nstacks_per_job = n;
+    }
+
+    #[cfg(test)]
+    fn set_nthreads(&mut self, n: usize) {
+        self.opt.nthreads = n;
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::path::PathBuf;
+
+    use lazy_static::lazy_static;
+
+    use super::*;
+    use crate::collapse::tests_common;
+
+    lazy_static! {
+        static ref INPUT: Vec<PathBuf> = {
+            [
+                // perf
+                "./flamegraph/example-perf-stacks.txt.gz",
+                "./flamegraph/test/perf-cycles-instructions-01.txt",
+                "./flamegraph/test/perf-dd-stacks-01.txt",
+                "./flamegraph/test/perf-funcab-cmd-01.txt",
+                "./flamegraph/test/perf-funcab-pid-01.txt",
+                "./flamegraph/test/perf-iperf-stacks-pidtid-01.txt",
+                "./flamegraph/test/perf-java-faults-01.txt",
+                "./flamegraph/test/perf-java-stacks-01.txt",
+                "./flamegraph/test/perf-java-stacks-02.txt",
+                "./flamegraph/test/perf-js-stacks-01.txt",
+                "./flamegraph/test/perf-mirageos-stacks-01.txt",
+                "./flamegraph/test/perf-numa-stacks-01.txt",
+                "./flamegraph/test/perf-rust-Yamakaky-dcpu.txt",
+                "./flamegraph/test/perf-vertx-stacks-01.txt",
+                "./tests/data/collapse-perf/empty-line.txt",
+                "./tests/data/collapse-perf/go-stacks.txt",
+                "./tests/data/collapse-perf/java-inline.txt",
+                "./tests/data/collapse-perf/weird-stack-line.txt",
+                // dtrace
+                "./flamegraph/example-dtrace-stacks.txt",
+                "./tests/data/collapse-dtrace/flamegraph-bug.txt",
+                "./tests/data/collapse-dtrace/hex-addresses.txt",
+                "./tests/data/collapse-dtrace/java.txt",
+                "./tests/data/collapse-dtrace/only-header-lines.txt",
+                "./tests/data/collapse-dtrace/scope_with_no_argument_list.txt",
+
+            ]
+            .into_iter()
+            .map(PathBuf::from)
+            .collect::<Vec<_>>()
+        };
+    }
+
+    #[test]
+    fn test_collapse_multi_guess() -> io::Result<()> {
+        let mut folder = Folder::default();
+        tests_common::test_collapse_multi(&mut folder, &INPUT)
     }
 }
