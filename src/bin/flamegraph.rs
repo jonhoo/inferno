@@ -20,7 +20,7 @@ struct Opt {
     #[structopt(long = "hash")]
     hash: bool,
 
-    /// Plot the flame graph up-side-down.
+    /// Plot the flame graph up-side-down
     #[structopt(short = "i", long = "inverted")]
     inverted: bool,
 
@@ -31,13 +31,13 @@ struct Opt {
     /// Don't include static JavaScript in flame graph.
     /// This flag is hidden since it's only meant to be used in
     /// tests so we don't have to include the same static
-    /// JavaScript in all of the test files.
+    /// JavaScript in all of the test files
     #[structopt(raw(hidden = "true"), long = "no-javascript")]
     no_javascript: bool,
 
     /// Don't sort the input lines.
     /// If you set this flag you need to be sure your
-    /// input stack lines are already sorted.
+    /// input stack lines are already sorted
     #[structopt(name = "no-sort", long = "no-sort")]
     no_sort: bool,
 
@@ -49,7 +49,7 @@ struct Opt {
     #[structopt(short = "q", long = "quiet")]
     quiet: bool,
 
-    /// Generate stack-reversed flame graph.
+    /// Generate stack-reversed flame graph
     #[structopt(long = "reverse", conflicts_with = "no-sort")]
     reverse: bool,
 
@@ -61,7 +61,7 @@ struct Opt {
     // *** OPTIONS *** //
     // *************** //
     /// Set background colors. Gradient choices are yellow (default), blue, green, grey; flat colors use "#rrggbb"
-    #[structopt(long = "bgcolors")]
+    #[structopt(long = "bgcolors", value_name = "STRING")]
     bgcolors: Option<BackgroundColor>,
 
     /// Set color palette
@@ -70,74 +70,119 @@ struct Opt {
         long = "colors",
         raw(default_value = "defaults::COLORS"),
         raw(
-            possible_values = r#"&["hot","mem","io","wakeup","java","js","perl","red","green","blue","aqua","yellow","purple","orange"]"#
-        )
+            possible_values = r#"&["aqua","blue","green","hot","io","java","js","mem","orange","perl","purple","red","wakeup","yellow"]"#
+        ),
+        value_name = "STRING"
     )]
     colors: Palette,
 
     /// Count type label
-    #[structopt(long = "countname", raw(default_value = "defaults::COUNT_NAME"))]
-    count_name: String,
+    #[structopt(
+        long = "countname",
+        raw(default_value = "defaults::COUNT_NAME"),
+        value_name = "STRING"
+    )]
+    countname: String,
 
     /// Factor to scale sample counts by
-    #[structopt(long = "factor", raw(default_value = "&defaults::str::FACTOR"))]
+    #[structopt(
+        long = "factor",
+        raw(default_value = "&defaults::str::FACTOR"),
+        value_name = "FLOAT"
+    )]
     factor: f64,
 
     /// Font size
-    #[structopt(long = "fontsize", raw(default_value = "&defaults::str::FONT_SIZE"))]
-    font_size: usize,
+    #[structopt(
+        long = "fontsize",
+        raw(default_value = "&defaults::str::FONT_SIZE"),
+        value_name = "UINT"
+    )]
+    fontsize: usize,
 
     /// Font type
-    #[structopt(long = "fonttype", raw(default_value = "defaults::FONT_TYPE"))]
-    font_type: String,
+    #[structopt(
+        long = "fonttype",
+        raw(default_value = "defaults::FONT_TYPE"),
+        value_name = "STRING"
+    )]
+    fonttype: String,
 
     /// Font width
-    #[structopt(long = "fontwidth", raw(default_value = "&defaults::str::FONT_WIDTH"))]
-    font_width: f64,
+    #[structopt(
+        long = "fontwidth",
+        raw(default_value = "&defaults::str::FONT_WIDTH"),
+        value_name = "FLOAT"
+    )]
+    fontwidth: f64,
 
     /// Height of each frame
-    #[structopt(long = "height", raw(default_value = "&defaults::str::FRAME_HEIGHT"))]
-    frame_height: usize,
+    #[structopt(
+        long = "height",
+        raw(default_value = "&defaults::str::FRAME_HEIGHT"),
+        value_name = "UINT"
+    )]
+    height: usize,
 
-    /// Omit smaller functions (default 0.1 pixels)
-    #[structopt(long = "minwidth", raw(default_value = "&defaults::str::MIN_WIDTH"))]
-    min_width: f64,
+    /// Omit functions smaller than <FLOAT> pixels
+    #[structopt(
+        long = "minwidth",
+        raw(default_value = "&defaults::str::MIN_WIDTH"),
+        value_name = "FLOAT"
+    )]
+    minwidth: f64,
 
     /// File containing attributes to use for the SVG frames of particular functions.
     /// Each line in the file should be a function name followed by a tab,
-    /// then a sequence of tab separated name=value pairs.
-    #[structopt(long = "nameattr")]
-    nameattr_file: Option<PathBuf>,
+    /// then a sequence of tab separated name=value pairs
+    #[structopt(long = "nameattr", value_name = "PATH")]
+    nameattr: Option<PathBuf>,
 
     /// Name type label
-    #[structopt(long = "nametype", raw(default_value = "defaults::NAME_TYPE"))]
-    name_type: String,
+    #[structopt(
+        long = "nametype",
+        raw(default_value = "defaults::NAME_TYPE"),
+        value_name = "STRING"
+    )]
+    nametype: String,
 
     /// Set embedded notes in SVG
-    #[structopt(long = "notes")]
+    #[structopt(long = "notes", value_name = "STRING")]
     notes: Option<String>,
 
     /// Search color
-    #[structopt(long = "search-color", raw(default_value = "defaults::SEARCH_COLOR"))]
+    #[structopt(
+        long = "search-color",
+        raw(default_value = "defaults::SEARCH_COLOR"),
+        value_name = "STRING"
+    )]
     search_color: SearchColor,
 
     /// Second level title (optional)
-    #[structopt(long = "subtitle")]
+    #[structopt(long = "subtitle", value_name = "STRING")]
     subtitle: Option<String>,
 
     /// Change title text
-    #[structopt(long = "title", raw(default_value = "defaults::TITLE"))]
+    #[structopt(
+        long = "title",
+        raw(default_value = "defaults::TITLE"),
+        value_name = "STRING"
+    )]
     title: String,
 
     /// Width of image
-    #[structopt(long = "width", raw(default_value = "&defaults::str::IMAGE_WIDTH"))]
-    image_width: usize,
+    #[structopt(
+        long = "width",
+        raw(default_value = "&defaults::str::IMAGE_WIDTH"),
+        value_name = "UINT"
+    )]
+    width: usize,
 
     // ************ //
     // *** ARGS *** //
     // ************ //
-    /// Collapsed perf output files. With no INFILE, or INFILE is -, read STDIN.
-    #[structopt(name = "INFILE", parse(from_os_str))]
+    /// Collapsed perf output files. With no PATH, or PATH is -, read STDIN.
+    #[structopt(name = "PATH", parse(from_os_str))]
     infiles: Vec<PathBuf>,
 }
 
@@ -148,7 +193,7 @@ impl<'a> Opt {
         options.colors = self.colors;
         options.bgcolors = self.bgcolors;
         options.hash = self.hash;
-        if let Some(file) = self.nameattr_file {
+        if let Some(file) = self.nameattr {
             match FuncFrameAttrsMap::from_file(&file) {
                 Ok(m) => {
                     options.func_frameattrs = m;
@@ -171,14 +216,14 @@ impl<'a> Opt {
 
         // set style options
         options.subtitle = self.subtitle;
-        options.image_width = self.image_width;
-        options.frame_height = self.frame_height;
-        options.min_width = self.min_width;
-        options.font_type = self.font_type;
-        options.font_size = self.font_size;
-        options.font_width = self.font_width;
-        options.count_name = self.count_name;
-        options.name_type = self.name_type;
+        options.image_width = self.width;
+        options.frame_height = self.height;
+        options.min_width = self.minwidth;
+        options.font_type = self.fonttype;
+        options.font_size = self.fontsize;
+        options.font_width = self.fontwidth;
+        options.count_name = self.countname;
+        options.name_type = self.nametype;
         if let Some(notes) = self.notes {
             options.notes = notes;
         }
