@@ -1,7 +1,7 @@
+use super::util::fix_partially_demangled_rust_symbol;
 use super::Collapse;
 use fnv::FnvHashMap;
 use log::warn;
-use std::borrow::Cow;
 use std::collections::VecDeque;
 use std::io;
 use std::io::prelude::*;
@@ -335,7 +335,9 @@ impl Folder {
             let rawfunc = if self.opt.demangle {
                 demangle(rawfunc)
             } else {
-                Cow::Borrowed(rawfunc)
+                // perf mostly demangles Rust symbols,
+                // but this will fix the things it gets wrong
+                fix_partially_demangled_rust_symbol(rawfunc)
             };
 
             // Support Java inlining by splitting on "->". After the first func, the

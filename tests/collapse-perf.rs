@@ -66,7 +66,7 @@ fn options_from_vec(opt_vec: Vec<&str>) -> Options {
 //     result file: perf-cycles-instructions-01-collapsed-pid.txt
 //     flag: pid
 macro_rules! collapse_perf_tests_inner {
-    ($($name:ident),*; $dir:expr; $strip_prefix:expr) => {
+    ($($name:ident),*; $dir:expr; $results_dir:expr; $strip_prefix:expr, $strip_quotes:expr) => {
     $(
         #[test]
         #[allow(non_snake_case)]
@@ -91,13 +91,13 @@ macro_rules! collapse_perf_tests_inner {
             );
 
             let test_path = Path::new($dir);
-            let results_path = test_path.join("results");
+            let results_path = Path::new($results_dir);
 
             test_collapse_perf(
                 test_path.join(test_file).to_str().unwrap(),
                 results_path.join(result_file).to_str().unwrap(),
                 options_from_vec(options),
-                true
+                $strip_quotes
             )
 
                 .unwrap()
@@ -108,7 +108,7 @@ macro_rules! collapse_perf_tests_inner {
 
 macro_rules! collapse_perf_tests_upstream {
     ($($name:ident),*) => {
-        collapse_perf_tests_inner!($($name),*; "./flamegraph/test"; "collapse_");
+        collapse_perf_tests_inner!($($name),*; "./flamegraph/test"; "./flamegraph/test/results"; "collapse_", true);
     }
 }
 
@@ -190,13 +190,6 @@ collapse_perf_tests_upstream! {
     collapse_perf_numa_stacks_01__all,
     collapse_perf_numa_stacks_01__addrs,
 
-    collapse_perf_rust_Yamakaky_dcpu__pid,
-    collapse_perf_rust_Yamakaky_dcpu__tid,
-    collapse_perf_rust_Yamakaky_dcpu__kernel,
-    collapse_perf_rust_Yamakaky_dcpu__jit,
-    collapse_perf_rust_Yamakaky_dcpu__all,
-    collapse_perf_rust_Yamakaky_dcpu__addrs,
-
     collapse_perf_vertx_stacks_01__pid,
     collapse_perf_vertx_stacks_01__tid,
     collapse_perf_vertx_stacks_01__kernel,
@@ -205,9 +198,26 @@ collapse_perf_tests_upstream! {
     collapse_perf_vertx_stacks_01__addrs
 }
 
+macro_rules! collapse_perf_tests_upstream_rust {
+    ($($name:ident),*) => {
+        collapse_perf_tests_inner!($($name),*; "./flamegraph/test"; "./tests/data/collapse-perf/results"; "collapse_", false);
+    }
+}
+
+// Because we fix improperly demangled Rust symbols, we can't compare the results to upstream.
+// Instead, we keep our own results to compare against.
+collapse_perf_tests_upstream_rust! {
+    collapse_perf_rust_Yamakaky_dcpu__pid,
+    collapse_perf_rust_Yamakaky_dcpu__tid,
+    collapse_perf_rust_Yamakaky_dcpu__kernel,
+    collapse_perf_rust_Yamakaky_dcpu__jit,
+    collapse_perf_rust_Yamakaky_dcpu__all,
+    collapse_perf_rust_Yamakaky_dcpu__addrs
+}
+
 macro_rules! collapse_perf_tests {
     ($($name:ident),*) => {
-        collapse_perf_tests_inner!($($name),*; "./tests/data/collapse-perf"; "collapse_perf_");
+        collapse_perf_tests_inner!($($name),*; "./tests/data/collapse-perf"; "./tests/data/collapse-perf/results"; "collapse_perf_", false);
     }
 }
 

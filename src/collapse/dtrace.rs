@@ -1,3 +1,4 @@
+use super::util::fix_partially_demangled_rust_symbol;
 use super::Collapse;
 use fnv::FnvHashMap;
 use log::warn;
@@ -168,24 +169,40 @@ impl Folder {
         )
     }
 
-    fn demangle<'a>(&self, frame: &'a str) -> Cow<'a, str> {
+    // Transforms the function part of a frame with the given function.
+    fn transform_function_name<'a, F>(&self, frame: &'a str, transform: F) -> Cow<'a, str>
+    where
+        F: Fn(&'a str) -> Cow<'a, str>,
+    {
         let mut parts = frame.splitn(2, '`');
         if let (Some(pname), Some(func)) = (parts.next(), parts.next()) {
             if self.opt.includeoffset {
                 let mut parts = func.rsplitn(2, '+');
                 if let (Some(offset), Some(func)) = (parts.next(), parts.next()) {
-                    return Cow::Owned(format!(
-                        "{}`{}+{}",
-                        pname,
-                        symbolic_demangle::demangle(func),
-                        offset
-                    ));
+                    if let Cow::Owned(func) = transform(func.trim_end()) {
+                        return Cow::Owned(format!("{}`{}+{}", pname, func, offset));
+                    } else {
+                        return Cow::Borrowed(frame);
+                    }
                 }
             }
-            return Cow::Owned(format!("{}`{}", pname, symbolic_demangle::demangle(func)));
+
+            if let Cow::Owned(func) = transform(func.trim_end()) {
+                return Cow::Owned(format!("{}`{}", pname, func));
+            }
         }
 
         Cow::Borrowed(frame)
+    }
+
+    // Demangle the function name if it's mangled.
+    fn demangle<'a>(&self, frame: &'a str) -> Cow<'a, str> {
+        self.transform_function_name(frame, symbolic_demangle::demangle)
+    }
+
+    // DTrace doesn't properly demangle Rust function names, so fix those.
+    fn fix_rust_symbol<'a>(&self, frame: &'a str) -> Cow<'a, str> {
+        self.transform_function_name(frame, fix_partially_demangled_rust_symbol)
     }
 
     // we have a stack line that shows one stack entry from the preceeding event, like:
@@ -211,7 +228,7 @@ impl Folder {
         } else if self.opt.demangle {
             self.demangle(frame)
         } else {
-            Cow::Borrowed(frame)
+            self.fix_rust_symbol(frame)
         };
 
         if has_inlines {
