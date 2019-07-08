@@ -195,8 +195,8 @@ impl Folder {
 
         crossbeam::thread::scope(|scope| {
             // Spin up the threadpool / worker threads.
-            let (tx_input, rx_input) = channel::bounded(2 * self.opt.nthreads);
-            let (tx_output, rx_output) = channel::unbounded();
+            let (tx_input, rx_input) = channel::bounded::<Option<Vec<u8>>>(2 * self.opt.nthreads);
+            let (tx_output, rx_output) = channel::bounded(self.opt.nthreads);
             let mut handles = Vec::with_capacity(self.opt.nthreads);
             for _ in 0..self.opt.nthreads {
                 let rx_input = rx_input.clone();
@@ -215,19 +215,22 @@ impl Folder {
                         stack_str_size: 0,
                         opt,
                     };
+                    let mut sent_output = false;
                     loop {
-                        // Receive the data...
-                        let data: Vec<u8> = match rx_input.recv().unwrap() {
-                            Some(data) => data,
-                            None => return,
-                        };
-                        // Process the data...
-                        let result = folder.collapse_single_threaded(&data[..]);
-                        // Send the result...
-                        tx_output.send(result).unwrap();
-                        // Prepare for the next round...
-                        folder.stack.clear();
-                        folder.stack_str_size = 0;
+                        if let Some(data) = rx_input.recv().unwrap() {
+                            if !sent_output {
+                                if let Err(e) = folder.collapse_single_threaded(&data[..]) {
+                                    tx_output.send(Err(e)).unwrap();
+                                    sent_output = true;
+                                    continue;
+                                }
+                                folder.stack.clear();
+                                folder.stack_str_size = 0;
+                            }
+                        } else {
+                            tx_output.send(Ok(())).unwrap();
+                            break;
+                        }
                     }
                 });
                 handles.push(handle);
@@ -238,7 +241,7 @@ impl Folder {
                 collapse::NBYTES_PER_STACK_GUESS * self.nstacks_per_job,
             );
             let mut buf = Vec::with_capacity(buf_capacity);
-            let (mut index, mut njobs, mut nstacks) = (0, 0, 0);
+            let (mut index, mut nstacks) = (0, 0);
 
             // The loop...
             loop {
@@ -249,7 +252,6 @@ impl Folder {
                 if n == 0 {
                     // Send the last slice.
                     tx_input.send(Some(buf)).unwrap();
-                    njobs += 1;
                     // Exit the loop.
                     break;
                 }
@@ -265,7 +267,6 @@ impl Folder {
                         // Send it.
                         let chunk = mem::replace(&mut buf, Vec::with_capacity(buf_capacity));
                         tx_input.send(Some(chunk)).unwrap();
-                        njobs += 1;
                         // Reset the state; mark the beginning of the next slice.
                         index = 0;
                         nstacks = 0;
@@ -273,14 +274,12 @@ impl Folder {
                 }
             }
 
-            for _ in 0..njobs {
-                rx_output.recv().unwrap()?;
-            }
-
             for _ in &handles {
                 tx_input.send(None).unwrap();
             }
-
+            for _ in &handles {
+                rx_output.recv().unwrap()?;
+            }
             for handle in handles {
                 handle.join().unwrap();
             }
