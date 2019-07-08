@@ -221,10 +221,14 @@ impl Folder {
                             // here, which can't happen because we need each thread to
                             // continuously pull values off the input channel or else
                             // it may fill up and clog. This is also why we continue
-                            // after trying to send the error - to ensure each thread
-                            // is always pulling values off the bounded input channel.
+                            // pulling data off the input channel even after we try
+                            // to send an error.
                             let _ = tx_output.try_send(Err(e));
-                            continue;
+                            loop {
+                                if rx_input.recv().unwrap().is_none() {
+                                    break;
+                                }
+                            }
                         }
                         folder.stack.clear();
                         folder.stack_str_size = 0;
