@@ -26,6 +26,8 @@ use fnv::FnvHashMap;
 use lazy_static::lazy_static;
 
 lazy_static! {
+    // The following in public, but hidden, because we use it in the help text
+    // of the binaries, but it doesn't need to be exposed to library users.
     #[doc(hidden)]
     pub static ref DEFAULT_NTHREADS: usize = num_cpus::get();
 }
