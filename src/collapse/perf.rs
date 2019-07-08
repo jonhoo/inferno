@@ -322,7 +322,7 @@ impl Folder {
             }
 
             // On the main thread, start running over the input data in order to figure out how to
-            // chunk it up to be sent to the worker threads. After having seen `opt.nstacks_per_job`
+            // chunk it up to be sent to the worker threads. After having seen `self.nstacks_per_job`
             // number of stacks, send a slice of the input data that includes those stacks off to
             // the threadpool.
             //
@@ -341,9 +341,8 @@ impl Folder {
 
                 // If we're at the end of the data...
                 if n == 0 {
-                    // Send the last slice.
+                    // Send the last slice and exit the loop.
                     tx_input.send(Some(buf)).unwrap();
-                    // Exit the loop.
                     break;
                 }
 

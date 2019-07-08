@@ -249,9 +249,8 @@ impl Folder {
 
                 // If we're at the end of the data...
                 if n == 0 {
-                    // Send the last slice.
+                    // Send the last slice and exit the loop.
                     tx_input.send(Some(buf)).unwrap();
-                    // Exit the loop.
                     break;
                 }
 
