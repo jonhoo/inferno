@@ -3,12 +3,11 @@ use std::path::PathBuf;
 
 use env_logger::Env;
 use inferno::collapse::guess::{Folder, Options};
-use inferno::collapse::{Collapse, DEFAULT_NSTACKS, DEFAULT_NTHREADS};
+use inferno::collapse::{Collapse, DEFAULT_NTHREADS};
 use lazy_static::lazy_static;
 use structopt::StructOpt;
 
 lazy_static! {
-    static ref NSTACKS: String = format!("{}", DEFAULT_NSTACKS);
     static ref NTHREADS: String = format!("{}", *DEFAULT_NTHREADS);
 }
 
@@ -29,10 +28,6 @@ struct Opt {
     #[structopt(short = "v", long = "verbose", parse(from_occurrences))]
     verbose: usize,
 
-    /// Number of stacks per job sent to threadpool (only used if nthreads > 1)
-    #[structopt(long = "nstacks", raw(default_value = "&NSTACKS"), value_name = "UINT")]
-    nstacks: usize,
-
     /// Number of threads to use
     #[structopt(
         short = "n",
@@ -52,7 +47,6 @@ impl Opt {
         (
             self.infile,
             Options {
-                nstacks_per_job: self.nstacks,
                 nthreads: self.nthreads,
             },
         )

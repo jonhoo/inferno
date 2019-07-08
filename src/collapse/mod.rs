@@ -32,9 +32,8 @@ lazy_static! {
 
 const CAPACITY_HASHMAP: usize = 512;
 const CAPACITY_READER: usize = 128 * 1024;
-#[doc(hidden)]
-pub const DEFAULT_NSTACKS: usize = 100;
-const GUESS_NBYTES_PER_STACK: usize = 1024;
+const NBYTES_PER_STACK_GUESS: usize = 1024;
+const NSTACKS_PER_JOB: usize = 100;
 
 /// The abstract behavior of stack collapsing.
 ///
@@ -270,7 +269,7 @@ mod tests_common {
                 }
 
                 let mut results = HashMap::default();
-                let iter = vec![1, DEFAULT_NSTACKS]
+                let iter = vec![1, NSTACKS_PER_JOB]
                     .into_iter()
                     .chain((10..=nstacks).step_by(10));
                 for nstacks_per_job in iter {
@@ -306,7 +305,7 @@ mod tests_common {
                     self.nstacks,
                     self.nlines
                 )?;
-                let default_duration = self.results[&DEFAULT_NSTACKS];
+                let default_duration = self.results[&NSTACKS_PER_JOB];
                 let mut results = self.results.iter().collect::<Vec<_>>();
                 results.sort_by(|(_, d1), (_, d2)| (**d1).cmp(*d2));
                 for (nstacks_per_job, duration) in results.iter().take(10) {

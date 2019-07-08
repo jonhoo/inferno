@@ -49,10 +49,6 @@ pub struct Options {
     /// Include TID and PID in the root frame. Implies `include_pid`. Default is `false`.
     pub include_tid: bool,
 
-    /// The number of stacks in each job sent to the threadpool (if using multiple threads).
-    /// Default is `100`.
-    pub nstacks_per_job: usize,
-
     /// The number of threads to use. Default is the number of logical cores on your machine.
     pub nthreads: usize,
 }
@@ -66,7 +62,6 @@ impl Default for Options {
             include_addrs: false,
             include_pid: false,
             include_tid: false,
-            nstacks_per_job: collapse::DEFAULT_NSTACKS,
             nthreads: *collapse::DEFAULT_NTHREADS,
         }
     }
@@ -93,6 +88,9 @@ pub struct Folder {
     /// All lines until the next empty line are stack lines.
     in_event: bool,
 
+    /// Number of stacks in each job sent to the threadpool.
+    nstacks_per_job: usize,
+
     /// Number of times each call stack has been seen.
     occurrences: Occurrences,
 
@@ -113,9 +111,6 @@ pub struct Folder {
 
 impl From<Options> for Folder {
     fn from(mut opt: Options) -> Self {
-        if opt.nstacks_per_job == 0 {
-            opt.nstacks_per_job = 1;
-        }
         if opt.nthreads == 0 {
             opt.nthreads = 1;
         }
@@ -129,6 +124,7 @@ impl From<Options> for Folder {
             cache_line: Vec::default(),
             event_filter: opt.event_filter.clone(),
             in_event: false,
+            nstacks_per_job: collapse::NSTACKS_PER_JOB,
             occurrences,
             pname: String::default(),
             skip_stack: false,
@@ -210,7 +206,7 @@ impl Collapse for Folder {
 
     #[cfg(test)]
     fn set_nstacks_per_job(&mut self, n: usize) {
-        self.opt.nstacks_per_job = n;
+        self.nstacks_per_job = n;
     }
 
     #[cfg(test)]
@@ -249,8 +245,8 @@ impl Folder {
         R: io::BufRead,
     {
         // Invariants of this function for crate's authors to keep in mind...
+        assert!(self.nstacks_per_job > 0);
         assert!(self.occurrences.is_concurrent());
-        assert!(self.opt.nstacks_per_job > 0);
         assert!(self.opt.nthreads > 1);
 
         // Type used below for sending data to the threadpool...
@@ -288,6 +284,7 @@ impl Folder {
                 let rx_input = rx_input.clone();
                 let tx_output = tx_output.clone();
 
+                let nstacks_per_job = self.nstacks_per_job;
                 let occurrences = self.occurrences.clone();
                 let opt = self.opt.clone();
 
@@ -298,6 +295,7 @@ impl Folder {
                         cache_line: Vec::default(),
                         event_filter,
                         in_event: false,
+                        nstacks_per_job,
                         occurrences,
                         pname: String::default(),
                         skip_stack: false,
@@ -334,7 +332,7 @@ impl Folder {
 
             // State for the loop...
             let buf_capacity = collapse::smallest_power_of_two_larger_than(
-                collapse::GUESS_NBYTES_PER_STACK * self.opt.nstacks_per_job,
+                collapse::NBYTES_PER_STACK_GUESS * self.nstacks_per_job,
             );
             let mut buf = Vec::with_capacity(buf_capacity);
             let (mut index, mut njobs, mut nstacks) = (0, 0, 0);
@@ -360,7 +358,7 @@ impl Folder {
                     // Count it
                     nstacks += 1;
                     // If we've seen enough stacks to make up a slice...
-                    if nstacks == self.opt.nstacks_per_job {
+                    if nstacks == self.nstacks_per_job {
                         // Send it.
                         let chunk = mem::replace(&mut buf, Vec::with_capacity(buf_capacity));
                         tx_input.send(Message::Job(chunk)).unwrap();
@@ -783,6 +781,7 @@ mod tests {
         let inputs = tests_common::read_inputs(&INPUT)?;
 
         loop {
+            let nstacks_per_job = rng.gen_range(1, 500 + 1);
             let options = Options {
                 annotate_jit: rng.gen(),
                 annotate_kernel: rng.gen(),
@@ -790,7 +789,6 @@ mod tests {
                 include_addrs: rng.gen(),
                 include_pid: rng.gen(),
                 include_tid: rng.gen(),
-                nstacks_per_job: rng.gen_range(0, 100 + 1),
                 nthreads: rng.gen_range(2, 32 + 1),
             };
 
@@ -803,10 +801,12 @@ mod tests {
                     options.nthreads = 1;
                     Folder::from(options)
                 };
+                folder.nstacks_per_job = nstacks_per_job;
                 folder.collapse(&input[..], &mut buf_expected)?;
                 let expected = std::str::from_utf8(&buf_expected[..]).unwrap();
 
                 let mut folder = Folder::from(options.clone());
+                folder.nstacks_per_job = nstacks_per_job;
                 folder.collapse(&input[..], &mut buf_actual)?;
                 let actual = std::str::from_utf8(&buf_actual[..]).unwrap();
 

@@ -10,10 +10,6 @@ const LINES_PER_ITERATION: usize = 10;
 /// Folder configuration options.
 #[derive(Clone, Debug)]
 pub struct Options {
-    /// The number of stacks in each job sent to the threadpool (if using multiple threads).
-    /// Default is `100`.
-    pub nstacks_per_job: usize,
-
     /// The number of threads to use. Default is the number of logical cores on your machine.
     pub nthreads: usize,
 }
@@ -21,7 +17,6 @@ pub struct Options {
 impl Default for Options {
     fn default() -> Self {
         Self {
-            nstacks_per_job: collapse::DEFAULT_NSTACKS,
             nthreads: *collapse::DEFAULT_NTHREADS,
         }
     }
@@ -56,13 +51,11 @@ impl Collapse for Folder {
     {
         let mut dtrace = {
             let mut options = dtrace::Options::default();
-            options.nstacks_per_job = self.opt.nstacks_per_job;
             options.nthreads = self.opt.nthreads;
             dtrace::Folder::from(options)
         };
         let mut perf = {
             let mut options = perf::Options::default();
-            options.nstacks_per_job = self.opt.nstacks_per_job;
             options.nthreads = self.opt.nthreads;
             perf::Folder::from(options)
         };
@@ -117,9 +110,7 @@ impl Collapse for Folder {
     }
 
     #[cfg(test)]
-    fn set_nstacks_per_job(&mut self, n: usize) {
-        self.opt.nstacks_per_job = n;
-    }
+    fn set_nstacks_per_job(&mut self, _: usize) {}
 
     #[cfg(test)]
     fn set_nthreads(&mut self, n: usize) {

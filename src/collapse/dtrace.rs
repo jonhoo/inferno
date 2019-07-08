@@ -13,10 +13,6 @@ pub struct Options {
     /// Include function offset (except leafs). Default is `false`.
     pub includeoffset: bool,
 
-    /// The number of stacks in each job sent to the threadpool (if using multiple threads).
-    /// Default is `100`.
-    pub nstacks_per_job: usize,
-
     /// The number of threads to use. Default is the number of logical cores on your machine.
     pub nthreads: usize,
 }
@@ -25,7 +21,6 @@ impl Default for Options {
     fn default() -> Self {
         Self {
             includeoffset: false,
-            nstacks_per_job: collapse::DEFAULT_NSTACKS,
             nthreads: *collapse::DEFAULT_NTHREADS,
         }
     }
@@ -38,6 +33,9 @@ impl Default for Options {
 pub struct Folder {
     /// Vector for processing java stuff
     cache_inlines: Vec<String>,
+
+    /// Number of stacks in each job sent to the threadpool.
+    nstacks_per_job: usize,
 
     /// Number of times each call stack has been seen.
     occurrences: Occurrences,
@@ -53,9 +51,6 @@ pub struct Folder {
 
 impl From<Options> for Folder {
     fn from(mut opt: Options) -> Self {
-        if opt.nstacks_per_job == 0 {
-            opt.nstacks_per_job = 1;
-        }
         if opt.nthreads == 0 {
             opt.nthreads = 1;
         }
@@ -66,6 +61,7 @@ impl From<Options> for Folder {
         };
         Self {
             cache_inlines: Vec::new(),
+            nstacks_per_job: collapse::NSTACKS_PER_JOB,
             occurrences,
             stack: VecDeque::default(),
             stack_str_size: 0,
@@ -154,7 +150,7 @@ impl Collapse for Folder {
 
     #[cfg(test)]
     fn set_nstacks_per_job(&mut self, n: usize) {
-        self.opt.nstacks_per_job = n;
+        self.nstacks_per_job = n;
     }
 
     #[cfg(test)]
@@ -193,8 +189,8 @@ impl Folder {
     where
         R: io::BufRead,
     {
+        assert!(self.nstacks_per_job > 0);
         assert!(self.occurrences.is_concurrent());
-        assert!(self.opt.nstacks_per_job > 0);
         assert!(self.opt.nthreads > 1);
 
         enum Message {
@@ -211,12 +207,14 @@ impl Folder {
                 let rx_input = rx_input.clone();
                 let tx_output = tx_output.clone();
 
+                let nstacks_per_job = self.nstacks_per_job;
                 let occurrences = self.occurrences.clone();
                 let opt = self.opt.clone();
 
                 let handle = scope.spawn(move |_| {
                     let mut folder = Folder {
                         cache_inlines: Vec::default(),
+                        nstacks_per_job,
                         occurrences,
                         stack: VecDeque::default(),
                         stack_str_size: 0,
@@ -242,7 +240,7 @@ impl Folder {
 
             // State for the loop...
             let buf_capacity = collapse::smallest_power_of_two_larger_than(
-                collapse::GUESS_NBYTES_PER_STACK * self.opt.nstacks_per_job,
+                collapse::NBYTES_PER_STACK_GUESS * self.nstacks_per_job,
             );
             let mut buf = Vec::with_capacity(buf_capacity);
             let (mut index, mut njobs, mut nstacks) = (0, 0, 0);
@@ -268,7 +266,7 @@ impl Folder {
                     // It's the end of a stack; count it
                     nstacks += 1;
                     // If we've seen enough stacks to make up a slice...
-                    if nstacks == self.opt.nstacks_per_job {
+                    if nstacks == self.nstacks_per_job {
                         // Send it.
                         let chunk = mem::replace(&mut buf, Vec::with_capacity(buf_capacity));
                         tx_input.send(Message::Job(chunk)).unwrap();
@@ -534,9 +532,9 @@ mod tests {
         let inputs = tests_common::read_inputs(&INPUT)?;
 
         loop {
+            let nstacks_per_job = rng.gen_range(1, 500 + 1);
             let options = Options {
                 includeoffset: rng.gen(),
-                nstacks_per_job: rng.gen_range(0, 100 + 1),
                 nthreads: rng.gen_range(2, 32 + 1),
             };
 
@@ -549,10 +547,12 @@ mod tests {
                     options.nthreads = 1;
                     Folder::from(options)
                 };
+                folder.nstacks_per_job = nstacks_per_job;
                 folder.collapse(&input[..], &mut buf_expected)?;
                 let expected = std::str::from_utf8(&buf_expected[..]).unwrap();
 
                 let mut folder = Folder::from(options.clone());
+                folder.nstacks_per_job = nstacks_per_job;
                 folder.collapse(&input[..], &mut buf_actual)?;
                 let actual = std::str::from_utf8(&buf_actual[..]).unwrap();
 
