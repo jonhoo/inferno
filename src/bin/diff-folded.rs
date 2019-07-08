@@ -13,7 +13,7 @@ use structopt::StructOpt;
 Creates a differential between two folded stack profiles that can be passed
 to inferno-flamegraph to generate a differential flame graph.
 
-$ inferno-diff-folded folded1 folded2 | inferno-flamegraph > diff2.svg
+  $ inferno-diff-folded folded1 folded2 | inferno-flamegraph > diff2.svg
 
 The flamegraph will be colored based on higher samples (red) and smaller
 samples (blue). The frame widths will be based on the 2nd folded profile.
@@ -22,7 +22,7 @@ the most sense to ALSO create a differential based on the 1st profile widths,
 while switching the hues. To do this, reverse the order of the folded files
 and pass the --negate flag to inferno-flamegraph like this:
 
-$ inferno-diff-folded folded2 folded1 | inferno-flamegraph --negate > diff1.svg
+  $ inferno-diff-folded folded2 folded1 | inferno-flamegraph --negate > diff1.svg
 
 You can use the inferno-collapse-* tools to generate the folded files."
 )]
@@ -32,7 +32,7 @@ struct Opt {
     normalize: bool,
 
     /// Strip hex numbers (addresses)
-    #[structopt(short = "s", long = "--strip-hex")]
+    #[structopt(short = "s", long = "strip-hex")]
     strip_hex: bool,
 
     /// Silence all log output
@@ -43,18 +43,20 @@ struct Opt {
     #[structopt(short = "v", long = "verbose", parse(from_occurrences))]
     verbose: usize,
 
-    /// Folded stack profile 1
-    infile1: PathBuf,
+    /// Path to folded stack profile 1
+    #[structopt(value_name = "PATH1")]
+    path1: PathBuf,
 
-    /// Folded stack profile 2
-    infile2: PathBuf,
+    /// Path to folded stack profile 2
+    #[structopt(value_name = "PATH2")]
+    path2: PathBuf,
 }
 
 impl Opt {
     fn into_parts(self) -> (PathBuf, PathBuf, Options) {
         (
-            self.infile1,
-            self.infile2,
+            self.path1,
+            self.path2,
             Options {
                 normalize: self.normalize,
                 strip_hex: self.strip_hex,
