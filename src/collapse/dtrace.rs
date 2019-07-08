@@ -181,9 +181,12 @@ impl Folder {
                 if let (Some(offset), Some(func)) = (parts.next(), parts.next()) {
                     if let Cow::Owned(func) = transform(func.trim_end()) {
                         return Cow::Owned(format!("{}`{}+{}", pname, func, offset));
+                    } else {
+                        return Cow::Borrowed(frame);
                     }
                 }
             }
+
             if let Cow::Owned(func) = transform(func.trim_end()) {
                 return Cow::Owned(format!("{}`{}", pname, func));
             }
