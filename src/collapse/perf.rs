@@ -270,7 +270,7 @@ impl Folder {
             }
 
             // Spin up the threadpool / worker threads.
-            let (tx_input, rx_input) = channel::unbounded();
+            let (tx_input, rx_input) = channel::bounded(2 * self.opt.nthreads);
             let (tx_output, rx_output) = channel::unbounded();
             let mut handles = Vec::with_capacity(self.opt.nthreads);
             for _ in 0..self.opt.nthreads {
