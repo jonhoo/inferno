@@ -297,6 +297,16 @@ impl Folder {
                     };
                     while let Some(data) = rx_input.recv().unwrap() {
                         if let Err(e) = folder.collapse_single_threaded(&data[..]) {
+                            // Use `try_send` here because we only need to send one
+                            // error back to the main thread for propogation (even if
+                            // multiple threads fail). If multiple threads fail,
+                            // the first one to do so will fill up our output channel
+                            // (which only has one slot); so plain `send` would block
+                            // here, which can't happen because we need each thread to
+                            // continuously pull values off the input channel or else
+                            // it may fill up and clog. This is also why we continue
+                            // after trying to send the error - to ensure each thread
+                            // is always pulling values off the bounded input channel.
                             let _ = tx_output.try_send(Err(e));
                             continue;
                         }
