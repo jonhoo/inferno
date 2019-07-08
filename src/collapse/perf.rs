@@ -273,7 +273,7 @@ impl Folder {
 
             // Spin up the threadpool / worker threads.
             let (tx_input, rx_input) = channel::bounded::<Option<Vec<u8>>>(2 * self.opt.nthreads);
-            let (tx_output, rx_output) = channel::bounded(self.opt.nthreads);
+            let (tx_output, rx_output) = channel::bounded::<io::Result<()>>(1);
             let mut handles = Vec::with_capacity(self.opt.nthreads);
             for _ in 0..self.opt.nthreads {
                 let rx_event_filter = rx_event_filter.clone();
@@ -298,24 +298,15 @@ impl Folder {
                         stack: VecDeque::default(),
                         opt,
                     };
-                    let mut sent_output = false;
-                    loop {
-                        if let Some(data) = rx_input.recv().unwrap() {
-                            if !sent_output {
-                                if let Err(e) = folder.collapse_single_threaded(&data[..]) {
-                                    tx_output.send(Err(e)).unwrap();
-                                    sent_output = true;
-                                    continue;
-                                }
-                                folder.in_event = false;
-                                folder.pname.clear();
-                                folder.skip_stack = false;
-                                folder.stack.clear();
-                            }
-                        } else {
-                            tx_output.send(Ok(())).unwrap();
-                            break;
+                    while let Some(data) = rx_input.recv().unwrap() {
+                        if let Err(e) = folder.collapse_single_threaded(&data[..]) {
+                            let _ = tx_output.try_send(Err(e));
+                            continue;
                         }
+                        folder.in_event = false;
+                        folder.pname.clear();
+                        folder.skip_stack = false;
+                        folder.stack.clear();
                     }
                 });
                 handles.push(handle);
@@ -385,13 +376,18 @@ impl Folder {
                 }
             }
 
-            // Shutown the threapool
+            // Send shutdown signal.
             for _ in &handles {
                 tx_input.send(None).unwrap();
             }
-            for _ in &handles {
-                rx_output.recv().unwrap()?;
+
+            // Retrieve error, if any.
+            drop(tx_output);
+            if let Ok(result) = rx_output.recv() {
+                result?;
             }
+
+            // Join threads.
             for handle in handles {
                 handle.join().unwrap();
             }
@@ -704,6 +700,7 @@ fn tidy_java(mut func: String) -> String {
 
 #[cfg(test)]
 mod tests {
+    use std::fs;
     use std::path::PathBuf;
 
     use lazy_static::lazy_static;
@@ -745,6 +742,17 @@ mod tests {
     fn test_collapse_multi_perf() -> io::Result<()> {
         let mut folder = Folder::default();
         tests_common::test_collapse_multi(&mut folder, &INPUT)
+    }
+
+    #[test]
+    #[ignore]
+    fn test_collapse_multi_perf_simple() -> io::Result<()> {
+        let path = "./flamegraph/test/perf-cycles-instructions-01.txt";
+        let mut file = fs::File::open(path)?;
+        let mut bytes = Vec::new();
+        file.read_to_end(&mut bytes)?;
+        let mut folder = Folder::default();
+        folder.collapse(&bytes[..], io::sink())
     }
 
     /// Varies the nstacks_per_job parameter and outputs the 10 fastests configurations by file.
