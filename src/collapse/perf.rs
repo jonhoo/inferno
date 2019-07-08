@@ -82,7 +82,7 @@ pub struct Folder {
     /// * Field on `Options` represents user's provided configuration and will never change.
     /// * This field, on the other hand, although initially set to the user's provided
     ///   configuration, represents state that may change as data is processed. In particular, if
-    ///   the user provided `None` for his/her initial configuration, this field **will** change to
+    ///   the user provided `None` for their initial configuration, this field **will** change to
     ///   `Some(<event type>)` when we encounter the first event during processing. Merging together
     ///   different event types, such as instructions and cycles, would produce misleading results.
     event_filter: Option<String>,
