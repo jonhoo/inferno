@@ -23,4 +23,10 @@ task:
     - cargo build --all-targets --verbose
   test_script:
     - . $HOME/.cargo/env
+    # Currently must run tests with `--test-threads=1` because we're testing
+    # the contents of log messages in our tests and the current logging
+    # infrastructure does not support that well for multithreaded code.
+    # See comment at top of `tests/common/test_logger.rs` for more detail.
+    # We plan to switch out our logging infrastructure for a solution that
+    # is more robust to multithreaded code in the future. See issue #TBD.
     - cargo test --no-fail-fast --verbose --all -- --test-threads=1 --nocapture
