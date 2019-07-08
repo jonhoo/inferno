@@ -237,9 +237,8 @@ impl Folder {
             }
 
             // State for the loop...
-            let buf_capacity = collapse::smallest_power_of_two_larger_than(
-                collapse::NBYTES_PER_STACK_GUESS * self.nstacks_per_job,
-            );
+            let buf_capacity =
+                usize::next_power_of_two(collapse::NBYTES_PER_STACK_GUESS * self.nstacks_per_job);
             let mut buf = Vec::with_capacity(buf_capacity);
             let (mut index, mut nstacks) = (0, 0);
 
@@ -265,6 +264,7 @@ impl Folder {
                     // If we've seen enough stacks to make up a slice...
                     if nstacks == self.nstacks_per_job {
                         // Send it.
+                        let buf_capacity = buf.capacity();
                         let chunk = mem::replace(&mut buf, Vec::with_capacity(buf_capacity));
                         tx_input.send(Some(chunk)).unwrap();
                         // Reset the state; mark the beginning of the next slice.

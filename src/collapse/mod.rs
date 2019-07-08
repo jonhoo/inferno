@@ -162,14 +162,6 @@ impl Occurrences {
     }
 }
 
-fn smallest_power_of_two_larger_than(n: usize) -> usize {
-    let mut output = 1024;
-    while output < n {
-        output <<= 1;
-    }
-    output
-}
-
 #[cfg(test)]
 mod tests_common {
     use std::collections::HashMap;
