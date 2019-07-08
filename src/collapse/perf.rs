@@ -298,7 +298,7 @@ impl Folder {
                     while let Some(data) = rx_input.recv().unwrap() {
                         if let Err(e) = folder.collapse_single_threaded(&data[..]) {
                             // Use `try_send` here because we only need to send one
-                            // error back to the main thread for propogation (even if
+                            // error back to the main thread for propagation (even if
                             // multiple threads fail). If multiple threads fail,
                             // the first one to do so will fill up our output channel
                             // (which only has one slot); so plain `send` would block
