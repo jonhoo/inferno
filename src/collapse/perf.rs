@@ -249,12 +249,6 @@ impl Folder {
         assert!(self.occurrences.is_concurrent());
         assert!(self.opt.nthreads > 1);
 
-        // Type used below for sending data to the threadpool...
-        enum Message {
-            Job(Vec<u8>),
-            Shutdown,
-        }
-
         crossbeam::thread::scope(|scope| {
             // A `Folder` must always have an event filter, yet the user can choose `None` for
             // his/her event filter option. When the user chooses `None`, this means "set the event
@@ -304,9 +298,9 @@ impl Folder {
                     };
                     loop {
                         // Receive the data...
-                        let data = match rx_input.recv().unwrap() {
-                            Message::Job(data) => data,
-                            Message::Shutdown => return,
+                        let data: Vec<u8> = match rx_input.recv().unwrap() {
+                            Some(data) => data,
+                            None => return,
                         };
                         // Process the data...
                         let result = folder.collapse_single_threaded(&data[..]);
@@ -344,7 +338,7 @@ impl Folder {
                 // If we're at the end of the data...
                 if n == 0 {
                     // Send the last slice.
-                    tx_input.send(Message::Job(buf)).unwrap();
+                    tx_input.send(Some(buf)).unwrap();
                     njobs += 1;
                     // Exit the loop.
                     break;
@@ -361,7 +355,7 @@ impl Folder {
                     if nstacks == self.nstacks_per_job {
                         // Send it.
                         let chunk = mem::replace(&mut buf, Vec::with_capacity(buf_capacity));
-                        tx_input.send(Message::Job(chunk)).unwrap();
+                        tx_input.send(Some(chunk)).unwrap();
                         njobs += 1;
                         // Reset the state; mark the beginning of the next slice.
                         index = 0;
@@ -397,7 +391,7 @@ impl Folder {
 
             // Shutown the threapool
             for _ in &handles {
-                tx_input.send(Message::Shutdown).unwrap();
+                tx_input.send(None).unwrap();
             }
             for handle in handles {
                 handle.join().unwrap();
