@@ -129,7 +129,7 @@ impl Occurrences {
         }
     }
 
-    fn write<W>(&mut self, mut writer: W) -> io::Result<()>
+    fn write_and_clear<W>(&mut self, mut writer: W) -> io::Result<()>
     where
         W: io::Write,
     {

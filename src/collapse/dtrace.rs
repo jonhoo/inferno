@@ -108,7 +108,7 @@ impl Collapse for Folder {
         }
 
         // Write results...
-        self.occurrences.write(writer)?;
+        self.occurrences.write_and_clear(writer)?;
 
         // Reset state...
         self.stack.clear();
