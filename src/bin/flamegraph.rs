@@ -9,19 +9,60 @@ use structopt::StructOpt;
 #[derive(Debug, StructOpt)]
 #[structopt(name = "inferno-flamegraph", author = "")]
 struct Opt {
-    /// Collapsed perf output files. With no INFILE, or INFILE is -, read STDIN.
-    #[structopt(name = "INFILE", parse(from_os_str))]
-    infiles: Vec<PathBuf>,
+    // ************* //
+    // *** FLAGS *** //
+    // ************* //
+    /// Use consistent palette (palette.map)
+    #[structopt(long = "cp")]
+    cp: bool,
 
-    /// File containing attributes to use for the SVG frames of particular functions.
-    /// Each line in the file should be a function name followed by a tab,
-    /// then a sequence of tab separated name=value pairs.
-    #[structopt(long = "nameattr")]
-    nameattr_file: Option<PathBuf>,
+    /// Colors are keyed by function name hash
+    #[structopt(long = "hash")]
+    hash: bool,
 
     /// Plot the flame graph up-side-down.
     #[structopt(short = "i", long = "inverted")]
     inverted: bool,
+
+    /// Switch differential hues (green<->red)
+    #[structopt(long = "negate")]
+    negate: bool,
+
+    /// Don't include static JavaScript in flame graph.
+    /// This flag is hidden since it's only meant to be used in
+    /// tests so we don't have to include the same static
+    /// JavaScript in all of the test files.
+    #[structopt(raw(hidden = "true"), long = "no-javascript")]
+    no_javascript: bool,
+
+    /// Don't sort the input lines.
+    /// If you set this flag you need to be sure your
+    /// input stack lines are already sorted.
+    #[structopt(name = "no-sort", long = "no-sort")]
+    no_sort: bool,
+
+    /// Pretty print XML with newlines and indentation.
+    #[structopt(long = "pretty-xml")]
+    pretty_xml: bool,
+
+    /// Silence all log output
+    #[structopt(short = "q", long = "quiet")]
+    quiet: bool,
+
+    /// Generate stack-reversed flame graph.
+    #[structopt(long = "reverse", conflicts_with = "no-sort")]
+    reverse: bool,
+
+    /// Verbose logging mode (-v, -vv, -vvv)
+    #[structopt(short = "v", long = "verbose", parse(from_occurrences))]
+    verbose: usize,
+
+    // *************** //
+    // *** OPTIONS *** //
+    // *************** //
+    /// Set background colors. Gradient choices are yellow (default), blue, green, grey; flat colors use "#rrggbb"
+    #[structopt(long = "bgcolors")]
+    bgcolors: Option<BackgroundColor>,
 
     /// Set color palette
     #[structopt(
@@ -34,33 +75,25 @@ struct Opt {
     )]
     colors: Palette,
 
-    /// Set background colors. Gradient choices are yellow (default), blue, green, grey; flat colors use "#rrggbb"
-    #[structopt(long = "bgcolors")]
-    bgcolors: Option<BackgroundColor>,
+    /// Count type label
+    #[structopt(long = "countname", raw(default_value = "defaults::COUNT_NAME"))]
+    count_name: String,
 
-    /// Colors are keyed by function name hash
-    #[structopt(long = "hash")]
-    hash: bool,
+    /// Factor to scale sample counts by
+    #[structopt(long = "factor", raw(default_value = "&defaults::str::FACTOR"))]
+    factor: f64,
 
-    /// Use consistent palette (palette.map)
-    #[structopt(long = "cp")]
-    cp: bool,
+    /// Font size
+    #[structopt(long = "fontsize", raw(default_value = "&defaults::str::FONT_SIZE"))]
+    font_size: usize,
 
-    /// Search color
-    #[structopt(long = "search-color", raw(default_value = "defaults::SEARCH_COLOR"))]
-    search_color: SearchColor,
+    /// Font type
+    #[structopt(long = "fonttype", raw(default_value = "defaults::FONT_TYPE"))]
+    font_type: String,
 
-    /// Change title text
-    #[structopt(long = "title", raw(default_value = "defaults::TITLE"))]
-    title: String,
-
-    /// Second level title (optional)
-    #[structopt(long = "subtitle")]
-    subtitle: Option<String>,
-
-    /// Width of image
-    #[structopt(long = "width", raw(default_value = "&defaults::str::IMAGE_WIDTH"))]
-    image_width: usize,
+    /// Font width
+    #[structopt(long = "fontwidth", raw(default_value = "&defaults::str::FONT_WIDTH"))]
+    font_width: f64,
 
     /// Height of each frame
     #[structopt(long = "height", raw(default_value = "&defaults::str::FRAME_HEIGHT"))]
@@ -70,21 +103,11 @@ struct Opt {
     #[structopt(long = "minwidth", raw(default_value = "&defaults::str::MIN_WIDTH"))]
     min_width: f64,
 
-    /// Font type
-    #[structopt(long = "fonttype", raw(default_value = "defaults::FONT_TYPE"))]
-    font_type: String,
-
-    /// Font size
-    #[structopt(long = "fontsize", raw(default_value = "&defaults::str::FONT_SIZE"))]
-    font_size: usize,
-
-    /// Font width
-    #[structopt(long = "fontwidth", raw(default_value = "&defaults::str::FONT_WIDTH"))]
-    font_width: f64,
-
-    /// Count type label
-    #[structopt(long = "countname", raw(default_value = "defaults::COUNT_NAME"))]
-    count_name: String,
+    /// File containing attributes to use for the SVG frames of particular functions.
+    /// Each line in the file should be a function name followed by a tab,
+    /// then a sequence of tab separated name=value pairs.
+    #[structopt(long = "nameattr")]
+    nameattr_file: Option<PathBuf>,
 
     /// Name type label
     #[structopt(long = "nametype", raw(default_value = "defaults::NAME_TYPE"))]
@@ -94,42 +117,28 @@ struct Opt {
     #[structopt(long = "notes")]
     notes: Option<String>,
 
-    /// Switch differential hues (green<->red)
-    #[structopt(long = "negate")]
-    negate: bool,
+    /// Search color
+    #[structopt(long = "search-color", raw(default_value = "defaults::SEARCH_COLOR"))]
+    search_color: SearchColor,
 
-    /// Factor to scale sample counts by
-    #[structopt(long = "factor", raw(default_value = "&defaults::str::FACTOR"))]
-    factor: f64,
+    /// Second level title (optional)
+    #[structopt(long = "subtitle")]
+    subtitle: Option<String>,
 
-    /// Silence all log output
-    #[structopt(short = "q", long = "quiet")]
-    quiet: bool,
+    /// Change title text
+    #[structopt(long = "title", raw(default_value = "defaults::TITLE"))]
+    title: String,
 
-    /// Verbose logging mode (-v, -vv, -vvv)
-    #[structopt(short = "v", long = "verbose", parse(from_occurrences))]
-    verbose: usize,
+    /// Width of image
+    #[structopt(long = "width", raw(default_value = "&defaults::str::IMAGE_WIDTH"))]
+    image_width: usize,
 
-    /// Pretty print XML with newlines and indentation.
-    #[structopt(long = "pretty-xml")]
-    pretty_xml: bool,
-
-    /// Don't sort the input lines.
-    /// If you set this flag you need to be sure your
-    /// input stack lines are already sorted.
-    #[structopt(name = "no-sort", long = "no-sort")]
-    no_sort: bool,
-
-    /// Generate stack-reversed flame graph.
-    #[structopt(long = "reverse", conflicts_with = "no-sort")]
-    reverse: bool,
-
-    /// Don't include static JavaScript in flame graph.
-    /// This flag is hidden since it's only meant to be used in
-    /// tests so we don't have to include the same static
-    /// JavaScript in all of the test files.
-    #[structopt(raw(hidden = "true"), long = "no-javascript")]
-    no_javascript: bool,
+    // ************ //
+    // *** ARGS *** //
+    // ************ //
+    /// Collapsed perf output files. With no INFILE, or INFILE is -, read STDIN.
+    #[structopt(name = "INFILE", parse(from_os_str))]
+    infiles: Vec<PathBuf>,
 }
 
 impl<'a> Opt {
