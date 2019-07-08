@@ -102,16 +102,19 @@ enum Occurrences {
 }
 
 impl Occurrences {
-    fn new_single_threaded() -> Self {
-        let map =
-            FnvHashMap::with_capacity_and_hasher(CAPACITY_HASHMAP, fnv::FnvBuildHasher::default());
-        Occurrences::SingleThreaded(map)
-    }
-
-    fn new_multi_threaded() -> Self {
-        let map = CHashMap::with_capacity(CAPACITY_HASHMAP);
-        let arc = Arc::new(map);
-        Occurrences::MultiThreaded(arc)
+    fn new(nthreads: usize) -> Self {
+        assert_ne!(nthreads, 0);
+        if nthreads == 1 {
+            let map = FnvHashMap::with_capacity_and_hasher(
+                CAPACITY_HASHMAP,
+                fnv::FnvBuildHasher::default(),
+            );
+            Occurrences::SingleThreaded(map)
+        } else {
+            let map = CHashMap::with_capacity(CAPACITY_HASHMAP);
+            let arc = Arc::new(map);
+            Occurrences::MultiThreaded(arc)
+        }
     }
 
     fn add(&mut self, key: String, count: usize) {

@@ -54,15 +54,10 @@ impl From<Options> for Folder {
         if opt.nthreads == 0 {
             opt.nthreads = 1;
         }
-        let occurrences = if opt.nthreads < 2 {
-            Occurrences::new_single_threaded()
-        } else {
-            Occurrences::new_multi_threaded()
-        };
         Self {
             cache_inlines: Vec::new(),
             nstacks_per_job: collapse::NSTACKS_PER_JOB,
-            occurrences,
+            occurrences: Occurrences::new(opt.nthreads),
             stack: VecDeque::default(),
             stack_str_size: 0,
             opt,
@@ -97,10 +92,10 @@ impl Collapse for Folder {
         }
 
         // Do collapsing...
-        if self.opt.nthreads < 2 {
-            self.collapse_single_threaded(reader)?;
-        } else {
+        if self.occurrences.is_concurrent() {
             self.collapse_multi_threaded(reader)?;
+        } else {
+            self.collapse_single_threaded(reader)?;
         }
 
         // Write results...
@@ -156,6 +151,7 @@ impl Collapse for Folder {
     #[cfg(test)]
     fn set_nthreads(&mut self, n: usize) {
         self.opt.nthreads = n;
+        self.occurrences = Occurrences::new(n);
     }
 }
 
