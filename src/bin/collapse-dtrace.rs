@@ -23,10 +23,12 @@ lazy_static! {
     "
 )]
 struct Opt {
-    // Flags...
+    // ************* //
+    // *** FLAGS *** //
+    // ************* //
     /// Include offsets
     #[structopt(long = "includeoffset")]
-    _includeoffset: bool,
+    includeoffset: bool,
 
     /// Silence all log output
     #[structopt(short = "q", long = "quiet")]
@@ -36,7 +38,9 @@ struct Opt {
     #[structopt(short = "v", long = "verbose", parse(from_occurrences))]
     verbose: usize,
 
-    // Options...
+    // *************** //
+    // *** OPTIONS *** //
+    // *************** //
     /// Number of threads to use.
     #[structopt(
         short = "n",
@@ -46,7 +50,9 @@ struct Opt {
     )]
     nthreads: usize,
 
-    // Args...
+    // ************ //
+    // *** ARGS *** //
+    // ************ //
     /// Dtrace script output file, or STDIN if not specified
     #[structopt(value_name = "PATH")]
     infile: Option<PathBuf>,
@@ -57,7 +63,7 @@ impl Opt {
         (
             self.infile,
             Options {
-                includeoffset: self._includeoffset,
+                includeoffset: self.includeoffset,
                 nthreads: self.nthreads,
             },
         )

@@ -23,30 +23,32 @@ lazy_static! {
     If you save this output add --header on Linux >= 3.14 to include perf info."
 )]
 struct Opt {
-    // Flags...
+    // ************* //
+    // *** FLAGS *** //
+    // ************* //
     /// Include raw addresses where symbols can't be found
     #[structopt(long = "addrs")]
-    _addrs: bool,
+    addrs: bool,
 
     /// All annotations (--kernel --jit)
     #[structopt(long = "all")]
-    _all: bool,
+    all: bool,
 
     /// Annotate jit functions with a _[j]
     #[structopt(long = "jit")]
-    _jit: bool,
+    jit: bool,
 
     /// Annotate kernel functions with a _[k]
     #[structopt(long = "kernel")]
-    _kernel: bool,
+    kernel: bool,
 
     /// Include PID with process names
     #[structopt(long = "pid")]
-    _pid: bool,
+    pid: bool,
 
     /// Include TID and PID with process names
     #[structopt(long = "tid")]
-    _tid: bool,
+    tid: bool,
 
     /// Silence all log output
     #[structopt(short = "q", long = "quiet")]
@@ -56,7 +58,9 @@ struct Opt {
     #[structopt(short = "v", long = "verbose", parse(from_occurrences))]
     verbose: usize,
 
-    // Options...
+    // *************** //
+    // *** OPTIONS *** //
+    // *************** //
     /// Event filter [default: first encountered event]
     #[structopt(long = "event-filter", value_name = "STRING")]
     event_filter: Option<String>,
@@ -70,7 +74,9 @@ struct Opt {
     )]
     nthreads: usize,
 
-    // Args...
+    // ************ //
+    // *** ARGS *** //
+    // ************ //
     /// Perf script output file, or STDIN if not specified
     #[structopt(value_name = "PATH")]
     infile: Option<PathBuf>,
@@ -81,11 +87,11 @@ impl Opt {
         (
             self.infile,
             Options {
-                include_pid: self._pid,
-                include_tid: self._tid,
-                include_addrs: self._addrs,
-                annotate_jit: self._jit || self._all,
-                annotate_kernel: self._kernel || self._all,
+                include_pid: self.pid,
+                include_tid: self.tid,
+                include_addrs: self.addrs,
+                annotate_jit: self.jit || self.all,
+                annotate_kernel: self.kernel || self.all,
                 event_filter: self.event_filter,
                 nthreads: self.nthreads,
             },

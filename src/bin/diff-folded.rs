@@ -27,6 +27,9 @@ and pass the --negate flag to inferno-flamegraph like this:
 You can use the inferno-collapse-* tools to generate the folded files."
 )]
 struct Opt {
+    // ************* //
+    // *** FLAGS *** //
+    // ************* //
     /// Normalize sample counts
     #[structopt(short = "n", long = "normalize")]
     normalize: bool,
@@ -43,6 +46,9 @@ struct Opt {
     #[structopt(short = "v", long = "verbose", parse(from_occurrences))]
     verbose: usize,
 
+    // ************ //
+    // *** ARGS *** //
+    // ************ //
     /// Path to folded stack profile 1
     #[structopt(value_name = "PATH1")]
     path1: PathBuf,

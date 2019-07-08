@@ -20,6 +20,9 @@ lazy_static! {
                   "
 )]
 struct Opt {
+    // ************* //
+    // *** FLAGS *** //
+    // ************* //
     /// Silence all log output
     #[structopt(short = "q", long = "quiet")]
     quiet: bool,
@@ -28,6 +31,9 @@ struct Opt {
     #[structopt(short = "v", long = "verbose", parse(from_occurrences))]
     verbose: usize,
 
+    // *************** //
+    // *** OPTIONS *** //
+    // *************** //
     /// Number of threads to use
     #[structopt(
         short = "n",
@@ -37,6 +43,9 @@ struct Opt {
     )]
     nthreads: usize,
 
+    // ************ //
+    // *** ARGS *** //
+    // ************ //
     /// Input file, or STDIN if not specified
     #[structopt(value_name = "PATH")]
     infile: Option<PathBuf>,
