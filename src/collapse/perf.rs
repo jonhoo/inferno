@@ -448,20 +448,17 @@ impl Folder {
                 if event.ends_with(':') {
                     let event = &event[..(event.len() - 1)];
 
-                    match self.event_filter {
-                        None => {
-                            // By default only show events of the first encountered event type.
-                            // Merging together different types, such as instructions and cycles,
-                            // produces misleading results.
-                            logging::filtering_for_events_of_type(event);
-                            self.event_filter = Some(event.to_string());
+                    if let Some(ref event_filter) = self.event_filter {
+                        if event != event_filter {
+                            self.skip_stack = true;
+                            return;
                         }
-                        Some(ref s) => {
-                            if event != s {
-                                self.skip_stack = true;
-                                return;
-                            }
-                        }
+                    } else {
+                        // By default only show events of the first encountered event type.
+                        // Merging together different types, such as instructions and cycles,
+                        // produces misleading results.
+                        logging::filtering_for_events_of_type(event);
+                        self.event_filter = Some(event.to_string());
                     }
                 }
             }
