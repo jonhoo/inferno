@@ -189,7 +189,7 @@ impl Folder {
     where
         R: io::BufRead,
     {
-        assert!(self.nstacks_per_job > 0);
+        assert_ne!(self.nstacks_per_job, 0);
         assert!(self.occurrences.is_concurrent());
         assert!(self.opt.nthreads > 1);
 
