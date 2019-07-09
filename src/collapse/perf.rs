@@ -232,12 +232,10 @@ impl Folder {
             }
         }
 
-        if self.in_event || self.skip_stack || !self.stack.is_empty() {
-            return Err(io::Error::new(
-                io::ErrorKind::InvalidData,
-                "Input data ends in the middle of a stack.",
-            ));
-        }
+        // Reset state
+        self.in_event = false;
+        self.skip_stack = false;
+        self.stack.clear();
 
         Ok(())
     }
