@@ -476,9 +476,8 @@ impl Folder {
 // }
 // ```
 // But it is much faster since it works directly on bytes and because all we're interested in is
-// whether the provided bytes **can** be parsed into a `usize`, not which `usize` they might
-// actually parse into. We don't need to validate that the input is utf8 and, again, we don't need
-// to keep track of what the number we're parsing actually is.
+// whether the provided bytes **can** be parsed into a `usize`, not which `usize` they parse into.
+// Also, we don't need to validate that the input is utf8.
 //
 // Benchmarking results for the two methods:
 // * Using the method above: 281 MiB/s
@@ -494,19 +493,12 @@ fn is_end_of_stack(line: &[u8]) -> bool {
     }
     let mut state = State::StartOfLine;
     for b in line {
-        let b = *b;
-        let c = b as char;
+        let c = *b as char;
         match state {
             State::StartOfLine => {
                 if c.is_whitespace() {
                     continue;
-                // The check below determines if the byte is an ascii digits, as digits lie
-                // between 47 and 58 in the ascii table. For an unknown reason, doing the check
-                // this way is much faster on my machine than calling the `is_ascii_digit` method
-                // on `char`. Oddly, the reverse is true for checking if the byte is whitespace.
-                // On my machine the `is_whitespace` method on `char` is faster than doing a
-                // manual check of the value of the byte itself.
-                } else if b > 47 && b < 58 {
+                } else if c.is_ascii_digit() {
                     state = State::MiddleOfLine;
                     continue;
                 } else {
@@ -514,8 +506,7 @@ fn is_end_of_stack(line: &[u8]) -> bool {
                 }
             }
             State::MiddleOfLine => {
-                // See comment above.
-                if b > 47 && b < 58 {
+                if c.is_ascii_digit() {
                     continue;
                 } else if c.is_whitespace() {
                     state = State::EndOfLine;
