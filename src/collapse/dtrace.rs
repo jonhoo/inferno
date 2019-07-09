@@ -1,3 +1,4 @@
+use std::borrow::Cow;
 use std::collections::VecDeque;
 use std::io::{self, prelude::*};
 use std::mem;
@@ -5,11 +6,15 @@ use std::mem;
 use crossbeam::channel;
 use log::warn;
 
+use crate::collapse::util::fix_partially_demangled_rust_symbol;
 use crate::collapse::{self, Collapse, Occurrences};
 
 /// Dtrace folder configuration options.
 #[derive(Clone, Debug)]
 pub struct Options {
+    /// Demangle function names
+    pub demangle: bool,
+
     /// Include function offset (except leafs). Default is `false`.
     pub includeoffset: bool,
 
@@ -20,6 +25,7 @@ pub struct Options {
 impl Default for Options {
     fn default() -> Self {
         Self {
+            demangle: false,
             includeoffset: false,
             nthreads: *collapse::DEFAULT_NTHREADS,
         }
@@ -144,7 +150,7 @@ impl Collapse for Folder {
         self.nstacks_per_job = n;
     }
 
-    #[cfg(test)]
+    #[doc(hidden)]
     fn set_nthreads(&mut self, n: usize) {
         self.opt.nthreads = n;
         self.occurrences = Occurrences::new(n);
@@ -316,7 +322,7 @@ impl Folder {
         let mut could_be_cpp = false;
         let mut has_semicolon = false;
         let mut last_offset = line.len();
-        // This seems risly but dtrace stacks are c-strings as can be seen in the function
+        // This seems risky, but dtrace stacks are c-strings as can be seen in the function
         // responsible for printing them:
         // https://github.com/opendtrace/opendtrace/blob/1a03ea5576a9219a43f28b4f159ff8a4b1f9a9fd/lib/libdtrace/common/dt_consume.c#L1331
         let bytes = line.as_bytes();
@@ -337,6 +343,42 @@ impl Folder {
         )
     }
 
+    // Transforms the function part of a frame with the given function.
+    fn transform_function_name<'a, F>(&self, frame: &'a str, transform: F) -> Cow<'a, str>
+    where
+        F: Fn(&'a str) -> Cow<'a, str>,
+    {
+        let mut parts = frame.splitn(2, '`');
+        if let (Some(pname), Some(func)) = (parts.next(), parts.next()) {
+            if self.opt.includeoffset {
+                let mut parts = func.rsplitn(2, '+');
+                if let (Some(offset), Some(func)) = (parts.next(), parts.next()) {
+                    if let Cow::Owned(func) = transform(func.trim_end()) {
+                        return Cow::Owned(format!("{}`{}+{}", pname, func, offset));
+                    } else {
+                        return Cow::Borrowed(frame);
+                    }
+                }
+            }
+
+            if let Cow::Owned(func) = transform(func.trim_end()) {
+                return Cow::Owned(format!("{}`{}", pname, func));
+            }
+        }
+
+        Cow::Borrowed(frame)
+    }
+
+    // Demangle the function name if it's mangled.
+    fn demangle<'a>(&self, frame: &'a str) -> Cow<'a, str> {
+        self.transform_function_name(frame, symbolic_demangle::demangle)
+    }
+
+    // DTrace doesn't properly demangle Rust function names, so fix those.
+    fn fix_rust_symbol<'a>(&self, frame: &'a str) -> Cow<'a, str> {
+        self.transform_function_name(frame, fix_partially_demangled_rust_symbol)
+    }
+
     // we have a stack line that shows one stack entry from the preceeding event, like:
     //
     //     unix`tsc_gethrtimeunscaled+0x21
@@ -355,8 +397,12 @@ impl Folder {
             frame = Self::uncpp(frame);
         }
 
-        if frame.is_empty() {
-            frame = "-";
+        let frame = if frame.is_empty() {
+            Cow::Borrowed("-")
+        } else if self.opt.demangle {
+            self.demangle(frame)
+        } else {
+            self.fix_rust_symbol(frame)
         };
 
         if has_inlines {
@@ -380,7 +426,7 @@ impl Folder {
         } else if has_semicolon {
             self.stack.push_front(frame.replace(';', ":"))
         } else {
-            self.stack.push_front(frame.to_owned())
+            self.stack.push_front(frame.to_string())
         }
     }
 
@@ -404,6 +450,7 @@ impl Folder {
                 stack_str.push_str(&e);
             }
         }
+
         // count it!
         self.occurrences.add(stack_str, count);
 
@@ -581,6 +628,7 @@ mod tests {
         loop {
             let nstacks_per_job = rng.gen_range(1, 500 + 1);
             let options = Options {
+                demangle: rng.gen(),
                 includeoffset: rng.gen(),
                 nthreads: rng.gen_range(2, 32 + 1),
             };

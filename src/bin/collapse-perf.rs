@@ -34,6 +34,10 @@ struct Opt {
     #[structopt(long = "all")]
     all: bool,
 
+    /// Demangle function names
+    #[structopt(long = "demangle")]
+    demangle: bool,
+
     /// Annotate jit functions with a _[j]
     #[structopt(long = "jit")]
     jit: bool,
@@ -77,8 +81,8 @@ struct Opt {
     // ************ //
     // *** ARGS *** //
     // ************ //
-    /// Perf script output file, or STDIN if not specified
     #[structopt(value_name = "PATH")]
+    /// Perf script output file, or STDIN if not specified
     infile: Option<PathBuf>,
 }
 
@@ -92,6 +96,7 @@ impl Opt {
                 include_addrs: self.addrs,
                 annotate_jit: self.jit || self.all,
                 annotate_kernel: self.kernel || self.all,
+                demangle: self.demangle,
                 event_filter: self.event_filter,
                 nthreads: self.nthreads,
             },

@@ -2,7 +2,7 @@ use std::fs::File;
 use std::io::{self, BufReader, Read};
 
 use criterion::*;
-use inferno::collapse::{dtrace, perf, Collapse};
+use inferno::collapse::{dtrace, perf, sample, Collapse};
 use libflate::gzip::Decoder;
 
 const INFILE_DTRACE: &str = "flamegraph/example-dtrace-stacks.txt";
@@ -72,12 +72,23 @@ fn perf_multi(c: &mut Criterion) {
     collapse_benchmark(c, perf::Folder::from(options), "perf_multi", INFILE_PERF);
 }
 
+fn sample(c: &mut Criterion) {
+    let infile = "tests/data/collapse-sample/sample.txt";
+    collapse_benchmark(
+        c,
+        sample::Folder::from(sample::Options::default()),
+        "sample",
+        infile,
+    );
+}
+
 criterion_group!(
     benches,
     dtrace_single,
     dtrace_multi,
     perf_single,
     perf_multi,
+    sample,
 );
 
 criterion_main!(benches);

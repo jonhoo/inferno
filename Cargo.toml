@@ -40,6 +40,7 @@ rand = "0.6.5"
 rgb = "0.8.13"
 str_stack = "0.1"
 structopt = { version = "0.2", optional = true }
+symbolic-demangle = "6.1.3"
 
 [dev-dependencies]
 assert_cmd = "0.11"
@@ -64,6 +65,11 @@ required-features = ["cli"]
 [[bin]]
 name = "inferno-collapse-dtrace"
 path = "src/bin/collapse-dtrace.rs"
+required-features = ["cli"]
+
+[[bin]]
+name = "inferno-collapse-sample"
+path = "src/bin/collapse-sample.rs"
 required-features = ["cli"]
 
 [[bin]]

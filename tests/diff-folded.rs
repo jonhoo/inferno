@@ -4,7 +4,7 @@ use std::fs::{self, File};
 use std::io::{self, BufRead, BufReader, Cursor};
 use std::process::Command;
 
-use assert_cmd::prelude::*;
+use assert_cmd::cargo::CommandCargoExt;
 use inferno::differential::{self, Options};
 use log::Level;
 use pretty_assertions::assert_eq;

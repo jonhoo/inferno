@@ -26,6 +26,10 @@ struct Opt {
     // ************* //
     // *** FLAGS *** //
     // ************* //
+    /// Demangle function names
+    #[structopt(long = "demangle")]
+    demangle: bool,
+
     /// Include offsets
     #[structopt(long = "includeoffset")]
     includeoffset: bool,
@@ -53,8 +57,8 @@ struct Opt {
     // ************ //
     // *** ARGS *** //
     // ************ //
-    /// Dtrace script output file, or STDIN if not specified
     #[structopt(value_name = "PATH")]
+    /// Dtrace script output file, or STDIN if not specified
     infile: Option<PathBuf>,
 }
 
@@ -63,6 +67,7 @@ impl Opt {
         (
             self.infile,
             Options {
+                demangle: self.demangle,
                 includeoffset: self.includeoffset,
                 nthreads: self.nthreads,
             },

@@ -5,24 +5,25 @@ use std::io::{self, BufReader, Cursor};
 use std::path::Path;
 use std::process::{Command, Stdio};
 
-use assert_cmd::prelude::*;
+use assert_cmd::cargo::CommandCargoExt;
 use inferno::collapse::perf::{Folder, Options};
 use log::Level;
 use pretty_assertions::assert_eq;
 
-use common::collapse::*;
 use common::test_logger::CapturedLog;
 
 fn test_collapse_perf(
     test_file: &str,
     expected_file: &str,
-    mut options: Options,
+    options: Options,
+    strip_quotes: bool,
 ) -> io::Result<()> {
-    options.nthreads = 1;
-    test_collapse(Folder::from(options.clone()), test_file, expected_file)?;
-    options.nthreads = 2;
-    test_collapse(Folder::from(options), test_file, expected_file)?;
-    Ok(())
+    common::test_collapse(
+        Folder::from(options),
+        test_file,
+        expected_file,
+        strip_quotes,
+    )
 }
 
 fn test_collapse_perf_logs<F>(input_file: &str, asserter: F)
@@ -36,7 +37,7 @@ fn test_collapse_perf_logs_with_options<F>(input_file: &str, asserter: F, option
 where
     F: Fn(&Vec<CapturedLog>),
 {
-    test_collapse_logs(Folder::from(options), input_file, asserter);
+    common::test_collapse_logs(Folder::from(options), input_file, asserter);
 }
 
 fn options_from_vec(opt_vec: Vec<&str>) -> Options {
@@ -67,7 +68,7 @@ fn options_from_vec(opt_vec: Vec<&str>) -> Options {
 //     result file: perf-cycles-instructions-01-collapsed-pid.txt
 //     flag: pid
 macro_rules! collapse_perf_tests_inner {
-    ($($name:ident),*; $dir:expr; $strip_prefix:expr) => {
+    ($($name:ident),*; $dir:expr; $results_dir:expr; $strip_prefix:expr, $strip_quotes:expr) => {
     $(
         #[test]
         #[allow(non_snake_case)]
@@ -92,16 +93,14 @@ macro_rules! collapse_perf_tests_inner {
             );
 
             let test_path = Path::new($dir);
-            let results_path = test_path.join("results");
-
-            let test_full_path = test_path.join(&test_file);
-            let results_full_path = results_path.join(&result_file);
+            let results_path = Path::new($results_dir);
 
             test_collapse_perf(
-                test_full_path.to_str().unwrap(),
-                results_full_path.to_str().unwrap(),
+                test_path.join(test_file).to_str().unwrap(),
+                results_path.join(result_file).to_str().unwrap(),
                 options_from_vec(options),
-            ).unwrap();
+                $strip_quotes
+            ).unwrap()
         }
     )*
     }
@@ -109,7 +108,7 @@ macro_rules! collapse_perf_tests_inner {
 
 macro_rules! collapse_perf_tests_upstream {
     ($($name:ident),*) => {
-        collapse_perf_tests_inner!($($name),*; "./flamegraph/test"; "collapse_");
+        collapse_perf_tests_inner!($($name),*; "./flamegraph/test"; "./flamegraph/test/results"; "collapse_", true);
     }
 }
 
@@ -191,13 +190,6 @@ collapse_perf_tests_upstream! {
     collapse_perf_numa_stacks_01__all,
     collapse_perf_numa_stacks_01__addrs,
 
-    collapse_perf_rust_Yamakaky_dcpu__pid,
-    collapse_perf_rust_Yamakaky_dcpu__tid,
-    collapse_perf_rust_Yamakaky_dcpu__kernel,
-    collapse_perf_rust_Yamakaky_dcpu__jit,
-    collapse_perf_rust_Yamakaky_dcpu__all,
-    collapse_perf_rust_Yamakaky_dcpu__addrs,
-
     collapse_perf_vertx_stacks_01__pid,
     collapse_perf_vertx_stacks_01__tid,
     collapse_perf_vertx_stacks_01__kernel,
@@ -206,9 +198,26 @@ collapse_perf_tests_upstream! {
     collapse_perf_vertx_stacks_01__addrs
 }
 
+macro_rules! collapse_perf_tests_upstream_rust {
+    ($($name:ident),*) => {
+        collapse_perf_tests_inner!($($name),*; "./flamegraph/test"; "./tests/data/collapse-perf/results"; "collapse_", false);
+    }
+}
+
+// Because we fix improperly demangled Rust symbols, we can't compare the results to upstream.
+// Instead, we keep our own results to compare against.
+collapse_perf_tests_upstream_rust! {
+    collapse_perf_rust_Yamakaky_dcpu__pid,
+    collapse_perf_rust_Yamakaky_dcpu__tid,
+    collapse_perf_rust_Yamakaky_dcpu__kernel,
+    collapse_perf_rust_Yamakaky_dcpu__jit,
+    collapse_perf_rust_Yamakaky_dcpu__all,
+    collapse_perf_rust_Yamakaky_dcpu__addrs
+}
+
 macro_rules! collapse_perf_tests {
     ($($name:ident),*) => {
-        collapse_perf_tests_inner!($($name),*; "./tests/data/collapse-perf"; "collapse_perf_");
+        collapse_perf_tests_inner!($($name),*; "./tests/data/collapse-perf"; "./tests/data/collapse-perf/results"; "collapse_perf_", false);
     }
 }
 
@@ -223,6 +232,7 @@ fn collapse_perf_example_perf_stacks() {
         "./flamegraph/example-perf-stacks.txt.gz",
         "./tests/data/collapse-perf/results/example-perf-stacks-collapsed.txt",
         Default::default(),
+        false,
     )
     .unwrap();
 }
@@ -268,6 +278,22 @@ fn collapse_perf_should_warn_about_weird_input_lines() {
 }
 
 #[test]
+fn collapse_perf_demangle() {
+    let test_file = "./tests/data/collapse-perf/mangled.txt";
+    let result_file = "./tests/data/collapse-perf/results/demangled.txt";
+    test_collapse_perf(
+        test_file,
+        result_file,
+        Options {
+            demangle: true,
+            ..Default::default()
+        },
+        false,
+    )
+    .unwrap()
+}
+
+#[test]
 fn collapse_perf_cli() {
     let input_file = "./flamegraph/test/perf-vertx-stacks-01.txt";
     let expected_file = "./flamegraph/test/results/perf-vertx-stacks-01-collapsed-all.txt";
@@ -280,7 +306,7 @@ fn collapse_perf_cli() {
         .output()
         .expect("failed to execute process");
     let expected = BufReader::new(File::open(expected_file).unwrap());
-    compare_results(Cursor::new(output.stdout), expected, expected_file);
+    common::compare_results(Cursor::new(output.stdout), expected, expected_file, true);
 
     // Test with STDIN
     let mut child = Command::cargo_bin("inferno-collapse-perf")
@@ -295,5 +321,5 @@ fn collapse_perf_cli() {
     io::copy(&mut input, stdin).unwrap();
     let output = child.wait_with_output().expect("Failed to read stdout");
     let expected = BufReader::new(File::open(expected_file).unwrap());
-    compare_results(Cursor::new(output.stdout), expected, expected_file);
+    common::compare_results(Cursor::new(output.stdout), expected, expected_file, true);
 }

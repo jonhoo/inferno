@@ -1,0 +1,100 @@
+CPU     ID                    FUNCTION:NAME
+  6  29091                        :tick-60s 
+
+
+              rg`_$LT$alloc..vec..Vec$LT$T$GT$$u20$as$u20$core..convert..From$LT$$RF$$u27$a$u20$$u5b$T$u5d$$GT$$GT$::from::hf1c5bb9dd6c517cb
+              rg`ignore::walk::Worker::run::h428457710ae7645a+0x6bf
+              rg`std::sys_common::backtrace::__rust_begin_short_backtrace::h71644e3bf9e2bb80+0x25
+              rg`std::panicking::try::do_call::h08ca64c12e8a9bb0 (.llvm.15516475458848885060)+0x25
+              rg`__rust_maybe_catch_panic+0x1f
+              rg`_$LT$F$u20$as$u20$alloc..boxed..FnBox$LT$A$GT$$GT$::call_box::h8612a2a83552fc2d+0xa5
+              rg`std::sys_common::thread::start_thread::he4c2173d5991c786+0x88
+              rg`std::sys::unix::thread::Thread::new::thread_start::h8b5ec703435993e3+0x9
+              libsystem_pthread.dylib`_pthread_body+0x7e
+              libsystem_pthread.dylib`_pthread_start+0x42
+              libsystem_pthread.dylib`thread_start+0xd
+                1
+
+              libsystem_platform.dylib`_platform_memset$VARIANT$Haswell
+              rg`_$LT$std..fs..ReadDir$u20$as$u20$core..iter..traits..iterator..Iterator$GT$::next::hc14f1750ca79129b+0x1d
+              rg`ignore::walk::Worker::run::h428457710ae7645a+0x12ce
+              rg`std::sys_common::backtrace::__rust_begin_short_backtrace::h71644e3bf9e2bb80+0x25
+              rg`std::panicking::try::do_call::h08ca64c12e8a9bb0 (.llvm.15516475458848885060)+0x25
+              rg`__rust_maybe_catch_panic+0x1f
+              rg`_$LT$F$u20$as$u20$alloc..boxed..FnBox$LT$A$GT$$GT$::call_box::h8612a2a83552fc2d+0xa5
+              rg`std::sys_common::thread::start_thread::he4c2173d5991c786+0x88
+              rg`std::sys::unix::thread::Thread::new::thread_start::h8b5ec703435993e3+0x9
+              libsystem_pthread.dylib`_pthread_body+0x7e
+              libsystem_pthread.dylib`_pthread_start+0x42
+              libsystem_pthread.dylib`thread_start+0xd
+                1
+
+              libsystem_malloc.dylib`malloc_zone_malloc+0x6a
+              libsystem_malloc.dylib`malloc+0x18
+              rg`_$LT$alloc..vec..Vec$LT$T$GT$$u20$as$u20$core..convert..From$LT$$RF$$u27$a$u20$$u5b$T$u5d$$GT$$GT$::from::hf1c5bb9dd6c517cb+0x28
+              rg`std::path::Path::to_path_buf::h8e41eec8afb7385b+0x15
+              rg`ignore::gitignore::GitignoreBuilder::add::hc80b039b5c69176e+0xd3
+              rg`ignore::dir::Ignore::add_child_path::ha7cb18cf236b4242+0x1ef
+              rg`ignore::walk::Worker::run::h428457710ae7645a+0x910
+              rg`std::sys_common::backtrace::__rust_begin_short_backtrace::h71644e3bf9e2bb80+0x25
+              rg`std::panicking::try::do_call::h08ca64c12e8a9bb0 (.llvm.15516475458848885060)+0x25
+              rg`__rust_maybe_catch_panic+0x1f
+              rg`_$LT$F$u20$as$u20$alloc..boxed..FnBox$LT$A$GT$$GT$::call_box::h8612a2a83552fc2d+0xa5
+              rg`std::sys_common::thread::start_thread::he4c2173d5991c786+0x88
+              rg`std::sys::unix::thread::Thread::new::thread_start::h8b5ec703435993e3+0x9
+              libsystem_pthread.dylib`_pthread_body+0x7e
+              libsystem_pthread.dylib`_pthread_start+0x42
+              libsystem_pthread.dylib`thread_start+0xd
+                1
+
+              rg`encoding_rs_io::util::PossibleBom::as_slice::h2cc2deba7651dc2a
+              rg`_$LT$encoding_rs_io..DecodeReaderBytes$LT$R$C$$u20$B$GT$$u20$as$u20$std..io..Read$GT$::read::h19bd185b1317f06c+0x50
+              rg`_$LT$grep_searcher..line_buffer..LineBufferReader$LT$$u27$b$C$$u20$R$GT$$GT$::fill::h5bc5eae4aa7991db+0x9f
+              rg`_$LT$grep_searcher..searcher..glue..ReadByLine$LT$$u27$s$C$$u20$M$C$$u20$R$C$$u20$S$GT$$GT$::run::h30ecedc997ad7e32+0x127
+              rg`grep_searcher::searcher::Searcher::search_path::h4867309d69f27419+0xb59
+              rg`_$LT$rg..search..SearchWorker$LT$W$GT$$GT$::search_impl::hcf61284e58f410e0 (.llvm.17269878581919215071)+0x1585
+              rg`rg::search_parallel::_$u7b$$u7b$closure$u7d$$u7d$::_$u7b$$u7b$closure$u7d$$u7d$::h6e849b55a66fcd85+0xac
+              rg`ignore::walk::Worker::run::h428457710ae7645a+0x40b
+              rg`std::sys_common::backtrace::__rust_begin_short_backtrace::h71644e3bf9e2bb80+0x25
+              rg`std::panicking::try::do_call::h08ca64c12e8a9bb0 (.llvm.15516475458848885060)+0x25
+              rg`__rust_maybe_catch_panic+0x1f
+              rg`_$LT$F$u20$as$u20$alloc..boxed..FnBox$LT$A$GT$$GT$::call_box::h8612a2a83552fc2d+0xa5
+              rg`std::sys_common::thread::start_thread::he4c2173d5991c786+0x88
+              rg`std::sys::unix::thread::Thread::new::thread_start::h8b5ec703435993e3+0x9
+              libsystem_pthread.dylib`_pthread_body+0x7e
+              libsystem_pthread.dylib`_pthread_start+0x42
+              libsystem_pthread.dylib`thread_start+0xd
+                1
+
+              rg`_$LT$alloc..raw_vec..RawVec$LT$T$C$$u20$A$GT$$GT$::reserve_internal::he5cd61d9fce80d26 (.llvm.1755077261050086054)
+              rg`std::sys::unix::fs::File::open::hb90e1c1c787080f0+0x20
+              rg`std::fs::OpenOptions::_open::h1cd1c180d181e2f5+0x21
+              rg`grep_searcher::searcher::Searcher::search_path::h4867309d69f27419+0x7f
+              rg`_$LT$rg..search..SearchWorker$LT$W$GT$$GT$::search_impl::hcf61284e58f410e0 (.llvm.17269878581919215071)+0x1585
+              rg`rg::search_parallel::_$u7b$$u7b$closure$u7d$$u7d$::_$u7b$$u7b$closure$u7d$$u7d$::h6e849b55a66fcd85+0xac
+              rg`ignore::walk::Worker::run::h428457710ae7645a+0x40b
+              rg`std::sys_common::backtrace::__rust_begin_short_backtrace::h71644e3bf9e2bb80+0x25
+              rg`std::panicking::try::do_call::h08ca64c12e8a9bb0 (.llvm.15516475458848885060)+0x25
+              rg`__rust_maybe_catch_panic+0x1f
+              rg`_$LT$F$u20$as$u20$alloc..boxed..FnBox$LT$A$GT$$GT$::call_box::h8612a2a83552fc2d+0xa5
+              rg`std::sys_common::thread::start_thread::he4c2173d5991c786+0x88
+              rg`std::sys::unix::thread::Thread::new::thread_start::h8b5ec703435993e3+0x9
+              libsystem_pthread.dylib`_pthread_body+0x7e
+              libsystem_pthread.dylib`_pthread_start+0x42
+              libsystem_pthread.dylib`thread_start+0xd
+                1
+
+              rg`ignore::walk::DirEntry::is_stdin::ha679f21193d29faa
+              rg`rg::subject::SubjectBuilder::build_from_result::hcf7623e5e343bc94+0x1ee
+              rg`rg::search_parallel::_$u7b$$u7b$closure$u7d$$u7d$::_$u7b$$u7b$closure$u7d$$u7d$::h6e849b55a66fcd85+0x3d
+              rg`ignore::walk::Worker::run::h428457710ae7645a+0x40b
+              rg`std::sys_common::backtrace::__rust_begin_short_backtrace::h71644e3bf9e2bb80+0x25
+              rg`std::panicking::try::do_call::h08ca64c12e8a9bb0 (.llvm.15516475458848885060)+0x25
+              rg`__rust_maybe_catch_panic+0x1f
+              rg`_$LT$F$u20$as$u20$alloc..boxed..FnBox$LT$A$GT$$GT$::call_box::h8612a2a83552fc2d+0xa5
+              rg`std::sys_common::thread::start_thread::he4c2173d5991c786+0x88
+              rg`std::sys::unix::thread::Thread::new::thread_start::h8b5ec703435993e3+0x9
+              libsystem_pthread.dylib`_pthread_body+0x7e
+              libsystem_pthread.dylib`_pthread_start+0x42
+              libsystem_pthread.dylib`thread_start+0xd
+                1

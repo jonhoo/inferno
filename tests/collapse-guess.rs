@@ -4,65 +4,71 @@ use std::fs::File;
 use std::io::{self, BufReader, Cursor};
 use std::process::{Command, Stdio};
 
-use assert_cmd::prelude::*;
+use assert_cmd::cargo::CommandCargoExt;
 use inferno::collapse::guess::Folder;
 use log::Level;
 use pretty_assertions::assert_eq;
 
-use common::collapse::*;
 use common::test_logger::CapturedLog;
 
-fn test_collapse_guess(test_file: &str, expected_file: &str) -> io::Result<()> {
-    test_collapse(Folder::default(), test_file, expected_file)
+fn test_collapse_guess(test_file: &str, expected_file: &str, strip_quotes: bool) -> io::Result<()> {
+    common::test_collapse(Folder::default(), test_file, expected_file, strip_quotes)
 }
 
 fn test_collapse_guess_logs<F>(input_file: &str, asserter: F)
 where
     F: Fn(&Vec<CapturedLog>),
 {
-    test_collapse_logs(Folder::default(), input_file, asserter);
+    common::test_collapse_logs(Folder::default(), input_file, asserter);
 }
 
 #[test]
 fn collapse_guess_dtrace_example() {
     let test_file = "./flamegraph/example-dtrace-stacks.txt";
     let result_file = "./tests/data/collapse-dtrace/results/dtrace-example.txt";
-    test_collapse_guess(test_file, result_file).unwrap()
+    test_collapse_guess(test_file, result_file, false).unwrap()
 }
 
 #[test]
 fn collapse_guess_dtrace_java() {
     let test_file = "./tests/data/collapse-dtrace/java.txt";
     let result_file = "./tests/data/collapse-dtrace/results/java.txt";
-    test_collapse_guess(test_file, result_file).unwrap()
+    test_collapse_guess(test_file, result_file, false).unwrap()
 }
 
 #[test]
 fn collapse_guess_dtrace_hex_addresses() {
     let test_file = "./tests/data/collapse-dtrace/hex-addresses.txt";
     let result_file = "./tests/data/collapse-dtrace/results/hex-addresses.txt";
-    test_collapse_guess(test_file, result_file).unwrap()
+    test_collapse_guess(test_file, result_file, false).unwrap()
 }
 
 #[test]
 fn collapse_guess_perf_example() {
     let test_file = "./flamegraph/example-perf-stacks.txt.gz";
     let result_file = "./tests/data/collapse-perf/results/example-perf-stacks-collapsed.txt";
-    test_collapse_guess(test_file, result_file).unwrap()
+    test_collapse_guess(test_file, result_file, true).unwrap()
 }
 
 #[test]
 fn collapse_guess_perf_go_stacks() {
     let test_file = "./tests/data/collapse-perf/go-stacks.txt";
     let result_file = "./tests/data/collapse-perf/results/go-stacks-collapsed.txt";
-    test_collapse_guess(test_file, result_file).unwrap()
+    test_collapse_guess(test_file, result_file, true).unwrap()
 }
 
 #[test]
 fn collapse_guess_perf_java_inline() {
     let test_file = "./tests/data/collapse-perf/java-inline.txt";
     let result_file = "./tests/data/collapse-perf/results/java-inline-collapsed.txt";
-    test_collapse_guess(test_file, result_file).unwrap()
+    test_collapse_guess(test_file, result_file, true).unwrap()
+}
+
+#[test]
+fn collapse_guess_sample() {
+    let test_file = "./tests/data/collapse-sample/sample.txt";
+    let result_file = "./tests/data/collapse-sample/results/sample-default.txt";
+    test_collapse_guess(test_file, result_file, false).unwrap()
 }
 
 #[test]
@@ -119,7 +125,7 @@ fn collapse_guess_cli() {
         .output()
         .expect("failed to execute process");
     let expected = BufReader::new(File::open(expected_file).unwrap());
-    compare_results(Cursor::new(output.stdout), expected, expected_file);
+    common::compare_results(Cursor::new(output.stdout), expected, expected_file, true);
 
     // Test with STDIN
     let mut child = Command::cargo_bin("inferno-collapse-guess")
@@ -133,5 +139,5 @@ fn collapse_guess_cli() {
     io::copy(&mut input, stdin).unwrap();
     let output = child.wait_with_output().expect("Failed to read stdout");
     let expected = BufReader::new(File::open(expected_file).unwrap());
-    compare_results(Cursor::new(output.stdout), expected, expected_file);
+    common::compare_results(Cursor::new(output.stdout), expected, expected_file, true);
 }

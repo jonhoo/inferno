@@ -3,13 +3,79 @@ use std::io::{self, BufRead, BufReader, Cursor};
 
 use inferno::collapse::Collapse;
 use libflate::gzip::Decoder;
+use pretty_assertions::assert_eq;
 
 use super::test_logger::{self, CapturedLog};
+
+pub fn compare_results<R, E>(result: R, mut expected: E, expected_file: &str, strip_quotes: bool)
+where
+    R: BufRead,
+    E: BufRead,
+{
+    let mut buf = String::new();
+    let mut line_num = 1;
+    for line in result.lines() {
+        let line = if strip_quotes {
+            line.unwrap().replace("\"", "").replace("'", "")
+        } else {
+            line.unwrap()
+        };
+        if expected.read_line(&mut buf).unwrap() == 0 {
+            panic!(
+                "\noutput has more lines than expected result file: {}",
+                expected_file
+            );
+        }
+        assert_eq!(line, buf.trim_end(), "\n{}:{}", expected_file, line_num);
+        buf.clear();
+        line_num += 1;
+    }
+
+    if expected.read_line(&mut buf).unwrap() > 0 {
+        panic!(
+            "\n{} has more lines than output, beginning at line: {}",
+            expected_file, line_num
+        )
+    }
+}
 
 pub fn test_collapse<C>(
     mut collapser: C,
     test_filename: &str,
     expected_filename: &str,
+    strip_quotes: bool,
+) -> io::Result<()>
+where
+    C: Collapse,
+{
+    for nthreads in &[1, 2] {
+        collapser.set_nthreads(*nthreads);
+        __test_collapse(
+            &mut collapser,
+            test_filename,
+            expected_filename,
+            strip_quotes,
+        )?;
+    }
+    Ok(())
+}
+
+pub fn test_collapse_logs<C, F>(mut collapser: C, input_file: &str, asserter: F)
+where
+    C: Collapse,
+    F: Fn(&Vec<CapturedLog>),
+{
+    test_logger::init();
+    let r = BufReader::new(File::open(input_file).unwrap());
+    collapser.collapse(r, std::io::sink()).unwrap();
+    test_logger::validate(asserter);
+}
+
+fn __test_collapse<C>(
+    collapser: &mut C,
+    test_filename: &str,
+    expected_filename: &str,
+    strip_quotes: bool,
 ) -> io::Result<()>
 where
     C: Collapse,
@@ -56,46 +122,6 @@ where
         eprintln!("test output in {}", tm.display());
     }
     // and then compare
-    compare_results(result, expected, expected_filename);
+    compare_results(result, expected, expected_filename, strip_quotes);
     Ok(return_value)
-}
-
-pub fn test_collapse_logs<C, F>(mut collapser: C, input_file: &str, asserter: F)
-where
-    C: Collapse,
-    F: Fn(&Vec<CapturedLog>),
-{
-    test_logger::init();
-    let r = BufReader::new(File::open(input_file).unwrap());
-    collapser.collapse(r, std::io::sink()).unwrap();
-    test_logger::validate(asserter);
-}
-
-pub fn compare_results<R, E>(result: R, mut expected: E, expected_file: &str)
-where
-    R: BufRead,
-    E: BufRead,
-{
-    let mut buf = String::new();
-    let mut line_num = 1;
-    for line in result.lines() {
-        // Strip out " and ' since perl version does.
-        let line = line.unwrap().replace("\"", "").replace("'", "");
-        if expected.read_line(&mut buf).unwrap() == 0 {
-            panic!(
-                "\noutput has more lines than expected result file: {}",
-                expected_file
-            );
-        }
-        assert_eq!(line, buf.trim_end(), "\n{}:{}", expected_file, line_num);
-        buf.clear();
-        line_num += 1;
-    }
-
-    if expected.read_line(&mut buf).unwrap() > 0 {
-        panic!(
-            "\n{} has more lines than output, beginning at line: {}",
-            expected_file, line_num
-        )
-    }
 }

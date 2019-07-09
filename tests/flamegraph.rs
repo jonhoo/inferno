@@ -6,7 +6,7 @@ use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::str::FromStr;
 
-use assert_cmd::prelude::*;
+use assert_cmd::cargo::CommandCargoExt;
 use inferno::flamegraph::color::{BackgroundColor, PaletteMap};
 use inferno::flamegraph::{self, Direction, Options, Palette};
 use log::Level;

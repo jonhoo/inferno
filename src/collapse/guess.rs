@@ -3,7 +3,7 @@ use std::io::{self, Cursor};
 
 use log::{error, info};
 
-use crate::collapse::{self, dtrace, perf, Collapse};
+use crate::collapse::{self, dtrace, perf, sample, Collapse};
 
 const LINES_PER_ITERATION: usize = 10;
 
@@ -59,10 +59,11 @@ impl Collapse for Folder {
             options.nthreads = self.opt.nthreads;
             perf::Folder::from(options)
         };
+        let mut sample = sample::Folder::from(sample::Options::default());
 
         // Each Collapse impl gets its own flag in this array.
         // It gets set to true when the impl has been ruled out.
-        let mut not_applicable = [false; 2];
+        let mut not_applicable = [false; 3];
 
         let mut buffer = String::new();
         loop {
@@ -94,6 +95,7 @@ impl Collapse for Folder {
             }
             try_collapse_impl!(perf, 0);
             try_collapse_impl!(dtrace, 1);
+            try_collapse_impl!(sample, 2);
 
             if eof {
                 break;
@@ -112,7 +114,7 @@ impl Collapse for Folder {
     #[cfg(test)]
     fn set_nstacks_per_job(&mut self, _: usize) {}
 
-    #[cfg(test)]
+    #[doc(hidden)]
     fn set_nthreads(&mut self, n: usize) {
         self.opt.nthreads = n;
     }

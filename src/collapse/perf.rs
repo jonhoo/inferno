@@ -3,7 +3,9 @@ use std::io::{self, prelude::*, BufRead};
 use std::mem;
 
 use crossbeam::channel;
+use symbolic_demangle::demangle;
 
+use crate::collapse::util::fix_partially_demangled_rust_symbol;
 use crate::collapse::{self, Collapse, Occurrences};
 
 const TIDY_GENERIC: bool = true;
@@ -34,6 +36,9 @@ pub struct Options {
     /// Annotate kernel functions with a `_[k]` suffix. Default is `false`.
     pub annotate_kernel: bool,
 
+    /// Demangle function names
+    pub demangle: bool,
+
     /// Only consider samples of the given event type (see `perf list`). If this option is
     /// set to `None`, it will be set to the first encountered event type. Default is `None`.
     pub event_filter: Option<String>,
@@ -58,6 +63,7 @@ impl Default for Options {
         Self {
             annotate_jit: false,
             annotate_kernel: false,
+            demangle: false,
             event_filter: None,
             include_addrs: false,
             include_pid: false,
@@ -201,7 +207,7 @@ impl Collapse for Folder {
         self.nstacks_per_job = n;
     }
 
-    #[cfg(test)]
+    #[doc(hidden)]
     fn set_nthreads(&mut self, n: usize) {
         self.opt.nthreads = n;
         self.occurrences = Occurrences::new(n);
@@ -496,8 +502,17 @@ impl Folder {
         let pc = line.next()?.trim_end();
         let mut line = line.next()?.rsplitn(2, ' ');
         let mut module = line.next()?;
-        // module is always wrapped in (), so remove those
+
+        // Module should always be wrapped in (), so remove those if they exist.
+        // We first check for their existence because it's possible this is being
+        // called from `is_applicable` on a non-perf profile. This both prevents
+        // a panic if `module.len() < 1` and helps detect whether or not we're
+        // parsing a `perf` profile and not something else.
+        if !module.starts_with('(') || !module.ends_with(')') {
+            return None;
+        }
         module = &module[1..(module.len() - 1)];
+
         let rawfunc = match line.next()?.trim() {
             // Sometimes there are two spaces betwen the pc and the (, like:
             //     7f1e2215d058  (/lib/x86_64-linux-gnu/libc-2.15.so)
@@ -539,8 +554,16 @@ impl Folder {
                 return;
             }
 
-            // Support Java inlining by splitting on "->". After the first func, the rest are
-            // annotated with "_[i]" to mark them as inlined.
+            let rawfunc = if self.opt.demangle {
+                demangle(rawfunc)
+            } else {
+                // perf mostly demangles Rust symbols,
+                // but this will fix the things it gets wrong
+                fix_partially_demangled_rust_symbol(rawfunc)
+            };
+
+            // Support Java inlining by splitting on "->". After the first func, the
+            // rest are annotated with "_[i]" to mark them as inlined.
             // See https://github.com/brendangregg/FlameGraph/pull/89.
             for func in rawfunc.split("->") {
                 let mut func = with_module_fallback(module, func, pc, self.opt.include_addrs);
@@ -791,6 +814,7 @@ mod tests {
             let options = Options {
                 annotate_jit: rng.gen(),
                 annotate_kernel: rng.gen(),
+                demangle: rng.gen(),
                 event_filter: None,
                 include_addrs: rng.gen(),
                 include_pid: rng.gen(),
