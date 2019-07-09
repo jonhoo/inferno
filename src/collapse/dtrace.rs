@@ -414,14 +414,16 @@ impl Folder {
 // This function should do the same thing as:
 // ```
 // fn is_end_of_stack(line: &[u8]) -> bool {
-//     if let Ok(line) = std::str::from_utf8(line) {
-//         let line = line.trim();
-//         match line.parse::<usize>() {
-//             Ok(_) => true,
-//             Err(_) => false,
+//     match std::str::from_utf8(line) {
+//         Ok(line) => {
+//             let line = line.trim();
+//             match line.parse::<usize>() {
+//                 Ok(_) => true,
+//                 Err(_) => false,
+//             }
 //         }
+//         Err(_) => false,
 //     }
-//     false
 // }
 // ```
 // But it is much faster since it works directly on bytes and because all we're interested in is
