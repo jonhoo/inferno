@@ -27,10 +27,16 @@ use std::iter;
 use std::path::PathBuf;
 use std::str::FromStr;
 use str_stack::StrStack;
-use svg::StyleOptions;
+use svg::{Dimension, StyleOptions};
 
-const XPAD: usize = 10; // pad lefm and right
+const XPAD: usize = 10; // pad left and right
 const FRAMEPAD: usize = 1; // vertical padding for frames
+
+// If no image width is given, this will be the initial width, but the embedded JavaScript will set
+// the width to 100% when it loads to make the width "fluid". The reason we give an initial width
+// even when the width will be "fluid" is so it looks good in previewers or viewers that don't run
+// the embedded JavaScript.
+const DEFAULT_IMAGE_WIDTH: usize = 1200;
 
 /// Default values for [`Options`].
 pub mod defaults {
@@ -66,7 +72,6 @@ pub mod defaults {
         COLORS: &str = "hot",
         SEARCH_COLOR: &str = "#e600e6",
         TITLE: &str = "Flame Graph",
-        IMAGE_WIDTH: usize = 1200,
         FRAME_HEIGHT: usize = 16,
         MIN_WIDTH: f64 = 0.1,
         FONT_TYPE: &str = "Verdana",
@@ -130,10 +135,10 @@ pub struct Options<'a> {
     /// Defaults to None.
     pub subtitle: Option<String>,
 
-    /// Width of for the flame graph
+    /// Width of the flame graph
     ///
-    /// [Default value](defaults::IMAGE_WIDTH).
-    pub image_width: usize,
+    /// Defaults to None, which means the width will be "fluid".
+    pub image_width: Option<usize>,
 
     /// Height of each frame.
     ///
@@ -235,7 +240,6 @@ impl<'a> Default for Options<'a> {
             colors: Palette::from_str(defaults::COLORS).unwrap(),
             search_color: SearchColor::from_str(defaults::SEARCH_COLOR).unwrap(),
             title: defaults::TITLE.to_string(),
-            image_width: defaults::IMAGE_WIDTH,
             frame_height: defaults::FRAME_HEIGHT,
             min_width: defaults::MIN_WIDTH,
             font_type: defaults::FONT_TYPE.to_string(),
@@ -244,6 +248,7 @@ impl<'a> Default for Options<'a> {
             count_name: defaults::COUNT_NAME.to_string(),
             name_type: defaults::NAME_TYPE.to_string(),
             factor: defaults::FACTOR,
+            image_width: Default::default(),
             notes: Default::default(),
             subtitle: Default::default(),
             bgcolors: Default::default(),
@@ -281,14 +286,15 @@ impl Default for Direction {
 }
 
 struct Rectangle {
-    x1: usize,
+    x1_pct: f64,
     y1: usize,
-    x2: usize,
+    x2_pct: f64,
     y2: usize,
 }
+
 impl Rectangle {
-    fn width(&self) -> usize {
-        self.x2 - self.x1
+    fn width_pct(&self) -> f64 {
+        self.x2_pct - self.x1_pct
     }
     fn height(&self) -> usize {
         self.y2 - self.y1
@@ -379,7 +385,7 @@ where
             &mut svg,
             &mut buffer,
             svg::TextItem {
-                x: (opt.image_width / 2) as f64,
+                x: Dimension::Percent(50.0),
                 y: (opt.font_size * 2) as f64,
                 text: "ERROR: No valid input provided to flamegraph".into(),
                 extra: None,
@@ -393,9 +399,10 @@ where
         )));
     }
 
+    let image_width = opt.image_width.unwrap_or(DEFAULT_IMAGE_WIDTH) as f64;
     let timemax = time;
-    let widthpertime = (opt.image_width - 2 * XPAD) as f64 / timemax as f64;
-    let minwidth_time = opt.min_width / widthpertime;
+    let widthpertime_pct = 100.0 / timemax as f64;
+    let minwidth_time = opt.min_width / widthpertime_pct;
 
     // prune blocks that are too narrow
     let mut depthmax = 0;
@@ -434,16 +441,21 @@ where
     let cache_a_end = Event::End(BytesEnd::borrowed(b"a"));
 
     // create frames container
-    if let Event::Start(ref mut g) = cache_g {
-        g.extend_attributes(std::iter::once(("id", "frames")));
-    }
-    svg.write_event(&cache_g)?;
+    let container_x = format!("{}", XPAD);
+    let container_width = format!("{}", image_width as usize - XPAD - XPAD);
+    svg.write_event(Event::Start(
+        BytesStart::borrowed_name(b"svg").with_attributes(vec![
+            ("id", "frames"),
+            ("x", &container_x),
+            ("width", &container_width),
+        ]),
+    ))?;
 
     // draw frames
     let mut samples_txt_buffer = num_format::Buffer::default();
     for frame in frames {
-        let x1 = XPAD + (frame.start_time as f64 * widthpertime) as usize;
-        let x2 = XPAD + (frame.end_time as f64 * widthpertime) as usize;
+        let x1_pct = frame.start_time as f64 * widthpertime_pct;
+        let x2_pct = frame.end_time as f64 * widthpertime_pct;
 
         let (y1, y2) = match opt.direction {
             Direction::Straight => {
@@ -458,7 +470,13 @@ where
                 (y1, y2)
             }
         };
-        let rect = Rectangle { x1, y1, x2, y2 };
+
+        let rect = Rectangle {
+            x1_pct,
+            y1,
+            x2_pct,
+            y2,
+        };
 
         // The rounding here can differ from the Perl version when the fractional part is `0.5`.
         // The Perl version does `my $samples = sprintf "%.0f", ($etime - $stime) * $factor;`,
@@ -556,8 +574,9 @@ where
         };
         filled_rectangle(&mut svg, &mut buffer, &rect, color, &mut cache_rect)?;
 
-        let fitchars =
-            (rect.width() as f64 / (opt.font_size as f64 * opt.font_width)).trunc() as usize;
+        let fitchars = (rect.width_pct() as f64
+            / (100.0 * opt.font_size as f64 * opt.font_width / image_width))
+            .trunc() as usize;
         let text: svg::TextArgument<'_> = if fitchars >= 3 {
             // room for one char plus two dots
             let f = deannotate(&frame.location.function);
@@ -586,7 +605,7 @@ where
             &mut svg,
             &mut buffer,
             svg::TextItem {
-                x: rect.x1 as f64 + 3.0,
+                x: Dimension::Percent(rect.x1_pct + 100.0 * 3.0 / image_width),
                 y: 3.0 + (rect.y1 + rect.y2) as f64 / 2.0,
                 text,
                 extra: None,
@@ -601,7 +620,7 @@ where
         }
     }
 
-    svg.write_event(&cache_g_end)?;
+    svg.write_event(Event::End(BytesEnd::borrowed(b"svg")))?;
     svg.write_event(Event::End(BytesEnd::borrowed(b"svg")))?;
     svg.write_event(Event::Eof)?;
 
@@ -711,9 +730,9 @@ fn filled_rectangle<W: Write>(
     color: Color,
     cache_rect: &mut Event<'_>,
 ) -> quick_xml::Result<usize> {
-    let x = write_usize(buffer, rect.x1);
+    let x = write!(buffer, "{:.4}%", rect.x1_pct);
     let y = write_usize(buffer, rect.y1);
-    let width = write_usize(buffer, rect.width());
+    let width = write!(buffer, "{:.4}%", rect.width_pct());
     let height = write_usize(buffer, rect.height());
     let color = write!(buffer, "rgb({},{},{})", color.r, color.g, color.b);
 

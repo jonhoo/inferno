@@ -1,4 +1,4 @@
-"use strict";
+"use strict"
 var details, searchbtn, unzoombtn, matchedtxt, svg, searching;
 function init(evt) {
     details = document.getElementById("details").firstChild;
@@ -8,14 +8,27 @@ function init(evt) {
     svg = document.getElementsByTagName("svg")[0];
     searching = 0;
 
-    // use GET parameters to restore a flamegraphs state.
+    if (fluiddrawing) {
+        // Make width dynamic so the SVG fits its parent's width.
+        svg.removeAttribute("width");
+        svg.removeAttribute("viewBox");
+        unzoom();
+        update_frames_width();
+        update_search_elements();
+        window.addEventListener('resize', () => {
+            update_frames_width();
+            update_all_text();
+            update_search_elements();
+        });
+    }
+
+    // use GET parameters to restore a flamegraph's state.
     var params = get_params();
     if (params.x && params.y)
         zoom(find_group(document.querySelector('[x="' + params.x + '"][y="' + params.y + '"]')));
     if (params.s)
         search(params.s);
 }
-
 // event listeners
 window.addEventListener("click", function(e) {
     var target = find_group(e.target);
@@ -47,7 +60,6 @@ window.addEventListener("click", function(e) {
     }
     else if (e.target.id == "search") search_prompt();
 }, false)
-
 // mouse-over for info
 // show
 window.addEventListener("mouseover", function(e) {
@@ -123,9 +135,10 @@ function g_to_func(e) {
 function update_text(e) {
     var r = find_child(e, "rect");
     var t = find_child(e, "text");
-    var w = parseFloat(r.attributes.width.value) -3;
-    var txt = find_child(e, "title").textContent.replace(/\\([^(]*\\)\$/,"");
-    t.attributes.x.value = parseFloat(r.attributes.x.value) + 3;
+    var svgWidth = svg.width.animVal.value;
+    var w = parseFloat(r.attributes.width.value) * svgWidth / 100 - 3;
+    var txt = find_child(e, "title").textContent.replace(/\([^(]*\)$/,"");
+    t.attributes.x.value = format_percent((parseFloat(r.attributes.x.value) + (100 * 3 / svgWidth)));
     // Smaller than this size won't fit anything
     if (w < 2 * fontsize * fontwidth) {
         t.textContent = "";
@@ -133,7 +146,7 @@ function update_text(e) {
     }
     t.textContent = txt;
     // Fit in full text width
-    if (/^ *\$/.test(txt) || t.getSubStringLength(0, txt.length) < w)
+    if (/^ *\$/.test(txt) || t.getComputedTextLength() < w)
         return;
     for (var x = txt.length - 2; x > 0; x--) {
         if (t.getSubStringLength(0, x + 2) <= w) {
@@ -142,6 +155,17 @@ function update_text(e) {
         }
     }
     t.textContent = "";
+}
+function update_all_text() {
+    var el = document.getElementById("frames").children;
+    for(var i = 0; i < el.length; i++) {
+        update_text(el[i]);
+    }
+}
+function update_search_elements() {
+    var svgWidth = svg.width.animVal.value;
+    searchbtn.attributes.x.value = svgWidth - xpad - 100;
+    matchedtxt.attributes.x.value = svgWidth - xpad - 100;
 }
 // zoom
 function zoom_reset(e) {
@@ -158,29 +182,29 @@ function zoom_child(e, x, ratio) {
     if (e.attributes != undefined) {
         if (e.attributes.x != undefined) {
             orig_save(e, "x");
-            e.attributes.x.value = (parseFloat(e.attributes.x.value) - x - xpad) * ratio + xpad;
+            e.attributes.x.value = format_percent((parseFloat(e.attributes.x.value) - x) * ratio);
             if(e.tagName == "text")
-                e.attributes.x.value = find_child(e.parentNode, "rect[x]").attributes.x.value + 3;
+                e.attributes.x.value = format_percent(parseFloat(find_child(e.parentNode, "rect[x]").attributes.x.value) + 3);
         }
         if (e.attributes.width != undefined) {
             orig_save(e, "width");
-            e.attributes.width.value = parseFloat(e.attributes.width.value) * ratio;
+            e.attributes.width.value = format_percent(parseFloat(e.attributes.width.value) * ratio);
         }
     }
     if (e.childNodes == undefined) return;
     for(var i = 0, c = e.childNodes; i < c.length; i++) {
-        zoom_child(c[i], x - xpad, ratio);
+        zoom_child(c[i], x, ratio);
     }
 }
 function zoom_parent(e) {
     if (e.attributes) {
         if (e.attributes.x != undefined) {
             orig_save(e, "x");
-            e.attributes.x.value = xpad;
+            e.attributes.x.value = "0.0%";
         }
         if (e.attributes.width != undefined) {
             orig_save(e, "width");
-            e.attributes.width.value = parseInt(svg.width.baseVal.value) - (xpad*2);
+            e.attributes.width.value = "100.0%";
         }
     }
     if (e.childNodes == undefined) return;
@@ -192,11 +216,11 @@ function zoom(node) {
     var attr = find_child(node, "rect").attributes;
     var width = parseFloat(attr.width.value);
     var xmin = parseFloat(attr.x.value);
-    var xmax = parseFloat(xmin + width);
+    var xmax = xmin + width;
     var ymin = parseFloat(attr.y.value);
-    var ratio = (svg.width.baseVal.value - 2 * xpad) / width;
+    var ratio = 100 / width;
     // XXX: Workaround for JavaScript float issues (fix me)
-    var fudge = 0.0001;
+    var fudge = 0.001;
     unzoombtn.classList.remove("hide");
     var el = document.getElementById("frames").children;
     for (var i = 0; i < el.length; i++) {
@@ -342,4 +366,10 @@ function search(term) {
     var pct = 100 * count / maxwidth;
     if (pct != 100) pct = pct.toFixed(1);
     matchedtxt.firstChild.nodeValue = "Matched: " + pct + "%";
+}
+function update_frames_width() {
+    document.getElementById("frames").attributes.width.value = svg.width.animVal.value - xpad * 2;
+}
+function format_percent(n) {
+    return n.toFixed(4) + "%";
 }
