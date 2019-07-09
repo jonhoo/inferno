@@ -175,7 +175,7 @@ impl Folder {
             }
         }
 
-        if !self.stack.is_empty() {
+        if !self.stack.is_empty() || self.stack_str_size != 0 {
             return Err(io::Error::new(
                 io::ErrorKind::InvalidData,
                 "Input data ends in the middle of a stack.",

@@ -153,12 +153,6 @@ impl Collapse for Folder {
         // Write results...
         self.occurrences.write_and_clear(writer)?;
 
-        // Reset state...
-        self.in_event = false;
-        self.pname.clear();
-        self.skip_stack = false;
-        self.stack.clear();
-
         Ok(())
     }
 
@@ -223,7 +217,7 @@ impl Folder {
         loop {
             line.clear();
             if reader.read_line(&mut line)? == 0 {
-                return Ok(());
+                break;
             }
             if line.starts_with('#') {
                 continue;
@@ -237,6 +231,15 @@ impl Folder {
                 self.on_event_line(line);
             }
         }
+
+        if self.in_event || self.skip_stack || !self.stack.is_empty() {
+            return Err(io::Error::new(
+                io::ErrorKind::InvalidData,
+                "Input data ends in the middle of a stack.",
+            ));
+        }
+
+        Ok(())
     }
 
     fn collapse_multi_threaded<R>(&mut self, mut reader: R) -> io::Result<()>
@@ -314,10 +317,6 @@ impl Folder {
                                 }
                             }
                         }
-                        folder.in_event = false;
-                        folder.pname.clear();
-                        folder.skip_stack = false;
-                        folder.stack.clear();
                     }
                 });
                 handles.push(handle);
