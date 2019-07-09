@@ -500,7 +500,6 @@ fn is_end_of_stack(line: &[u8]) -> bool {
                     continue;
                 } else if c.is_ascii_digit() {
                     state = State::MiddleOfLine;
-                    continue;
                 } else {
                     return false;
                 }
