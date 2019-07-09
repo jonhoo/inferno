@@ -101,10 +101,6 @@ impl Collapse for Folder {
         // Write results...
         self.occurrences.write_and_clear(writer)?;
 
-        // Reset state...
-        self.stack.clear();
-        self.stack_str_size = 0;
-
         Ok(())
     }
 
@@ -178,6 +174,14 @@ impl Folder {
                 self.on_stack_line(line);
             }
         }
+
+        if !self.stack.is_empty() {
+            return Err(io::Error::new(
+                io::ErrorKind::InvalidData,
+                "Input data ends in the middle of a stack.",
+            ));
+        }
+
         Ok(())
     }
 
@@ -230,8 +234,6 @@ impl Folder {
                                 }
                             }
                         }
-                        folder.stack.clear();
-                        folder.stack_str_size = 0;
                     }
                 });
                 handles.push(handle);
