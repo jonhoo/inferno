@@ -411,42 +411,73 @@ impl Folder {
     }
 }
 
+// This function should do the same thing as:
+// ```
+// fn is_end_of_stack(line: &[u8]) -> bool {
+//     if let Ok(line) = std::str::from_utf8(line) {
+//         let line = line.trim();
+//         match line.parse::<usize>() {
+//             Ok(_) => true,
+//             Err(_) => false,
+//         }
+//     }
+//     false
+// }
+// ```
+// But it is much faster since it works directly on bytes and because all we're interested in is
+// whether the provided bytes **can** be parsed into a `usize`, not which `usize` they might
+// actually parse into. We don't need to validate that the input is utf8 and, again, we don't need
+// to keep track of what the number we're parsing actually is.
+//
+// Benchmarking results for the two methods:
+// * Using the method above: 281 MiB/s
+// * Using the method below: 437 MiB/s
+//
 fn is_end_of_stack(line: &[u8]) -> bool {
+    // In order to return `true`, as we iterate over the provided bytes, we need to progress
+    // through each of the follow states, in order; if we can't, immediately return `false`.
     enum State {
-        Start,
-        Middle,
-        End,
+        StartOfLine,  // Accept any number of whitespace characters
+        MiddleOfLine, // Accept any number of ascii digits
+        EndOfLine,    // Accept any number of whitespace characters
     }
-    let mut state = State::Start;
+    let mut state = State::StartOfLine;
     for b in line {
         let b = *b;
         let c = b as char;
         match state {
-            State::Start => {
+            State::StartOfLine => {
                 if c.is_whitespace() {
                     continue;
-                }
-                if b > 47 && b < 58 {
-                    state = State::Middle;
+                // The check below determines if the byte is an ascii digits, as digits lie
+                // between 47 and 58 in the ascii table. For an unknown reason, doing the check
+                // this way is much faster on my machine than calling the `is_ascii_digit` method
+                // on `char`. Oddly, the reverse is true for checking if the byte is whitespace.
+                // On my machine the `is_whitespace` method on `char` is faster than doing a
+                // manual check of the value of the byte itself.
+                } else if b > 47 && b < 58 {
+                    state = State::MiddleOfLine;
                     continue;
+                } else {
+                    return false;
                 }
-                return false;
             }
-            State::Middle => {
+            State::MiddleOfLine => {
+                // See comment above.
                 if b > 47 && b < 58 {
                     continue;
+                } else if c.is_whitespace() {
+                    state = State::EndOfLine;
+                } else {
+                    return false;
                 }
-                if c.is_whitespace() {
-                    state = State::End;
-                    continue;
-                }
-                return false;
             }
-            State::End => {
+            State::EndOfLine => {
                 if c.is_whitespace() {
                     continue;
+                } else {
+                    return false;
                 }
-                return false;
             }
         }
     }
