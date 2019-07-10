@@ -1,4 +1,4 @@
-"use strict"
+"use strict";
 var details, searchbtn, unzoombtn, matchedtxt, svg, searching, frames;
 function init(evt) {
     details = document.getElementById("details").firstChild;
