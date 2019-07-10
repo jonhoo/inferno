@@ -185,11 +185,27 @@ mod tests_common {
     use std::fs::File;
     use std::io::{self, BufRead, Read};
     use std::path::{Path, PathBuf};
-    use std::time::Instant;
+    use std::time::{Instant, Duration};
 
     use libflate::gzip::Decoder;
 
     use super::*;
+
+    pub(crate) trait DurationExt {
+        fn as_nanos_compat(&self) -> u128;
+    }
+
+    impl DurationExt for Duration {
+        #[rustversion::since(1.33)]
+        fn as_nanos_compat(&self) -> u128 {
+            self.as_nanos()
+        }
+
+        #[rustversion::before(1.33)]
+        fn as_nanos_compat(&self) -> u128 {
+            self.as_secs() as u128 * 1_000_000_000 + self.subsec_nanos() as u128
+        }
+    }
 
     pub(crate) fn read_inputs<P>(inputs: &[P]) -> io::Result<HashMap<PathBuf, Vec<u8>>>
     where
@@ -287,7 +303,7 @@ mod tests_common {
                         let mut throwaway_buffer = Vec::new();
                         let now = Instant::now();
                         folder.collapse(&bytes[..], &mut throwaway_buffer)?;
-                        durations.push(now.elapsed().as_nanos());
+                        durations.push(now.elapsed().as_nanos_compat());
                     }
                     let avg_duration =
                         (durations.iter().sum::<u128>() as f64 / durations.len() as f64) as u64;
