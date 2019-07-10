@@ -185,7 +185,7 @@ mod tests_common {
     use std::fs::File;
     use std::io::{self, BufRead, Read};
     use std::path::{Path, PathBuf};
-    use std::time::{Instant, Duration};
+    use std::time::{Duration, Instant};
 
     use libflate::gzip::Decoder;
 
