@@ -201,12 +201,22 @@ impl Folder {
 
         crossbeam::thread::scope(|scope| {
             // Spin up the threadpool / worker threads.
+
+            // Channel for the main thread to send input data to the worker threads
             let (tx_input, rx_input) = channel::bounded::<Option<Vec<u8>>>(2 * self.opt.nthreads);
+
+            // Channel for the worker threads to send an error, if any, to the main thread.
             let (tx_output, rx_output) = channel::bounded::<io::Result<()>>(1);
+
+            // Channel for the worker threads to send a signal to the other worker threads that
+            // they have errored and so everyone should stop doing unnecessary work and return.
+            let (tx_stop, rx_stop) = channel::bounded::<()>(self.opt.nthreads - 1);
+
             let mut handles = Vec::with_capacity(self.opt.nthreads);
             for _ in 0..self.opt.nthreads {
-                let rx_input = rx_input.clone();
                 let tx_output = tx_output.clone();
+                let rx_input = rx_input.clone();
+                let (tx_stop, rx_stop) = (tx_stop.clone(), rx_stop.clone());
 
                 let nstacks_per_job = self.nstacks_per_job;
                 let occurrences = self.occurrences.clone();
@@ -221,60 +231,79 @@ impl Folder {
                         stack_str_size: 0,
                         opt,
                     };
-                    while let Some(data) = rx_input.recv().unwrap() {
-                        if let Err(e) = folder.collapse_single_threaded(&data[..]) {
-                            // Use `try_send` here because we only need to send one
-                            // error back to the main thread for propagation (even if
-                            // multiple threads fail). If multiple threads fail,
-                            // the first one to do so will fill up our output channel
-                            // (which only has one slot); so plain `send` would block
-                            // here, which can't happen because we need each thread to
-                            // continuously pull values off the input channel or else
-                            // it may fill up and clog. This is also why we continue
-                            // pulling data off the input channel even after we try
-                            // to send an error.
-                            let _ = tx_output.try_send(Err(e));
-                            loop {
-                                if rx_input.recv().unwrap().is_none() {
-                                    break;
+                    // Loop until the main thread signals there is no more data
+                    // or another worker signals they have errored...
+                    loop {
+                        channel::select! {
+                            recv(rx_input) -> input => {
+                                let data = match input.unwrap() {
+                                    Some(data) => data,
+                                    None => return,
+                                };
+                                if let Err(e) = folder.collapse_single_threaded(&data[..]) {
+                                    // If we produce an error...
+
+                                    // Signal all the other threads; so they can stop doing needless work.
+                                    // (note: if this fails, it means another thread has already sent
+                                    // stop signals to all the other threads; so we don't have to.)
+                                    for _ in 0..(folder.opt.nthreads - 1) {
+                                        let _ = tx_stop.try_send(());
+                                    }
+
+                                    // Send the error back to the main thread for propagation.
+                                    // (note: if this fails it means another thread has already sent an error
+                                    // to the main thread; so we don't have to.)
+                                    let _ = tx_output.try_send(Err(e));
+
+                                    // Return.
+                                    return;
                                 }
-                            }
+                            },
+                            recv(rx_stop) -> _ => return,
                         }
                     }
                 });
                 handles.push(handle);
             }
 
-            // State for the loop...
+            drop(rx_input);
+
             let buf_capacity =
                 usize::next_power_of_two(collapse::NBYTES_PER_STACK_GUESS * self.nstacks_per_job);
             let mut buf = Vec::with_capacity(buf_capacity);
             let (mut index, mut nstacks) = (0, 0);
 
-            // The loop...
+            // Loop through the input data in order to chunk it up and send it off to the worker threads...
             loop {
-                // First, read some data into the `utils::Buffer`.
+                // First, read some data into the buffer.
                 let n = reader.read_until(b'\n', &mut buf)?;
 
                 // If we're at the end of the data...
                 if n == 0 {
                     // Send the last slice and exit the loop.
-                    tx_input.send(Some(buf)).unwrap();
+                    let _ = tx_input.send(Some(buf));
                     break;
                 }
 
                 let line = &buf[index..index + n];
                 index += n;
 
+                // If we're at the end of a stack...
                 if is_end_of_stack(line) {
-                    // It's the end of a stack; count it
+                    // Count it.
                     nstacks += 1;
                     // If we've seen enough stacks to make up a slice...
                     if nstacks == self.nstacks_per_job {
                         // Send it.
                         let buf_capacity = buf.capacity();
                         let chunk = mem::replace(&mut buf, Vec::with_capacity(buf_capacity));
-                        tx_input.send(Some(chunk)).unwrap();
+                        if let Err(_) = tx_input.send(Some(chunk)) {
+                            // If this send returns an error, it means the children have shutdown
+                            // because one of them produced an error and has already sent
+                            // it to the main thread; so we should stop doing unnecessary work,
+                            // i.e. we should break.
+                            break;
+                        }
                         // Reset the state; mark the beginning of the next slice.
                         index = 0;
                         nstacks = 0;
@@ -282,20 +311,26 @@ impl Folder {
                 }
             }
 
-            // Send shutdown signal.
+            // We've finished sending the input; so send the "no more input" signal,
+            // i.e. `None`, to the children.
             for _ in &handles {
-                tx_input.send(None).unwrap();
+                if let Err(_) = tx_input.send(None) {
+                    // If this send returns an error, it means the children have shutdown
+                    // because one of them has already produced an error and sent it to the
+                    // main thread; so we should break here.
+                    break;
+                }
             }
 
-            // Retrieve error, if any.
             drop(tx_output);
-            if let Ok(result) = rx_output.recv() {
-                result?;
-            }
+            let maybe_error = rx_output.iter().find(|result| result.is_err());
 
-            // Join threads.
             for handle in handles {
                 handle.join().unwrap();
+            }
+
+            if let Some(error) = maybe_error {
+                error?;
             }
 
             Ok(())
@@ -576,6 +611,40 @@ mod tests {
     fn test_collapse_multi_dtrace() -> io::Result<()> {
         let mut folder = Folder::default();
         tests_common::test_collapse_multi(&mut folder, &INPUT)
+    }
+
+    #[test]
+    fn test_collapse_multi_dtrace_stop_early() {
+        let invalid_utf8 = unsafe { std::str::from_utf8_unchecked(&[0xf0, 0x28, 0x8c, 0xbc]) };
+        let invalid_stack = format!("genunix`cv_broadcast+0x1{}\n1\n\n", invalid_utf8);
+        let valid_stack = "genunix`cv_broadcast+0x1\n1\n\n";
+
+        let mut input = Vec::new();
+        for _ in 0..100 {
+            input.extend_from_slice(valid_stack.as_bytes());
+        }
+        input.extend_from_slice(invalid_stack.as_bytes());
+        for _ in 0..(1024 * 1024 * 10) {
+            input.extend_from_slice(valid_stack.as_bytes());
+        }
+
+        let mut folder = Folder::default();
+        folder.nstacks_per_job = 1;
+        folder.opt.nthreads = 12;
+        match folder.collapse(&input[..], io::sink()) {
+            Ok(_) => panic!("collapse should have return error, but instead returned Ok."),
+            Err(e) => match e.kind() {
+                io::ErrorKind::InvalidData => assert_eq!(
+                    &format!("{}", e),
+                    "stream did not contain valid UTF-8",
+                    "error message is incorrect.",
+                ),
+                k => panic!(
+                    "collapse should have returned `InvalidData` error but instead returned {:?}",
+                    k
+                ),
+            },
+        }
     }
 
     #[test]
