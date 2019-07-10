@@ -297,7 +297,7 @@ impl Folder {
                         // Send it.
                         let buf_capacity = buf.capacity();
                         let chunk = mem::replace(&mut buf, Vec::with_capacity(buf_capacity));
-                        if let Err(_) = tx_input.send(Some(chunk)) {
+                        if tx_input.send(Some(chunk)).is_err() {
                             // If this send returns an error, it means the children have shutdown
                             // because one of them produced an error and has already sent
                             // it to the main thread; so we should stop doing unnecessary work,
@@ -314,7 +314,7 @@ impl Folder {
             // We've finished sending the input; so send the "no more input" signal,
             // i.e. `None`, to the children.
             for _ in &handles {
-                if let Err(_) = tx_input.send(None) {
+                if tx_input.send(None).is_err() {
                     // If this send returns an error, it means the children have shutdown
                     // because one of them has already produced an error and sent it to the
                     // main thread; so we should break here.
@@ -521,6 +521,7 @@ impl Folder {
 fn is_end_of_stack(line: &[u8]) -> bool {
     // In order to return `true`, as we iterate over the provided bytes, we need to progress
     // through each of the follow states, in order; if we can't, immediately return `false`.
+    #[allow(clippy::enum_variant_names)]
     enum State {
         StartOfLine,  // Accept any number of whitespace characters
         MiddleOfLine, // Accept any number of ascii digits
