@@ -24,1819 +24,1820 @@ var fontsize = 12;
 var fontwidth = 0.59;
 var xpad = 10;
 var inverted = false;
-var searchcolor = 'rgb(230,0,230)';]]>
+var searchcolor = 'rgb(230,0,230)';
+var fluiddrawing = true;]]>
     </script>
-    <rect x="0" y="0" width="1200" height="1190" fill="url(#background)"/>
-    <text id="title" x="600.00" y="24.00">Flame Graph</text>
-    <text id="details" x="10.00" y="1173.00"> </text>
-    <text id="unzoom" class="hide" x="10.00" y="24.00">Reset Zoom</text>
-    <text id="search" x="1090.00" y="24.00">Search</text>
-    <text id="matched" x="1090.00" y="1173.00"> </text>
-    <g id="frames">
+    <rect x="0" y="0" width="100%" height="1190" fill="url(#background)"/>
+    <text id="title" x="50.0000%" y="24.00">Flame Graph</text>
+    <text id="details" x="10" y="1173.00"> </text>
+    <text id="unzoom" class="hide" x="10" y="24.00">Reset Zoom</text>
+    <text id="search" x="1090" y="24.00">Search</text>
+    <text id="matched" x="1090" y="1173.00"> </text>
+    <svg id="frames" x="10" width="1180">
         <g>
             <title>read (1 samples, 0.35%)</title>
-            <rect x="10" y="1109" width="4" height="15" fill="rgb(241,184,40)"/>
-            <text x="13.00" y="1119.50"></text>
+            <rect x="0.0000%" y="1109" width="0.3509%" height="15" fill="rgb(241,184,40)"/>
+            <text x="0.2500%" y="1119.50"></text>
         </g>
         <g>
             <title>check_events (1 samples, 0.35%)</title>
-            <rect x="10" y="1093" width="4" height="15" fill="rgb(236,116,34)"/>
-            <text x="13.00" y="1103.50"></text>
+            <rect x="0.0000%" y="1093" width="0.3509%" height="15" fill="rgb(236,116,34)"/>
+            <text x="0.2500%" y="1103.50"></text>
         </g>
         <g>
             <title>hypercall_page (1 samples, 0.35%)</title>
-            <rect x="10" y="1077" width="4" height="15" fill="rgb(236,185,34)"/>
-            <text x="13.00" y="1087.50"></text>
+            <rect x="0.0000%" y="1077" width="0.3509%" height="15" fill="rgb(236,185,34)"/>
+            <text x="0.2500%" y="1087.50"></text>
         </g>
         <g>
             <title>ScavengeRootsTask::do_it (1 samples, 0.35%)</title>
-            <rect x="14" y="1061" width="4" height="15" fill="rgb(230,202,27)"/>
-            <text x="17.00" y="1071.50"></text>
+            <rect x="0.3509%" y="1061" width="0.3509%" height="15" fill="rgb(230,202,27)"/>
+            <text x="0.6009%" y="1071.50"></text>
         </g>
         <g>
             <title>ClassLoaderDataGraph::oops_do (1 samples, 0.35%)</title>
-            <rect x="14" y="1045" width="4" height="15" fill="rgb(244,125,43)"/>
-            <text x="17.00" y="1055.50"></text>
+            <rect x="0.3509%" y="1045" width="0.3509%" height="15" fill="rgb(244,125,43)"/>
+            <text x="0.6009%" y="1055.50"></text>
         </g>
         <g>
             <title>ClassLoaderData::oops_do (1 samples, 0.35%)</title>
-            <rect x="14" y="1029" width="4" height="15" fill="rgb(244,125,43)"/>
-            <text x="17.00" y="1039.50"></text>
+            <rect x="0.3509%" y="1029" width="0.3509%" height="15" fill="rgb(244,125,43)"/>
+            <text x="0.6009%" y="1039.50"></text>
         </g>
         <g>
             <title>PSScavengeKlassClosure::do_klass (1 samples, 0.35%)</title>
-            <rect x="14" y="1013" width="4" height="15" fill="rgb(240,164,38)"/>
-            <text x="17.00" y="1023.50"></text>
+            <rect x="0.3509%" y="1013" width="0.3509%" height="15" fill="rgb(240,164,38)"/>
+            <text x="0.6009%" y="1023.50"></text>
         </g>
         <g>
             <title>PSPromotionManager::drain_stacks_depth (1 samples, 0.35%)</title>
-            <rect x="18" y="1045" width="4" height="15" fill="rgb(238,174,37)"/>
-            <text x="21.00" y="1055.50"></text>
+            <rect x="0.7018%" y="1045" width="0.3509%" height="15" fill="rgb(238,174,37)"/>
+            <text x="0.9518%" y="1055.50"></text>
         </g>
         <g>
             <title>oopDesc* PSPromotionManager::copy_to_survivor_space&lt;false&gt; (1 samples, 0.35%)</title>
-            <rect x="18" y="1029" width="4" height="15" fill="rgb(244,204,43)"/>
-            <text x="21.00" y="1039.50"></text>
+            <rect x="0.7018%" y="1029" width="0.3509%" height="15" fill="rgb(244,204,43)"/>
+            <text x="0.9518%" y="1039.50"></text>
         </g>
         <g>
             <title>InstanceKlass::oop_push_contents (1 samples, 0.35%)</title>
-            <rect x="18" y="1013" width="4" height="15" fill="rgb(238,183,36)"/>
-            <text x="21.00" y="1023.50"></text>
+            <rect x="0.7018%" y="1013" width="0.3509%" height="15" fill="rgb(238,183,36)"/>
+            <text x="0.9518%" y="1023.50"></text>
         </g>
         <g>
             <title>ParallelTaskTerminator::offer_termination (5 samples, 1.75%)</title>
-            <rect x="22" y="1045" width="21" height="15" fill="rgb(247,165,46)"/>
-            <text x="25.00" y="1055.50"></text>
+            <rect x="1.0526%" y="1045" width="1.7544%" height="15" fill="rgb(247,165,46)"/>
+            <text x="1.3026%" y="1055.50"></text>
         </g>
         <g>
             <title>GCTaskThread::run (14 samples, 4.91%)</title>
-            <rect x="14" y="1077" width="58" height="15" fill="rgb(243,216,41)"/>
-            <text x="17.00" y="1087.50">GCTask..</text>
+            <rect x="0.3509%" y="1077" width="4.9123%" height="15" fill="rgb(243,216,41)"/>
+            <text x="0.6009%" y="1087.50">GCTask..</text>
         </g>
         <g>
             <title>StealTask::do_it (13 samples, 4.56%)</title>
-            <rect x="18" y="1061" width="54" height="15" fill="rgb(230,159,27)"/>
-            <text x="21.00" y="1071.50">Steal..</text>
+            <rect x="0.7018%" y="1061" width="4.5614%" height="15" fill="rgb(230,159,27)"/>
+            <text x="0.9518%" y="1071.50">Steal..</text>
         </g>
         <g>
             <title>SpinPause (7 samples, 2.46%)</title>
-            <rect x="43" y="1045" width="29" height="15" fill="rgb(241,166,40)"/>
-            <text x="46.00" y="1055.50">Sp..</text>
+            <rect x="2.8070%" y="1045" width="2.4561%" height="15" fill="rgb(241,166,40)"/>
+            <text x="3.0570%" y="1055.50">Sp..</text>
         </g>
         <g>
             <title>io/netty/buffer/AbstractByteBufAllocator:.directBuffer (1 samples, 0.35%)</title>
-            <rect x="84" y="853" width="4" height="15" fill="rgb(237,149,35)"/>
-            <text x="87.00" y="863.50"></text>
+            <rect x="6.3158%" y="853" width="0.3509%" height="15" fill="rgb(237,149,35)"/>
+            <text x="6.5658%" y="863.50"></text>
         </g>
         <g>
             <title>io/netty/buffer/AbstractReferenceCountedByteBuf:.release (1 samples, 0.35%)</title>
-            <rect x="96" y="661" width="5" height="15" fill="rgb(237,149,35)"/>
-            <text x="99.00" y="671.50"></text>
+            <rect x="7.3684%" y="661" width="0.3509%" height="15" fill="rgb(237,149,35)"/>
+            <text x="7.6184%" y="671.50"></text>
         </g>
         <g>
             <title>io/netty/buffer/PooledByteBuf:.internalNioBuffer (1 samples, 0.35%)</title>
-            <rect x="101" y="645" width="4" height="15" fill="rgb(237,149,35)"/>
-            <text x="104.00" y="655.50"></text>
+            <rect x="7.7193%" y="645" width="0.3509%" height="15" fill="rgb(237,149,35)"/>
+            <text x="7.9693%" y="655.50"></text>
         </g>
         <g>
             <title>sun/nio/ch/NativeThread:.current (1 samples, 0.35%)</title>
-            <rect x="105" y="645" width="4" height="15" fill="rgb(237,148,35)"/>
-            <text x="108.00" y="655.50"></text>
+            <rect x="8.0702%" y="645" width="0.3509%" height="15" fill="rgb(237,148,35)"/>
+            <text x="8.3202%" y="655.50"></text>
         </g>
         <g>
             <title> (3 samples, 1.05%)</title>
-            <rect x="113" y="613" width="12" height="15" fill="rgb(255,230,55)"/>
-            <text x="116.00" y="623.50"></text>
+            <rect x="8.7719%" y="613" width="1.0526%" height="15" fill="rgb(255,230,55)"/>
+            <text x="9.0219%" y="623.50"></text>
         </g>
         <g>
             <title>Java_sun_nio_ch_FileDispatcherImpl_write0 (1 samples, 0.35%)</title>
-            <rect x="125" y="613" width="5" height="15" fill="rgb(233,120,31)"/>
-            <text x="128.00" y="623.50"></text>
+            <rect x="9.8246%" y="613" width="0.3509%" height="15" fill="rgb(233,120,31)"/>
+            <text x="10.0746%" y="623.50"></text>
         </g>
         <g>
             <title>sys_write (1 samples, 0.35%)</title>
-            <rect x="134" y="597" width="4" height="15" fill="rgb(236,167,34)"/>
-            <text x="137.00" y="607.50"></text>
+            <rect x="10.5263%" y="597" width="0.3509%" height="15" fill="rgb(236,167,34)"/>
+            <text x="10.7763%" y="607.50"></text>
         </g>
         <g>
             <title>fget_light (1 samples, 0.35%)</title>
-            <rect x="138" y="565" width="4" height="15" fill="rgb(236,177,34)"/>
-            <text x="141.00" y="575.50"></text>
+            <rect x="10.8772%" y="565" width="0.3509%" height="15" fill="rgb(236,177,34)"/>
+            <text x="11.1272%" y="575.50"></text>
         </g>
         <g>
             <title>__srcu_read_lock (1 samples, 0.35%)</title>
-            <rect x="142" y="549" width="4" height="15" fill="rgb(236,132,34)"/>
-            <text x="145.00" y="559.50"></text>
+            <rect x="11.2281%" y="549" width="0.3509%" height="15" fill="rgb(236,132,34)"/>
+            <text x="11.4781%" y="559.50"></text>
         </g>
         <g>
             <title>__tcp_push_pending_frames (1 samples, 0.35%)</title>
-            <rect x="146" y="485" width="4" height="15" fill="rgb(236,128,34)"/>
-            <text x="149.00" y="495.50"></text>
+            <rect x="11.5789%" y="485" width="0.3509%" height="15" fill="rgb(236,128,34)"/>
+            <text x="11.8289%" y="495.50"></text>
         </g>
         <g>
             <title>ktime_get_real (1 samples, 0.35%)</title>
-            <rect x="159" y="437" width="4" height="15" fill="rgb(236,114,34)"/>
-            <text x="162.00" y="447.50"></text>
+            <rect x="12.6316%" y="437" width="0.3509%" height="15" fill="rgb(236,114,34)"/>
+            <text x="12.8816%" y="447.50"></text>
         </g>
         <g>
             <title>skb_clone (1 samples, 0.35%)</title>
-            <rect x="163" y="437" width="4" height="15" fill="rgb(236,143,34)"/>
-            <text x="166.00" y="447.50"></text>
+            <rect x="12.9825%" y="437" width="0.3509%" height="15" fill="rgb(236,143,34)"/>
+            <text x="13.2325%" y="447.50"></text>
         </g>
         <g>
             <title>tcp_set_skb_tso_segs (1 samples, 0.35%)</title>
-            <rect x="167" y="437" width="4" height="15" fill="rgb(236,169,34)"/>
-            <text x="170.00" y="447.50"></text>
+            <rect x="13.3333%" y="437" width="0.3509%" height="15" fill="rgb(236,169,34)"/>
+            <text x="13.5833%" y="447.50"></text>
         </g>
         <g>
             <title>dev_hard_start_xmit (1 samples, 0.35%)</title>
-            <rect x="179" y="357" width="4" height="15" fill="rgb(236,187,34)"/>
-            <text x="182.00" y="367.50"></text>
+            <rect x="14.3860%" y="357" width="0.3509%" height="15" fill="rgb(236,187,34)"/>
+            <text x="14.6360%" y="367.50"></text>
         </g>
         <g>
             <title>dev_pick_tx (1 samples, 0.35%)</title>
-            <rect x="183" y="357" width="5" height="15" fill="rgb(236,187,34)"/>
-            <text x="186.00" y="367.50"></text>
+            <rect x="14.7368%" y="357" width="0.3509%" height="15" fill="rgb(236,187,34)"/>
+            <text x="14.9868%" y="367.50"></text>
         </g>
         <g>
             <title>dev_queue_xmit_nit (1 samples, 0.35%)</title>
-            <rect x="188" y="325" width="4" height="15" fill="rgb(236,187,34)"/>
-            <text x="191.00" y="335.50"></text>
+            <rect x="15.0877%" y="325" width="0.3509%" height="15" fill="rgb(236,187,34)"/>
+            <text x="15.3377%" y="335.50"></text>
         </g>
         <g>
             <title>xen_restore_fl_direct (1 samples, 0.35%)</title>
-            <rect x="196" y="277" width="4" height="15" fill="rgb(236,213,34)"/>
-            <text x="199.00" y="287.50"></text>
+            <rect x="15.7895%" y="277" width="0.3509%" height="15" fill="rgb(236,213,34)"/>
+            <text x="16.0395%" y="287.50"></text>
         </g>
         <g>
             <title>dev_hard_start_xmit (4 samples, 1.40%)</title>
-            <rect x="188" y="341" width="16" height="15" fill="rgb(236,187,34)"/>
-            <text x="191.00" y="351.50"></text>
+            <rect x="15.0877%" y="341" width="1.4035%" height="15" fill="rgb(236,187,34)"/>
+            <text x="15.3377%" y="351.50"></text>
         </g>
         <g>
             <title>loopback_xmit (3 samples, 1.05%)</title>
-            <rect x="192" y="325" width="12" height="15" fill="rgb(236,151,34)"/>
-            <text x="195.00" y="335.50"></text>
+            <rect x="15.4386%" y="325" width="1.0526%" height="15" fill="rgb(236,151,34)"/>
+            <text x="15.6886%" y="335.50"></text>
         </g>
         <g>
             <title>netif_rx (2 samples, 0.70%)</title>
-            <rect x="196" y="309" width="8" height="15" fill="rgb(236,194,34)"/>
-            <text x="199.00" y="319.50"></text>
+            <rect x="15.7895%" y="309" width="0.7018%" height="15" fill="rgb(236,194,34)"/>
+            <text x="16.0395%" y="319.50"></text>
         </g>
         <g>
             <title>netif_rx.part.82 (2 samples, 0.70%)</title>
-            <rect x="196" y="293" width="8" height="15" fill="rgb(236,194,34)"/>
-            <text x="199.00" y="303.50"></text>
+            <rect x="15.7895%" y="293" width="0.7018%" height="15" fill="rgb(236,194,34)"/>
+            <text x="16.0395%" y="303.50"></text>
         </g>
         <g>
             <title>xen_restore_fl_direct_end (1 samples, 0.35%)</title>
-            <rect x="200" y="277" width="4" height="15" fill="rgb(236,213,34)"/>
-            <text x="203.00" y="287.50"></text>
+            <rect x="16.1404%" y="277" width="0.3509%" height="15" fill="rgb(236,213,34)"/>
+            <text x="16.3904%" y="287.50"></text>
         </g>
         <g>
             <title>dma_issue_pending_all (1 samples, 0.35%)</title>
-            <rect x="204" y="261" width="4" height="15" fill="rgb(236,176,34)"/>
-            <text x="207.00" y="271.50"></text>
+            <rect x="16.4912%" y="261" width="0.3509%" height="15" fill="rgb(236,176,34)"/>
+            <text x="16.7412%" y="271.50"></text>
         </g>
         <g>
             <title>__inet_lookup_established (3 samples, 1.05%)</title>
-            <rect x="221" y="149" width="12" height="15" fill="rgb(236,125,34)"/>
-            <text x="224.00" y="159.50"></text>
+            <rect x="17.8947%" y="149" width="1.0526%" height="15" fill="rgb(236,125,34)"/>
+            <text x="18.1447%" y="159.50"></text>
         </g>
         <g>
             <title>tcp_event_data_recv (1 samples, 0.35%)</title>
-            <rect x="233" y="133" width="4" height="15" fill="rgb(236,169,34)"/>
-            <text x="236.00" y="143.50"></text>
+            <rect x="18.9474%" y="133" width="0.3509%" height="15" fill="rgb(236,169,34)"/>
+            <text x="19.1974%" y="143.50"></text>
         </g>
         <g>
             <title>sock_def_readable (19 samples, 6.67%)</title>
-            <rect x="237" y="117" width="79" height="15" fill="rgb(236,175,34)"/>
-            <text x="240.00" y="127.50">sock_def_..</text>
+            <rect x="19.2982%" y="117" width="6.6667%" height="15" fill="rgb(236,175,34)"/>
+            <text x="19.5482%" y="127.50">sock_def_..</text>
         </g>
         <g>
             <title>__wake_up_sync_key (19 samples, 6.67%)</title>
-            <rect x="237" y="101" width="79" height="15" fill="rgb(236,119,34)"/>
-            <text x="240.00" y="111.50">__wake_up..</text>
+            <rect x="19.2982%" y="101" width="6.6667%" height="15" fill="rgb(236,119,34)"/>
+            <text x="19.5482%" y="111.50">__wake_up..</text>
         </g>
         <g>
             <title>check_events (19 samples, 6.67%)</title>
-            <rect x="237" y="85" width="79" height="15" fill="rgb(236,116,34)"/>
-            <text x="240.00" y="95.50">check_eve..</text>
+            <rect x="19.2982%" y="85" width="6.6667%" height="15" fill="rgb(236,116,34)"/>
+            <text x="19.5482%" y="95.50">check_eve..</text>
         </g>
         <g>
             <title>hypercall_page (19 samples, 6.67%)</title>
-            <rect x="237" y="69" width="79" height="15" fill="rgb(236,185,34)"/>
-            <text x="240.00" y="79.50">hypercall..</text>
+            <rect x="19.2982%" y="69" width="6.6667%" height="15" fill="rgb(236,185,34)"/>
+            <text x="19.5482%" y="79.50">hypercall..</text>
         </g>
         <g>
             <title>bictcp_acked (1 samples, 0.35%)</title>
-            <rect x="332" y="85" width="5" height="15" fill="rgb(236,125,34)"/>
-            <text x="335.00" y="95.50"></text>
+            <rect x="27.3684%" y="85" width="0.3509%" height="15" fill="rgb(236,125,34)"/>
+            <text x="27.6184%" y="95.50"></text>
         </g>
         <g>
             <title>ktime_get_real (2 samples, 0.70%)</title>
-            <rect x="337" y="85" width="8" height="15" fill="rgb(236,114,34)"/>
-            <text x="340.00" y="95.50"></text>
+            <rect x="27.7193%" y="85" width="0.7018%" height="15" fill="rgb(236,114,34)"/>
+            <text x="27.9693%" y="95.50"></text>
         </g>
         <g>
             <title>getnstimeofday (2 samples, 0.70%)</title>
-            <rect x="337" y="69" width="8" height="15" fill="rgb(236,170,34)"/>
-            <text x="340.00" y="79.50"></text>
+            <rect x="27.7193%" y="69" width="0.7018%" height="15" fill="rgb(236,170,34)"/>
+            <text x="27.9693%" y="79.50"></text>
         </g>
         <g>
             <title>xen_clocksource_get_cycles (1 samples, 0.35%)</title>
-            <rect x="341" y="53" width="4" height="15" fill="rgb(236,213,34)"/>
-            <text x="344.00" y="63.50"></text>
+            <rect x="28.0702%" y="53" width="0.3509%" height="15" fill="rgb(236,213,34)"/>
+            <text x="28.3202%" y="63.50"></text>
         </g>
         <g>
             <title>xen_clocksource_read (1 samples, 0.35%)</title>
-            <rect x="341" y="37" width="4" height="15" fill="rgb(236,213,34)"/>
-            <text x="344.00" y="47.50"></text>
+            <rect x="28.0702%" y="37" width="0.3509%" height="15" fill="rgb(236,213,34)"/>
+            <text x="28.3202%" y="47.50"></text>
         </g>
         <g>
             <title>tcp_rtt_estimator (1 samples, 0.35%)</title>
-            <rect x="345" y="85" width="4" height="15" fill="rgb(236,169,34)"/>
-            <text x="348.00" y="95.50"></text>
+            <rect x="28.4211%" y="85" width="0.3509%" height="15" fill="rgb(236,169,34)"/>
+            <text x="28.6711%" y="95.50"></text>
         </g>
         <g>
             <title>ip_local_deliver (34 samples, 11.93%)</title>
-            <rect x="212" y="197" width="141" height="15" fill="rgb(236,144,34)"/>
-            <text x="215.00" y="207.50">ip_local_deliver</text>
+            <rect x="17.1930%" y="197" width="11.9298%" height="15" fill="rgb(236,144,34)"/>
+            <text x="17.4430%" y="207.50">ip_local_deliver</text>
         </g>
         <g>
             <title>ip_local_deliver_finish (34 samples, 11.93%)</title>
-            <rect x="212" y="181" width="141" height="15" fill="rgb(236,144,34)"/>
-            <text x="215.00" y="191.50">ip_local_deliver_..</text>
+            <rect x="17.1930%" y="181" width="11.9298%" height="15" fill="rgb(236,144,34)"/>
+            <text x="17.4430%" y="191.50">ip_local_deliver_f..</text>
         </g>
         <g>
             <title>tcp_v4_rcv (33 samples, 11.58%)</title>
-            <rect x="217" y="165" width="136" height="15" fill="rgb(236,169,34)"/>
-            <text x="220.00" y="175.50">tcp_v4_rcv</text>
+            <rect x="17.5439%" y="165" width="11.5789%" height="15" fill="rgb(236,169,34)"/>
+            <text x="17.7939%" y="175.50">tcp_v4_rcv</text>
         </g>
         <g>
             <title>tcp_v4_do_rcv (29 samples, 10.18%)</title>
-            <rect x="233" y="149" width="120" height="15" fill="rgb(236,169,34)"/>
-            <text x="236.00" y="159.50">tcp_v4_do_rcv</text>
+            <rect x="18.9474%" y="149" width="10.1754%" height="15" fill="rgb(236,169,34)"/>
+            <text x="19.1974%" y="159.50">tcp_v4_do_rcv</text>
         </g>
         <g>
             <title>tcp_rcv_established (28 samples, 9.82%)</title>
-            <rect x="237" y="133" width="116" height="15" fill="rgb(236,169,34)"/>
-            <text x="240.00" y="143.50">tcp_rcv_establ..</text>
+            <rect x="19.2982%" y="133" width="9.8246%" height="15" fill="rgb(236,169,34)"/>
+            <text x="19.5482%" y="143.50">tcp_rcv_establ..</text>
         </g>
         <g>
             <title>tcp_ack (9 samples, 3.16%)</title>
-            <rect x="316" y="117" width="37" height="15" fill="rgb(236,169,34)"/>
-            <text x="319.00" y="127.50">tcp..</text>
+            <rect x="25.9649%" y="117" width="3.1579%" height="15" fill="rgb(236,169,34)"/>
+            <text x="26.2149%" y="127.50">tcp..</text>
         </g>
         <g>
             <title>tcp_clean_rtx_queue (6 samples, 2.11%)</title>
-            <rect x="328" y="101" width="25" height="15" fill="rgb(236,169,34)"/>
-            <text x="331.00" y="111.50">t..</text>
+            <rect x="27.0175%" y="101" width="2.1053%" height="15" fill="rgb(236,169,34)"/>
+            <text x="27.2675%" y="111.50">t..</text>
         </g>
         <g>
             <title>tcp_valid_rtt_meas (1 samples, 0.35%)</title>
-            <rect x="349" y="85" width="4" height="15" fill="rgb(236,169,34)"/>
-            <text x="352.00" y="95.50"></text>
+            <rect x="28.7719%" y="85" width="0.3509%" height="15" fill="rgb(236,169,34)"/>
+            <text x="29.0219%" y="95.50"></text>
         </g>
         <g>
             <title>tcp_rtt_estimator (1 samples, 0.35%)</title>
-            <rect x="349" y="69" width="4" height="15" fill="rgb(236,169,34)"/>
-            <text x="352.00" y="79.50"></text>
+            <rect x="28.7719%" y="69" width="0.3509%" height="15" fill="rgb(236,169,34)"/>
+            <text x="29.0219%" y="79.50"></text>
         </g>
         <g>
             <title>__do_softirq (37 samples, 12.98%)</title>
-            <rect x="204" y="293" width="153" height="15" fill="rgb(236,141,34)"/>
-            <text x="207.00" y="303.50">__do_softirq</text>
+            <rect x="16.4912%" y="293" width="12.9825%" height="15" fill="rgb(236,141,34)"/>
+            <text x="16.7412%" y="303.50">__do_softirq</text>
         </g>
         <g>
             <title>net_rx_action (37 samples, 12.98%)</title>
-            <rect x="204" y="277" width="153" height="15" fill="rgb(236,194,34)"/>
-            <text x="207.00" y="287.50">net_rx_action</text>
+            <rect x="16.4912%" y="277" width="12.9825%" height="15" fill="rgb(236,194,34)"/>
+            <text x="16.7412%" y="287.50">net_rx_action</text>
         </g>
         <g>
             <title>process_backlog (36 samples, 12.63%)</title>
-            <rect x="208" y="261" width="149" height="15" fill="rgb(236,184,34)"/>
-            <text x="211.00" y="271.50">process_backlog</text>
+            <rect x="16.8421%" y="261" width="12.6316%" height="15" fill="rgb(236,184,34)"/>
+            <text x="17.0921%" y="271.50">process_backlog</text>
         </g>
         <g>
             <title>__netif_receive_skb (36 samples, 12.63%)</title>
-            <rect x="208" y="245" width="149" height="15" fill="rgb(236,148,34)"/>
-            <text x="211.00" y="255.50">__netif_receive_skb</text>
+            <rect x="16.8421%" y="245" width="12.6316%" height="15" fill="rgb(236,148,34)"/>
+            <text x="17.0921%" y="255.50">__netif_receive_skb</text>
         </g>
         <g>
             <title>ip_rcv (35 samples, 12.28%)</title>
-            <rect x="212" y="229" width="145" height="15" fill="rgb(236,144,34)"/>
-            <text x="215.00" y="239.50">ip_rcv</text>
+            <rect x="17.1930%" y="229" width="12.2807%" height="15" fill="rgb(236,144,34)"/>
+            <text x="17.4430%" y="239.50">ip_rcv</text>
         </g>
         <g>
             <title>ip_rcv_finish (35 samples, 12.28%)</title>
-            <rect x="212" y="213" width="145" height="15" fill="rgb(236,144,34)"/>
-            <text x="215.00" y="223.50">ip_rcv_finish</text>
+            <rect x="17.1930%" y="213" width="12.2807%" height="15" fill="rgb(236,144,34)"/>
+            <text x="17.4430%" y="223.50">ip_rcv_finish</text>
         </g>
         <g>
             <title>ip_local_deliver_finish (1 samples, 0.35%)</title>
-            <rect x="353" y="197" width="4" height="15" fill="rgb(236,144,34)"/>
-            <text x="356.00" y="207.50"></text>
+            <rect x="29.1228%" y="197" width="0.3509%" height="15" fill="rgb(236,144,34)"/>
+            <text x="29.3728%" y="207.50"></text>
         </g>
         <g>
             <title>local_bh_enable (38 samples, 13.33%)</title>
-            <rect x="204" y="341" width="157" height="15" fill="rgb(236,151,34)"/>
-            <text x="207.00" y="351.50">local_bh_enable</text>
+            <rect x="16.4912%" y="341" width="13.3333%" height="15" fill="rgb(236,151,34)"/>
+            <text x="16.7412%" y="351.50">local_bh_enable</text>
         </g>
         <g>
             <title>do_softirq (38 samples, 13.33%)</title>
-            <rect x="204" y="325" width="157" height="15" fill="rgb(236,189,34)"/>
-            <text x="207.00" y="335.50">do_softirq</text>
+            <rect x="16.4912%" y="325" width="13.3333%" height="15" fill="rgb(236,189,34)"/>
+            <text x="16.7412%" y="335.50">do_softirq</text>
         </g>
         <g>
             <title>call_softirq (38 samples, 13.33%)</title>
-            <rect x="204" y="309" width="157" height="15" fill="rgb(236,112,34)"/>
-            <text x="207.00" y="319.50">call_softirq</text>
+            <rect x="16.4912%" y="309" width="13.3333%" height="15" fill="rgb(236,112,34)"/>
+            <text x="16.7412%" y="319.50">call_softirq</text>
         </g>
         <g>
             <title>rcu_bh_qs (1 samples, 0.35%)</title>
-            <rect x="357" y="293" width="4" height="15" fill="rgb(236,169,34)"/>
-            <text x="360.00" y="303.50"></text>
+            <rect x="29.4737%" y="293" width="0.3509%" height="15" fill="rgb(236,169,34)"/>
+            <text x="29.7237%" y="303.50"></text>
         </g>
         <g>
             <title>ip_local_out (45 samples, 15.79%)</title>
-            <rect x="179" y="405" width="187" height="15" fill="rgb(236,144,34)"/>
-            <text x="182.00" y="415.50">ip_local_out</text>
+            <rect x="14.3860%" y="405" width="15.7895%" height="15" fill="rgb(236,144,34)"/>
+            <text x="14.6360%" y="415.50">ip_local_out</text>
         </g>
         <g>
             <title>ip_output (45 samples, 15.79%)</title>
-            <rect x="179" y="389" width="187" height="15" fill="rgb(236,144,34)"/>
-            <text x="182.00" y="399.50">ip_output</text>
+            <rect x="14.3860%" y="389" width="15.7895%" height="15" fill="rgb(236,144,34)"/>
+            <text x="14.6360%" y="399.50">ip_output</text>
         </g>
         <g>
             <title>ip_finish_output (45 samples, 15.79%)</title>
-            <rect x="179" y="373" width="187" height="15" fill="rgb(236,144,34)"/>
-            <text x="182.00" y="383.50">ip_finish_output</text>
+            <rect x="14.3860%" y="373" width="15.7895%" height="15" fill="rgb(236,144,34)"/>
+            <text x="14.6360%" y="383.50">ip_finish_output</text>
         </g>
         <g>
             <title>dev_queue_xmit (43 samples, 15.09%)</title>
-            <rect x="188" y="357" width="178" height="15" fill="rgb(236,187,34)"/>
-            <text x="191.00" y="367.50">dev_queue_xmit</text>
+            <rect x="15.0877%" y="357" width="15.0877%" height="15" fill="rgb(236,187,34)"/>
+            <text x="15.3377%" y="367.50">dev_queue_xmit</text>
         </g>
         <g>
             <title>netif_skb_features (1 samples, 0.35%)</title>
-            <rect x="361" y="341" width="5" height="15" fill="rgb(236,194,34)"/>
-            <text x="364.00" y="351.50"></text>
+            <rect x="29.8246%" y="341" width="0.3509%" height="15" fill="rgb(236,194,34)"/>
+            <text x="30.0746%" y="351.50"></text>
         </g>
         <g>
             <title>ip_queue_xmit (47 samples, 16.49%)</title>
-            <rect x="179" y="421" width="195" height="15" fill="rgb(236,144,34)"/>
-            <text x="182.00" y="431.50">ip_queue_xmit</text>
+            <rect x="14.3860%" y="421" width="16.4912%" height="15" fill="rgb(236,144,34)"/>
+            <text x="14.6360%" y="431.50">ip_queue_xmit</text>
         </g>
         <g>
             <title>ip_output (2 samples, 0.70%)</title>
-            <rect x="366" y="405" width="8" height="15" fill="rgb(236,144,34)"/>
-            <text x="369.00" y="415.50"></text>
+            <rect x="30.1754%" y="405" width="0.7018%" height="15" fill="rgb(236,144,34)"/>
+            <text x="30.4254%" y="415.50"></text>
         </g>
         <g>
             <title>pvclock_clocksource_read (1 samples, 0.35%)</title>
-            <rect x="374" y="373" width="4" height="15" fill="rgb(236,163,34)"/>
-            <text x="377.00" y="383.50"></text>
+            <rect x="30.8772%" y="373" width="0.3509%" height="15" fill="rgb(236,163,34)"/>
+            <text x="31.1272%" y="383.50"></text>
         </g>
         <g>
             <title>getnstimeofday (2 samples, 0.70%)</title>
-            <rect x="374" y="405" width="8" height="15" fill="rgb(236,170,34)"/>
-            <text x="377.00" y="415.50"></text>
+            <rect x="30.8772%" y="405" width="0.7018%" height="15" fill="rgb(236,170,34)"/>
+            <text x="31.1272%" y="415.50"></text>
         </g>
         <g>
             <title>xen_clocksource_get_cycles (2 samples, 0.70%)</title>
-            <rect x="374" y="389" width="8" height="15" fill="rgb(236,213,34)"/>
-            <text x="377.00" y="399.50"></text>
+            <rect x="30.8772%" y="389" width="0.7018%" height="15" fill="rgb(236,213,34)"/>
+            <text x="31.1272%" y="399.50"></text>
         </g>
         <g>
             <title>xen_clocksource_read (1 samples, 0.35%)</title>
-            <rect x="378" y="373" width="4" height="15" fill="rgb(236,213,34)"/>
-            <text x="381.00" y="383.50"></text>
+            <rect x="31.2281%" y="373" width="0.3509%" height="15" fill="rgb(236,213,34)"/>
+            <text x="31.4781%" y="383.50"></text>
         </g>
         <g>
             <title>pvclock_clocksource_read (1 samples, 0.35%)</title>
-            <rect x="378" y="357" width="4" height="15" fill="rgb(236,163,34)"/>
-            <text x="381.00" y="367.50"></text>
+            <rect x="31.2281%" y="357" width="0.3509%" height="15" fill="rgb(236,163,34)"/>
+            <text x="31.4781%" y="367.50"></text>
         </g>
         <g>
             <title>ktime_get_real (3 samples, 1.05%)</title>
-            <rect x="374" y="421" width="12" height="15" fill="rgb(236,114,34)"/>
-            <text x="377.00" y="431.50"></text>
+            <rect x="30.8772%" y="421" width="1.0526%" height="15" fill="rgb(236,114,34)"/>
+            <text x="31.1272%" y="431.50"></text>
         </g>
         <g>
             <title>xen_clocksource_get_cycles (1 samples, 0.35%)</title>
-            <rect x="382" y="405" width="4" height="15" fill="rgb(236,213,34)"/>
-            <text x="385.00" y="415.50"></text>
+            <rect x="31.5789%" y="405" width="0.3509%" height="15" fill="rgb(236,213,34)"/>
+            <text x="31.8289%" y="415.50"></text>
         </g>
         <g>
             <title>__tcp_push_pending_frames (56 samples, 19.65%)</title>
-            <rect x="159" y="469" width="231" height="15" fill="rgb(236,128,34)"/>
-            <text x="162.00" y="479.50">__tcp_push_pending_frames</text>
+            <rect x="12.6316%" y="469" width="19.6491%" height="15" fill="rgb(236,128,34)"/>
+            <text x="12.8816%" y="479.50">__tcp_push_pending_frames</text>
         </g>
         <g>
             <title>tcp_write_xmit (56 samples, 19.65%)</title>
-            <rect x="159" y="453" width="231" height="15" fill="rgb(236,169,34)"/>
-            <text x="162.00" y="463.50">tcp_write_xmit</text>
+            <rect x="12.6316%" y="453" width="19.6491%" height="15" fill="rgb(236,169,34)"/>
+            <text x="12.8816%" y="463.50">tcp_write_xmit</text>
         </g>
         <g>
             <title>tcp_transmit_skb (53 samples, 18.60%)</title>
-            <rect x="171" y="437" width="219" height="15" fill="rgb(236,169,34)"/>
-            <text x="174.00" y="447.50">tcp_transmit_skb</text>
+            <rect x="13.6842%" y="437" width="18.5965%" height="15" fill="rgb(236,169,34)"/>
+            <text x="13.9342%" y="447.50">tcp_transmit_skb</text>
         </g>
         <g>
             <title>skb_dst_set_noref (1 samples, 0.35%)</title>
-            <rect x="386" y="421" width="4" height="15" fill="rgb(236,143,34)"/>
-            <text x="389.00" y="431.50"></text>
+            <rect x="31.9298%" y="421" width="0.3509%" height="15" fill="rgb(236,143,34)"/>
+            <text x="32.1798%" y="431.50"></text>
         </g>
         <g>
             <title>lock_sock_nested (1 samples, 0.35%)</title>
-            <rect x="390" y="469" width="5" height="15" fill="rgb(236,151,34)"/>
-            <text x="393.00" y="479.50"></text>
+            <rect x="32.2807%" y="469" width="0.3509%" height="15" fill="rgb(236,151,34)"/>
+            <text x="32.5307%" y="479.50"></text>
         </g>
         <g>
             <title>_raw_spin_lock_bh (1 samples, 0.35%)</title>
-            <rect x="390" y="453" width="5" height="15" fill="rgb(236,166,34)"/>
-            <text x="393.00" y="463.50"></text>
+            <rect x="32.2807%" y="453" width="0.3509%" height="15" fill="rgb(236,166,34)"/>
+            <text x="32.5307%" y="463.50"></text>
         </g>
         <g>
             <title>local_bh_disable (1 samples, 0.35%)</title>
-            <rect x="390" y="437" width="5" height="15" fill="rgb(236,151,34)"/>
-            <text x="393.00" y="447.50"></text>
+            <rect x="32.2807%" y="437" width="0.3509%" height="15" fill="rgb(236,151,34)"/>
+            <text x="32.5307%" y="447.50"></text>
         </g>
         <g>
             <title>__kmalloc_node_track_caller (2 samples, 0.70%)</title>
-            <rect x="399" y="437" width="8" height="15" fill="rgb(236,119,34)"/>
-            <text x="402.00" y="447.50"></text>
+            <rect x="32.9825%" y="437" width="0.7018%" height="15" fill="rgb(236,119,34)"/>
+            <text x="33.2325%" y="447.50"></text>
         </g>
         <g>
             <title>arch_local_irq_save (1 samples, 0.35%)</title>
-            <rect x="403" y="421" width="4" height="15" fill="rgb(236,144,34)"/>
-            <text x="406.00" y="431.50"></text>
+            <rect x="33.3333%" y="421" width="0.3509%" height="15" fill="rgb(236,144,34)"/>
+            <text x="33.5833%" y="431.50"></text>
         </g>
         <g>
             <title>__phys_addr (1 samples, 0.35%)</title>
-            <rect x="407" y="437" width="4" height="15" fill="rgb(236,141,34)"/>
-            <text x="410.00" y="447.50"></text>
+            <rect x="33.6842%" y="437" width="0.3509%" height="15" fill="rgb(236,141,34)"/>
+            <text x="33.9342%" y="447.50"></text>
         </g>
         <g>
             <title>get_slab (2 samples, 0.70%)</title>
-            <rect x="411" y="437" width="8" height="15" fill="rgb(236,170,34)"/>
-            <text x="414.00" y="447.50"></text>
+            <rect x="34.0351%" y="437" width="0.7018%" height="15" fill="rgb(236,170,34)"/>
+            <text x="34.2851%" y="447.50"></text>
         </g>
         <g>
             <title>__alloc_skb (7 samples, 2.46%)</title>
-            <rect x="395" y="453" width="29" height="15" fill="rgb(236,151,34)"/>
-            <text x="398.00" y="463.50">__..</text>
+            <rect x="32.6316%" y="453" width="2.4561%" height="15" fill="rgb(236,151,34)"/>
+            <text x="32.8816%" y="463.50">__..</text>
         </g>
         <g>
             <title>kmem_cache_alloc_node (1 samples, 0.35%)</title>
-            <rect x="419" y="437" width="5" height="15" fill="rgb(236,107,34)"/>
-            <text x="422.00" y="447.50"></text>
+            <rect x="34.7368%" y="437" width="0.3509%" height="15" fill="rgb(236,107,34)"/>
+            <text x="34.9868%" y="447.50"></text>
         </g>
         <g>
             <title>sk_stream_alloc_skb (8 samples, 2.81%)</title>
-            <rect x="395" y="469" width="33" height="15" fill="rgb(236,114,34)"/>
-            <text x="398.00" y="479.50">sk..</text>
+            <rect x="32.6316%" y="469" width="2.8070%" height="15" fill="rgb(236,114,34)"/>
+            <text x="32.8816%" y="479.50">sk..</text>
         </g>
         <g>
             <title>ksize (1 samples, 0.35%)</title>
-            <rect x="424" y="453" width="4" height="15" fill="rgb(236,119,34)"/>
-            <text x="427.00" y="463.50"></text>
+            <rect x="35.0877%" y="453" width="0.3509%" height="15" fill="rgb(236,119,34)"/>
+            <text x="35.3377%" y="463.50"></text>
         </g>
         <g>
             <title>ipv4_mtu (1 samples, 0.35%)</title>
-            <rect x="428" y="437" width="4" height="15" fill="rgb(236,147,34)"/>
-            <text x="431.00" y="447.50"></text>
+            <rect x="35.4386%" y="437" width="0.3509%" height="15" fill="rgb(236,147,34)"/>
+            <text x="35.6886%" y="447.50"></text>
         </g>
         <g>
             <title>tcp_current_mss (2 samples, 0.70%)</title>
-            <rect x="428" y="453" width="8" height="15" fill="rgb(236,169,34)"/>
-            <text x="431.00" y="463.50"></text>
+            <rect x="35.4386%" y="453" width="0.7018%" height="15" fill="rgb(236,169,34)"/>
+            <text x="35.6886%" y="463.50"></text>
         </g>
         <g>
             <title>tcp_established_options (1 samples, 0.35%)</title>
-            <rect x="432" y="437" width="4" height="15" fill="rgb(236,169,34)"/>
-            <text x="435.00" y="447.50"></text>
+            <rect x="35.7895%" y="437" width="0.3509%" height="15" fill="rgb(236,169,34)"/>
+            <text x="36.0395%" y="447.50"></text>
         </g>
         <g>
             <title>tcp_send_mss (3 samples, 1.05%)</title>
-            <rect x="428" y="469" width="12" height="15" fill="rgb(236,169,34)"/>
-            <text x="431.00" y="479.50"></text>
+            <rect x="35.4386%" y="469" width="1.0526%" height="15" fill="rgb(236,169,34)"/>
+            <text x="35.6886%" y="479.50"></text>
         </g>
         <g>
             <title>tcp_xmit_size_goal (1 samples, 0.35%)</title>
-            <rect x="436" y="453" width="4" height="15" fill="rgb(236,169,34)"/>
-            <text x="439.00" y="463.50"></text>
+            <rect x="36.1404%" y="453" width="0.3509%" height="15" fill="rgb(236,169,34)"/>
+            <text x="36.3904%" y="463.50"></text>
         </g>
         <g>
             <title>do_sync_write (72 samples, 25.26%)</title>
-            <rect x="146" y="549" width="298" height="15" fill="rgb(236,189,34)"/>
-            <text x="149.00" y="559.50">do_sync_write</text>
+            <rect x="11.5789%" y="549" width="25.2632%" height="15" fill="rgb(236,189,34)"/>
+            <text x="11.8289%" y="559.50">do_sync_write</text>
         </g>
         <g>
             <title>sock_aio_write (72 samples, 25.26%)</title>
-            <rect x="146" y="533" width="298" height="15" fill="rgb(236,175,34)"/>
-            <text x="149.00" y="543.50">sock_aio_write</text>
+            <rect x="11.5789%" y="533" width="25.2632%" height="15" fill="rgb(236,175,34)"/>
+            <text x="11.8289%" y="543.50">sock_aio_write</text>
         </g>
         <g>
             <title>do_sock_write.isra.10 (72 samples, 25.26%)</title>
-            <rect x="146" y="517" width="298" height="15" fill="rgb(236,189,34)"/>
-            <text x="149.00" y="527.50">do_sock_write.isra.10</text>
+            <rect x="11.5789%" y="517" width="25.2632%" height="15" fill="rgb(236,189,34)"/>
+            <text x="11.8289%" y="527.50">do_sock_write.isra.10</text>
         </g>
         <g>
             <title>inet_sendmsg (72 samples, 25.26%)</title>
-            <rect x="146" y="501" width="298" height="15" fill="rgb(236,173,34)"/>
-            <text x="149.00" y="511.50">inet_sendmsg</text>
+            <rect x="11.5789%" y="501" width="25.2632%" height="15" fill="rgb(236,173,34)"/>
+            <text x="11.8289%" y="511.50">inet_sendmsg</text>
         </g>
         <g>
             <title>tcp_sendmsg (71 samples, 24.91%)</title>
-            <rect x="150" y="485" width="294" height="15" fill="rgb(236,169,34)"/>
-            <text x="153.00" y="495.50">tcp_sendmsg</text>
+            <rect x="11.9298%" y="485" width="24.9123%" height="15" fill="rgb(236,169,34)"/>
+            <text x="12.1798%" y="495.50">tcp_sendmsg</text>
         </g>
         <g>
             <title>tcp_xmit_size_goal (1 samples, 0.35%)</title>
-            <rect x="440" y="469" width="4" height="15" fill="rgb(236,169,34)"/>
-            <text x="443.00" y="479.50"></text>
+            <rect x="36.4912%" y="469" width="0.3509%" height="15" fill="rgb(236,169,34)"/>
+            <text x="36.7412%" y="479.50"></text>
         </g>
         <g>
             <title>fsnotify (2 samples, 0.70%)</title>
-            <rect x="444" y="549" width="9" height="15" fill="rgb(236,182,34)"/>
-            <text x="447.00" y="559.50"></text>
+            <rect x="36.8421%" y="549" width="0.7018%" height="15" fill="rgb(236,182,34)"/>
+            <text x="37.0921%" y="559.50"></text>
         </g>
         <g>
             <title>__srcu_read_lock (1 samples, 0.35%)</title>
-            <rect x="448" y="533" width="5" height="15" fill="rgb(236,132,34)"/>
-            <text x="451.00" y="543.50"></text>
+            <rect x="37.1930%" y="533" width="0.3509%" height="15" fill="rgb(236,132,34)"/>
+            <text x="37.4430%" y="543.50"></text>
         </g>
         <g>
             <title>apparmor_file_permission (1 samples, 0.35%)</title>
-            <rect x="457" y="533" width="4" height="15" fill="rgb(236,150,34)"/>
-            <text x="460.00" y="543.50"></text>
+            <rect x="37.8947%" y="533" width="0.3509%" height="15" fill="rgb(236,150,34)"/>
+            <text x="38.1447%" y="543.50"></text>
         </g>
         <g>
             <title>rw_verify_area (3 samples, 1.05%)</title>
-            <rect x="453" y="549" width="12" height="15" fill="rgb(236,117,34)"/>
-            <text x="456.00" y="559.50"></text>
+            <rect x="37.5439%" y="549" width="1.0526%" height="15" fill="rgb(236,117,34)"/>
+            <text x="37.7939%" y="559.50"></text>
         </g>
         <g>
             <title>security_file_permission (1 samples, 0.35%)</title>
-            <rect x="461" y="533" width="4" height="15" fill="rgb(236,170,34)"/>
-            <text x="464.00" y="543.50"></text>
+            <rect x="38.2456%" y="533" width="0.3509%" height="15" fill="rgb(236,170,34)"/>
+            <text x="38.4956%" y="543.50"></text>
         </g>
         <g>
             <title>apparmor_file_permission (1 samples, 0.35%)</title>
-            <rect x="461" y="517" width="4" height="15" fill="rgb(236,150,34)"/>
-            <text x="464.00" y="527.50"></text>
+            <rect x="38.2456%" y="517" width="0.3509%" height="15" fill="rgb(236,150,34)"/>
+            <text x="38.4956%" y="527.50"></text>
         </g>
         <g>
             <title>common_file_perm (1 samples, 0.35%)</title>
-            <rect x="461" y="501" width="4" height="15" fill="rgb(236,149,34)"/>
-            <text x="464.00" y="511.50"></text>
+            <rect x="38.2456%" y="501" width="0.3509%" height="15" fill="rgb(236,149,34)"/>
+            <text x="38.4956%" y="511.50"></text>
         </g>
         <g>
             <title>sun/nio/ch/FileDispatcherImpl:.write0 (87 samples, 30.53%)</title>
-            <rect x="109" y="629" width="360" height="15" fill="rgb(237,148,35)"/>
-            <text x="112.00" y="639.50">sun/nio/ch/FileDispatcherImpl:.write0</text>
+            <rect x="8.4211%" y="629" width="30.5263%" height="15" fill="rgb(237,148,35)"/>
+            <text x="8.6711%" y="639.50">sun/nio/ch/FileDispatcherImpl:.write0</text>
         </g>
         <g>
             <title>write (82 samples, 28.77%)</title>
-            <rect x="130" y="613" width="339" height="15" fill="rgb(240,108,38)"/>
-            <text x="133.00" y="623.50">write</text>
+            <rect x="10.1754%" y="613" width="28.7719%" height="15" fill="rgb(240,108,38)"/>
+            <text x="10.4254%" y="623.50">write</text>
         </g>
         <g>
             <title>system_call_fastpath (80 samples, 28.07%)</title>
-            <rect x="138" y="597" width="331" height="15" fill="rgb(236,167,34)"/>
-            <text x="141.00" y="607.50">system_call_fastpath</text>
+            <rect x="10.8772%" y="597" width="28.0702%" height="15" fill="rgb(236,167,34)"/>
+            <text x="11.1272%" y="607.50">system_call_fastpath</text>
         </g>
         <g>
             <title>sys_write (80 samples, 28.07%)</title>
-            <rect x="138" y="581" width="331" height="15" fill="rgb(236,167,34)"/>
-            <text x="141.00" y="591.50">sys_write</text>
+            <rect x="10.8772%" y="581" width="28.0702%" height="15" fill="rgb(236,167,34)"/>
+            <text x="11.1272%" y="591.50">sys_write</text>
         </g>
         <g>
             <title>vfs_write (79 samples, 27.72%)</title>
-            <rect x="142" y="565" width="327" height="15" fill="rgb(236,128,34)"/>
-            <text x="145.00" y="575.50">vfs_write</text>
+            <rect x="11.2281%" y="565" width="27.7193%" height="15" fill="rgb(236,128,34)"/>
+            <text x="11.4781%" y="575.50">vfs_write</text>
         </g>
         <g>
             <title>sock_aio_write (1 samples, 0.35%)</title>
-            <rect x="465" y="549" width="4" height="15" fill="rgb(236,175,34)"/>
-            <text x="468.00" y="559.50"></text>
+            <rect x="38.5965%" y="549" width="0.3509%" height="15" fill="rgb(236,175,34)"/>
+            <text x="38.8465%" y="559.50"></text>
         </g>
         <g>
             <title>sun/nio/ch/SocketChannelImpl:.write (88 samples, 30.88%)</title>
-            <rect x="109" y="645" width="364" height="15" fill="rgb(237,148,35)"/>
-            <text x="112.00" y="655.50">sun/nio/ch/SocketChannelImpl:.write</text>
+            <rect x="8.4211%" y="645" width="30.8772%" height="15" fill="rgb(237,148,35)"/>
+            <text x="8.6711%" y="655.50">sun/nio/ch/SocketChannelImpl:.write</text>
         </g>
         <g>
             <title>sun/nio/ch/SocketChannelImpl:.writerCleanup (1 samples, 0.35%)</title>
-            <rect x="469" y="629" width="4" height="15" fill="rgb(237,148,35)"/>
-            <text x="472.00" y="639.50"></text>
+            <rect x="38.9474%" y="629" width="0.3509%" height="15" fill="rgb(237,148,35)"/>
+            <text x="39.1974%" y="639.50"></text>
         </g>
         <g>
             <title>io/netty/buffer/PooledUnsafeDirectByteBuf:.readBytes (91 samples, 31.93%)</title>
-            <rect x="101" y="661" width="376" height="15" fill="rgb(237,149,35)"/>
-            <text x="104.00" y="671.50">io/netty/buffer/PooledUnsafeDirectByteBuf:.readBytes</text>
+            <rect x="7.7193%" y="661" width="31.9298%" height="15" fill="rgb(237,149,35)"/>
+            <text x="7.9693%" y="671.50">io/netty/buffer/PooledUnsafeDirectByteBuf:.readBytes</text>
         </g>
         <g>
             <title>sun/nio/ch/SocketChannelImpl:.writerCleanup (1 samples, 0.35%)</title>
-            <rect x="473" y="645" width="4" height="15" fill="rgb(237,148,35)"/>
-            <text x="476.00" y="655.50"></text>
+            <rect x="39.2982%" y="645" width="0.3509%" height="15" fill="rgb(237,148,35)"/>
+            <text x="39.5482%" y="655.50"></text>
         </g>
         <g>
             <title>io/netty/channel/AbstractChannelHandlerContext:.flush (95 samples, 33.33%)</title>
-            <rect x="88" y="789" width="394" height="15" fill="rgb(237,149,35)"/>
-            <text x="91.00" y="799.50">io/netty/channel/AbstractChannelHandlerContext:.flush</text>
+            <rect x="6.6667%" y="789" width="33.3333%" height="15" fill="rgb(237,149,35)"/>
+            <text x="6.9167%" y="799.50">io/netty/channel/AbstractChannelHandlerContext:.flush</text>
         </g>
         <g>
             <title>io/netty/channel/ChannelDuplexHandler:.flush (95 samples, 33.33%)</title>
-            <rect x="88" y="773" width="394" height="15" fill="rgb(237,149,35)"/>
-            <text x="91.00" y="783.50">io/netty/channel/ChannelDuplexHandler:.flush</text>
+            <rect x="6.6667%" y="773" width="33.3333%" height="15" fill="rgb(237,149,35)"/>
+            <text x="6.9167%" y="783.50">io/netty/channel/ChannelDuplexHandler:.flush</text>
         </g>
         <g>
             <title>io/netty/channel/AbstractChannelHandlerContext:.flush (95 samples, 33.33%)</title>
-            <rect x="88" y="757" width="394" height="15" fill="rgb(237,149,35)"/>
-            <text x="91.00" y="767.50">io/netty/channel/AbstractChannelHandlerContext:.flush</text>
+            <rect x="6.6667%" y="757" width="33.3333%" height="15" fill="rgb(237,149,35)"/>
+            <text x="6.9167%" y="767.50">io/netty/channel/AbstractChannelHandlerContext:.flush</text>
         </g>
         <g>
             <title>io/netty/channel/ChannelOutboundHandlerAdapter:.flush (95 samples, 33.33%)</title>
-            <rect x="88" y="741" width="394" height="15" fill="rgb(237,149,35)"/>
-            <text x="91.00" y="751.50">io/netty/channel/ChannelOutboundHandlerAdapter:.flush</text>
+            <rect x="6.6667%" y="741" width="33.3333%" height="15" fill="rgb(237,149,35)"/>
+            <text x="6.9167%" y="751.50">io/netty/channel/ChannelOutboundHandlerAdapter:.flush</text>
         </g>
         <g>
             <title>io/netty/channel/AbstractChannelHandlerContext:.flush (95 samples, 33.33%)</title>
-            <rect x="88" y="725" width="394" height="15" fill="rgb(237,149,35)"/>
-            <text x="91.00" y="735.50">io/netty/channel/AbstractChannelHandlerContext:.flush</text>
+            <rect x="6.6667%" y="725" width="33.3333%" height="15" fill="rgb(237,149,35)"/>
+            <text x="6.9167%" y="735.50">io/netty/channel/AbstractChannelHandlerContext:.flush</text>
         </g>
         <g>
             <title>io/netty/channel/DefaultChannelPipeline$HeadContext:.flush (95 samples, 33.33%)</title>
-            <rect x="88" y="709" width="394" height="15" fill="rgb(237,149,35)"/>
-            <text x="91.00" y="719.50">io/netty/channel/DefaultChannelPipeline$HeadContext:...</text>
+            <rect x="6.6667%" y="709" width="33.3333%" height="15" fill="rgb(237,149,35)"/>
+            <text x="6.9167%" y="719.50">io/netty/channel/DefaultChannelPipeline$HeadContext:.f..</text>
         </g>
         <g>
             <title>io/netty/channel/AbstractChannel$AbstractUnsafe:.flush0 (95 samples, 33.33%)</title>
-            <rect x="88" y="693" width="394" height="15" fill="rgb(237,149,35)"/>
-            <text x="91.00" y="703.50">io/netty/channel/AbstractChannel$AbstractUnsafe:.flus..</text>
+            <rect x="6.6667%" y="693" width="33.3333%" height="15" fill="rgb(237,149,35)"/>
+            <text x="6.9167%" y="703.50">io/netty/channel/AbstractChannel$AbstractUnsafe:.flush0</text>
         </g>
         <g>
             <title>io/netty/channel/nio/AbstractNioByteChannel:.doWrite (95 samples, 33.33%)</title>
-            <rect x="88" y="677" width="394" height="15" fill="rgb(237,149,35)"/>
-            <text x="91.00" y="687.50">io/netty/channel/nio/AbstractNioByteChannel:.doWrite</text>
+            <rect x="6.6667%" y="677" width="33.3333%" height="15" fill="rgb(237,149,35)"/>
+            <text x="6.9167%" y="687.50">io/netty/channel/nio/AbstractNioByteChannel:.doWrite</text>
         </g>
         <g>
             <title>io/netty/util/Recycler:.recycle (1 samples, 0.35%)</title>
-            <rect x="477" y="661" width="5" height="15" fill="rgb(237,149,35)"/>
-            <text x="480.00" y="671.50"></text>
+            <rect x="39.6491%" y="661" width="0.3509%" height="15" fill="rgb(237,149,35)"/>
+            <text x="39.8991%" y="671.50"></text>
         </g>
         <g>
             <title>io/netty/channel/AbstractChannelHandlerContext:.fireChannelReadComplete (97 samples, 34.04%)</title>
-            <rect x="88" y="821" width="402" height="15" fill="rgb(237,149,35)"/>
-            <text x="91.00" y="831.50">io/netty/channel/AbstractChannelHandlerContext:.fireCh..</text>
+            <rect x="6.6667%" y="821" width="34.0351%" height="15" fill="rgb(237,149,35)"/>
+            <text x="6.9167%" y="831.50">io/netty/channel/AbstractChannelHandlerContext:.fireCha..</text>
         </g>
         <g>
             <title>org/vertx/java/core/net/impl/VertxHandler:.channelReadComplete (97 samples, 34.04%)</title>
-            <rect x="88" y="805" width="402" height="15" fill="rgb(237,179,35)"/>
-            <text x="91.00" y="815.50">org/vertx/java/core/net/impl/VertxHandler:.channelRead..</text>
+            <rect x="6.6667%" y="805" width="34.0351%" height="15" fill="rgb(237,179,35)"/>
+            <text x="6.9167%" y="815.50">org/vertx/java/core/net/impl/VertxHandler:.channelReadC..</text>
         </g>
         <g>
             <title>io/netty/channel/ChannelDuplexHandler:.flush (2 samples, 0.70%)</title>
-            <rect x="482" y="789" width="8" height="15" fill="rgb(237,149,35)"/>
-            <text x="485.00" y="799.50"></text>
+            <rect x="40.0000%" y="789" width="0.7018%" height="15" fill="rgb(237,149,35)"/>
+            <text x="40.2500%" y="799.50"></text>
         </g>
         <g>
             <title>io/netty/channel/AbstractChannelHandlerContext:.fireChannelReadComplete (98 samples, 34.39%)</title>
-            <rect x="88" y="853" width="406" height="15" fill="rgb(237,149,35)"/>
-            <text x="91.00" y="863.50">io/netty/channel/AbstractChannelHandlerContext:.fireCha..</text>
+            <rect x="6.6667%" y="853" width="34.3860%" height="15" fill="rgb(237,149,35)"/>
+            <text x="6.9167%" y="863.50">io/netty/channel/AbstractChannelHandlerContext:.fireChan..</text>
         </g>
         <g>
             <title>io/netty/handler/codec/ByteToMessageDecoder:.channelReadComplete (98 samples, 34.39%)</title>
-            <rect x="88" y="837" width="406" height="15" fill="rgb(237,149,35)"/>
-            <text x="91.00" y="847.50">io/netty/handler/codec/ByteToMessageDecoder:.channelRea..</text>
+            <rect x="6.6667%" y="837" width="34.3860%" height="15" fill="rgb(237,149,35)"/>
+            <text x="6.9167%" y="847.50">io/netty/handler/codec/ByteToMessageDecoder:.channelRead..</text>
         </g>
         <g>
             <title>org/vertx/java/core/net/impl/VertxHandler:.channelReadComplete (1 samples, 0.35%)</title>
-            <rect x="490" y="821" width="4" height="15" fill="rgb(237,179,35)"/>
-            <text x="493.00" y="831.50"></text>
+            <rect x="40.7018%" y="821" width="0.3509%" height="15" fill="rgb(237,179,35)"/>
+            <text x="40.9518%" y="831.50"></text>
         </g>
         <g>
             <title>io/netty/buffer/AbstractReferenceCountedByteBuf:.release (1 samples, 0.35%)</title>
-            <rect x="498" y="821" width="4" height="15" fill="rgb(237,149,35)"/>
-            <text x="501.00" y="831.50"></text>
+            <rect x="41.4035%" y="821" width="0.3509%" height="15" fill="rgb(237,149,35)"/>
+            <text x="41.6535%" y="831.50"></text>
         </g>
         <g>
             <title>java/util/concurrent/ConcurrentHashMap:.get (1 samples, 0.35%)</title>
-            <rect x="506" y="789" width="4" height="15" fill="rgb(237,104,35)"/>
-            <text x="509.00" y="799.50"></text>
+            <rect x="42.1053%" y="789" width="0.3509%" height="15" fill="rgb(237,104,35)"/>
+            <text x="42.3553%" y="799.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/Context:.getWrapFactory (2 samples, 0.70%)</title>
-            <rect x="510" y="789" width="9" height="15" fill="rgb(237,179,35)"/>
-            <text x="513.00" y="799.50"></text>
+            <rect x="42.4561%" y="789" width="0.7018%" height="15" fill="rgb(237,179,35)"/>
+            <text x="42.7061%" y="799.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/ScriptableObject:.getParentScope (1 samples, 0.35%)</title>
-            <rect x="531" y="773" width="4" height="15" fill="rgb(237,179,35)"/>
-            <text x="534.00" y="783.50"></text>
+            <rect x="44.2105%" y="773" width="0.3509%" height="15" fill="rgb(237,179,35)"/>
+            <text x="44.4605%" y="783.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/WrapFactory:.wrapAsJavaObject (2 samples, 0.70%)</title>
-            <rect x="535" y="773" width="9" height="15" fill="rgb(237,179,35)"/>
-            <text x="538.00" y="783.50"></text>
+            <rect x="44.5614%" y="773" width="0.7018%" height="15" fill="rgb(237,179,35)"/>
+            <text x="44.8114%" y="783.50"></text>
         </g>
         <g>
             <title>java/util/HashMap:.get (1 samples, 0.35%)</title>
-            <rect x="539" y="757" width="5" height="15" fill="rgb(237,104,35)"/>
-            <text x="542.00" y="767.50"></text>
+            <rect x="44.9123%" y="757" width="0.3509%" height="15" fill="rgb(237,104,35)"/>
+            <text x="45.1623%" y="767.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/WrapFactory:.wrap (1 samples, 0.35%)</title>
-            <rect x="544" y="773" width="4" height="15" fill="rgb(237,179,35)"/>
-            <text x="547.00" y="783.50"></text>
+            <rect x="45.2632%" y="773" width="0.3509%" height="15" fill="rgb(237,179,35)"/>
+            <text x="45.5132%" y="783.50"></text>
         </g>
         <g>
             <title>java/util/HashMap:.get (1 samples, 0.35%)</title>
-            <rect x="544" y="757" width="4" height="15" fill="rgb(237,104,35)"/>
-            <text x="547.00" y="767.50"></text>
+            <rect x="45.2632%" y="757" width="0.3509%" height="15" fill="rgb(237,104,35)"/>
+            <text x="45.5132%" y="767.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/ScriptableObject$RelinkedSlot:.getValue (1 samples, 0.35%)</title>
-            <rect x="564" y="725" width="4" height="15" fill="rgb(237,179,35)"/>
-            <text x="567.00" y="735.50"></text>
+            <rect x="47.0175%" y="725" width="0.3509%" height="15" fill="rgb(237,179,35)"/>
+            <text x="47.2675%" y="735.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/ScriptRuntime:.getObjectProp (4 samples, 1.40%)</title>
-            <rect x="556" y="741" width="17" height="15" fill="rgb(237,179,35)"/>
-            <text x="559.00" y="751.50"></text>
+            <rect x="46.3158%" y="741" width="1.4035%" height="15" fill="rgb(237,179,35)"/>
+            <text x="46.5658%" y="751.50"></text>
         </g>
         <g>
             <title>vtable chunks (1 samples, 0.35%)</title>
-            <rect x="568" y="725" width="5" height="15" fill="rgb(237,132,35)"/>
-            <text x="571.00" y="735.50"></text>
+            <rect x="47.3684%" y="725" width="0.3509%" height="15" fill="rgb(237,132,35)"/>
+            <text x="47.6184%" y="735.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/ScriptRuntime:.nameOrFunction (1 samples, 0.35%)</title>
-            <rect x="573" y="741" width="4" height="15" fill="rgb(237,179,35)"/>
-            <text x="576.00" y="751.50"></text>
+            <rect x="47.7193%" y="741" width="0.3509%" height="15" fill="rgb(237,179,35)"/>
+            <text x="47.9693%" y="751.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/ScriptableObject$Slot:.getValue (1 samples, 0.35%)</title>
-            <rect x="573" y="725" width="4" height="15" fill="rgb(237,179,35)"/>
-            <text x="576.00" y="735.50"></text>
+            <rect x="47.7193%" y="725" width="0.3509%" height="15" fill="rgb(237,179,35)"/>
+            <text x="47.9693%" y="735.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/ScriptRuntime:.name (1 samples, 0.35%)</title>
-            <rect x="577" y="741" width="4" height="15" fill="rgb(237,179,35)"/>
-            <text x="580.00" y="751.50"></text>
+            <rect x="48.0702%" y="741" width="0.3509%" height="15" fill="rgb(237,179,35)"/>
+            <text x="48.3202%" y="751.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/IdScriptableObject:.get (1 samples, 0.35%)</title>
-            <rect x="577" y="725" width="4" height="15" fill="rgb(237,179,35)"/>
-            <text x="580.00" y="735.50"></text>
+            <rect x="48.0702%" y="725" width="0.3509%" height="15" fill="rgb(237,179,35)"/>
+            <text x="48.3202%" y="735.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/ScriptRuntime:.getPropFunctionAndThis (1 samples, 0.35%)</title>
-            <rect x="581" y="725" width="4" height="15" fill="rgb(237,179,35)"/>
-            <text x="584.00" y="735.50"></text>
+            <rect x="48.4211%" y="725" width="0.3509%" height="15" fill="rgb(237,179,35)"/>
+            <text x="48.6711%" y="735.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/IdScriptableObject:.findInstanceIdInfo (1 samples, 0.35%)</title>
-            <rect x="585" y="709" width="4" height="15" fill="rgb(237,179,35)"/>
-            <text x="588.00" y="719.50"></text>
+            <rect x="48.7719%" y="709" width="0.3509%" height="15" fill="rgb(237,179,35)"/>
+            <text x="49.0219%" y="719.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/IdScriptableObject:.has (3 samples, 1.05%)</title>
-            <rect x="589" y="709" width="13" height="15" fill="rgb(237,179,35)"/>
-            <text x="592.00" y="719.50"></text>
+            <rect x="49.1228%" y="709" width="1.0526%" height="15" fill="rgb(237,179,35)"/>
+            <text x="49.3728%" y="719.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/ScriptableObject:.getSlot (2 samples, 0.70%)</title>
-            <rect x="593" y="693" width="9" height="15" fill="rgb(237,179,35)"/>
-            <text x="596.00" y="703.50"></text>
+            <rect x="49.4737%" y="693" width="0.7018%" height="15" fill="rgb(237,179,35)"/>
+            <text x="49.7237%" y="703.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/IdScriptableObject:.put (1 samples, 0.35%)</title>
-            <rect x="602" y="709" width="4" height="15" fill="rgb(237,179,35)"/>
-            <text x="605.00" y="719.50"></text>
+            <rect x="50.1754%" y="709" width="0.3509%" height="15" fill="rgb(237,179,35)"/>
+            <text x="50.4254%" y="719.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/ScriptableObject:.getSlot (1 samples, 0.35%)</title>
-            <rect x="602" y="693" width="4" height="15" fill="rgb(237,179,35)"/>
-            <text x="605.00" y="703.50"></text>
+            <rect x="50.1754%" y="693" width="0.3509%" height="15" fill="rgb(237,179,35)"/>
+            <text x="50.4254%" y="703.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/IdScriptableObject:.setAttributes (1 samples, 0.35%)</title>
-            <rect x="606" y="709" width="4" height="15" fill="rgb(237,179,35)"/>
-            <text x="609.00" y="719.50"></text>
+            <rect x="50.5263%" y="709" width="0.3509%" height="15" fill="rgb(237,179,35)"/>
+            <text x="50.7763%" y="719.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/MemberBox:.invoke (1 samples, 0.35%)</title>
-            <rect x="610" y="709" width="4" height="15" fill="rgb(237,179,35)"/>
-            <text x="613.00" y="719.50"></text>
+            <rect x="50.8772%" y="709" width="0.3509%" height="15" fill="rgb(237,179,35)"/>
+            <text x="51.1272%" y="719.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/NativeJavaMethod:.call (2 samples, 0.70%)</title>
-            <rect x="614" y="709" width="8" height="15" fill="rgb(237,179,35)"/>
-            <text x="617.00" y="719.50"></text>
+            <rect x="51.2281%" y="709" width="0.7018%" height="15" fill="rgb(237,179,35)"/>
+            <text x="51.4781%" y="719.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/WrapFactory:.wrap (1 samples, 0.35%)</title>
-            <rect x="618" y="693" width="4" height="15" fill="rgb(237,179,35)"/>
-            <text x="621.00" y="703.50"></text>
+            <rect x="51.5789%" y="693" width="0.3509%" height="15" fill="rgb(237,179,35)"/>
+            <text x="51.8289%" y="703.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/NativeJavaMethod:.findFunction (1 samples, 0.35%)</title>
-            <rect x="622" y="709" width="4" height="15" fill="rgb(237,179,35)"/>
-            <text x="625.00" y="719.50"></text>
+            <rect x="51.9298%" y="709" width="0.3509%" height="15" fill="rgb(237,179,35)"/>
+            <text x="52.1798%" y="719.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/NativeJavaObject:.get (2 samples, 0.70%)</title>
-            <rect x="626" y="709" width="9" height="15" fill="rgb(237,179,35)"/>
-            <text x="629.00" y="719.50"></text>
+            <rect x="52.2807%" y="709" width="0.7018%" height="15" fill="rgb(237,179,35)"/>
+            <text x="52.5307%" y="719.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/IdScriptableObject:.get (1 samples, 0.35%)</title>
-            <rect x="635" y="693" width="4" height="15" fill="rgb(237,179,35)"/>
-            <text x="638.00" y="703.50"></text>
+            <rect x="52.9825%" y="693" width="0.3509%" height="15" fill="rgb(237,179,35)"/>
+            <text x="53.2325%" y="703.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/ScriptableObject:.getSlot (1 samples, 0.35%)</title>
-            <rect x="635" y="677" width="4" height="15" fill="rgb(237,179,35)"/>
-            <text x="638.00" y="687.50"></text>
+            <rect x="52.9825%" y="677" width="0.3509%" height="15" fill="rgb(237,179,35)"/>
+            <text x="53.2325%" y="687.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/IdScriptableObject:.put (2 samples, 0.70%)</title>
-            <rect x="639" y="693" width="8" height="15" fill="rgb(237,179,35)"/>
-            <text x="642.00" y="703.50"></text>
+            <rect x="53.3333%" y="693" width="0.7018%" height="15" fill="rgb(237,179,35)"/>
+            <text x="53.5833%" y="703.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/ScriptableObject:.getSlot (2 samples, 0.70%)</title>
-            <rect x="639" y="677" width="8" height="15" fill="rgb(237,179,35)"/>
-            <text x="642.00" y="687.50"></text>
+            <rect x="53.3333%" y="677" width="0.7018%" height="15" fill="rgb(237,179,35)"/>
+            <text x="53.5833%" y="687.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/ScriptableObject:.createSlot (2 samples, 0.70%)</title>
-            <rect x="639" y="661" width="8" height="15" fill="rgb(237,179,35)"/>
-            <text x="642.00" y="671.50"></text>
+            <rect x="53.3333%" y="661" width="0.7018%" height="15" fill="rgb(237,179,35)"/>
+            <text x="53.5833%" y="671.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/IdScriptableObject:.setAttributes (1 samples, 0.35%)</title>
-            <rect x="647" y="693" width="4" height="15" fill="rgb(237,179,35)"/>
-            <text x="650.00" y="703.50"></text>
+            <rect x="54.0351%" y="693" width="0.3509%" height="15" fill="rgb(237,179,35)"/>
+            <text x="54.2851%" y="703.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/ScriptRuntime:.createFunctionActivation (5 samples, 1.75%)</title>
-            <rect x="635" y="709" width="20" height="15" fill="rgb(237,179,35)"/>
-            <text x="638.00" y="719.50"></text>
+            <rect x="52.9825%" y="709" width="1.7544%" height="15" fill="rgb(237,179,35)"/>
+            <text x="53.2325%" y="719.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/gen/file__home_bgregg_testtest_vert_x_2_1_4_sys_mods_io_vertx_lang_js_1_1_0 (1 samples, 0.35%)</title>
-            <rect x="651" y="693" width="4" height="15" fill="rgb(237,179,35)"/>
-            <text x="654.00" y="703.50"></text>
+            <rect x="54.3860%" y="693" width="0.3509%" height="15" fill="rgb(237,179,35)"/>
+            <text x="54.6360%" y="703.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/ScriptRuntime:.getObjectProp (1 samples, 0.35%)</title>
-            <rect x="655" y="709" width="5" height="15" fill="rgb(237,179,35)"/>
-            <text x="658.00" y="719.50"></text>
+            <rect x="54.7368%" y="709" width="0.3509%" height="15" fill="rgb(237,179,35)"/>
+            <text x="54.9868%" y="719.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/ScriptableObject$Slot:.getValue (1 samples, 0.35%)</title>
-            <rect x="655" y="693" width="5" height="15" fill="rgb(237,179,35)"/>
-            <text x="658.00" y="703.50"></text>
+            <rect x="54.7368%" y="693" width="0.3509%" height="15" fill="rgb(237,179,35)"/>
+            <text x="54.9868%" y="703.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/ScriptRuntime:.getPropFunctionAndThis (1 samples, 0.35%)</title>
-            <rect x="660" y="709" width="4" height="15" fill="rgb(237,179,35)"/>
-            <text x="663.00" y="719.50"></text>
+            <rect x="55.0877%" y="709" width="0.3509%" height="15" fill="rgb(237,179,35)"/>
+            <text x="55.3377%" y="719.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/NativeJavaObject:.get (1 samples, 0.35%)</title>
-            <rect x="660" y="693" width="4" height="15" fill="rgb(237,179,35)"/>
-            <text x="663.00" y="703.50"></text>
+            <rect x="55.0877%" y="693" width="0.3509%" height="15" fill="rgb(237,179,35)"/>
+            <text x="55.3377%" y="703.50"></text>
         </g>
         <g>
             <title>java/util/HashMap:.get (1 samples, 0.35%)</title>
-            <rect x="660" y="677" width="4" height="15" fill="rgb(237,104,35)"/>
-            <text x="663.00" y="687.50"></text>
+            <rect x="55.0877%" y="677" width="0.3509%" height="15" fill="rgb(237,104,35)"/>
+            <text x="55.3377%" y="687.50"></text>
         </g>
         <g>
             <title>jint_disjoint_arraycopy (1 samples, 0.35%)</title>
-            <rect x="668" y="661" width="4" height="15" fill="rgb(237,145,35)"/>
-            <text x="671.00" y="671.50"></text>
+            <rect x="55.7895%" y="661" width="0.3509%" height="15" fill="rgb(237,145,35)"/>
+            <text x="56.0395%" y="671.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/IdScriptableObject:.get (2 samples, 0.70%)</title>
-            <rect x="672" y="661" width="8" height="15" fill="rgb(237,179,35)"/>
-            <text x="675.00" y="671.50"></text>
+            <rect x="56.1404%" y="661" width="0.7018%" height="15" fill="rgb(237,179,35)"/>
+            <text x="56.3904%" y="671.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/IdScriptableObject:.has (1 samples, 0.35%)</title>
-            <rect x="680" y="661" width="4" height="15" fill="rgb(237,179,35)"/>
-            <text x="683.00" y="671.50"></text>
+            <rect x="56.8421%" y="661" width="0.3509%" height="15" fill="rgb(237,179,35)"/>
+            <text x="57.0921%" y="671.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/IdScriptableObject:.put (2 samples, 0.70%)</title>
-            <rect x="689" y="645" width="8" height="15" fill="rgb(237,179,35)"/>
-            <text x="692.00" y="655.50"></text>
+            <rect x="57.5439%" y="645" width="0.7018%" height="15" fill="rgb(237,179,35)"/>
+            <text x="57.7939%" y="655.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/ScriptableObject:.getSlot (2 samples, 0.70%)</title>
-            <rect x="689" y="629" width="8" height="15" fill="rgb(237,179,35)"/>
-            <text x="692.00" y="639.50"></text>
+            <rect x="57.5439%" y="629" width="0.7018%" height="15" fill="rgb(237,179,35)"/>
+            <text x="57.7939%" y="639.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/ScriptableObject:.createSlot (2 samples, 0.70%)</title>
-            <rect x="689" y="613" width="8" height="15" fill="rgb(237,179,35)"/>
-            <text x="692.00" y="623.50"></text>
+            <rect x="57.5439%" y="613" width="0.7018%" height="15" fill="rgb(237,179,35)"/>
+            <text x="57.7939%" y="623.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/ScriptRuntime:.createFunctionActivation (5 samples, 1.75%)</title>
-            <rect x="684" y="661" width="21" height="15" fill="rgb(237,179,35)"/>
-            <text x="687.00" y="671.50"></text>
+            <rect x="57.1930%" y="661" width="1.7544%" height="15" fill="rgb(237,179,35)"/>
+            <text x="57.4430%" y="671.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/IdScriptableObject:.setAttributes (2 samples, 0.70%)</title>
-            <rect x="697" y="645" width="8" height="15" fill="rgb(237,179,35)"/>
-            <text x="700.00" y="655.50"></text>
+            <rect x="58.2456%" y="645" width="0.7018%" height="15" fill="rgb(237,179,35)"/>
+            <text x="58.4956%" y="655.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/ScriptRuntime:.getObjectProp (1 samples, 0.35%)</title>
-            <rect x="705" y="661" width="4" height="15" fill="rgb(237,179,35)"/>
-            <text x="708.00" y="671.50"></text>
+            <rect x="58.9474%" y="661" width="0.3509%" height="15" fill="rgb(237,179,35)"/>
+            <text x="59.1974%" y="671.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/IdScriptableObject:.get (1 samples, 0.35%)</title>
-            <rect x="705" y="645" width="4" height="15" fill="rgb(237,179,35)"/>
-            <text x="708.00" y="655.50"></text>
+            <rect x="58.9474%" y="645" width="0.3509%" height="15" fill="rgb(237,179,35)"/>
+            <text x="59.1974%" y="655.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/ScriptableObject:.getSlot (1 samples, 0.35%)</title>
-            <rect x="705" y="629" width="4" height="15" fill="rgb(237,179,35)"/>
-            <text x="708.00" y="639.50"></text>
+            <rect x="58.9474%" y="629" width="0.3509%" height="15" fill="rgb(237,179,35)"/>
+            <text x="59.1974%" y="639.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/ScriptRuntime:.nameOrFunction (1 samples, 0.35%)</title>
-            <rect x="709" y="661" width="4" height="15" fill="rgb(237,179,35)"/>
-            <text x="712.00" y="671.50"></text>
+            <rect x="59.2982%" y="661" width="0.3509%" height="15" fill="rgb(237,179,35)"/>
+            <text x="59.5482%" y="671.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/IdScriptableObject:.get (1 samples, 0.35%)</title>
-            <rect x="709" y="645" width="4" height="15" fill="rgb(237,179,35)"/>
-            <text x="712.00" y="655.50"></text>
+            <rect x="59.2982%" y="645" width="0.3509%" height="15" fill="rgb(237,179,35)"/>
+            <text x="59.5482%" y="655.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/ScriptableObject$RelinkedSlot:.getValue (1 samples, 0.35%)</title>
-            <rect x="709" y="629" width="4" height="15" fill="rgb(237,179,35)"/>
-            <text x="712.00" y="639.50"></text>
+            <rect x="59.2982%" y="629" width="0.3509%" height="15" fill="rgb(237,179,35)"/>
+            <text x="59.5482%" y="639.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/IdScriptableObject:.findInstanceIdInfo (1 samples, 0.35%)</title>
-            <rect x="713" y="645" width="5" height="15" fill="rgb(237,179,35)"/>
-            <text x="716.00" y="655.50"></text>
+            <rect x="59.6491%" y="645" width="0.3509%" height="15" fill="rgb(237,179,35)"/>
+            <text x="59.8991%" y="655.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/IdScriptableObject:.put (4 samples, 1.40%)</title>
-            <rect x="718" y="645" width="16" height="15" fill="rgb(237,179,35)"/>
-            <text x="721.00" y="655.50"></text>
+            <rect x="60.0000%" y="645" width="1.4035%" height="15" fill="rgb(237,179,35)"/>
+            <text x="60.2500%" y="655.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/ScriptableObject:.getSlot (3 samples, 1.05%)</title>
-            <rect x="722" y="629" width="12" height="15" fill="rgb(237,179,35)"/>
-            <text x="725.00" y="639.50"></text>
+            <rect x="60.3509%" y="629" width="1.0526%" height="15" fill="rgb(237,179,35)"/>
+            <text x="60.6009%" y="639.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/ScriptableObject:.createSlot (3 samples, 1.05%)</title>
-            <rect x="722" y="613" width="12" height="15" fill="rgb(237,179,35)"/>
-            <text x="725.00" y="623.50"></text>
+            <rect x="60.3509%" y="613" width="1.0526%" height="15" fill="rgb(237,179,35)"/>
+            <text x="60.6009%" y="623.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/ScriptableObject:.getSlot (1 samples, 0.35%)</title>
-            <rect x="734" y="645" width="4" height="15" fill="rgb(237,179,35)"/>
-            <text x="737.00" y="655.50"></text>
+            <rect x="61.4035%" y="645" width="0.3509%" height="15" fill="rgb(237,179,35)"/>
+            <text x="61.6535%" y="655.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/ScriptRuntime:.setObjectProp (7 samples, 2.46%)</title>
-            <rect x="713" y="661" width="29" height="15" fill="rgb(237,179,35)"/>
-            <text x="716.00" y="671.50">or..</text>
+            <rect x="59.6491%" y="661" width="2.4561%" height="15" fill="rgb(237,179,35)"/>
+            <text x="59.8991%" y="671.50">or..</text>
         </g>
         <g>
             <title>vtable chunks (1 samples, 0.35%)</title>
-            <rect x="738" y="645" width="4" height="15" fill="rgb(237,132,35)"/>
-            <text x="741.00" y="655.50"></text>
+            <rect x="61.7544%" y="645" width="0.3509%" height="15" fill="rgb(237,132,35)"/>
+            <text x="62.0044%" y="655.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/NativeFunction:.initScriptFunction (1 samples, 0.35%)</title>
-            <rect x="742" y="645" width="4" height="15" fill="rgb(237,179,35)"/>
-            <text x="745.00" y="655.50"></text>
+            <rect x="62.1053%" y="645" width="0.3509%" height="15" fill="rgb(237,179,35)"/>
+            <text x="62.3553%" y="655.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/ScriptRuntime:.createFunctionActivation (1 samples, 0.35%)</title>
-            <rect x="746" y="645" width="5" height="15" fill="rgb(237,179,35)"/>
-            <text x="749.00" y="655.50"></text>
+            <rect x="62.4561%" y="645" width="0.3509%" height="15" fill="rgb(237,179,35)"/>
+            <text x="62.7061%" y="655.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/ScriptRuntime:.createFunctionActivation (2 samples, 0.70%)</title>
-            <rect x="751" y="629" width="8" height="15" fill="rgb(237,179,35)"/>
-            <text x="754.00" y="639.50"></text>
+            <rect x="62.8070%" y="629" width="0.7018%" height="15" fill="rgb(237,179,35)"/>
+            <text x="63.0570%" y="639.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/IdScriptableObject:.get (1 samples, 0.35%)</title>
-            <rect x="755" y="613" width="4" height="15" fill="rgb(237,179,35)"/>
-            <text x="758.00" y="623.50"></text>
+            <rect x="63.1579%" y="613" width="0.3509%" height="15" fill="rgb(237,179,35)"/>
+            <text x="63.4079%" y="623.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/IdScriptableObject:.has (1 samples, 0.35%)</title>
-            <rect x="759" y="613" width="4" height="15" fill="rgb(237,179,35)"/>
-            <text x="762.00" y="623.50"></text>
+            <rect x="63.5088%" y="613" width="0.3509%" height="15" fill="rgb(237,179,35)"/>
+            <text x="63.7588%" y="623.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/ScriptRuntime:.setObjectProp (8 samples, 2.81%)</title>
-            <rect x="759" y="629" width="33" height="15" fill="rgb(237,179,35)"/>
-            <text x="762.00" y="639.50">or..</text>
+            <rect x="63.5088%" y="629" width="2.8070%" height="15" fill="rgb(237,179,35)"/>
+            <text x="63.7588%" y="639.50">or..</text>
         </g>
         <g>
             <title>org/mozilla/javascript/IdScriptableObject:.put (7 samples, 2.46%)</title>
-            <rect x="763" y="613" width="29" height="15" fill="rgb(237,179,35)"/>
-            <text x="766.00" y="623.50">or..</text>
+            <rect x="63.8596%" y="613" width="2.4561%" height="15" fill="rgb(237,179,35)"/>
+            <text x="64.1096%" y="623.50">or..</text>
         </g>
         <g>
             <title>org/mozilla/javascript/ScriptableObject:.getSlot (6 samples, 2.11%)</title>
-            <rect x="767" y="597" width="25" height="15" fill="rgb(237,179,35)"/>
-            <text x="770.00" y="607.50">o..</text>
+            <rect x="64.2105%" y="597" width="2.1053%" height="15" fill="rgb(237,179,35)"/>
+            <text x="64.4605%" y="607.50">o..</text>
         </g>
         <g>
             <title>org/mozilla/javascript/ScriptableObject:.createSlot (6 samples, 2.11%)</title>
-            <rect x="767" y="581" width="25" height="15" fill="rgb(237,179,35)"/>
-            <text x="770.00" y="591.50">o..</text>
+            <rect x="64.2105%" y="581" width="2.1053%" height="15" fill="rgb(237,179,35)"/>
+            <text x="64.4605%" y="591.50">o..</text>
         </g>
         <g>
             <title>org/mozilla/javascript/ScriptRuntime:.newObject (32 samples, 11.23%)</title>
-            <rect x="664" y="709" width="132" height="15" fill="rgb(237,179,35)"/>
-            <text x="667.00" y="719.50">org/mozilla/java..</text>
+            <rect x="55.4386%" y="709" width="11.2281%" height="15" fill="rgb(237,179,35)"/>
+            <text x="55.6886%" y="719.50">org/mozilla/javas..</text>
         </g>
         <g>
             <title>org/mozilla/javascript/gen/file__home_bgregg_testtest_vert_x_2_1_4_sys_mods_io_vertx_lang_js_1_1_0 (32 samples, 11.23%)</title>
-            <rect x="664" y="693" width="132" height="15" fill="rgb(237,179,35)"/>
-            <text x="667.00" y="703.50">org/mozilla/java..</text>
+            <rect x="55.4386%" y="693" width="11.2281%" height="15" fill="rgb(237,179,35)"/>
+            <text x="55.6886%" y="703.50">org/mozilla/javas..</text>
         </g>
         <g>
             <title>org/mozilla/javascript/gen/file__home_bgregg_testtest_vert_x_2_1_4_sys_mods_io_vertx_lang_js_1_1_0 (32 samples, 11.23%)</title>
-            <rect x="664" y="677" width="132" height="15" fill="rgb(237,179,35)"/>
-            <text x="667.00" y="687.50">org/mozilla/java..</text>
+            <rect x="55.4386%" y="677" width="11.2281%" height="15" fill="rgb(237,179,35)"/>
+            <text x="55.6886%" y="687.50">org/mozilla/javas..</text>
         </g>
         <g>
             <title>org/mozilla/javascript/optimizer/OptRuntime:.call2 (13 samples, 4.56%)</title>
-            <rect x="742" y="661" width="54" height="15" fill="rgb(237,179,35)"/>
-            <text x="745.00" y="671.50">org/m..</text>
+            <rect x="62.1053%" y="661" width="4.5614%" height="15" fill="rgb(237,179,35)"/>
+            <text x="62.3553%" y="671.50">org/m..</text>
         </g>
         <g>
             <title>org/mozilla/javascript/gen/file__home_bgregg_testtest_vert_x_2_1_4_sys_mods_io_vertx_lang_js_1_1_0 (11 samples, 3.86%)</title>
-            <rect x="751" y="645" width="45" height="15" fill="rgb(237,179,35)"/>
-            <text x="754.00" y="655.50">org/..</text>
+            <rect x="62.8070%" y="645" width="3.8596%" height="15" fill="rgb(237,179,35)"/>
+            <text x="63.0570%" y="655.50">org/..</text>
         </g>
         <g>
             <title>org/mozilla/javascript/ScriptableObject:.getParentScope (1 samples, 0.35%)</title>
-            <rect x="792" y="629" width="4" height="15" fill="rgb(237,179,35)"/>
-            <text x="795.00" y="639.50"></text>
+            <rect x="66.3158%" y="629" width="0.3509%" height="15" fill="rgb(237,179,35)"/>
+            <text x="66.5658%" y="639.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/IdScriptableObject:.has (9 samples, 3.16%)</title>
-            <rect x="796" y="693" width="37" height="15" fill="rgb(237,179,35)"/>
-            <text x="799.00" y="703.50">org..</text>
+            <rect x="66.6667%" y="693" width="3.1579%" height="15" fill="rgb(237,179,35)"/>
+            <text x="66.9167%" y="703.50">org..</text>
         </g>
         <g>
             <title>org/mozilla/javascript/ScriptableObject:.getSlot (5 samples, 1.75%)</title>
-            <rect x="813" y="677" width="20" height="15" fill="rgb(237,179,35)"/>
-            <text x="816.00" y="687.50"></text>
+            <rect x="68.0702%" y="677" width="1.7544%" height="15" fill="rgb(237,179,35)"/>
+            <text x="68.3202%" y="687.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/ScriptRuntime:.setObjectProp (17 samples, 5.96%)</title>
-            <rect x="796" y="709" width="71" height="15" fill="rgb(237,179,35)"/>
-            <text x="799.00" y="719.50">org/mozi..</text>
+            <rect x="66.6667%" y="709" width="5.9649%" height="15" fill="rgb(237,179,35)"/>
+            <text x="66.9167%" y="719.50">org/mozi..</text>
         </g>
         <g>
             <title>org/mozilla/javascript/IdScriptableObject:.put (8 samples, 2.81%)</title>
-            <rect x="833" y="693" width="34" height="15" fill="rgb(237,179,35)"/>
-            <text x="836.00" y="703.50">or..</text>
+            <rect x="69.8246%" y="693" width="2.8070%" height="15" fill="rgb(237,179,35)"/>
+            <text x="70.0746%" y="703.50">or..</text>
         </g>
         <g>
             <title>org/mozilla/javascript/ScriptableObject:.getSlot (7 samples, 2.46%)</title>
-            <rect x="838" y="677" width="29" height="15" fill="rgb(237,179,35)"/>
-            <text x="841.00" y="687.50">or..</text>
+            <rect x="70.1754%" y="677" width="2.4561%" height="15" fill="rgb(237,179,35)"/>
+            <text x="70.4254%" y="687.50">or..</text>
         </g>
         <g>
             <title>org/mozilla/javascript/ScriptableObject:.createSlot (6 samples, 2.11%)</title>
-            <rect x="842" y="661" width="25" height="15" fill="rgb(237,179,35)"/>
-            <text x="845.00" y="671.50">o..</text>
+            <rect x="70.5263%" y="661" width="2.1053%" height="15" fill="rgb(237,179,35)"/>
+            <text x="70.7763%" y="671.50">o..</text>
         </g>
         <g>
             <title>org/mozilla/javascript/ScriptableObject:.getPrototype (1 samples, 0.35%)</title>
-            <rect x="867" y="709" width="4" height="15" fill="rgb(237,179,35)"/>
-            <text x="870.00" y="719.50"></text>
+            <rect x="72.6316%" y="709" width="0.3509%" height="15" fill="rgb(237,179,35)"/>
+            <text x="72.8816%" y="719.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/ScriptableObject:.getParentScope (1 samples, 0.35%)</title>
-            <rect x="871" y="677" width="4" height="15" fill="rgb(237,179,35)"/>
-            <text x="874.00" y="687.50"></text>
+            <rect x="72.9825%" y="677" width="0.3509%" height="15" fill="rgb(237,179,35)"/>
+            <text x="73.2325%" y="687.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/gen/file__home_bgregg_testtest_vert_x_2_1_4_sys_mods_io_vertx_lang_js_1_1_0 (3 samples, 1.05%)</title>
-            <rect x="871" y="709" width="12" height="15" fill="rgb(237,179,35)"/>
-            <text x="874.00" y="719.50"></text>
+            <rect x="72.9825%" y="709" width="1.0526%" height="15" fill="rgb(237,179,35)"/>
+            <text x="73.2325%" y="719.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/gen/file__home_bgregg_testtest_vert_x_2_1_4_sys_mods_io_vertx_lang_js_1_1_0 (3 samples, 1.05%)</title>
-            <rect x="871" y="693" width="12" height="15" fill="rgb(237,179,35)"/>
-            <text x="874.00" y="703.50"></text>
+            <rect x="72.9825%" y="693" width="1.0526%" height="15" fill="rgb(237,179,35)"/>
+            <text x="73.2325%" y="703.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/TopLevel:.getBuiltinPrototype (2 samples, 0.70%)</title>
-            <rect x="875" y="677" width="8" height="15" fill="rgb(237,179,35)"/>
-            <text x="878.00" y="687.50"></text>
+            <rect x="73.3333%" y="677" width="0.7018%" height="15" fill="rgb(237,179,35)"/>
+            <text x="73.5833%" y="687.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/ScriptRuntime:.name (1 samples, 0.35%)</title>
-            <rect x="887" y="693" width="4" height="15" fill="rgb(237,179,35)"/>
-            <text x="890.00" y="703.50"></text>
+            <rect x="74.3860%" y="693" width="0.3509%" height="15" fill="rgb(237,179,35)"/>
+            <text x="74.6360%" y="703.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/ScriptRuntime:.nameOrFunction (1 samples, 0.35%)</title>
-            <rect x="887" y="677" width="4" height="15" fill="rgb(237,179,35)"/>
-            <text x="890.00" y="687.50"></text>
+            <rect x="74.3860%" y="677" width="0.3509%" height="15" fill="rgb(237,179,35)"/>
+            <text x="74.6360%" y="687.50"></text>
         </g>
         <g>
             <title>vtable chunks (1 samples, 0.35%)</title>
-            <rect x="887" y="661" width="4" height="15" fill="rgb(237,132,35)"/>
-            <text x="890.00" y="671.50"></text>
+            <rect x="74.3860%" y="661" width="0.3509%" height="15" fill="rgb(237,132,35)"/>
+            <text x="74.6360%" y="671.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/ScriptRuntime:.setObjectProp (1 samples, 0.35%)</title>
-            <rect x="891" y="693" width="5" height="15" fill="rgb(237,179,35)"/>
-            <text x="894.00" y="703.50"></text>
+            <rect x="74.7368%" y="693" width="0.3509%" height="15" fill="rgb(237,179,35)"/>
+            <text x="74.9868%" y="703.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/IdScriptableObject:.has (1 samples, 0.35%)</title>
-            <rect x="891" y="677" width="5" height="15" fill="rgb(237,179,35)"/>
-            <text x="894.00" y="687.50"></text>
+            <rect x="74.7368%" y="677" width="0.3509%" height="15" fill="rgb(237,179,35)"/>
+            <text x="74.9868%" y="687.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/ScriptableObject:.getSlot (1 samples, 0.35%)</title>
-            <rect x="891" y="661" width="5" height="15" fill="rgb(237,179,35)"/>
-            <text x="894.00" y="671.50"></text>
+            <rect x="74.7368%" y="661" width="0.3509%" height="15" fill="rgb(237,179,35)"/>
+            <text x="74.9868%" y="671.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/IdScriptableObject:.setAttributes (2 samples, 0.70%)</title>
-            <rect x="900" y="661" width="8" height="15" fill="rgb(237,179,35)"/>
-            <text x="903.00" y="671.50"></text>
+            <rect x="75.4386%" y="661" width="0.7018%" height="15" fill="rgb(237,179,35)"/>
+            <text x="75.6886%" y="671.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/ScriptRuntime:.createFunctionActivation (5 samples, 1.75%)</title>
-            <rect x="896" y="677" width="20" height="15" fill="rgb(237,179,35)"/>
-            <text x="899.00" y="687.50"></text>
+            <rect x="75.0877%" y="677" width="1.7544%" height="15" fill="rgb(237,179,35)"/>
+            <text x="75.3377%" y="687.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/TopLevel:.getBuiltinPrototype (2 samples, 0.70%)</title>
-            <rect x="908" y="661" width="8" height="15" fill="rgb(237,179,35)"/>
-            <text x="911.00" y="671.50"></text>
+            <rect x="76.1404%" y="661" width="0.7018%" height="15" fill="rgb(237,179,35)"/>
+            <text x="76.3904%" y="671.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/gen/file__home_bgregg_testtest_vert_x_2_1_4_sys_mods_io_vertx_lang_js_1_1_0 (82 samples, 28.77%)</title>
-            <rect x="581" y="741" width="339" height="15" fill="rgb(237,179,35)"/>
-            <text x="584.00" y="751.50">org/mozilla/javascript/gen/file__home_bgregg_..</text>
+            <rect x="48.4211%" y="741" width="28.7719%" height="15" fill="rgb(237,179,35)"/>
+            <text x="48.6711%" y="751.50">org/mozilla/javascript/gen/file__home_bgregg_t..</text>
         </g>
         <g>
             <title>org/mozilla/javascript/gen/file__home_bgregg_testtest_vert_x_2_1_4_sys_mods_io_vertx_lang_js_1_1_0 (81 samples, 28.42%)</title>
-            <rect x="585" y="725" width="335" height="15" fill="rgb(237,179,35)"/>
-            <text x="588.00" y="735.50">org/mozilla/javascript/gen/file__home_bgregg_..</text>
+            <rect x="48.7719%" y="725" width="28.4211%" height="15" fill="rgb(237,179,35)"/>
+            <text x="49.0219%" y="735.50">org/mozilla/javascript/gen/file__home_bgregg_t..</text>
         </g>
         <g>
             <title>org/mozilla/javascript/optimizer/OptRuntime:.call2 (9 samples, 3.16%)</title>
-            <rect x="883" y="709" width="37" height="15" fill="rgb(237,179,35)"/>
-            <text x="886.00" y="719.50">org..</text>
+            <rect x="74.0351%" y="709" width="3.1579%" height="15" fill="rgb(237,179,35)"/>
+            <text x="74.2851%" y="719.50">org..</text>
         </g>
         <g>
             <title>org/mozilla/javascript/gen/file__home_bgregg_testtest_vert_x_2_1_4_sys_mods_io_vertx_lang_js_1_1_0 (6 samples, 2.11%)</title>
-            <rect x="896" y="693" width="24" height="15" fill="rgb(237,179,35)"/>
-            <text x="899.00" y="703.50">o..</text>
+            <rect x="75.0877%" y="693" width="2.1053%" height="15" fill="rgb(237,179,35)"/>
+            <text x="75.3377%" y="703.50">o..</text>
         </g>
         <g>
             <title>org/mozilla/javascript/ScriptRuntime:.setObjectProp (1 samples, 0.35%)</title>
-            <rect x="916" y="677" width="4" height="15" fill="rgb(237,179,35)"/>
-            <text x="919.00" y="687.50"></text>
+            <rect x="76.8421%" y="677" width="0.3509%" height="15" fill="rgb(237,179,35)"/>
+            <text x="77.0921%" y="687.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/IdScriptableObject:.put (1 samples, 0.35%)</title>
-            <rect x="916" y="661" width="4" height="15" fill="rgb(237,179,35)"/>
-            <text x="919.00" y="671.50"></text>
+            <rect x="76.8421%" y="661" width="0.3509%" height="15" fill="rgb(237,179,35)"/>
+            <text x="77.0921%" y="671.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/ScriptableObject:.getSlot (1 samples, 0.35%)</title>
-            <rect x="916" y="645" width="4" height="15" fill="rgb(237,179,35)"/>
-            <text x="919.00" y="655.50"></text>
+            <rect x="76.8421%" y="645" width="0.3509%" height="15" fill="rgb(237,179,35)"/>
+            <text x="77.0921%" y="655.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/ScriptableObject:.createSlot (1 samples, 0.35%)</title>
-            <rect x="916" y="629" width="4" height="15" fill="rgb(237,179,35)"/>
-            <text x="919.00" y="639.50"></text>
+            <rect x="76.8421%" y="629" width="0.3509%" height="15" fill="rgb(237,179,35)"/>
+            <text x="77.0921%" y="639.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/ScriptRuntime:.indexFromString (1 samples, 0.35%)</title>
-            <rect x="920" y="725" width="5" height="15" fill="rgb(237,179,35)"/>
-            <text x="923.00" y="735.50"></text>
+            <rect x="77.1930%" y="725" width="0.3509%" height="15" fill="rgb(237,179,35)"/>
+            <text x="77.4430%" y="735.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/ScriptRuntime:.setObjectElem (2 samples, 0.70%)</title>
-            <rect x="925" y="725" width="8" height="15" fill="rgb(237,179,35)"/>
-            <text x="928.00" y="735.50"></text>
+            <rect x="77.5439%" y="725" width="0.7018%" height="15" fill="rgb(237,179,35)"/>
+            <text x="77.7939%" y="735.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/ScriptRuntime:.indexFromString (2 samples, 0.70%)</title>
-            <rect x="925" y="709" width="8" height="15" fill="rgb(237,179,35)"/>
-            <text x="928.00" y="719.50"></text>
+            <rect x="77.5439%" y="709" width="0.7018%" height="15" fill="rgb(237,179,35)"/>
+            <text x="77.7939%" y="719.50"></text>
         </g>
         <g>
             <title>io/netty/handler/codec/http/DefaultHttpHeaders:.set (1 samples, 0.35%)</title>
-            <rect x="945" y="677" width="4" height="15" fill="rgb(237,149,35)"/>
-            <text x="948.00" y="687.50"></text>
+            <rect x="79.2982%" y="677" width="0.3509%" height="15" fill="rgb(237,149,35)"/>
+            <text x="79.5482%" y="687.50"></text>
         </g>
         <g>
             <title>io/netty/buffer/AbstractByteBuf:.writeBytes (1 samples, 0.35%)</title>
-            <rect x="974" y="581" width="4" height="15" fill="rgb(237,149,35)"/>
-            <text x="977.00" y="591.50"></text>
+            <rect x="81.7544%" y="581" width="0.3509%" height="15" fill="rgb(237,149,35)"/>
+            <text x="82.0044%" y="591.50"></text>
         </g>
         <g>
             <title>io/netty/buffer/AbstractByteBuf:.writeBytes (1 samples, 0.35%)</title>
-            <rect x="978" y="565" width="4" height="15" fill="rgb(237,149,35)"/>
-            <text x="981.00" y="575.50"></text>
+            <rect x="82.1053%" y="565" width="0.3509%" height="15" fill="rgb(237,149,35)"/>
+            <text x="82.3553%" y="575.50"></text>
         </g>
         <g>
             <title>io/netty/buffer/AbstractByteBufAllocator:.directBuffer (3 samples, 1.05%)</title>
-            <rect x="982" y="565" width="13" height="15" fill="rgb(237,149,35)"/>
-            <text x="985.00" y="575.50"></text>
+            <rect x="82.4561%" y="565" width="1.0526%" height="15" fill="rgb(237,149,35)"/>
+            <text x="82.7061%" y="575.50"></text>
         </g>
         <g>
             <title>io/netty/util/concurrent/FastThreadLocal:.get (1 samples, 0.35%)</title>
-            <rect x="991" y="549" width="4" height="15" fill="rgb(237,149,35)"/>
-            <text x="994.00" y="559.50"></text>
+            <rect x="83.1579%" y="549" width="0.3509%" height="15" fill="rgb(237,149,35)"/>
+            <text x="83.4079%" y="559.50"></text>
         </g>
         <g>
             <title>io/netty/handler/codec/http/HttpObjectEncoder:.encode (5 samples, 1.75%)</title>
-            <rect x="978" y="581" width="21" height="15" fill="rgb(237,149,35)"/>
-            <text x="981.00" y="591.50"></text>
+            <rect x="82.1053%" y="581" width="1.7544%" height="15" fill="rgb(237,149,35)"/>
+            <text x="82.3553%" y="591.50"></text>
         </g>
         <g>
             <title>java/util/ArrayList:.add (1 samples, 0.35%)</title>
-            <rect x="995" y="565" width="4" height="15" fill="rgb(237,104,35)"/>
-            <text x="998.00" y="575.50"></text>
+            <rect x="83.5088%" y="565" width="0.3509%" height="15" fill="rgb(237,104,35)"/>
+            <text x="83.7588%" y="575.50"></text>
         </g>
         <g>
             <title>io/netty/util/internal/RecyclableArrayList:.newInstance (1 samples, 0.35%)</title>
-            <rect x="999" y="581" width="4" height="15" fill="rgb(237,149,35)"/>
-            <text x="1002.00" y="591.50"></text>
+            <rect x="83.8596%" y="581" width="0.3509%" height="15" fill="rgb(237,149,35)"/>
+            <text x="84.1096%" y="591.50"></text>
         </g>
         <g>
             <title>io/netty/util/concurrent/FastThreadLocal:.get (1 samples, 0.35%)</title>
-            <rect x="999" y="565" width="4" height="15" fill="rgb(237,149,35)"/>
-            <text x="1002.00" y="575.50"></text>
+            <rect x="83.8596%" y="565" width="0.3509%" height="15" fill="rgb(237,149,35)"/>
+            <text x="84.1096%" y="575.50"></text>
         </g>
         <g>
             <title>java/util/ArrayList:.ensureExplicitCapacity (1 samples, 0.35%)</title>
-            <rect x="1003" y="581" width="4" height="15" fill="rgb(237,104,35)"/>
-            <text x="1006.00" y="591.50"></text>
+            <rect x="84.2105%" y="581" width="0.3509%" height="15" fill="rgb(237,104,35)"/>
+            <text x="84.4605%" y="591.50"></text>
         </g>
         <g>
             <title>io/netty/channel/AbstractChannelHandlerContext:.write (12 samples, 4.21%)</title>
-            <rect x="962" y="645" width="49" height="15" fill="rgb(237,149,35)"/>
-            <text x="965.00" y="655.50">io/n..</text>
+            <rect x="80.7018%" y="645" width="4.2105%" height="15" fill="rgb(237,149,35)"/>
+            <text x="80.9518%" y="655.50">io/ne..</text>
         </g>
         <g>
             <title>org/vertx/java/core/http/impl/VertxHttpHandler:.write (11 samples, 3.86%)</title>
-            <rect x="966" y="629" width="45" height="15" fill="rgb(237,179,35)"/>
-            <text x="969.00" y="639.50">org/..</text>
+            <rect x="81.0526%" y="629" width="3.8596%" height="15" fill="rgb(237,179,35)"/>
+            <text x="81.3026%" y="639.50">org/..</text>
         </g>
         <g>
             <title>io/netty/channel/AbstractChannelHandlerContext:.write (10 samples, 3.51%)</title>
-            <rect x="970" y="613" width="41" height="15" fill="rgb(237,149,35)"/>
-            <text x="973.00" y="623.50">io/..</text>
+            <rect x="81.4035%" y="613" width="3.5088%" height="15" fill="rgb(237,149,35)"/>
+            <text x="81.6535%" y="623.50">io/..</text>
         </g>
         <g>
             <title>io/netty/handler/codec/MessageToMessageEncoder:.write (10 samples, 3.51%)</title>
-            <rect x="970" y="597" width="41" height="15" fill="rgb(237,149,35)"/>
-            <text x="973.00" y="607.50">io/..</text>
+            <rect x="81.4035%" y="597" width="3.5088%" height="15" fill="rgb(237,149,35)"/>
+            <text x="81.6535%" y="607.50">io/..</text>
         </g>
         <g>
             <title>vtable chunks (1 samples, 0.35%)</title>
-            <rect x="1007" y="581" width="4" height="15" fill="rgb(237,132,35)"/>
-            <text x="1010.00" y="591.50"></text>
+            <rect x="84.5614%" y="581" width="0.3509%" height="15" fill="rgb(237,132,35)"/>
+            <text x="84.8114%" y="591.50"></text>
         </g>
         <g>
             <title>io/netty/channel/AbstractChannelHandlerContext:.write (13 samples, 4.56%)</title>
-            <rect x="962" y="661" width="54" height="15" fill="rgb(237,149,35)"/>
-            <text x="965.00" y="671.50">io/ne..</text>
+            <rect x="80.7018%" y="661" width="4.5614%" height="15" fill="rgb(237,149,35)"/>
+            <text x="80.9518%" y="671.50">io/ne..</text>
         </g>
         <g>
             <title>org/vertx/java/core/http/impl/VertxHttpHandler:.write (1 samples, 0.35%)</title>
-            <rect x="1011" y="645" width="5" height="15" fill="rgb(237,179,35)"/>
-            <text x="1014.00" y="655.50"></text>
+            <rect x="84.9123%" y="645" width="0.3509%" height="15" fill="rgb(237,179,35)"/>
+            <text x="85.1623%" y="655.50"></text>
         </g>
         <g>
             <title>io/netty/handler/codec/http/DefaultHttpHeaders:.add0 (1 samples, 0.35%)</title>
-            <rect x="1016" y="661" width="4" height="15" fill="rgb(237,149,35)"/>
-            <text x="1019.00" y="671.50"></text>
+            <rect x="85.2632%" y="661" width="0.3509%" height="15" fill="rgb(237,149,35)"/>
+            <text x="85.5132%" y="671.50"></text>
         </g>
         <g>
             <title>io/netty/handler/codec/http/DefaultHttpHeaders:.set (1 samples, 0.35%)</title>
-            <rect x="1020" y="661" width="4" height="15" fill="rgb(237,149,35)"/>
-            <text x="1023.00" y="671.50"></text>
+            <rect x="85.6140%" y="661" width="0.3509%" height="15" fill="rgb(237,149,35)"/>
+            <text x="85.8640%" y="671.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/NativeJavaMethod:.call (21 samples, 7.37%)</title>
-            <rect x="941" y="709" width="87" height="15" fill="rgb(237,179,35)"/>
-            <text x="944.00" y="719.50">org/mozill..</text>
+            <rect x="78.9474%" y="709" width="7.3684%" height="15" fill="rgb(237,179,35)"/>
+            <text x="79.1974%" y="719.50">org/mozill..</text>
         </g>
         <g>
             <title>org/mozilla/javascript/MemberBox:.invoke (21 samples, 7.37%)</title>
-            <rect x="941" y="693" width="87" height="15" fill="rgb(237,179,35)"/>
-            <text x="944.00" y="703.50">org/mozill..</text>
+            <rect x="78.9474%" y="693" width="7.3684%" height="15" fill="rgb(237,179,35)"/>
+            <text x="79.1974%" y="703.50">org/mozill..</text>
         </g>
         <g>
             <title>sun/reflect/DelegatingMethodAccessorImpl:.invoke (19 samples, 6.67%)</title>
-            <rect x="949" y="677" width="79" height="15" fill="rgb(237,148,35)"/>
-            <text x="952.00" y="687.50">sun/refle..</text>
+            <rect x="79.6491%" y="677" width="6.6667%" height="15" fill="rgb(237,148,35)"/>
+            <text x="79.8991%" y="687.50">sun/refle..</text>
         </g>
         <g>
             <title>sun/nio/cs/UTF_8$Encoder:.&lt;init&gt; (1 samples, 0.35%)</title>
-            <rect x="1024" y="661" width="4" height="15" fill="rgb(237,148,35)"/>
-            <text x="1027.00" y="671.50"></text>
+            <rect x="85.9649%" y="661" width="0.3509%" height="15" fill="rgb(237,148,35)"/>
+            <text x="86.2149%" y="671.50"></text>
         </g>
         <g>
             <title>jbyte_disjoint_arraycopy (1 samples, 0.35%)</title>
-            <rect x="1024" y="645" width="4" height="15" fill="rgb(237,128,35)"/>
-            <text x="1027.00" y="655.50"></text>
+            <rect x="85.9649%" y="645" width="0.3509%" height="15" fill="rgb(237,128,35)"/>
+            <text x="86.2149%" y="655.50"></text>
         </g>
         <g>
             <title>io/netty/channel/AbstractChannelHandlerContext:.fireChannelRead (128 samples, 44.91%)</title>
-            <rect x="502" y="821" width="530" height="15" fill="rgb(237,149,35)"/>
-            <text x="505.00" y="831.50">io/netty/channel/AbstractChannelHandlerContext:.fireChannelRead</text>
+            <rect x="41.7544%" y="821" width="44.9123%" height="15" fill="rgb(237,149,35)"/>
+            <text x="42.0044%" y="831.50">io/netty/channel/AbstractChannelHandlerContext:.fireChannelRead</text>
         </g>
         <g>
             <title>org/vertx/java/core/net/impl/VertxHandler:.channelRead (128 samples, 44.91%)</title>
-            <rect x="502" y="805" width="530" height="15" fill="rgb(237,179,35)"/>
-            <text x="505.00" y="815.50">org/vertx/java/core/net/impl/VertxHandler:.channelRead</text>
+            <rect x="41.7544%" y="805" width="44.9123%" height="15" fill="rgb(237,179,35)"/>
+            <text x="42.0044%" y="815.50">org/vertx/java/core/net/impl/VertxHandler:.channelRead</text>
         </g>
         <g>
             <title>org/vertx/java/core/http/impl/DefaultHttpServer$ServerHandler:.doMessageReceived (124 samples, 43.51%)</title>
-            <rect x="519" y="789" width="513" height="15" fill="rgb(237,179,35)"/>
-            <text x="522.00" y="799.50">org/vertx/java/core/http/impl/DefaultHttpServer$ServerHandler:.doMessa..</text>
+            <rect x="43.1579%" y="789" width="43.5088%" height="15" fill="rgb(237,179,35)"/>
+            <text x="43.4079%" y="799.50">org/vertx/java/core/http/impl/DefaultHttpServer$ServerHandler:.doMessag..</text>
         </g>
         <g>
             <title>org/mozilla/javascript/gen/file__home_bgregg_testtest_vert_x_2_1_4_sys_mods_io_vertx_lang_js_1_1_0 (117 samples, 41.05%)</title>
-            <rect x="548" y="773" width="484" height="15" fill="rgb(237,179,35)"/>
-            <text x="551.00" y="783.50">org/mozilla/javascript/gen/file__home_bgregg_testtest_vert_x_2_1_4..</text>
+            <rect x="45.6140%" y="773" width="41.0526%" height="15" fill="rgb(237,179,35)"/>
+            <text x="45.8640%" y="783.50">org/mozilla/javascript/gen/file__home_bgregg_testtest_vert_x_2_1_4_..</text>
         </g>
         <g>
             <title>org/mozilla/javascript/gen/file__home_bgregg_testtest_vert_x_2_1_4_sys_mods_io_vertx_lang_js_1_1_0 (116 samples, 40.70%)</title>
-            <rect x="552" y="757" width="480" height="15" fill="rgb(237,179,35)"/>
-            <text x="555.00" y="767.50">org/mozilla/javascript/gen/file__home_bgregg_testtest_vert_x_2_1_..</text>
+            <rect x="45.9649%" y="757" width="40.7018%" height="15" fill="rgb(237,179,35)"/>
+            <text x="46.2149%" y="767.50">org/mozilla/javascript/gen/file__home_bgregg_testtest_vert_x_2_1_4..</text>
         </g>
         <g>
             <title>org/mozilla/javascript/gen/file__home_bgregg_testtest_vhello_js_1:.call (27 samples, 9.47%)</title>
-            <rect x="920" y="741" width="112" height="15" fill="rgb(237,179,35)"/>
-            <text x="923.00" y="751.50">org/mozilla/j..</text>
+            <rect x="77.1930%" y="741" width="9.4737%" height="15" fill="rgb(237,179,35)"/>
+            <text x="77.4430%" y="751.50">org/mozilla/ja..</text>
         </g>
         <g>
             <title>org/mozilla/javascript/gen/file__home_bgregg_testtest_vert_x_2_1_4_sys_mods_io_vertx_lang_js_1_1_0 (24 samples, 8.42%)</title>
-            <rect x="933" y="725" width="99" height="15" fill="rgb(237,179,35)"/>
-            <text x="936.00" y="735.50">org/mozilla..</text>
+            <rect x="78.2456%" y="725" width="8.4211%" height="15" fill="rgb(237,179,35)"/>
+            <text x="78.4956%" y="735.50">org/mozilla/..</text>
         </g>
         <g>
             <title>org/mozilla/javascript/ScriptRuntime:.name (1 samples, 0.35%)</title>
-            <rect x="1028" y="709" width="4" height="15" fill="rgb(237,179,35)"/>
-            <text x="1031.00" y="719.50"></text>
+            <rect x="86.3158%" y="709" width="0.3509%" height="15" fill="rgb(237,179,35)"/>
+            <text x="86.5658%" y="719.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/ScriptRuntime:.nameOrFunction (1 samples, 0.35%)</title>
-            <rect x="1028" y="693" width="4" height="15" fill="rgb(237,179,35)"/>
-            <text x="1031.00" y="703.50"></text>
+            <rect x="86.3158%" y="693" width="0.3509%" height="15" fill="rgb(237,179,35)"/>
+            <text x="86.5658%" y="703.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/IdScriptableObject:.get (1 samples, 0.35%)</title>
-            <rect x="1028" y="677" width="4" height="15" fill="rgb(237,179,35)"/>
-            <text x="1031.00" y="687.50"></text>
+            <rect x="86.3158%" y="677" width="0.3509%" height="15" fill="rgb(237,179,35)"/>
+            <text x="86.5658%" y="687.50"></text>
         </g>
         <g>
             <title>org/mozilla/javascript/ScriptableObject$RelinkedSlot:.getValue (1 samples, 0.35%)</title>
-            <rect x="1028" y="661" width="4" height="15" fill="rgb(237,179,35)"/>
-            <text x="1031.00" y="671.50"></text>
+            <rect x="86.3158%" y="661" width="0.3509%" height="15" fill="rgb(237,179,35)"/>
+            <text x="86.5658%" y="671.50"></text>
         </g>
         <g>
             <title>io/netty/buffer/AbstractByteBuf:.forEachByteAsc0 (1 samples, 0.35%)</title>
-            <rect x="1032" y="805" width="4" height="15" fill="rgb(237,149,35)"/>
-            <text x="1035.00" y="815.50"></text>
+            <rect x="86.6667%" y="805" width="0.3509%" height="15" fill="rgb(237,149,35)"/>
+            <text x="86.9167%" y="815.50"></text>
         </g>
         <g>
             <title>io/netty/util/internal/AppendableCharSequence:.append (1 samples, 0.35%)</title>
-            <rect x="1032" y="789" width="4" height="15" fill="rgb(237,149,35)"/>
-            <text x="1035.00" y="799.50"></text>
+            <rect x="86.6667%" y="789" width="0.3509%" height="15" fill="rgb(237,149,35)"/>
+            <text x="86.9167%" y="799.50"></text>
         </g>
         <g>
             <title>io/netty/handler/codec/http/HttpHeaders:.isTransferEncodingChunked (1 samples, 0.35%)</title>
-            <rect x="1036" y="805" width="4" height="15" fill="rgb(237,149,35)"/>
-            <text x="1039.00" y="815.50"></text>
+            <rect x="87.0175%" y="805" width="0.3509%" height="15" fill="rgb(237,149,35)"/>
+            <text x="87.2675%" y="815.50"></text>
         </g>
         <g>
             <title>io/netty/handler/codec/http/HttpObjectDecoder:.findWhitespace (1 samples, 0.35%)</title>
-            <rect x="1040" y="805" width="5" height="15" fill="rgb(237,149,35)"/>
-            <text x="1043.00" y="815.50"></text>
+            <rect x="87.3684%" y="805" width="0.3509%" height="15" fill="rgb(237,149,35)"/>
+            <text x="87.6184%" y="815.50"></text>
         </g>
         <g>
             <title>io/netty/buffer/AbstractByteBuf:.forEachByteAsc0 (2 samples, 0.70%)</title>
-            <rect x="1049" y="789" width="8" height="15" fill="rgb(237,149,35)"/>
-            <text x="1052.00" y="799.50"></text>
+            <rect x="88.0702%" y="789" width="0.7018%" height="15" fill="rgb(237,149,35)"/>
+            <text x="88.3202%" y="799.50"></text>
         </g>
         <g>
             <title>io/netty/handler/codec/http/HttpHeaders:.hash (1 samples, 0.35%)</title>
-            <rect x="1057" y="789" width="4" height="15" fill="rgb(237,149,35)"/>
-            <text x="1060.00" y="799.50"></text>
+            <rect x="88.7719%" y="789" width="0.3509%" height="15" fill="rgb(237,149,35)"/>
+            <text x="89.0219%" y="799.50"></text>
         </g>
         <g>
             <title>io/netty/handler/codec/http/HttpObjectDecoder:.splitHeader (5 samples, 1.75%)</title>
-            <rect x="1061" y="789" width="21" height="15" fill="rgb(237,149,35)"/>
-            <text x="1064.00" y="799.50"></text>
+            <rect x="89.1228%" y="789" width="1.7544%" height="15" fill="rgb(237,149,35)"/>
+            <text x="89.3728%" y="799.50"></text>
         </g>
         <g>
             <title>io/netty/channel/AbstractChannelHandlerContext:.fireChannelRead (143 samples, 50.18%)</title>
-            <rect x="494" y="853" width="592" height="15" fill="rgb(237,149,35)"/>
-            <text x="497.00" y="863.50">io/netty/channel/AbstractChannelHandlerContext:.fireChannelRead</text>
+            <rect x="41.0526%" y="853" width="50.1754%" height="15" fill="rgb(237,149,35)"/>
+            <text x="41.3026%" y="863.50">io/netty/channel/AbstractChannelHandlerContext:.fireChannelRead</text>
         </g>
         <g>
             <title>io/netty/handler/codec/ByteToMessageDecoder:.channelRead (143 samples, 50.18%)</title>
-            <rect x="494" y="837" width="592" height="15" fill="rgb(237,149,35)"/>
-            <text x="497.00" y="847.50">io/netty/handler/codec/ByteToMessageDecoder:.channelRead</text>
+            <rect x="41.0526%" y="837" width="50.1754%" height="15" fill="rgb(237,149,35)"/>
+            <text x="41.3026%" y="847.50">io/netty/handler/codec/ByteToMessageDecoder:.channelRead</text>
         </g>
         <g>
             <title>io/netty/handler/codec/http/HttpObjectDecoder:.decode (13 samples, 4.56%)</title>
-            <rect x="1032" y="821" width="54" height="15" fill="rgb(237,149,35)"/>
-            <text x="1035.00" y="831.50">io/ne..</text>
+            <rect x="86.6667%" y="821" width="4.5614%" height="15" fill="rgb(237,149,35)"/>
+            <text x="86.9167%" y="831.50">io/ne..</text>
         </g>
         <g>
             <title>io/netty/handler/codec/http/HttpObjectDecoder:.readHeaders (10 samples, 3.51%)</title>
-            <rect x="1045" y="805" width="41" height="15" fill="rgb(237,149,35)"/>
-            <text x="1048.00" y="815.50">io/..</text>
+            <rect x="87.7193%" y="805" width="3.5088%" height="15" fill="rgb(237,149,35)"/>
+            <text x="87.9693%" y="815.50">io/..</text>
         </g>
         <g>
             <title>java/util/Arrays:.fill (1 samples, 0.35%)</title>
-            <rect x="1082" y="789" width="4" height="15" fill="rgb(237,104,35)"/>
-            <text x="1085.00" y="799.50"></text>
+            <rect x="90.8772%" y="789" width="0.3509%" height="15" fill="rgb(237,104,35)"/>
+            <text x="91.1272%" y="799.50"></text>
         </g>
         <g>
             <title>java/nio/channels/spi/AbstractInterruptibleChannel:.end (1 samples, 0.35%)</title>
-            <rect x="1086" y="821" width="4" height="15" fill="rgb(237,104,35)"/>
-            <text x="1089.00" y="831.50"></text>
+            <rect x="91.2281%" y="821" width="0.3509%" height="15" fill="rgb(237,104,35)"/>
+            <text x="91.4781%" y="831.50"></text>
         </g>
         <g>
             <title>sys_read (1 samples, 0.35%)</title>
-            <rect x="1098" y="789" width="5" height="15" fill="rgb(236,167,34)"/>
-            <text x="1101.00" y="799.50"></text>
+            <rect x="92.2807%" y="789" width="0.3509%" height="15" fill="rgb(236,167,34)"/>
+            <text x="92.5307%" y="799.50"></text>
         </g>
         <g>
             <title>do_sync_read (1 samples, 0.35%)</title>
-            <rect x="1107" y="757" width="4" height="15" fill="rgb(236,189,34)"/>
-            <text x="1110.00" y="767.50"></text>
+            <rect x="92.9825%" y="757" width="0.3509%" height="15" fill="rgb(236,189,34)"/>
+            <text x="93.2325%" y="767.50"></text>
         </g>
         <g>
             <title>__kfree_skb (1 samples, 0.35%)</title>
-            <rect x="1111" y="661" width="4" height="15" fill="rgb(236,119,34)"/>
-            <text x="1114.00" y="671.50"></text>
+            <rect x="93.3333%" y="661" width="0.3509%" height="15" fill="rgb(236,119,34)"/>
+            <text x="93.5833%" y="671.50"></text>
         </g>
         <g>
             <title>tcp_rcv_space_adjust (1 samples, 0.35%)</title>
-            <rect x="1115" y="661" width="4" height="15" fill="rgb(236,169,34)"/>
-            <text x="1118.00" y="671.50"></text>
+            <rect x="93.6842%" y="661" width="0.3509%" height="15" fill="rgb(236,169,34)"/>
+            <text x="93.9342%" y="671.50"></text>
         </g>
         <g>
             <title>skb_release_data (1 samples, 0.35%)</title>
-            <rect x="1119" y="629" width="4" height="15" fill="rgb(236,143,34)"/>
-            <text x="1122.00" y="639.50"></text>
+            <rect x="94.0351%" y="629" width="0.3509%" height="15" fill="rgb(236,143,34)"/>
+            <text x="94.2851%" y="639.50"></text>
         </g>
         <g>
             <title>__kfree_skb (2 samples, 0.70%)</title>
-            <rect x="1119" y="645" width="8" height="15" fill="rgb(236,119,34)"/>
-            <text x="1122.00" y="655.50"></text>
+            <rect x="94.0351%" y="645" width="0.7018%" height="15" fill="rgb(236,119,34)"/>
+            <text x="94.2851%" y="655.50"></text>
         </g>
         <g>
             <title>skb_release_head_state (1 samples, 0.35%)</title>
-            <rect x="1123" y="629" width="4" height="15" fill="rgb(236,143,34)"/>
-            <text x="1126.00" y="639.50"></text>
+            <rect x="94.3860%" y="629" width="0.3509%" height="15" fill="rgb(236,143,34)"/>
+            <text x="94.6360%" y="639.50"></text>
         </g>
         <g>
             <title>dst_release (1 samples, 0.35%)</title>
-            <rect x="1123" y="613" width="4" height="15" fill="rgb(236,179,34)"/>
-            <text x="1126.00" y="623.50"></text>
+            <rect x="94.3860%" y="613" width="0.3509%" height="15" fill="rgb(236,179,34)"/>
+            <text x="94.6360%" y="623.50"></text>
         </g>
         <g>
             <title>_raw_spin_lock_bh (1 samples, 0.35%)</title>
-            <rect x="1127" y="645" width="5" height="15" fill="rgb(236,166,34)"/>
-            <text x="1130.00" y="655.50"></text>
+            <rect x="94.7368%" y="645" width="0.3509%" height="15" fill="rgb(236,166,34)"/>
+            <text x="94.9868%" y="655.50"></text>
         </g>
         <g>
             <title>skb_copy_datagram_iovec (2 samples, 0.70%)</title>
-            <rect x="1132" y="645" width="8" height="15" fill="rgb(236,143,34)"/>
-            <text x="1135.00" y="655.50"></text>
+            <rect x="95.0877%" y="645" width="0.7018%" height="15" fill="rgb(236,143,34)"/>
+            <text x="95.3377%" y="655.50"></text>
         </g>
         <g>
             <title>copy_user_enhanced_fast_string (1 samples, 0.35%)</title>
-            <rect x="1136" y="629" width="4" height="15" fill="rgb(236,140,34)"/>
-            <text x="1139.00" y="639.50"></text>
+            <rect x="95.4386%" y="629" width="0.3509%" height="15" fill="rgb(236,140,34)"/>
+            <text x="95.6886%" y="639.50"></text>
         </g>
         <g>
             <title>do_sync_read (9 samples, 3.16%)</title>
-            <rect x="1111" y="741" width="37" height="15" fill="rgb(236,189,34)"/>
-            <text x="1114.00" y="751.50">do_..</text>
+            <rect x="93.3333%" y="741" width="3.1579%" height="15" fill="rgb(236,189,34)"/>
+            <text x="93.5833%" y="751.50">do_..</text>
         </g>
         <g>
             <title>sock_aio_read (9 samples, 3.16%)</title>
-            <rect x="1111" y="725" width="37" height="15" fill="rgb(236,175,34)"/>
-            <text x="1114.00" y="735.50">soc..</text>
+            <rect x="93.3333%" y="725" width="3.1579%" height="15" fill="rgb(236,175,34)"/>
+            <text x="93.5833%" y="735.50">soc..</text>
         </g>
         <g>
             <title>sock_aio_read.part.13 (9 samples, 3.16%)</title>
-            <rect x="1111" y="709" width="37" height="15" fill="rgb(236,175,34)"/>
-            <text x="1114.00" y="719.50">soc..</text>
+            <rect x="93.3333%" y="709" width="3.1579%" height="15" fill="rgb(236,175,34)"/>
+            <text x="93.5833%" y="719.50">soc..</text>
         </g>
         <g>
             <title>do_sock_read.isra.12 (9 samples, 3.16%)</title>
-            <rect x="1111" y="693" width="37" height="15" fill="rgb(236,189,34)"/>
-            <text x="1114.00" y="703.50">do_..</text>
+            <rect x="93.3333%" y="693" width="3.1579%" height="15" fill="rgb(236,189,34)"/>
+            <text x="93.5833%" y="703.50">do_..</text>
         </g>
         <g>
             <title>inet_recvmsg (9 samples, 3.16%)</title>
-            <rect x="1111" y="677" width="37" height="15" fill="rgb(236,173,34)"/>
-            <text x="1114.00" y="687.50">ine..</text>
+            <rect x="93.3333%" y="677" width="3.1579%" height="15" fill="rgb(236,173,34)"/>
+            <text x="93.5833%" y="687.50">ine..</text>
         </g>
         <g>
             <title>tcp_recvmsg (7 samples, 2.46%)</title>
-            <rect x="1119" y="661" width="29" height="15" fill="rgb(236,169,34)"/>
-            <text x="1122.00" y="671.50">tc..</text>
+            <rect x="94.0351%" y="661" width="2.4561%" height="15" fill="rgb(236,169,34)"/>
+            <text x="94.2851%" y="671.50">tc..</text>
         </g>
         <g>
             <title>tcp_cleanup_rbuf (2 samples, 0.70%)</title>
-            <rect x="1140" y="645" width="8" height="15" fill="rgb(236,169,34)"/>
-            <text x="1143.00" y="655.50"></text>
+            <rect x="95.7895%" y="645" width="0.7018%" height="15" fill="rgb(236,169,34)"/>
+            <text x="96.0395%" y="655.50"></text>
         </g>
         <g>
             <title>__tcp_select_window (1 samples, 0.35%)</title>
-            <rect x="1144" y="629" width="4" height="15" fill="rgb(236,128,34)"/>
-            <text x="1147.00" y="639.50"></text>
+            <rect x="96.1404%" y="629" width="0.3509%" height="15" fill="rgb(236,128,34)"/>
+            <text x="96.3904%" y="639.50"></text>
         </g>
         <g>
             <title>io/netty/channel/socket/nio/NioSocketChannel:.doReadBytes (16 samples, 5.61%)</title>
-            <rect x="1086" y="853" width="66" height="15" fill="rgb(237,149,35)"/>
-            <text x="1089.00" y="863.50">io/nett..</text>
+            <rect x="91.2281%" y="853" width="5.6140%" height="15" fill="rgb(237,149,35)"/>
+            <text x="91.4781%" y="863.50">io/nett..</text>
         </g>
         <g>
             <title>sun/nio/ch/SocketChannelImpl:.read (16 samples, 5.61%)</title>
-            <rect x="1086" y="837" width="66" height="15" fill="rgb(237,148,35)"/>
-            <text x="1089.00" y="847.50">sun/nio..</text>
+            <rect x="91.2281%" y="837" width="5.6140%" height="15" fill="rgb(237,148,35)"/>
+            <text x="91.4781%" y="847.50">sun/nio..</text>
         </g>
         <g>
             <title>sun/nio/ch/FileDispatcherImpl:.read0 (15 samples, 5.26%)</title>
-            <rect x="1090" y="821" width="62" height="15" fill="rgb(237,148,35)"/>
-            <text x="1093.00" y="831.50">sun/ni..</text>
+            <rect x="91.5789%" y="821" width="5.2632%" height="15" fill="rgb(237,148,35)"/>
+            <text x="91.8289%" y="831.50">sun/ni..</text>
         </g>
         <g>
             <title>read (15 samples, 5.26%)</title>
-            <rect x="1090" y="805" width="62" height="15" fill="rgb(241,184,40)"/>
-            <text x="1093.00" y="815.50">read</text>
+            <rect x="91.5789%" y="805" width="5.2632%" height="15" fill="rgb(241,184,40)"/>
+            <text x="91.8289%" y="815.50">read</text>
         </g>
         <g>
             <title>system_call_fastpath (12 samples, 4.21%)</title>
-            <rect x="1103" y="789" width="49" height="15" fill="rgb(236,167,34)"/>
-            <text x="1106.00" y="799.50">syst..</text>
+            <rect x="92.6316%" y="789" width="4.2105%" height="15" fill="rgb(236,167,34)"/>
+            <text x="92.8816%" y="799.50">syste..</text>
         </g>
         <g>
             <title>sys_read (12 samples, 4.21%)</title>
-            <rect x="1103" y="773" width="49" height="15" fill="rgb(236,167,34)"/>
-            <text x="1106.00" y="783.50">sys_..</text>
+            <rect x="92.6316%" y="773" width="4.2105%" height="15" fill="rgb(236,167,34)"/>
+            <text x="92.8816%" y="783.50">sys_r..</text>
         </g>
         <g>
             <title>vfs_read (10 samples, 3.51%)</title>
-            <rect x="1111" y="757" width="41" height="15" fill="rgb(236,128,34)"/>
-            <text x="1114.00" y="767.50">vfs..</text>
+            <rect x="93.3333%" y="757" width="3.5088%" height="15" fill="rgb(236,128,34)"/>
+            <text x="93.5833%" y="767.50">vfs..</text>
         </g>
         <g>
             <title>rw_verify_area (1 samples, 0.35%)</title>
-            <rect x="1148" y="741" width="4" height="15" fill="rgb(236,117,34)"/>
-            <text x="1151.00" y="751.50"></text>
+            <rect x="96.4912%" y="741" width="0.3509%" height="15" fill="rgb(236,117,34)"/>
+            <text x="96.7412%" y="751.50"></text>
         </g>
         <g>
             <title>io/netty/channel/nio/AbstractNioByteChannel$NioByteUnsafe:.read (260 samples, 91.23%)</title>
-            <rect x="80" y="869" width="1076" height="15" fill="rgb(237,149,35)"/>
-            <text x="83.00" y="879.50">io/netty/channel/nio/AbstractNioByteChannel$NioByteUnsafe:.read</text>
+            <rect x="5.9649%" y="869" width="91.2281%" height="15" fill="rgb(237,149,35)"/>
+            <text x="6.2149%" y="879.50">io/netty/channel/nio/AbstractNioByteChannel$NioByteUnsafe:.read</text>
         </g>
         <g>
             <title>io/netty/handler/codec/ByteToMessageDecoder:.channelReadComplete (1 samples, 0.35%)</title>
-            <rect x="1152" y="853" width="4" height="15" fill="rgb(237,149,35)"/>
-            <text x="1155.00" y="863.50"></text>
+            <rect x="96.8421%" y="853" width="0.3509%" height="15" fill="rgb(237,149,35)"/>
+            <text x="97.0921%" y="863.50"></text>
         </g>
         <g>
             <title>JavaThread::run (263 samples, 92.28%)</title>
-            <rect x="72" y="1077" width="1089" height="15" fill="rgb(243,120,41)"/>
-            <text x="75.00" y="1087.50">JavaThread::run</text>
+            <rect x="5.2632%" y="1077" width="92.2807%" height="15" fill="rgb(243,120,41)"/>
+            <text x="5.5132%" y="1087.50">JavaThread::run</text>
         </g>
         <g>
             <title>JavaThread::thread_main_inner (263 samples, 92.28%)</title>
-            <rect x="72" y="1061" width="1089" height="15" fill="rgb(244,120,43)"/>
-            <text x="75.00" y="1071.50">JavaThread::thread_main_inner</text>
+            <rect x="5.2632%" y="1061" width="92.2807%" height="15" fill="rgb(244,120,43)"/>
+            <text x="5.5132%" y="1071.50">JavaThread::thread_main_inner</text>
         </g>
         <g>
             <title>thread_entry (263 samples, 92.28%)</title>
-            <rect x="72" y="1045" width="1089" height="15" fill="rgb(243,137,42)"/>
-            <text x="75.00" y="1055.50">thread_entry</text>
+            <rect x="5.2632%" y="1045" width="92.2807%" height="15" fill="rgb(243,137,42)"/>
+            <text x="5.5132%" y="1055.50">thread_entry</text>
         </g>
         <g>
             <title>JavaCalls::call_virtual (263 samples, 92.28%)</title>
-            <rect x="72" y="1029" width="1089" height="15" fill="rgb(224,120,21)"/>
-            <text x="75.00" y="1039.50">JavaCalls::call_virtual</text>
+            <rect x="5.2632%" y="1029" width="92.2807%" height="15" fill="rgb(224,120,21)"/>
+            <text x="5.5132%" y="1039.50">JavaCalls::call_virtual</text>
         </g>
         <g>
             <title>JavaCalls::call_virtual (263 samples, 92.28%)</title>
-            <rect x="72" y="1013" width="1089" height="15" fill="rgb(224,120,21)"/>
-            <text x="75.00" y="1023.50">JavaCalls::call_virtual</text>
+            <rect x="5.2632%" y="1013" width="92.2807%" height="15" fill="rgb(224,120,21)"/>
+            <text x="5.5132%" y="1023.50">JavaCalls::call_virtual</text>
         </g>
         <g>
             <title>JavaCalls::call_helper (263 samples, 92.28%)</title>
-            <rect x="72" y="997" width="1089" height="15" fill="rgb(243,120,41)"/>
-            <text x="75.00" y="1007.50">JavaCalls::call_helper</text>
+            <rect x="5.2632%" y="997" width="92.2807%" height="15" fill="rgb(243,120,41)"/>
+            <text x="5.5132%" y="1007.50">JavaCalls::call_helper</text>
         </g>
         <g>
             <title>call_stub (263 samples, 92.28%)</title>
-            <rect x="72" y="981" width="1089" height="15" fill="rgb(237,112,35)"/>
-            <text x="75.00" y="991.50">call_stub</text>
+            <rect x="5.2632%" y="981" width="92.2807%" height="15" fill="rgb(237,112,35)"/>
+            <text x="5.5132%" y="991.50">call_stub</text>
         </g>
         <g>
             <title>Interpreter (263 samples, 92.28%)</title>
-            <rect x="72" y="965" width="1089" height="15" fill="rgb(237,180,35)"/>
-            <text x="75.00" y="975.50">Interpreter</text>
+            <rect x="5.2632%" y="965" width="92.2807%" height="15" fill="rgb(237,180,35)"/>
+            <text x="5.5132%" y="975.50">Interpreter</text>
         </g>
         <g>
             <title>Interpreter (263 samples, 92.28%)</title>
-            <rect x="72" y="949" width="1089" height="15" fill="rgb(237,180,35)"/>
-            <text x="75.00" y="959.50">Interpreter</text>
+            <rect x="5.2632%" y="949" width="92.2807%" height="15" fill="rgb(237,180,35)"/>
+            <text x="5.5132%" y="959.50">Interpreter</text>
         </g>
         <g>
             <title>io/netty/channel/nio/NioEventLoop:.run (263 samples, 92.28%)</title>
-            <rect x="72" y="933" width="1089" height="15" fill="rgb(237,149,35)"/>
-            <text x="75.00" y="943.50">io/netty/channel/nio/NioEventLoop:.run</text>
+            <rect x="5.2632%" y="933" width="92.2807%" height="15" fill="rgb(237,149,35)"/>
+            <text x="5.5132%" y="943.50">io/netty/channel/nio/NioEventLoop:.run</text>
         </g>
         <g>
             <title>io/netty/channel/nio/NioEventLoop:.processSelectedKeys (262 samples, 91.93%)</title>
-            <rect x="76" y="917" width="1085" height="15" fill="rgb(237,149,35)"/>
-            <text x="79.00" y="927.50">io/netty/channel/nio/NioEventLoop:.processSelectedKeys</text>
+            <rect x="5.6140%" y="917" width="91.9298%" height="15" fill="rgb(237,149,35)"/>
+            <text x="5.8640%" y="927.50">io/netty/channel/nio/NioEventLoop:.processSelectedKeys</text>
         </g>
         <g>
             <title>io/netty/channel/nio/NioEventLoop:.processSelectedKeysOptimized (262 samples, 91.93%)</title>
-            <rect x="76" y="901" width="1085" height="15" fill="rgb(237,149,35)"/>
-            <text x="79.00" y="911.50">io/netty/channel/nio/NioEventLoop:.processSelectedKeysOptimized</text>
+            <rect x="5.6140%" y="901" width="91.9298%" height="15" fill="rgb(237,149,35)"/>
+            <text x="5.8640%" y="911.50">io/netty/channel/nio/NioEventLoop:.processSelectedKeysOptimized</text>
         </g>
         <g>
             <title>io/netty/channel/nio/NioEventLoop:.processSelectedKey (261 samples, 91.58%)</title>
-            <rect x="80" y="885" width="1081" height="15" fill="rgb(237,149,35)"/>
-            <text x="83.00" y="895.50">io/netty/channel/nio/NioEventLoop:.processSelectedKey</text>
+            <rect x="5.9649%" y="885" width="91.5789%" height="15" fill="rgb(237,149,35)"/>
+            <text x="6.2149%" y="895.50">io/netty/channel/nio/NioEventLoop:.processSelectedKey</text>
         </g>
         <g>
             <title>io/netty/channel/socket/nio/NioSocketChannel:.doReadBytes (1 samples, 0.35%)</title>
-            <rect x="1156" y="869" width="5" height="15" fill="rgb(237,149,35)"/>
-            <text x="1159.00" y="879.50"></text>
+            <rect x="97.1930%" y="869" width="0.3509%" height="15" fill="rgb(237,149,35)"/>
+            <text x="97.4430%" y="879.50"></text>
         </g>
         <g>
             <title>PSIsAliveClosure::do_object_b (1 samples, 0.35%)</title>
-            <rect x="1161" y="949" width="4" height="15" fill="rgb(227,196,25)"/>
-            <text x="1164.00" y="959.50"></text>
+            <rect x="97.5439%" y="949" width="0.3509%" height="15" fill="rgb(227,196,25)"/>
+            <text x="97.7939%" y="959.50"></text>
         </g>
         <g>
             <title>StringTable::unlink_or_oops_do (2 samples, 0.70%)</title>
-            <rect x="1165" y="949" width="8" height="15" fill="rgb(244,156,43)"/>
-            <text x="1168.00" y="959.50"></text>
+            <rect x="97.8947%" y="949" width="0.7018%" height="15" fill="rgb(244,156,43)"/>
+            <text x="98.1447%" y="959.50"></text>
         </g>
         <g>
             <title>start_thread (281 samples, 98.60%)</title>
-            <rect x="14" y="1109" width="1163" height="15" fill="rgb(241,156,40)"/>
-            <text x="17.00" y="1119.50">start_thread</text>
+            <rect x="0.3509%" y="1109" width="98.5965%" height="15" fill="rgb(241,156,40)"/>
+            <text x="0.6009%" y="1119.50">start_thread</text>
         </g>
         <g>
             <title>java_start (281 samples, 98.60%)</title>
-            <rect x="14" y="1093" width="1163" height="15" fill="rgb(239,104,37)"/>
-            <text x="17.00" y="1103.50">java_start</text>
+            <rect x="0.3509%" y="1093" width="98.5965%" height="15" fill="rgb(239,104,37)"/>
+            <text x="0.6009%" y="1103.50">java_start</text>
         </g>
         <g>
             <title>VMThread::run (4 samples, 1.40%)</title>
-            <rect x="1161" y="1077" width="16" height="15" fill="rgb(243,181,41)"/>
-            <text x="1164.00" y="1087.50"></text>
+            <rect x="97.5439%" y="1077" width="1.4035%" height="15" fill="rgb(243,181,41)"/>
+            <text x="97.7939%" y="1087.50"></text>
         </g>
         <g>
             <title>VMThread::loop (4 samples, 1.40%)</title>
-            <rect x="1161" y="1061" width="16" height="15" fill="rgb(248,181,47)"/>
-            <text x="1164.00" y="1071.50"></text>
+            <rect x="97.5439%" y="1061" width="1.4035%" height="15" fill="rgb(248,181,47)"/>
+            <text x="97.7939%" y="1071.50"></text>
         </g>
         <g>
             <title>VMThread::evaluate_operation (4 samples, 1.40%)</title>
-            <rect x="1161" y="1045" width="16" height="15" fill="rgb(247,181,46)"/>
-            <text x="1164.00" y="1055.50"></text>
+            <rect x="97.5439%" y="1045" width="1.4035%" height="15" fill="rgb(247,181,46)"/>
+            <text x="97.7939%" y="1055.50"></text>
         </g>
         <g>
             <title>VM_Operation::evaluate (4 samples, 1.40%)</title>
-            <rect x="1161" y="1029" width="16" height="15" fill="rgb(245,146,45)"/>
-            <text x="1164.00" y="1039.50"></text>
+            <rect x="97.5439%" y="1029" width="1.4035%" height="15" fill="rgb(245,146,45)"/>
+            <text x="97.7939%" y="1039.50"></text>
         </g>
         <g>
             <title>VM_ParallelGCFailedAllocation::doit (4 samples, 1.40%)</title>
-            <rect x="1161" y="1013" width="16" height="15" fill="rgb(235,146,33)"/>
-            <text x="1164.00" y="1023.50"></text>
+            <rect x="97.5439%" y="1013" width="1.4035%" height="15" fill="rgb(235,146,33)"/>
+            <text x="97.7939%" y="1023.50"></text>
         </g>
         <g>
             <title>ParallelScavengeHeap::failed_mem_allocate (4 samples, 1.40%)</title>
-            <rect x="1161" y="997" width="16" height="15" fill="rgb(245,165,45)"/>
-            <text x="1164.00" y="1007.50"></text>
+            <rect x="97.5439%" y="997" width="1.4035%" height="15" fill="rgb(245,165,45)"/>
+            <text x="97.7939%" y="1007.50"></text>
         </g>
         <g>
             <title>PSScavenge::invoke (4 samples, 1.40%)</title>
-            <rect x="1161" y="981" width="16" height="15" fill="rgb(242,164,41)"/>
-            <text x="1164.00" y="991.50"></text>
+            <rect x="97.5439%" y="981" width="1.4035%" height="15" fill="rgb(242,164,41)"/>
+            <text x="97.7939%" y="991.50"></text>
         </g>
         <g>
             <title>PSScavenge::invoke_no_policy (4 samples, 1.40%)</title>
-            <rect x="1161" y="965" width="16" height="15" fill="rgb(246,164,46)"/>
-            <text x="1164.00" y="975.50"></text>
+            <rect x="97.5439%" y="965" width="1.4035%" height="15" fill="rgb(246,164,46)"/>
+            <text x="97.7939%" y="975.50"></text>
         </g>
         <g>
             <title>pthread_cond_signal@@GLIBC_2.3.2 (1 samples, 0.35%)</title>
-            <rect x="1173" y="949" width="4" height="15" fill="rgb(250,158,50)"/>
-            <text x="1176.00" y="959.50"></text>
+            <rect x="98.5965%" y="949" width="0.3509%" height="15" fill="rgb(250,158,50)"/>
+            <text x="98.8465%" y="959.50"></text>
         </g>
         <g>
             <title>system_call_fastpath (1 samples, 0.35%)</title>
-            <rect x="1173" y="933" width="4" height="15" fill="rgb(236,167,34)"/>
-            <text x="1176.00" y="943.50"></text>
+            <rect x="98.5965%" y="933" width="0.3509%" height="15" fill="rgb(236,167,34)"/>
+            <text x="98.8465%" y="943.50"></text>
         </g>
         <g>
             <title>sys_futex (1 samples, 0.35%)</title>
-            <rect x="1173" y="917" width="4" height="15" fill="rgb(236,167,34)"/>
-            <text x="1176.00" y="927.50"></text>
+            <rect x="98.5965%" y="917" width="0.3509%" height="15" fill="rgb(236,167,34)"/>
+            <text x="98.8465%" y="927.50"></text>
         </g>
         <g>
             <title>do_futex (1 samples, 0.35%)</title>
-            <rect x="1173" y="901" width="4" height="15" fill="rgb(236,189,34)"/>
-            <text x="1176.00" y="911.50"></text>
+            <rect x="98.5965%" y="901" width="0.3509%" height="15" fill="rgb(236,189,34)"/>
+            <text x="98.8465%" y="911.50"></text>
         </g>
         <g>
             <title>futex_wake_op (1 samples, 0.35%)</title>
-            <rect x="1173" y="885" width="4" height="15" fill="rgb(236,152,34)"/>
-            <text x="1176.00" y="895.50"></text>
+            <rect x="98.5965%" y="885" width="0.3509%" height="15" fill="rgb(236,152,34)"/>
+            <text x="98.8465%" y="895.50"></text>
         </g>
         <g>
             <title>all (285 samples, 100%)</title>
-            <rect x="10" y="1141" width="1180" height="15" fill="rgb(255,230,55)"/>
-            <text x="13.00" y="1151.50"></text>
+            <rect x="0.0000%" y="1141" width="100.0000%" height="15" fill="rgb(255,230,55)"/>
+            <text x="0.2500%" y="1151.50"></text>
         </g>
         <g>
             <title>java (285 samples, 100.00%)</title>
-            <rect x="10" y="1125" width="1180" height="15" fill="rgb(233,104,31)"/>
-            <text x="13.00" y="1135.50">java</text>
+            <rect x="0.0000%" y="1125" width="100.0000%" height="15" fill="rgb(233,104,31)"/>
+            <text x="0.2500%" y="1135.50">java</text>
         </g>
         <g>
             <title>write (3 samples, 1.05%)</title>
-            <rect x="1177" y="1109" width="13" height="15" fill="rgb(240,108,38)"/>
-            <text x="1180.00" y="1119.50"></text>
+            <rect x="98.9474%" y="1109" width="1.0526%" height="15" fill="rgb(240,108,38)"/>
+            <text x="99.1974%" y="1119.50"></text>
         </g>
         <g>
             <title>check_events (3 samples, 1.05%)</title>
-            <rect x="1177" y="1093" width="13" height="15" fill="rgb(236,116,34)"/>
-            <text x="1180.00" y="1103.50"></text>
+            <rect x="98.9474%" y="1093" width="1.0526%" height="15" fill="rgb(236,116,34)"/>
+            <text x="99.1974%" y="1103.50"></text>
         </g>
         <g>
             <title>hypercall_page (3 samples, 1.05%)</title>
-            <rect x="1177" y="1077" width="13" height="15" fill="rgb(236,185,34)"/>
-            <text x="1180.00" y="1087.50"></text>
+            <rect x="98.9474%" y="1077" width="1.0526%" height="15" fill="rgb(236,185,34)"/>
+            <text x="99.1974%" y="1087.50"></text>
         </g>
-    </g>
+    </svg>
 </svg>

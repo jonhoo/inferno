@@ -32,8 +32,13 @@ impl<'a> From<usize> for TextArgument<'a> {
     }
 }
 
+pub(super) enum Dimension {
+    Pixels(usize),
+    Percent(f64),
+}
+
 pub(super) struct TextItem<'a, I> {
-    pub(super) x: f64,
+    pub(super) x: Dimension,
     pub(super) y: f64,
     pub(super) text: TextArgument<'a>,
     pub(super) extra: I,
@@ -55,16 +60,14 @@ where
 {
     svg.write(br#"<?xml version="1.0" standalone="no"?>"#)?;
     svg.write(br#"<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">"#)?;
+    let imagewidth = opt.image_width.unwrap_or(super::DEFAULT_IMAGE_WIDTH);
     svg.write_event(Event::Start(
         BytesStart::borrowed_name(b"svg").with_attributes(vec![
             ("version", "1.1"),
-            ("width", &*format!("{}", opt.image_width)),
+            ("width", &*format!("{}", imagewidth)),
             ("height", &*format!("{}", imageheight)),
             ("onload", "init(evt)"),
-            (
-                "viewBox",
-                &*format!("0 0 {} {}", opt.image_width, imageheight),
-            ),
+            ("viewBox", &*format!("0 0 {} {}", imagewidth, imageheight)),
             ("xmlns", "http://www.w3.org/2000/svg"),
             ("xmlns:xlink", "http://www.w3.org/1999/xlink"),
         ]),
@@ -136,13 +139,15 @@ var fontsize = {};
 var fontwidth = {};
 var xpad = {};
 var inverted = {};
-var searchcolor = '{}';",
+var searchcolor = '{}';
+var fluiddrawing = {};",
         enquote('\'', &opt.name_type),
         opt.font_size,
         opt.font_width,
         super::XPAD,
         opt.direction == Direction::Inverted,
-        opt.search_color
+        opt.search_color,
+        opt.image_width.is_none()
     ))))?;
     if !opt.no_javascript {
         svg.write_event(Event::CData(BytesText::from_escaped_str(include_str!(
@@ -155,7 +160,7 @@ var searchcolor = '{}';",
         BytesStart::borrowed_name(b"rect").with_attributes(vec![
             ("x", "0"),
             ("y", "0"),
-            ("width", &*format!("{}", opt.image_width)),
+            ("width", "100%"),
             ("height", &*format!("{}", style_options.imageheight)),
             ("fill", "url(#background)"),
         ]),
@@ -167,7 +172,7 @@ var searchcolor = '{}';",
         svg,
         &mut buf,
         TextItem {
-            x: (opt.image_width / 2) as f64,
+            x: Dimension::Percent(50.0),
             y: (opt.font_size * 2) as f64,
             text: (&*opt.title).into(),
             extra: vec![("id", "title")],
@@ -179,7 +184,7 @@ var searchcolor = '{}';",
             svg,
             &mut buf,
             TextItem {
-                x: (opt.image_width / 2) as f64,
+                x: Dimension::Percent(50.0),
                 y: (opt.font_size * 4) as f64,
                 text: (&**subtitle).into(),
                 extra: vec![("id", "subtitle")],
@@ -187,11 +192,13 @@ var searchcolor = '{}';",
         )?;
     }
 
+    let image_width = opt.image_width.unwrap_or(super::DEFAULT_IMAGE_WIDTH) as f64;
+
     write_str(
         svg,
         &mut buf,
         TextItem {
-            x: super::XPAD as f64,
+            x: Dimension::Pixels(super::XPAD),
             y: (style_options.imageheight - (opt.ypad2() / 2)) as f64,
             text: " ".into(),
             extra: iter::once(("id", "details")),
@@ -202,7 +209,7 @@ var searchcolor = '{}';",
         svg,
         &mut buf,
         TextItem {
-            x: super::XPAD as f64,
+            x: Dimension::Pixels(super::XPAD),
             y: (opt.font_size * 2) as f64,
             text: "Reset Zoom".into(),
             extra: vec![("id", "unzoom"), ("class", "hide")],
@@ -213,7 +220,7 @@ var searchcolor = '{}';",
         svg,
         &mut buf,
         TextItem {
-            x: (opt.image_width - super::XPAD - 100) as f64,
+            x: Dimension::Pixels(image_width as usize - super::XPAD - 100),
             y: (opt.font_size * 2) as f64,
             text: "Search".into(),
             extra: vec![("id", "search")],
@@ -224,7 +231,7 @@ var searchcolor = '{}';",
         svg,
         &mut buf,
         TextItem {
-            x: (opt.image_width - super::XPAD - 100) as f64,
+            x: Dimension::Pixels(image_width as usize - super::XPAD - 100),
             y: (style_options.imageheight - (opt.ypad2() / 2)) as f64,
             text: " ".into(),
             extra: iter::once(("id", "matched")),
@@ -243,7 +250,10 @@ where
     W: Write,
     I: IntoIterator<Item = (&'a str, &'a str)>,
 {
-    let x = write!(buf, "{:.2}", item.x);
+    let x = match item.x {
+        Dimension::Pixels(x) => write!(buf, "{:.2}", x),
+        Dimension::Percent(x) => write!(buf, "{:.4}%", x),
+    };
     let y = write!(buf, "{:.2}", item.y);
 
     let TextItem { text, extra, .. } = item;
