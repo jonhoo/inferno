@@ -185,11 +185,6 @@ function update_text(e) {
     }
     t.textContent = "";
 }
-function update_search_elements() {
-    var svgWidth = svg.width.baseVal.value;
-    searchbtn.attributes.x.value = svgWidth - xpad - 100;
-    matchedtxt.attributes.x.value = svgWidth - xpad - 100;
-}
 // zoom
 function zoom_reset(e) {
     if (e.attributes != undefined) {
