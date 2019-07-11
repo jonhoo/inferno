@@ -164,10 +164,9 @@ function g_to_func(e) {
 function update_text(e) {
     var r = find_child(e, "rect");
     var t = find_child(e, "text");
-    var framesWidth = frames.width.baseVal.value;
-    var w = parseFloat(r.attributes.width.value) * framesWidth / 100 - 3;
+    var w = parseFloat(r.attributes.width.value) * frames.attributes.width.value / 100 - 3;
     var txt = find_child(e, "title").textContent.replace(/\([^(]*\)$/,"");
-    t.attributes.x.value = format_percent((parseFloat(r.attributes.x.value) + (100 * 3 / framesWidth)));
+    t.attributes.x.value = format_percent((parseFloat(r.attributes.x.value) + (100 * 3 / frames.attributes.width.value)));
     // Smaller than this size won't fit anything
     if (w < 2 * fontsize * fontwidth) {
         t.textContent = "";
@@ -201,8 +200,9 @@ function zoom_child(e, x, ratio) {
         if (e.attributes.x != undefined) {
             orig_save(e, "x");
             e.attributes.x.value = format_percent((parseFloat(e.attributes.x.value) - x) * ratio);
-            if(e.tagName == "text")
-                e.attributes.x.value = format_percent(parseFloat(find_child(e.parentNode, "rect[x]").attributes.x.value) + 3);
+            if (e.tagName == "text") {
+                e.attributes.x.value = format_percent(parseFloat(find_child(e.parentNode, "rect[x]").attributes.x.value) + (100 * 3 / frames.attributes.width.value));
+            }
         }
         if (e.attributes.width != undefined) {
             orig_save(e, "width");
