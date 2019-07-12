@@ -1,12 +1,9 @@
 use std::collections::VecDeque;
-use std::io::{self, prelude::*, BufRead};
-use std::mem;
+use std::io::{self, BufRead};
 
-use crossbeam::channel;
 use symbolic_demangle::demangle;
 
-use crate::collapse::util::fix_partially_demangled_rust_symbol;
-use crate::collapse::{self, Collapse, Occurrences};
+use crate::collapse::common::{self, CollapsePrivate, Occurrences};
 
 const TIDY_GENERIC: bool = true;
 const TIDY_JAVA: bool = true;
@@ -27,7 +24,7 @@ mod logging {
     }
 }
 
-/// Perf folder configuration options.
+/// `perf` folder configuration options.
 #[derive(Clone, Debug)]
 pub struct Options {
     /// Annotate JIT functions with a `_[j]` suffix. Default is `false`.
@@ -36,7 +33,7 @@ pub struct Options {
     /// Annotate kernel functions with a `_[k]` suffix. Default is `false`.
     pub annotate_kernel: bool,
 
-    /// Demangle function names
+    /// Demangle function names. Default is `false`.
     pub demangle: bool,
 
     /// Only consider samples of the given event type (see `perf list`). If this option is
@@ -68,7 +65,7 @@ impl Default for Options {
             include_addrs: false,
             include_pid: false,
             include_tid: false,
-            nthreads: *collapse::DEFAULT_NTHREADS,
+            nthreads: *common::DEFAULT_NTHREADS,
         }
     }
 }
@@ -77,6 +74,7 @@ impl Default for Options {
 ///
 /// To construct one, either use `perf::Folder::default()` or create an [`Options`] and use
 /// `perf::Folder::from(options)`.
+#[derive(Clone)]
 pub struct Folder {
     // State...
     /// General String cache that can be used while processing lines. Currently only used to keep
@@ -96,11 +94,8 @@ pub struct Folder {
     /// All lines until the next empty line are stack lines.
     in_event: bool,
 
-    /// Number of stacks in each job sent to the threadpool.
+    /// The number of stacks per job to send to the threadpool.
     nstacks_per_job: usize,
-
-    /// Number of times each call stack has been seen.
-    occurrences: Occurrences,
 
     /// Current comm name.
     ///
@@ -127,8 +122,7 @@ impl From<Options> for Folder {
             cache_line: Vec::default(),
             event_filter: opt.event_filter.clone(),
             in_event: false,
-            nstacks_per_job: collapse::NSTACKS_PER_JOB,
-            occurrences: Occurrences::new(opt.nthreads),
+            nstacks_per_job: common::DEFAULT_NSTACKS_PER_JOB,
             pname: String::default(),
             skip_stack: false,
             stack: VecDeque::default(),
@@ -143,27 +137,52 @@ impl Default for Folder {
     }
 }
 
-impl Collapse for Folder {
-    fn collapse<R, W>(&mut self, reader: R, writer: W) -> io::Result<()>
+impl CollapsePrivate for Folder {
+    fn pre_process<R>(&mut self, reader: &mut R, occurrences: &mut Occurrences) -> io::Result<()>
     where
-        R: BufRead,
-        W: Write,
+        R: io::BufRead,
     {
-        // Do collapsing...
-        if self.occurrences.is_concurrent() {
-            self.collapse_multi_threaded(reader)?;
-        } else {
-            self.collapse_single_threaded(reader)?;
+        // If user has provided an event filter, do nothing...
+        if self.event_filter.is_some() {
+            return Ok(());
         }
 
-        // Write results...
-        self.occurrences.write_and_clear(writer)?;
+        // Otherwise, we don't know what the event filter should be; so process
+        // the first stack to figure it out (the worker threads need this
+        // information to get started). Only read one stack, however, as we would
+        // like the remaining stacks to be processed on the worker threads.
+        let mut line_buffer = String::new();
+        self.process_stack(&mut line_buffer, reader, occurrences)?;
+
+        // If we didn't find an event filter, there is something wrong with
+        // our processing code.
+        assert!(self.event_filter.is_some());
 
         Ok(())
     }
 
-    // Check if the input has an event line followed by a stack line.
-    fn is_applicable(&mut self, input: &str) -> Option<bool> {
+    fn collapse_single_threaded<R>(
+        &mut self,
+        mut reader: R,
+        occurrences: &mut Occurrences,
+    ) -> io::Result<()>
+    where
+        R: io::BufRead,
+    {
+        // While there are still stacks left to process, process them...
+        let mut line_buffer = String::new();
+        while !self.process_stack(&mut line_buffer, &mut reader, occurrences)? {}
+
+        // Reset state...
+        self.in_event = false;
+        self.skip_stack = false;
+        self.stack.clear();
+        Ok(())
+    }
+
+    fn is_applicable_(&mut self, input: &str) -> Option<bool> {
+        // Check if the input has an event line followed by a stack line.
+
         let mut last_line_was_event_line = false;
         let mut input = input.as_bytes();
         let mut line = String::new();
@@ -202,213 +221,56 @@ impl Collapse for Folder {
         None
     }
 
-    #[cfg(test)]
+    fn is_end_of_stack(&self, line: &[u8]) -> bool {
+        line.iter().all(|b| (*b as char).is_whitespace())
+    }
+
+    fn nstacks_per_job(&self) -> usize {
+        self.nstacks_per_job
+    }
+
     fn set_nstacks_per_job(&mut self, n: usize) {
         self.nstacks_per_job = n;
     }
 
-    #[doc(hidden)]
-    fn set_nthreads(&mut self, n: usize) {
+    fn nthreads(&self) -> usize {
+        self.opt.nthreads
+    }
+
+    fn set_nthreads_(&mut self, n: usize) {
         self.opt.nthreads = n;
-        self.occurrences = Occurrences::new(n);
     }
 }
 
 impl Folder {
-    fn collapse_single_threaded<R>(&mut self, mut reader: R) -> io::Result<()>
+    /// Processes a stack. On success, returns `true` if at end of data; `false` otherwise.
+    fn process_stack<R>(
+        &mut self,
+        line_buffer: &mut String,
+        reader: &mut R,
+        occurrences: &mut Occurrences,
+    ) -> io::Result<bool>
     where
-        R: BufRead,
+        R: io::BufRead,
     {
-        let mut line = String::new();
         loop {
-            line.clear();
-            if reader.read_line(&mut line)? == 0 {
-                break;
+            line_buffer.clear();
+            if reader.read_line(line_buffer)? == 0 {
+                return Ok(true);
             }
-            if line.starts_with('#') {
+            if line_buffer.starts_with('#') {
                 continue;
             }
-            let line = line.trim_end();
+            let line = line_buffer.trim_end();
             if line.is_empty() {
-                self.after_event();
+                self.after_event(occurrences);
+                return Ok(false);
             } else if self.in_event {
                 self.on_stack_line(line);
             } else {
                 self.on_event_line(line);
             }
         }
-
-        // Reset state
-        self.in_event = false;
-        self.skip_stack = false;
-        self.stack.clear();
-
-        Ok(())
-    }
-
-    fn collapse_multi_threaded<R>(&mut self, mut reader: R) -> io::Result<()>
-    where
-        R: io::BufRead,
-    {
-        // Invariants of this function for crate's authors to keep in mind...
-        assert_ne!(self.nstacks_per_job, 0);
-        assert!(self.occurrences.is_concurrent());
-        assert!(self.opt.nthreads > 1);
-
-        crossbeam::thread::scope(|scope| {
-            // A `Folder` must always have an event filter, yet the user can choose `None` for
-            // his/her event filter option. When the user chooses `None`, this means "set the event
-            // filter to the first event we come across in the data." In a multithreaded context,
-            // the consequences of this are, when the user has chosen `None` for the event filter
-            // option, the initial state of each Folder on each thread needs information that can
-            // only be known once we've started looking over the input data. They must wait on this;
-            // therefore we set up a channel to be able to communicate what the event filter state
-            // should be as soon as we know it and make the first thing each thread does be waiting
-            // on receiving information from this channel.
-            let (tx_event_filter, rx_event_filter) = channel::bounded(self.opt.nthreads);
-
-            // If we know what the event filter state should be without having to look at the data
-            // (because the user provided it), send this information down the channel immediately.
-            if self.event_filter.is_some() {
-                for _ in 0..self.opt.nthreads {
-                    tx_event_filter.send(self.event_filter.clone()).unwrap();
-                }
-            }
-
-            // Spin up the threadpool / worker threads.
-            let (tx_input, rx_input) = channel::bounded::<Option<Vec<u8>>>(2 * self.opt.nthreads);
-            let (tx_output, rx_output) = channel::bounded::<io::Result<()>>(1);
-            let mut handles = Vec::with_capacity(self.opt.nthreads);
-            for _ in 0..self.opt.nthreads {
-                let rx_event_filter = rx_event_filter.clone();
-                let rx_input = rx_input.clone();
-                let tx_output = tx_output.clone();
-
-                let nstacks_per_job = self.nstacks_per_job;
-                let occurrences = self.occurrences.clone();
-                let opt = self.opt.clone();
-
-                let handle = scope.spawn(move |_| {
-                    // Don't do anything until we know what the event filter should be
-                    let event_filter = rx_event_filter.recv().unwrap();
-                    let mut folder = Folder {
-                        cache_line: Vec::default(),
-                        event_filter,
-                        in_event: false,
-                        nstacks_per_job,
-                        occurrences,
-                        pname: String::default(),
-                        skip_stack: false,
-                        stack: VecDeque::default(),
-                        opt,
-                    };
-                    while let Some(data) = rx_input.recv().unwrap() {
-                        if let Err(e) = folder.collapse_single_threaded(&data[..]) {
-                            // Use `try_send` here because we only need to send one
-                            // error back to the main thread for propagation (even if
-                            // multiple threads fail). If multiple threads fail,
-                            // the first one to do so will fill up our output channel
-                            // (which only has one slot); so plain `send` would block
-                            // here, which can't happen because we need each thread to
-                            // continuously pull values off the input channel or else
-                            // it may fill up and clog. This is also why we continue
-                            // pulling data off the input channel even after we try
-                            // to send an error.
-                            let _ = tx_output.try_send(Err(e));
-                            loop {
-                                if rx_input.recv().unwrap().is_none() {
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                });
-                handles.push(handle);
-            }
-
-            // On the main thread, start running over the input data in order to figure out how to
-            // chunk it up to be sent to the worker threads. After having seen `self.nstacks_per_job`
-            // number of stacks, send a slice of the input data that includes those stacks off to
-            // the threadpool.
-            //
-            // In addition, if the user didn't provide an event filter, send the event filter to the
-            // worker threads as soon as we learn what it is.
-
-            // State for the loop...
-            let buf_capacity =
-                usize::next_power_of_two(collapse::NBYTES_PER_STACK_GUESS * self.nstacks_per_job);
-            let mut buf = Vec::with_capacity(buf_capacity);
-            let (mut index, mut nstacks) = (0, 0);
-
-            // The loop...
-            loop {
-                let n = reader.read_until(b'\n', &mut buf)?;
-
-                // If we're at the end of the data...
-                if n == 0 {
-                    // Send the last slice and exit the loop.
-                    tx_input.send(Some(buf)).unwrap();
-                    break;
-                }
-
-                let line = &buf[index..index + n];
-                index += n;
-
-                // If we've reached the end of a stack...
-                if line.iter().all(|b| (*b as char).is_whitespace()) {
-                    // Count it
-                    nstacks += 1;
-                    // If we've seen enough stacks to make up a slice...
-                    if nstacks == self.nstacks_per_job {
-                        // Send it.
-                        let buf_capacity = buf.capacity();
-                        let chunk = mem::replace(&mut buf, Vec::with_capacity(buf_capacity));
-                        tx_input.send(Some(chunk)).unwrap();
-                        // Reset the state; mark the beginning of the next slice.
-                        index = 0;
-                        nstacks = 0;
-                    }
-                    continue;
-                }
-
-                // If we don't know the event filter (because the user didn't provide it) look for
-                // it; if we find it, send it to the threads, which need it to get started.
-                if self.event_filter.is_none() {
-                    let line = std::str::from_utf8(line)
-                        .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))?
-                        .trim_end();
-                    if let Some(event) = line.rsplitn(2, ' ').next() {
-                        if event.ends_with(':') {
-                            let event = &event[..(event.len() - 1)];
-                            logging::filtering_for_events_of_type(event);
-                            self.event_filter = Some(event.to_string());
-                            for _ in 0..self.opt.nthreads {
-                                tx_event_filter.send(self.event_filter.clone()).unwrap();
-                            }
-                        }
-                    }
-                }
-            }
-
-            // Send shutdown signal.
-            for _ in &handles {
-                tx_input.send(None).unwrap();
-            }
-
-            // Retrieve error, if any.
-            drop(tx_output);
-            if let Ok(result) = rx_output.recv() {
-                result?;
-            }
-
-            // Join threads.
-            for handle in handles {
-                handle.join().unwrap();
-            }
-
-            Ok(())
-        })
-        .unwrap()
     }
 
     fn event_line_parts(line: &str) -> Option<(&str, &str, &str)> {
@@ -559,7 +421,7 @@ impl Folder {
             } else {
                 // perf mostly demangles Rust symbols,
                 // but this will fix the things it gets wrong
-                fix_partially_demangled_rust_symbol(rawfunc)
+                common::fix_partially_demangled_rust_symbol(rawfunc)
             };
 
             // Support Java inlining by splitting on "->". After the first func, the
@@ -612,7 +474,7 @@ impl Folder {
         }
     }
 
-    fn after_event(&mut self) {
+    fn after_event(&mut self, occurrences: &mut Occurrences) {
         // end of stack, so emit stack entry
         if !self.skip_stack {
             // allocate a string that is long enough to hold the entire stack string
@@ -629,7 +491,7 @@ impl Folder {
             }
 
             // count it!
-            self.occurrences.add(stack_str, 1);
+            occurrences.insert_or_add(stack_str, 1);
         }
 
         // reset for the next event
@@ -729,6 +591,7 @@ fn tidy_java(mut func: String) -> String {
 #[cfg(test)]
 mod tests {
     use std::fs;
+    use std::io::Read;
     use std::path::PathBuf;
 
     use lazy_static::lazy_static;
@@ -736,7 +599,8 @@ mod tests {
     use rand::{Rng, SeedableRng};
 
     use super::*;
-    use crate::collapse::tests_common;
+    use crate::collapse::common;
+    use crate::collapse::Collapse;
 
     lazy_static! {
         static ref INPUT: Vec<PathBuf> = {
@@ -769,7 +633,7 @@ mod tests {
     #[test]
     fn test_collapse_multi_perf() -> io::Result<()> {
         let mut folder = Folder::default();
-        tests_common::test_collapse_multi(&mut folder, &INPUT)
+        common::testing::test_collapse_multi(&mut folder, &INPUT)
     }
 
     #[test]
@@ -790,7 +654,7 @@ mod tests {
     #[ignore]
     fn bench_nstacks_perf() -> io::Result<()> {
         let mut folder = Folder::default();
-        tests_common::bench_nstacks(&mut folder, &INPUT)
+        common::testing::bench_nstacks(&mut folder, &INPUT)
     }
 
     #[test]
@@ -807,7 +671,7 @@ mod tests {
         let mut buf_expected = Vec::new();
         let mut count = 0;
 
-        let inputs = tests_common::read_inputs(&INPUT)?;
+        let inputs = common::testing::read_inputs(&INPUT)?;
 
         loop {
             let nstacks_per_job = rng.gen_range(1, 500 + 1);

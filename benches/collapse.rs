@@ -7,10 +7,11 @@ use libflate::gzip::Decoder;
 
 const INFILE_DTRACE: &str = "flamegraph/example-dtrace-stacks.txt";
 const INFILE_PERF: &str = "flamegraph/example-perf-stacks.txt.gz";
+const INFILE_SAMPLE: &str = "tests/data/collapse-sample/large.txt.gz";
 
 fn collapse_benchmark<C>(c: &mut Criterion, mut collapser: C, id: &str, infile: &str)
 where
-    C: 'static + Collapse,
+    C: 'static + Collapse + Clone,
 {
     let mut f = File::open(infile).expect("file not found");
 
@@ -22,73 +23,45 @@ where
         f.read_to_end(&mut bytes).expect("Could not read file");
     }
 
+    collapser.set_nthreads(1);
+
+    let nthreads = num_cpus::get();
+    let mut collapser2 = collapser.clone();
+    collapser2.set_nthreads(nthreads);
+
     c.bench(
         "collapse",
         ParameterizedBenchmark::new(
-            id,
+            format!("{}/1", id),
             move |b, data| {
                 b.iter(|| {
-                    let _folder = collapser.collapse(data.as_slice(), io::sink());
+                    let _result = collapser.collapse(data.as_slice(), io::sink());
                 })
             },
             vec![bytes],
         )
-        .sample_size(100)
-        .throughput(|bytes| Throughput::Bytes(bytes.len() as u32)),
+        .with_function(format!("{}/{}", id, nthreads), move |b, data| {
+            b.iter(|| {
+                let _result = collapser2.collapse(data.as_slice(), io::sink());
+            })
+        })
+        .throughput(|bytes| Throughput::Bytes(bytes.len() as u32))
+        .sample_size(100),
     );
 }
 
-fn dtrace_single(c: &mut Criterion) {
-    let mut options = dtrace::Options::default();
-    options.nthreads = 1;
-    collapse_benchmark(
-        c,
-        dtrace::Folder::from(options),
-        "dtrace_single",
-        INFILE_DTRACE,
-    );
+fn dtrace(c: &mut Criterion) {
+    collapse_benchmark(c, dtrace::Folder::default(), "dtrace", INFILE_DTRACE);
 }
 
-fn dtrace_multi(c: &mut Criterion) {
-    let mut options = dtrace::Options::default();
-    options.nthreads = num_cpus::get();
-    collapse_benchmark(
-        c,
-        dtrace::Folder::from(options),
-        "dtrace_multi",
-        INFILE_DTRACE,
-    );
-}
-
-fn perf_single(c: &mut Criterion) {
-    let mut options = perf::Options::default();
-    options.nthreads = 1;
-    collapse_benchmark(c, perf::Folder::from(options), "perf_single", INFILE_PERF);
-}
-
-fn perf_multi(c: &mut Criterion) {
-    let mut options = perf::Options::default();
-    options.nthreads = num_cpus::get();
-    collapse_benchmark(c, perf::Folder::from(options), "perf_multi", INFILE_PERF);
+fn perf(c: &mut Criterion) {
+    collapse_benchmark(c, perf::Folder::default(), "perf", INFILE_PERF);
 }
 
 fn sample(c: &mut Criterion) {
-    let infile = "tests/data/collapse-sample/sample.txt";
-    collapse_benchmark(
-        c,
-        sample::Folder::from(sample::Options::default()),
-        "sample",
-        infile,
-    );
+    collapse_benchmark(c, sample::Folder::default(), "sample", INFILE_SAMPLE);
 }
 
-criterion_group!(
-    benches,
-    dtrace_single,
-    dtrace_multi,
-    perf_single,
-    perf_multi,
-    sample,
-);
+criterion_group!(benches, dtrace, perf, sample,);
 
 criterion_main!(benches);

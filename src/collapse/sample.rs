@@ -1,8 +1,12 @@
-use super::util::fix_partially_demangled_rust_symbol;
-use super::Collapse;
+use std::io::{self, BufRead};
+
 use log::{error, warn};
-use std::io;
-use std::io::prelude::*;
+
+use crate::collapse::common::{self, CollapsePrivate, Occurrences};
+
+// sample files, even large ones, appear to have very few stacks;
+// so we set the default # of stacks per job to 1.
+const DEFAULT_NSTACKS_PER_JOB: usize = 1;
 
 // The set of symbols to ignore for 'waiting' threads, for ease of use.
 // This will hide waiting threads from the view, making it easier to
@@ -27,38 +31,61 @@ static START_LINE: &str = "Call graph:";
 // We know we're done when we get to this line.
 static END_LINE: &str = "Total number in stack";
 
-/// Settings that change how frames are named from the incoming stack traces.
-///
-/// All options default to off.
-#[derive(Clone, Debug, Default)]
+/// `sample` folder configuration options.
+#[derive(Clone, Debug)]
 pub struct Options {
-    /// Don't include modules with function names
+    /// Don't include modules with function names. Default is `false`.
     pub no_modules: bool,
+
+    /// The number of threads to use. Default is the number of logical cores on your machine.
+    pub nthreads: usize,
+}
+
+impl Default for Options {
+    fn default() -> Self {
+        Self {
+            no_modules: false,
+            nthreads: *common::DEFAULT_NTHREADS,
+        }
+    }
 }
 
 /// A stack collapser for the output of `sample` on macOS.
 ///
 /// To construct one, either use `sample::Folder::default()` or create an [`Options`] and use
 /// `sample::Folder::from(options)`.
-#[derive(Default)]
+#[derive(Clone)]
 pub struct Folder {
+    /// Number of samples for the current stack frame.
+    current_samples: usize,
+
+    /// The number of stacks per job to send to the threadpool.
+    nstacks_per_job: usize,
+
     /// Function on the stack in this entry thus far.
     stack: Vec<String>,
 
-    /// Number of samples for the current stack frame.
-    current_samples: usize,
     opt: Options,
 }
 
-impl Collapse for Folder {
-    fn collapse<R, W>(&mut self, mut reader: R, mut writer: W) -> io::Result<()>
-    where
-        R: BufRead,
-        W: Write,
-    {
-        let mut line = String::new();
+impl Default for Folder {
+    fn default() -> Self {
+        Self {
+            current_samples: 0,
+            nstacks_per_job: DEFAULT_NSTACKS_PER_JOB,
+            stack: Vec::default(),
+            opt: Options::default(),
+        }
+    }
+}
 
-        // Skip everything until we find the call graph.
+impl CollapsePrivate for Folder {
+    fn pre_process<R>(&mut self, reader: &mut R, _: &mut Occurrences) -> io::Result<()>
+    where
+        R: io::BufRead,
+    {
+        // Consume the header...
+        let mut line = String::new();
         loop {
             line.clear();
             if reader.read_line(&mut line)? == 0 {
@@ -66,42 +93,46 @@ impl Collapse for Folder {
                 return Ok(());
             };
             if line.starts_with(START_LINE) {
-                break;
+                return Ok(());
             }
         }
+    }
 
+    fn collapse_single_threaded<R>(
+        &mut self,
+        mut reader: R,
+        occurrences: &mut Occurrences,
+    ) -> io::Result<()>
+    where
+        R: io::BufRead,
+    {
+        let mut line = String::new();
         loop {
             line.clear();
-
             if reader.read_line(&mut line)? == 0 {
                 warn!("File ended before end of call graph");
                 break;
             }
-
             let line = line.trim_end();
-
             if line.is_empty() {
                 continue;
             } else if line.starts_with("    ") {
-                self.on_line(line, &mut writer)?;
+                self.on_line(line, occurrences);
             } else if line.starts_with(END_LINE) {
+                self.write_stack(occurrences);
                 break;
             } else {
                 error!("Stack line doesn't start with 4 spaces:\n{}", line);
             }
         }
-
-        self.write_stack(&mut writer)?;
-
-        // Clear state in case collapse is called again.
+        // Reset the state...
         self.current_samples = 0;
         self.stack.clear();
-
         Ok(())
     }
 
     /// Check for start and end lines of a call graph.
-    fn is_applicable(&mut self, input: &str) -> Option<bool> {
+    fn is_applicable_(&mut self, input: &str) -> Option<bool> {
         let mut found_start = false;
         let mut input = input.as_bytes();
         let mut line = String::new();
@@ -125,11 +156,34 @@ impl Collapse for Folder {
         None
     }
 
-    #[cfg(test)]
-    fn set_nstacks_per_job(&mut self, _: usize) {}
+    fn is_end_of_stack(&self, line: &[u8]) -> bool {
+        if line.len() < 4 {
+            return false;
+        }
+        if let Some(indent_chars) = line[4..].iter().position(|b| !Self::is_indent_byte(*b)) {
+            let prev_depth = self.stack.len();
+            let depth = indent_chars / 2 + 1;
+            depth <= prev_depth
+        } else {
+            false
+        }
+    }
 
-    #[doc(hidden)]
-    fn set_nthreads(&mut self, _: usize) {}
+    fn nstacks_per_job(&self) -> usize {
+        self.nstacks_per_job
+    }
+
+    fn set_nstacks_per_job(&mut self, n: usize) {
+        self.nstacks_per_job = n
+    }
+
+    fn nthreads(&self) -> usize {
+        self.opt.nthreads
+    }
+
+    fn set_nthreads_(&mut self, n: usize) {
+        self.opt.nthreads = n
+    }
 }
 
 impl From<Options> for Folder {
@@ -177,6 +231,10 @@ impl Folder {
         c == ' ' || c == '+' || c == '|' || c == ':' || c == '!'
     }
 
+    fn is_indent_byte(b: u8) -> bool {
+        b == b' ' || b == b'+' || b == b'|' || b == b':' || b == b'!'
+    }
+
     // Handle call graph lines of the form:
     //
     // 5130 Thread_8749954
@@ -185,7 +243,7 @@ impl Folder {
     //    +   ! 4282 __doworkq_kernreturn  (in libsystem_kernel.dylib) ...
     //    +   848 _pthread_wqthread  (in libsystem_pthread.dylib) ...
     //    +     848 __doworkq_kernreturn  (in libsystem_kernel.dylib) ...
-    fn on_line<W: Write>(&mut self, line: &str, writer: &mut W) -> io::Result<()> {
+    fn on_line(&mut self, line: &str, occurrences: &mut Occurrences) {
         if let Some(indent_chars) = line[4..].find(|c| !Self::is_indent_char(c)) {
             // Each indent is two characters
             if indent_chars % 2 != 0 {
@@ -200,7 +258,7 @@ impl Folder {
                 // If the depth of this line is less than the previous one,
                 // it means the previous line was a leaf node and we should
                 // write out the stack and pop it back to one before the current depth.
-                self.write_stack(writer)?;
+                self.write_stack(occurrences);
                 for _ in 0..=prev_depth - depth {
                     self.stack.pop();
                 }
@@ -215,7 +273,7 @@ impl Folder {
                     // sample count at the top of the stack.
                     self.current_samples = samples;
                     // sample doesn't properly demangle Rust symbols, so fix those.
-                    let func = fix_partially_demangled_rust_symbol(func);
+                    let func = common::fix_partially_demangled_rust_symbol(func);
                     if module.is_empty() {
                         self.stack.push(func.to_string());
                     } else {
@@ -230,26 +288,63 @@ impl Folder {
         } else {
             error!("Found stack line with only indent characters:\n{}", line);
         }
-
-        Ok(())
     }
 
-    fn write_stack<W: Write>(&self, writer: &mut W) -> io::Result<()> {
+    fn write_stack(&self, occurrences: &mut Occurrences) {
         if let Some(func) = self.stack.last() {
             for symbol in IGNORE_SYMBOLS {
                 if func.ends_with(symbol) {
                     // Don't write out stacks with ignored symbols
-                    return Ok(());
+                    return;
                 }
             }
         }
-
+        let mut key = String::new();
         for (i, frame) in self.stack.iter().enumerate() {
             if i > 0 {
-                write!(writer, ";")?;
+                key.push(';');
             }
-            write!(writer, "{}", frame)?;
+            key.push_str(frame);
         }
-        writeln!(writer, " {}", self.current_samples)
+        occurrences.insert(key, self.current_samples);
     }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::path::PathBuf;
+
+    use lazy_static::lazy_static;
+
+    use super::*;
+    use crate::collapse::common;
+
+    lazy_static! {
+        static ref INPUT: Vec<PathBuf> = {
+            [
+                "./tests/data/collapse-sample/sample.txt",
+                "./tests/data/collapse-sample/large.txt.gz",
+            ]
+            .into_iter()
+            .map(PathBuf::from)
+            .collect::<Vec<_>>()
+        };
+    }
+
+    #[test]
+    fn test_collapse_multi_sample() -> io::Result<()> {
+        let mut folder = Folder::default();
+        common::testing::test_collapse_multi(&mut folder, &INPUT)
+    }
+
+    /// Varies the nstacks_per_job parameter and outputs the 10 fastests configurations by file.
+    ///
+    /// Command: `cargo test bench_nstacks_sample --release -- --ignored --nocapture`
+    #[test]
+    #[ignore]
+    fn bench_nstacks_sample() -> io::Result<()> {
+        let mut folder = Folder::default();
+        common::testing::bench_nstacks(&mut folder, &INPUT)
+    }
+
 }
