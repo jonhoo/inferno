@@ -171,12 +171,8 @@ struct Opt {
     title: String,
 
     /// Width of image
-    #[structopt(
-        long = "width",
-        raw(default_value = "&defaults::str::IMAGE_WIDTH"),
-        value_name = "UINT"
-    )]
-    width: usize,
+    #[structopt(long = "width", value_name = "UINT")]
+    width: Option<usize>,
 
     // ************ //
     // *** ARGS *** //
@@ -356,7 +352,7 @@ mod tests {
             colors: Palette::from_str("purple").unwrap(),
             search_color: color::SearchColor::from_str("#203040").unwrap(),
             title: "Test Title".to_string(),
-            image_width: 100,
+            image_width: Some(100),
             frame_height: 500,
             min_width: 90.1,
             font_type: "Helvetica".to_string(),

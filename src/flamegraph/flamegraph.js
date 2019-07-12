@@ -1,21 +1,63 @@
 "use strict";
-var details, searchbtn, unzoombtn, matchedtxt, svg, searching;
+var details, searchbtn, unzoombtn, matchedtxt, svg, searching, frames;
 function init(evt) {
     details = document.getElementById("details").firstChild;
     searchbtn = document.getElementById("search");
     unzoombtn = document.getElementById("unzoom");
     matchedtxt = document.getElementById("matched");
     svg = document.getElementsByTagName("svg")[0];
+    frames = document.getElementById("frames");
     searching = 0;
 
-    // use GET parameters to restore a flamegraphs state.
-    var params = get_params();
-    if (params.x && params.y)
-        zoom(find_group(document.querySelector('[x="' + params.x + '"][y="' + params.y + '"]')));
-    if (params.s)
-        search(params.s);
-}
+    // Use GET parameters to restore a flamegraph's state.
+    var restore_state = function() {
+        var params = get_params();
+        if (params.x && params.y)
+            zoom(find_group(document.querySelector('[x="' + params.x + '"][y="' + params.y + '"]')));
+        if (params.s)
+            search(params.s);
+    };
 
+    if (fluiddrawing) {
+        // Make width dynamic so the SVG fits its parent's width.
+        svg.removeAttribute("width");
+        // Edge requires us to have a viewBox that gets updated with size changes.
+        var isEdge = /Edge\/\d./i.test(navigator.userAgent);
+        if (!isEdge) {
+          svg.removeAttribute("viewBox");
+        }
+        var update_for_width_change = function() {
+            if (isEdge) {
+                svg.attributes.viewBox.value = "0 0 " + svg.width.baseVal.value + " " + svg.height.baseVal.value;
+            }
+
+            // Keep consistent padding on left and right of frames container.
+            frames.attributes.width.value = svg.width.baseVal.value - xpad * 2;
+
+            // Text truncation needs to be adjusted for the current width.
+            var el = frames.children;
+            for(var i = 0; i < el.length; i++) {
+                update_text(el[i]);
+            }
+
+            // Keep search elements at a fixed distance from right edge.
+            var svgWidth = svg.width.baseVal.value;
+            searchbtn.attributes.x.value = svgWidth - xpad - 100;
+            matchedtxt.attributes.x.value = svgWidth - xpad - 100;
+        };
+        window.addEventListener('resize', function() {
+            update_for_width_change();
+        });
+        // This needs to be done asynchronously for Safari to work.
+        setTimeout(function() {
+            unzoom();
+            update_for_width_change();
+            restore_state();
+        }, 0);
+    } else {
+        restore_state();
+    }
+}
 // event listeners
 window.addEventListener("click", function(e) {
     var target = find_group(e.target);
@@ -47,7 +89,6 @@ window.addEventListener("click", function(e) {
     }
     else if (e.target.id == "search") search_prompt();
 }, false)
-
 // mouse-over for info
 // show
 window.addEventListener("mouseover", function(e) {
@@ -123,9 +164,9 @@ function g_to_func(e) {
 function update_text(e) {
     var r = find_child(e, "rect");
     var t = find_child(e, "text");
-    var w = parseFloat(r.attributes.width.value) -3;
-    var txt = find_child(e, "title").textContent.replace(/\\([^(]*\\)\$/,"");
-    t.attributes.x.value = parseFloat(r.attributes.x.value) + 3;
+    var w = parseFloat(r.attributes.width.value) * frames.attributes.width.value / 100 - 3;
+    var txt = find_child(e, "title").textContent.replace(/\([^(]*\)$/,"");
+    t.attributes.x.value = format_percent((parseFloat(r.attributes.x.value) + (100 * 3 / frames.attributes.width.value)));
     // Smaller than this size won't fit anything
     if (w < 2 * fontsize * fontwidth) {
         t.textContent = "";
@@ -133,7 +174,7 @@ function update_text(e) {
     }
     t.textContent = txt;
     // Fit in full text width
-    if (/^ *\$/.test(txt) || t.getSubStringLength(0, txt.length) < w)
+    if (/^ *\$/.test(txt) || t.getComputedTextLength() < w)
         return;
     for (var x = txt.length - 2; x > 0; x--) {
         if (t.getSubStringLength(0, x + 2) <= w) {
@@ -158,29 +199,30 @@ function zoom_child(e, x, ratio) {
     if (e.attributes != undefined) {
         if (e.attributes.x != undefined) {
             orig_save(e, "x");
-            e.attributes.x.value = (parseFloat(e.attributes.x.value) - x - xpad) * ratio + xpad;
-            if(e.tagName == "text")
-                e.attributes.x.value = find_child(e.parentNode, "rect[x]").attributes.x.value + 3;
+            e.attributes.x.value = format_percent((parseFloat(e.attributes.x.value) - x) * ratio);
+            if (e.tagName == "text") {
+                e.attributes.x.value = format_percent(parseFloat(find_child(e.parentNode, "rect[x]").attributes.x.value) + (100 * 3 / frames.attributes.width.value));
+            }
         }
         if (e.attributes.width != undefined) {
             orig_save(e, "width");
-            e.attributes.width.value = parseFloat(e.attributes.width.value) * ratio;
+            e.attributes.width.value = format_percent(parseFloat(e.attributes.width.value) * ratio);
         }
     }
     if (e.childNodes == undefined) return;
     for(var i = 0, c = e.childNodes; i < c.length; i++) {
-        zoom_child(c[i], x - xpad, ratio);
+        zoom_child(c[i], x, ratio);
     }
 }
 function zoom_parent(e) {
     if (e.attributes) {
         if (e.attributes.x != undefined) {
             orig_save(e, "x");
-            e.attributes.x.value = xpad;
+            e.attributes.x.value = "0.0%";
         }
         if (e.attributes.width != undefined) {
             orig_save(e, "width");
-            e.attributes.width.value = parseInt(svg.width.baseVal.value) - (xpad*2);
+            e.attributes.width.value = "100.0%";
         }
     }
     if (e.childNodes == undefined) return;
@@ -192,13 +234,13 @@ function zoom(node) {
     var attr = find_child(node, "rect").attributes;
     var width = parseFloat(attr.width.value);
     var xmin = parseFloat(attr.x.value);
-    var xmax = parseFloat(xmin + width);
+    var xmax = xmin + width;
     var ymin = parseFloat(attr.y.value);
-    var ratio = (svg.width.baseVal.value - 2 * xpad) / width;
+    var ratio = 100 / width;
     // XXX: Workaround for JavaScript float issues (fix me)
-    var fudge = 0.0001;
+    var fudge = 0.001;
     unzoombtn.classList.remove("hide");
-    var el = document.getElementById("frames").children;
+    var el = frames.children;
     for (var i = 0; i < el.length; i++) {
         var e = el[i];
         var a = find_child(e, "rect").attributes;
@@ -236,7 +278,7 @@ function zoom(node) {
 }
 function unzoom() {
     unzoombtn.classList.add("hide");
-    var el = document.getElementById("frames").children;
+    var el = frames.children;
     for(var i = 0; i < el.length; i++) {
         el[i].classList.remove("parent");
         el[i].classList.remove("hide");
@@ -272,7 +314,7 @@ function search_prompt() {
 }
 function search(term) {
     var re = new RegExp(term);
-    var el = document.getElementById("frames").children;
+    var el = frames.children;
     var matches = new Object();
     var maxwidth = 0;
     for (var i = 0; i < el.length; i++) {
@@ -342,4 +384,7 @@ function search(term) {
     var pct = 100 * count / maxwidth;
     if (pct != 100) pct = pct.toFixed(1);
     matchedtxt.firstChild.nodeValue = "Matched: " + pct + "%";
+}
+function format_percent(n) {
+    return n.toFixed(4) + "%";
 }

@@ -24,74 +24,75 @@ var fontsize = 12;
 var fontwidth = 0.59;
 var xpad = 10;
 var inverted = false;
-var searchcolor = 'rgb(230,0,230)';]]>
+var searchcolor = 'rgb(230,0,230)';
+var fluiddrawing = true;]]>
     </script>
-    <rect x="0" y="0" width="1200" height="166" fill="url(#background)"/>
-    <text id="title" x="600.00" y="24.00">Flame Graph</text>
-    <text id="details" x="10.00" y="149.00"> </text>
-    <text id="unzoom" class="hide" x="10.00" y="24.00">Reset Zoom</text>
-    <text id="search" x="1090.00" y="24.00">Search</text>
-    <text id="matched" x="1090.00" y="149.00"> </text>
-    <g id="frames">
+    <rect x="0" y="0" width="100%" height="166" fill="url(#background)"/>
+    <text id="title" x="50.0000%" y="24.00">Flame Graph</text>
+    <text id="details" x="10" y="149.00"> </text>
+    <text id="unzoom" class="hide" x="10" y="24.00">Reset Zoom</text>
+    <text id="search" x="1090" y="24.00">Search</text>
+    <text id="matched" x="1090" y="149.00"> </text>
+    <svg id="frames" x="10" width="1180">
         <g>
             <title>_start (31,000 samples, 8.03%)</title>
-            <rect x="10" y="85" width="94" height="15" fill="rgb(239,139,37)"/>
-            <text x="13.00" y="95.50">_start</text>
+            <rect x="0.0000%" y="85" width="8.0311%" height="15" fill="rgb(239,139,37)"/>
+            <text x="0.2500%" y="95.50">_start</text>
         </g>
         <g>
             <title>__libc_start_main (31,000 samples, 8.03%)</title>
-            <rect x="10" y="69" width="94" height="15" fill="rgb(247,154,46)"/>
-            <text x="13.00" y="79.50">__libc_star..</text>
+            <rect x="0.0000%" y="69" width="8.0311%" height="15" fill="rgb(247,154,46)"/>
+            <text x="0.2500%" y="79.50">__libc_star..</text>
         </g>
         <g>
             <title>main (31,000 samples, 8.03%)</title>
-            <rect x="10" y="53" width="94" height="15" fill="rgb(247,83,46)"/>
-            <text x="13.00" y="63.50">main</text>
+            <rect x="0.0000%" y="53" width="8.0311%" height="15" fill="rgb(247,83,46)"/>
+            <text x="0.2500%" y="63.50">main</text>
         </g>
         <g>
             <title>cksum (31,000 samples, 8.03%)</title>
-            <rect x="10" y="37" width="94" height="15" fill="rgb(226,95,23)"/>
-            <text x="13.00" y="47.50">cksum</text>
+            <rect x="0.0000%" y="37" width="8.0311%" height="15" fill="rgb(226,95,23)"/>
+            <text x="0.2500%" y="47.50">cksum</text>
         </g>
         <g>
             <title>cksum (60,001 samples, 15.54%)</title>
-            <rect x="104" y="85" width="184" height="15" fill="rgb(226,95,23)"/>
-            <text x="107.00" y="95.50">cksum</text>
+            <rect x="8.0311%" y="85" width="15.5443%" height="15" fill="rgb(226,95,23)"/>
+            <text x="8.2811%" y="95.50">cksum</text>
         </g>
         <g>
             <title>cksum (110,001 samples, 28.50%)</title>
-            <rect x="10" y="101" width="336" height="15" fill="rgb(226,95,23)"/>
-            <text x="13.00" y="111.50">cksum</text>
+            <rect x="0.0000%" y="101" width="28.4976%" height="15" fill="rgb(226,95,23)"/>
+            <text x="0.2500%" y="111.50">cksum</text>
         </g>
         <g>
             <title>main (19,000 samples, 4.92%)</title>
-            <rect x="288" y="85" width="58" height="15" fill="rgb(247,83,46)"/>
-            <text x="291.00" y="95.50">main</text>
+            <rect x="23.5753%" y="85" width="4.9223%" height="15" fill="rgb(247,83,46)"/>
+            <text x="23.8253%" y="95.50">main</text>
         </g>
         <g>
             <title>cksum (19,000 samples, 4.92%)</title>
-            <rect x="288" y="69" width="58" height="15" fill="rgb(226,95,23)"/>
-            <text x="291.00" y="79.50">cksum</text>
+            <rect x="23.5753%" y="69" width="4.9223%" height="15" fill="rgb(226,95,23)"/>
+            <text x="23.8253%" y="79.50">cksum</text>
         </g>
         <g>
             <title>[unknown] (2,000 samples, 0.52%)</title>
-            <rect x="346" y="85" width="6" height="15" fill="rgb(242,180,40)"/>
-            <text x="349.00" y="95.50"></text>
+            <rect x="28.4976%" y="85" width="0.5181%" height="15" fill="rgb(242,180,40)"/>
+            <text x="28.7476%" y="95.50"></text>
         </g>
         <g>
             <title>all (386,001 samples, 100%)</title>
-            <rect x="10" y="117" width="1180" height="15" fill="rgb(255,230,55)"/>
-            <text x="13.00" y="127.50"></text>
+            <rect x="0.0000%" y="117" width="100.0000%" height="15" fill="rgb(255,230,55)"/>
+            <text x="0.2500%" y="127.50"></text>
         </g>
         <g>
             <title>noploop (276,000 samples, 71.50%)</title>
-            <rect x="346" y="101" width="844" height="15" fill="rgb(248,212,47)"/>
-            <text x="349.00" y="111.50">noploop</text>
+            <rect x="28.4976%" y="101" width="71.5024%" height="15" fill="rgb(248,212,47)"/>
+            <text x="28.7476%" y="111.50">noploop</text>
         </g>
         <g>
             <title>main (274,000 samples, 70.98%)</title>
-            <rect x="352" y="85" width="838" height="15" fill="rgb(247,83,46)"/>
-            <text x="355.00" y="95.50">main</text>
+            <rect x="29.0157%" y="85" width="70.9843%" height="15" fill="rgb(247,83,46)"/>
+            <text x="29.2657%" y="95.50">main</text>
         </g>
-    </g>
+    </svg>
 </svg>
