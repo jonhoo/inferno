@@ -1,7 +1,6 @@
 [![Crates.io](https://img.shields.io/crates/v/inferno.svg)](https://crates.io/crates/inferno)
 [![Documentation](https://docs.rs/inferno/badge.svg)](https://docs.rs/inferno/)
-[![Build Status](https://dev.azure.com/jonhoo/jonhoo/_apis/build/status/inferno?branchName=master)](https://dev.azure.com/jonhoo/jonhoo/_build/latest?definitionId=3&branchName=master)
-[![Travis Build Status](https://travis-ci.com/jonhoo/inferno.svg?branch=master)](https://travis-ci.com/jonhoo/inferno)
+[![Build Status](https://dev.azure.com/jonhoo/jonhoo/_apis/build/status/inferno?branchName=master)](https://dev.azure.com/jonhoo/jonhoo/_build/latest?definitionId=6&branchName=master)
 [![Cirrus CI Build Status](https://api.cirrus-ci.com/github/jonhoo/inferno.svg)](https://cirrus-ci.com/github/jonhoo/inferno)
 [![Codecov](https://codecov.io/github/jonhoo/inferno/coverage.svg?branch=master)](https://codecov.io/gh/jonhoo/inferno)
 [![Dependency status](https://deps.rs/repo/github/jonhoo/inferno/status.svg)](https://deps.rs/repo/github/jonhoo/inferno)
