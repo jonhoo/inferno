@@ -16,7 +16,7 @@ license = "CDDL-1.0"
 exclude = ["/tests/**", "/flamegraph/**", "/*.perf"]
 
 [badges]
-travis-ci = { repository = "jonhoo/inferno" }
+azure-devops = { project = "jonhoo/jonhoo", pipeline = "inferno", build = "3" }
 cirrus-ci = { repository = "jonhoo/inferno" }
 codecov = { repository = "jonhoo/inferno", branch = "master", service = "github" }
 
