@@ -484,6 +484,7 @@ pub(crate) mod testing {
     use super::*;
     use crate::collapse::Collapse;
 
+    // TODO: Eventually replace with `as_nanos`, which became part of the standard library in Rust 1.33.0.
     pub(crate) trait DurationExt {
         fn as_nanos_compat(&self) -> u128;
     }
