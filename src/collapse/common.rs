@@ -523,7 +523,7 @@ pub(crate) mod testing {
         P: AsRef<Path>,
     {
         const MAX_THREADS: usize = 16;
-        for (_, bytes) in read_inputs(inputs)? {
+        for (path, bytes) in read_inputs(inputs)? {
             folder.set_nthreads(1);
             let mut writer = Vec::new();
             folder.collapse(&bytes[..], &mut writer)?;
@@ -535,7 +535,13 @@ pub(crate) mod testing {
                 folder.collapse(&bytes[..], &mut writer)?;
                 let actual = std::str::from_utf8(&writer[..]).unwrap();
 
-                assert_eq!(actual, expected);
+                assert_eq!(
+                    actual,
+                    expected,
+                    "Collapsing with {} threads does not produce the same output as collapsing with 1 thread for {}",
+                    n,
+                    path.display()
+                );
             }
         }
 
