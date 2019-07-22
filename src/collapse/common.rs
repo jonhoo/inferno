@@ -136,6 +136,8 @@ pub trait CollapsePrivate: Clone + Send + Sized + Sized {
             let (tx_error, rx_error) = channel::bounded::<io::Error>(1);
 
             // Channel for sending input data from the main thread to the worker threads.
+            // We choose `2 * nthreads` as the channel size here in order to limit memory
+            // usage in the case of particularly large input files.
             let (tx_input, rx_input) = channel::bounded::<Option<Vec<u8>>>(2 * nthreads);
 
             // Channel for worker threads that have errored to signal to all the other
