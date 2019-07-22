@@ -148,7 +148,7 @@ pub trait CollapsePrivate: Clone + Send + Sized + Sized {
             // Channel for sending input data from the main thread to the worker threads.
             // We choose `2 * nthreads` as the channel size here in order to limit memory
             // usage in the case of particularly large input files.
-            let (tx_input, rx_input) = channel::bounded::<Option<Vec<u8>>>(2 * nthreads);
+            let (tx_input, rx_input) = channel::bounded::<Vec<u8>>(2 * nthreads);
 
             // Channel for worker threads that have errored to signal to all the other
             // worker threads that they should stop work immediately and return.
@@ -167,13 +167,13 @@ pub trait CollapsePrivate: Clone + Send + Sized + Sized {
                 let handle = scope.spawn(move |_| loop {
                     channel::select! {
                         recv(rx_input) -> input => {
-                            // Received from the main thread either:
-                            // * `Some(<input_data>)`, or
-                            // * `None` = a signal that no more input data will be sent.
-                            let data = match input.unwrap() {
-                                Some(data) => data,
-                                // If there is no more input data, return.
-                                None => return,
+                            // Received input from the main thread.
+                            let data = match input {
+                                Ok(data) => data,
+                                // The main threads drops it's handle to the input sender once it's
+                                // finished sending data; so if we get an error here, it means
+                                // there is no more data to be sent and we should exit.
+                                Err(_) => return,
                             };
                             // If there is input data, process it.
                             if let Err(e) = folder.collapse_single_threaded(&data[..], &mut occurrences) {
@@ -234,7 +234,7 @@ pub trait CollapsePrivate: Clone + Send + Sized + Sized {
                     // be alive (depending on if one errored in between the sending of the last
                     // chunk and the sending of this one), but either way we should break the loop;
                     // so there's no need to check for a `SendError` here.
-                    let _ = tx_input.send(Some(buf));
+                    let _ = tx_input.send(buf);
                     break;
                 }
                 let line = &buf[index..index + n];
@@ -247,7 +247,7 @@ pub trait CollapsePrivate: Clone + Send + Sized + Sized {
                         // worker threads, try to send it.
                         let buf_capacity = usize::next_power_of_two(buf.capacity());
                         let chunk = mem::replace(&mut buf, Vec::with_capacity(buf_capacity));
-                        if tx_input.send(Some(chunk)).is_err() {
+                        if tx_input.send(chunk).is_err() {
                             // If sending the chunk produces a `SendError`, this means that one
                             // of the worker threads has errored, sent a signal to all the other
                             // worker threads to shut down, and they have all shutdown, in which
@@ -262,17 +262,10 @@ pub trait CollapsePrivate: Clone + Send + Sized + Sized {
                 }
             }
 
-            // We've run out of input data to send to the worker threads; so tell them.
-            for _ in &handles {
-                if tx_input.send(None).is_err() {
-                    // If we're unable to send data on the input channel, it means one of the
-                    // worker threads has errored and signaled to all the other worker threads
-                    // to shutdown (and they all have), in which case, as above, we should stop
-                    // trying to send information to them and proceed directly to the checking
-                    // the error channel for the error that will be there.
-                    break;
-                }
-            }
+            // The main thread needs to drop it's handle to the input sender here because we
+            // that's how we signal to the worker threads that there is no more data coming
+            // on the input channel, in which case they should exit.
+            drop(tx_input);
 
             // The main thread needs to drop it's handle to the error sender here because we
             // are about to poll the error receiver for errors, which will block until all
