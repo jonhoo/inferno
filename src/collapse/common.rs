@@ -166,12 +166,14 @@ pub trait CollapsePrivate: Clone + Send + Sized + Sized {
                             // If there is input data, process it.
                             if let Err(e) = folder.collapse_single_threaded(&data[..], &mut occurrences) {
                                 // In the event of an error...
-
-                                // First, signal to all the other worker threads that they
-                                // should stop work immediately.  If the channel is full, it
-                                // means another thread has also errored and already sent a stop
-                                // signal to the other threads; so there is no need to wait or
-                                // to check for a `SendError` here.
+                                //
+                                // We notify all the threads about it here, rather than wait for the main input
+                                // loop to see the error, so that we can also stop the input loop from iterating
+                                // through the rest of the file.
+                                //
+                                // If the channel is full, it means another thread has also errored
+                                // and already sent a stop signal to the other threads; so there is
+                                // no need to wait or to check for a `SendError` here.
                                 for _ in 0..(nthreads - 1) {
                                     let _ = tx_stop.try_send(());
                                 }
