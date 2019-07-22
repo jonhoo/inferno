@@ -152,7 +152,7 @@ impl CollapsePrivate for Folder {
         // information to get started). Only read one stack, however, as we would
         // like the remaining stacks to be processed on the worker threads.
         let mut line_buffer = String::new();
-        self.process_stack(&mut line_buffer, reader, occurrences)?;
+        self.process_single_stack(&mut line_buffer, reader, occurrences)?;
 
         // If we didn't find an event filter, there is something wrong with
         // our processing code.
@@ -171,7 +171,7 @@ impl CollapsePrivate for Folder {
     {
         // While there are still stacks left to process, process them...
         let mut line_buffer = String::new();
-        while !self.process_stack(&mut line_buffer, &mut reader, occurrences)? {}
+        while !self.process_single_stack(&mut line_buffer, &mut reader, occurrences)? {}
 
         // Reset state...
         self.in_event = false;
@@ -244,7 +244,7 @@ impl CollapsePrivate for Folder {
 
 impl Folder {
     /// Processes a stack. On success, returns `true` if at end of data; `false` otherwise.
-    fn process_stack<R>(
+    fn process_single_stack<R>(
         &mut self,
         line_buffer: &mut String,
         reader: &mut R,
