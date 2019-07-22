@@ -167,7 +167,7 @@ pub trait CollapsePrivate: Clone + Send + Sized + Sized {
                 let handle = scope.spawn(move |_| loop {
                     channel::select! {
                         recv(rx_input) -> input => {
-                            // Received input from the main thread.
+                            // Receive input from the main thread.
                             let data = match input {
                                 Ok(data) => data,
                                 // The main threads drops it's handle to the input sender once it's
