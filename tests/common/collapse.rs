@@ -48,38 +48,6 @@ pub fn test_collapse<C>(
 where
     C: Collapse,
 {
-    for nthreads in &[1, 2] {
-        collapser.set_nthreads(*nthreads);
-        __test_collapse(
-            &mut collapser,
-            test_filename,
-            expected_filename,
-            strip_quotes,
-        )?;
-    }
-    Ok(())
-}
-
-pub fn test_collapse_logs<C, F>(mut collapser: C, input_file: &str, asserter: F)
-where
-    C: Collapse,
-    F: Fn(&Vec<CapturedLog>),
-{
-    test_logger::init();
-    let r = BufReader::new(File::open(input_file).unwrap());
-    collapser.collapse(r, std::io::sink()).unwrap();
-    test_logger::validate(asserter);
-}
-
-fn __test_collapse<C>(
-    collapser: &mut C,
-    test_filename: &str,
-    expected_filename: &str,
-    strip_quotes: bool,
-) -> io::Result<()>
-where
-    C: Collapse,
-{
     if let Err(e) = fs::metadata(test_filename) {
         eprintln!("Failed to open input file '{}'", test_filename);
         return Err(e.into());
@@ -124,4 +92,15 @@ where
     // and then compare
     compare_results(result, expected, expected_filename, strip_quotes);
     Ok(return_value)
+}
+
+pub fn test_collapse_logs<C, F>(mut collapser: C, input_file: &str, asserter: F)
+where
+    C: Collapse,
+    F: Fn(&Vec<CapturedLog>),
+{
+    test_logger::init();
+    let r = BufReader::new(File::open(input_file).unwrap());
+    collapser.collapse(r, std::io::sink()).unwrap();
+    test_logger::validate(asserter);
 }

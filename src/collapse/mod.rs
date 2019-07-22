@@ -82,9 +82,6 @@ pub trait Collapse {
     /// - `Some(true)` means "yes, this implementation should work with this string"
     /// - `Some(false)` means "no, this implementation definitely won't work"
     fn is_applicable(&mut self, input: &str) -> Option<bool>;
-
-    /// Sets the number of threads to use. Default is the number of logical cores on your machine.
-    fn set_nthreads(&mut self, n: usize);
 }
 
 impl<T> Collapse for T
@@ -101,9 +98,5 @@ where
 
     fn is_applicable(&mut self, input: &str) -> Option<bool> {
         self.is_applicable_(input)
-    }
-
-    fn set_nthreads(&mut self, n: usize) {
-        self.set_nthreads_(n)
     }
 }

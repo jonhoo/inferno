@@ -2,11 +2,8 @@ use std::io::{self, BufRead};
 
 use log::{error, warn};
 
-use crate::collapse::common::{self, CollapsePrivate, Occurrences};
-
-// sample files, even large ones, appear to have very few stacks;
-// so we set the default # of stacks per job to 1.
-const DEFAULT_NSTACKS_PER_JOB: usize = 1;
+use crate::collapse::common::{self, Occurrences};
+use crate::collapse::Collapse;
 
 // The set of symbols to ignore for 'waiting' threads, for ease of use.
 // This will hide waiting threads from the view, making it easier to
@@ -36,17 +33,11 @@ static END_LINE: &str = "Total number in stack";
 pub struct Options {
     /// Don't include modules with function names. Default is `false`.
     pub no_modules: bool,
-
-    /// The number of threads to use. Default is the number of logical cores on your machine.
-    pub nthreads: usize,
 }
 
 impl Default for Options {
     fn default() -> Self {
-        Self {
-            no_modules: false,
-            nthreads: *common::DEFAULT_NTHREADS,
-        }
+        Self { no_modules: false }
     }
 }
 
@@ -59,9 +50,6 @@ pub struct Folder {
     /// Number of samples for the current stack frame.
     current_samples: usize,
 
-    /// The number of stacks per job to send to the threadpool.
-    nstacks_per_job: usize,
-
     /// Function on the stack in this entry thus far.
     stack: Vec<String>,
 
@@ -72,17 +60,17 @@ impl Default for Folder {
     fn default() -> Self {
         Self {
             current_samples: 0,
-            nstacks_per_job: DEFAULT_NSTACKS_PER_JOB,
             stack: Vec::default(),
             opt: Options::default(),
         }
     }
 }
 
-impl CollapsePrivate for Folder {
-    fn pre_process<R>(&mut self, reader: &mut R, _: &mut Occurrences) -> io::Result<()>
+impl Collapse for Folder {
+    fn collapse<R, W>(&mut self, mut reader: R, writer: W) -> io::Result<()>
     where
         R: io::BufRead,
+        W: io::Write,
     {
         // Consume the header...
         let mut line = String::new();
@@ -93,20 +81,12 @@ impl CollapsePrivate for Folder {
                 return Ok(());
             };
             if line.starts_with(START_LINE) {
-                return Ok(());
+                break;
             }
         }
-    }
 
-    fn collapse_single_threaded<R>(
-        &mut self,
-        mut reader: R,
-        occurrences: &mut Occurrences,
-    ) -> io::Result<()>
-    where
-        R: io::BufRead,
-    {
-        let mut line = String::new();
+        // Process the data...
+        let mut occurrences = Occurrences::new(1);
         loop {
             line.clear();
             if reader.read_line(&mut line)? == 0 {
@@ -117,14 +97,18 @@ impl CollapsePrivate for Folder {
             if line.is_empty() {
                 continue;
             } else if line.starts_with("    ") {
-                self.on_line(line, occurrences);
+                self.on_line(line, &mut occurrences);
             } else if line.starts_with(END_LINE) {
-                self.write_stack(occurrences);
+                self.write_stack(&mut occurrences);
                 break;
             } else {
                 error!("Stack line doesn't start with 4 spaces:\n{}", line);
             }
         }
+
+        // Write the results...
+        occurrences.write_and_clear(writer)?;
+
         // Reset the state...
         self.current_samples = 0;
         self.stack.clear();
@@ -132,7 +116,7 @@ impl CollapsePrivate for Folder {
     }
 
     /// Check for start and end lines of a call graph.
-    fn is_applicable_(&mut self, input: &str) -> Option<bool> {
+    fn is_applicable(&mut self, input: &str) -> Option<bool> {
         let mut found_start = false;
         let mut input = input.as_bytes();
         let mut line = String::new();
@@ -154,35 +138,6 @@ impl CollapsePrivate for Folder {
             }
         }
         None
-    }
-
-    fn is_end_of_stack(&self, line: &[u8]) -> bool {
-        if line.len() < 4 {
-            return false;
-        }
-        if let Some(indent_chars) = line[4..].iter().position(|b| !Self::is_indent_byte(*b)) {
-            let prev_depth = self.stack.len();
-            let depth = indent_chars / 2 + 1;
-            depth <= prev_depth
-        } else {
-            false
-        }
-    }
-
-    fn nstacks_per_job(&self) -> usize {
-        self.nstacks_per_job
-    }
-
-    fn set_nstacks_per_job(&mut self, n: usize) {
-        self.nstacks_per_job = n
-    }
-
-    fn nthreads(&self) -> usize {
-        self.opt.nthreads
-    }
-
-    fn set_nthreads_(&mut self, n: usize) {
-        self.opt.nthreads = n
     }
 }
 
@@ -229,10 +184,6 @@ impl Folder {
 
     fn is_indent_char(c: char) -> bool {
         c == ' ' || c == '+' || c == '|' || c == ':' || c == '!'
-    }
-
-    fn is_indent_byte(b: u8) -> bool {
-        b == b' ' || b == b'+' || b == b'|' || b == b':' || b == b'!'
     }
 
     // Handle call graph lines of the form:
@@ -308,43 +259,4 @@ impl Folder {
         }
         occurrences.insert(key, self.current_samples);
     }
-}
-
-#[cfg(test)]
-mod tests {
-    use std::path::PathBuf;
-
-    use lazy_static::lazy_static;
-
-    use super::*;
-    use crate::collapse::common;
-
-    lazy_static! {
-        static ref INPUT: Vec<PathBuf> = {
-            [
-                "./tests/data/collapse-sample/sample.txt",
-                "./tests/data/collapse-sample/large.txt.gz",
-            ]
-            .into_iter()
-            .map(PathBuf::from)
-            .collect::<Vec<_>>()
-        };
-    }
-
-    #[test]
-    fn test_collapse_multi_sample() -> io::Result<()> {
-        let mut folder = Folder::default();
-        common::testing::test_collapse_multi(&mut folder, &INPUT)
-    }
-
-    /// Varies the nstacks_per_job parameter and outputs the 10 fastests configurations by file.
-    ///
-    /// Command: `cargo test bench_nstacks_sample --release -- --ignored --nocapture`
-    #[test]
-    #[ignore]
-    fn bench_nstacks_sample() -> io::Result<()> {
-        let mut folder = Folder::default();
-        common::testing::bench_nstacks(&mut folder, &INPUT)
-    }
-
 }

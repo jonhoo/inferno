@@ -237,7 +237,7 @@ impl CollapsePrivate for Folder {
         self.opt.nthreads
     }
 
-    fn set_nthreads_(&mut self, n: usize) {
+    fn set_nthreads(&mut self, n: usize) {
         self.opt.nthreads = n;
     }
 }

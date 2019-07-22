@@ -15,18 +15,18 @@ fn test_collapse_sample(test_file: &str, expected_file: &str, options: Options) 
     common::test_collapse(Folder::from(options), test_file, expected_file, false)
 }
 
-fn test_collapse_sample_logs<F>(input_file: &str, asserter: F)
-where
-    F: Fn(&Vec<CapturedLog>),
-{
-    test_collapse_sample_logs_with_options(input_file, asserter, Options::default());
-}
-
 fn test_collapse_sample_logs_with_options<F>(input_file: &str, asserter: F, options: Options)
 where
     F: Fn(&Vec<CapturedLog>),
 {
     common::test_collapse_logs(Folder::from(options), input_file, asserter);
+}
+
+fn test_collapse_sample_logs<F>(input_file: &str, asserter: F)
+where
+    F: Fn(&Vec<CapturedLog>),
+{
+    test_collapse_sample_logs_with_options(input_file, asserter, Options::default());
 }
 
 #[test]

@@ -87,7 +87,7 @@ pub trait CollapsePrivate: Clone + Send + Sized + Sized {
     fn nthreads(&self) -> usize;
 
     /// This method should set the number of threads to use.
-    fn set_nthreads_(&mut self, n: usize);
+    fn set_nthreads(&mut self, n: usize);
 
     // *********************************************************** //
     // ******************** PROVIDED METHODS ********************* //
@@ -519,7 +519,7 @@ pub(crate) mod testing {
 
     pub(crate) fn test_collapse_multi<C, P>(folder: &mut C, inputs: &[P]) -> io::Result<()>
     where
-        C: Collapse,
+        C: Collapse + CollapsePrivate,
         P: AsRef<Path>,
     {
         const MAX_THREADS: usize = 16;

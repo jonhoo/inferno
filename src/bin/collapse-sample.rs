@@ -35,18 +35,6 @@ struct Opt {
     #[structopt(short = "v", long = "verbose", parse(from_occurrences))]
     verbose: usize,
 
-    // *************** //
-    // *** OPTIONS *** //
-    // *************** //
-    /// Number of threads to use.
-    #[structopt(
-        short = "n",
-        long = "nthreads",
-        raw(default_value = "&NTHREADS"),
-        value_name = "UINT"
-    )]
-    nthreads: usize,
-
     // ************ //
     // *** ARGS *** //
     // ************ //
@@ -61,7 +49,6 @@ impl Opt {
             self.infile,
             Options {
                 no_modules: self.no_modules,
-                nthreads: self.nthreads,
             },
         )
     }

@@ -60,11 +60,7 @@ impl Collapse for Folder {
             options.nthreads = self.opt.nthreads;
             perf::Folder::from(options)
         };
-        let mut sample = {
-            let mut options = sample::Options::default();
-            options.nthreads = self.opt.nthreads;
-            sample::Folder::from(options)
-        };
+        let mut sample = sample::Folder::default();
 
         // Each Collapse impl gets its own flag in this array.
         // It gets set to true when the impl has been ruled out.
@@ -114,9 +110,5 @@ impl Collapse for Folder {
 
     fn is_applicable(&mut self, _line: &str) -> Option<bool> {
         unreachable!()
-    }
-
-    fn set_nthreads(&mut self, n: usize) {
-        self.opt.nthreads = n;
     }
 }

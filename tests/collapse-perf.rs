@@ -18,12 +18,25 @@ fn test_collapse_perf(
     options: Options,
     strip_quotes: bool,
 ) -> io::Result<()> {
-    common::test_collapse(
-        Folder::from(options),
-        test_file,
-        expected_file,
-        strip_quotes,
-    )
+    for n in 1..=2 {
+        let mut options = options.clone();
+        options.nthreads = n;
+        common::test_collapse(
+            Folder::from(options),
+            test_file,
+            expected_file,
+            strip_quotes,
+        )?;
+    }
+    Ok(())
+}
+
+fn test_collapse_perf_logs_with_options<F>(input_file: &str, asserter: F, mut options: Options)
+where
+    F: Fn(&Vec<CapturedLog>),
+{
+    options.nthreads = 2;
+    common::test_collapse_logs(Folder::from(options), input_file, asserter);
 }
 
 fn test_collapse_perf_logs<F>(input_file: &str, asserter: F)
@@ -31,13 +44,6 @@ where
     F: Fn(&Vec<CapturedLog>),
 {
     test_collapse_perf_logs_with_options(input_file, asserter, Options::default());
-}
-
-fn test_collapse_perf_logs_with_options<F>(input_file: &str, asserter: F, options: Options)
-where
-    F: Fn(&Vec<CapturedLog>),
-{
-    common::test_collapse_logs(Folder::from(options), input_file, asserter);
 }
 
 fn options_from_vec(opt_vec: Vec<&str>) -> Options {

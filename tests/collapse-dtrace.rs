@@ -12,7 +12,20 @@ use pretty_assertions::assert_eq;
 use common::test_logger::CapturedLog;
 
 fn test_collapse_dtrace(test_file: &str, expected_file: &str, options: Options) -> io::Result<()> {
-    common::test_collapse(Folder::from(options), test_file, expected_file, false)
+    for n in 1..=2 {
+        let mut options = options.clone();
+        options.nthreads = n;
+        common::test_collapse(Folder::from(options), test_file, expected_file, false)?;
+    }
+    Ok(())
+}
+
+fn test_collapse_dtrace_logs_with_options<F>(input_file: &str, asserter: F, mut options: Options)
+where
+    F: Fn(&Vec<CapturedLog>),
+{
+    options.nthreads = 2;
+    common::test_collapse_logs(Folder::from(options), input_file, asserter);
 }
 
 fn test_collapse_dtrace_logs<F>(input_file: &str, asserter: F)
@@ -20,13 +33,6 @@ where
     F: Fn(&Vec<CapturedLog>),
 {
     test_collapse_dtrace_logs_with_options(input_file, asserter, Options::default());
-}
-
-fn test_collapse_dtrace_logs_with_options<F>(input_file: &str, asserter: F, options: Options)
-where
-    F: Fn(&Vec<CapturedLog>),
-{
-    common::test_collapse_logs(Folder::from(options), input_file, asserter);
 }
 
 #[test]
