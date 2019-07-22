@@ -221,7 +221,7 @@ impl CollapsePrivate for Folder {
         None
     }
 
-    fn is_end_of_stack(&self, line: &[u8]) -> bool {
+    fn would_end_stack(&self, line: &[u8]) -> bool {
         line.iter().all(|b| (*b as char).is_whitespace())
     }
 

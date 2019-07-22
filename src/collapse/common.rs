@@ -65,9 +65,19 @@ pub trait CollapsePrivate: Clone + Send + Sized + Sized {
     where
         R: io::BufRead;
 
-    /// This method receives a line from the input data (including the trailing newline byte)
-    /// and should return `true` if the line represents the end of a stack; `false` otherwise.
-    fn is_end_of_stack(&self, line: &[u8]) -> bool;
+    /// The following method is used to determine how to chunk up the input data in order to
+    /// send it off to worker threads, which **must** receive full stacks (as opposed to partial
+    /// stacks). Since what comprises a "stack" will vary from format to format, implementors for
+    /// a specific format need to implement this method, which encodes how we know when we've
+    /// reached the end of a stack.
+    ///
+    /// This method **must** return `true` if the provided line represents the end of a stack;
+    /// `false` otherwise.
+    ///
+    /// If your format requires more information than merely a line of the input data in order
+    /// to determine whether or not you are at the end of a stack, you can access information
+    /// stored on the `self` instance, which is also available to you in this method.
+    fn would_end_stack(&self, line: &[u8]) -> bool;
 
     /// This method should return whether the implementation corresponds with
     /// the given input string, i.e. if the input data matches the collapser.
@@ -229,7 +239,7 @@ pub trait CollapsePrivate: Clone + Send + Sized + Sized {
                 }
                 let line = &buf[index..index + n];
                 index += n;
-                if self.is_end_of_stack(line) {
+                if self.would_end_stack(line) {
                     // If we've reached the end of a stack, count it.
                     nstacks += 1;
                     if nstacks == nstacks_per_job {
