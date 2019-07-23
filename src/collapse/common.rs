@@ -267,7 +267,7 @@ pub trait CollapsePrivate: Clone + Send + Sized + Sized {
             // on the input channel, in which case they should exit.
             drop(tx_input);
 
-            // The main thread needs to drop it's handle to the error sender here because we
+            // The main thread needs to drop its handle to the error sender here because we
             // are about to poll the error receiver for errors, which will block until all
             // the error senders have been dropped (including ours).
             drop(tx_error);
