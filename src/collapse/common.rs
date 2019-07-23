@@ -9,9 +9,21 @@ use fnv::FnvHashMap;
 use lazy_static::lazy_static;
 
 const CAPACITY_HASHMAP: usize = 512;
+
 pub(crate) const CAPACITY_READER: usize = 128 * 1024;
+
+/// Internal parameter (not exposed to users) that determines how many stacks of
+/// input data make up a "chunk" (unit that is sent to the threadpool for
+/// processing). Chosen by benchmarking various values using the following tests:
+/// * cargo test bench_nstacks_dtrace --release -- --ignored --nocapture
+/// * cargo test bench_nstacks_perf --release -- --ignored --nocapture
 pub(crate) const DEFAULT_NSTACKS_PER_JOB: usize = 100;
+
+/// A guess at the number of bytes contained in any given stack of any given format.
+/// Used to calculate the initial capacity of the vector used for sending input
+/// data across threads.
 const NBYTES_PER_STACK_GUESS: usize = 1024;
+
 const RUST_HASH_LENGTH: usize = 17;
 
 lazy_static! {
