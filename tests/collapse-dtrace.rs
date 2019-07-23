@@ -12,7 +12,7 @@ use pretty_assertions::assert_eq;
 use common::test_logger::CapturedLog;
 
 fn test_collapse_dtrace(test_file: &str, expected_file: &str, options: Options) -> io::Result<()> {
-    for n in 1..=2 {
+    for &n in &[1, 2] {
         let mut options = options.clone();
         options.nthreads = n;
         common::test_collapse(Folder::from(options), test_file, expected_file, false)?;
