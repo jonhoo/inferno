@@ -30,6 +30,8 @@ pub trait CollapsePrivate: Clone + Send + Sized {
     // ********************* REQUIRED METHODS ******************** //
     // *********************************************************** //
 
+    /// Process any header lines that precede the main body of samples.
+    ///
     /// Some formats, such as `dtrace`, contain a header or other non-stack
     /// information at the beginning of their input files. If header information
     /// is present, this method **must** consume it (i.e. advance the provided
@@ -37,8 +39,8 @@ pub trait CollapsePrivate: Clone + Send + Sized {
     ///
     /// This method also provides an opportunity to do processing of actual
     /// stack data on the main thread before worker threads are spun up. For
-    /// an example of why this might be necessary, see `perf`, which can require
-    /// reading the first stack in order to know how to process the rest.
+    /// example, `perf` requires reading the first stack in order to know how to
+    /// process the rest; so this method is used for that "upfront" processing.
     ///
     /// If the format you are working with does not contain header information
     /// or does not need any special, up-front processing, just have this method
@@ -47,10 +49,10 @@ pub trait CollapsePrivate: Clone + Send + Sized {
     where
         R: io::BufRead;
 
-    /// The primary method.
+    /// Process all samples in a chunk of input (the primary method).
     ///
-    /// It receives a reader whose header has already been consumed (see above), as
-    /// well as a mutable reference to an `Occurences` instance (just a hashamp that
+    /// This method receives a reader whose header has already been consumed (see above),
+    /// as well as a mutable reference to an `Occurences` instance (just a hashamp that
     /// works across multiple threads). Implementators should parse the stack data
     /// contained in the reader and write output to the provided `Occurrences` map.
     ///
@@ -65,13 +67,12 @@ pub trait CollapsePrivate: Clone + Send + Sized {
     where
         R: io::BufRead;
 
-    /// The following method is used to determine how to chunk up the input data in order to
-    /// send it off to worker threads, which **must** receive full stacks (as opposed to partial
-    /// stacks). Since what comprises a "stack" will vary from format to format, implementors for
-    /// a specific format need to implement this method, which encodes how we know when we've
-    /// reached the end of a stack.
+    /// Determine the end of a stack.
     ///
-    /// This method **must** return `true` if the provided line represents the end of a stack;
+    /// Worker threads **must** receive full stacks (as opposed to partial stacks); so this method
+    /// determines, for your specific format, when the end of a stack has been reached.
+    ///
+    /// This method should return `true` if the provided line represents the end of a stack;
     /// `false` otherwise.
     ///
     /// If your format requires more information than merely a line of the input data in order
@@ -81,24 +82,27 @@ pub trait CollapsePrivate: Clone + Send + Sized {
     /// `pre_process` method).
     fn would_end_stack(&mut self, line: &[u8]) -> bool;
 
-    /// This method should return whether the implementation corresponds with
-    /// the given input string, i.e. if the input data matches the collapser.
+    /// Determine if this format corresponds to the input data.
+    ///
+    /// This method, used by the `guess` collapser, should return whether or not the
+    /// implementation corresponds with the given input string, i.e. if the input data
+    /// matches the collapser.
     ///
     /// - `None` means "not sure -- need more input"
     /// - `Some(true)` means "yes, this implementation should work with this string"
     /// - `Some(false)` means "no, this implementation definitely won't work"
     fn is_applicable(&mut self, input: &str) -> Option<bool>;
 
-    /// This method should return the number of stacks per job to send to the threadpool.
+    /// Returns the number of stacks per job to send to the threadpool.
     fn nstacks_per_job(&self) -> usize;
 
-    /// This method should set the number of stacks per job to send to the threadpool.
+    /// Sets the number of stacks per job to send to the threadpool.
     fn set_nstacks_per_job(&mut self, n: usize);
 
-    /// This method should return the number of threads to use.
+    /// Returns the number of threads to use.
     fn nthreads(&self) -> usize;
 
-    /// This method should set the number of threads to use.
+    /// Sets the number of threads to use.
     fn set_nthreads(&mut self, n: usize);
 
     // *********************************************************** //
