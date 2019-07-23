@@ -185,7 +185,7 @@ impl CollapsePrivate for Folder {
     // * Using the method above: 281 MiB/s
     // * Using the method below: 437 MiB/s
     //
-    fn would_end_stack(&self, line: &[u8]) -> bool {
+    fn would_end_stack(&mut self, line: &[u8]) -> bool {
         // In order to return `true`, as we iterate over the provided bytes, we need to progress
         // through each of the follow states, in order; if we can't, immediately return `false`.
         #[allow(clippy::enum_variant_names)]

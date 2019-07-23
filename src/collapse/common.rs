@@ -75,9 +75,11 @@ pub trait CollapsePrivate: Clone + Send + Sized {
     /// `false` otherwise.
     ///
     /// If your format requires more information than merely a line of the input data in order
-    /// to determine whether or not you are at the end of a stack, you can access information
-    /// stored on the `self` instance, which is also available to you in this method.
-    fn would_end_stack(&self, line: &[u8]) -> bool;
+    /// to determine whether or not you are at the end of a stack, you can retreive/store
+    /// information on the `self` instance, which is also available to you in this method. This
+    /// method will be called for every line of input data (excluding those consumed by the
+    /// `pre_process` method).
+    fn would_end_stack(&mut self, line: &[u8]) -> bool;
 
     /// This method should return whether the implementation corresponds with
     /// the given input string, i.e. if the input data matches the collapser.
