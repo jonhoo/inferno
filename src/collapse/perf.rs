@@ -180,7 +180,7 @@ impl CollapsePrivate for Folder {
         Ok(())
     }
 
-    fn is_applicable_(&mut self, input: &str) -> Option<bool> {
+    fn is_applicable(&mut self, input: &str) -> Option<bool> {
         // Check if the input has an event line followed by a stack line.
 
         let mut last_line_was_event_line = false;
@@ -644,7 +644,7 @@ mod tests {
         let mut bytes = Vec::new();
         file.read_to_end(&mut bytes)?;
         let mut folder = Folder::default();
-        folder.collapse(&bytes[..], io::sink())
+        <Folder as Collapse>::collapse(&mut folder, &bytes[..], io::sink())
     }
 
     /// Varies the nstacks_per_job parameter and outputs the 10 fastests configurations by file.
@@ -696,12 +696,12 @@ mod tests {
                     Folder::from(options)
                 };
                 folder.nstacks_per_job = nstacks_per_job;
-                folder.collapse(&input[..], &mut buf_expected)?;
+                <Folder as Collapse>::collapse(&mut folder, &input[..], &mut buf_expected)?;
                 let expected = std::str::from_utf8(&buf_expected[..]).unwrap();
 
                 let mut folder = Folder::from(options.clone());
                 folder.nstacks_per_job = nstacks_per_job;
-                folder.collapse(&input[..], &mut buf_actual)?;
+                <Folder as Collapse>::collapse(&mut folder, &input[..], &mut buf_actual)?;
                 let actual = std::str::from_utf8(&buf_actual[..]).unwrap();
 
                 if actual != expected {

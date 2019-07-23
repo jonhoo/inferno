@@ -25,7 +25,7 @@ lazy_static! {
 /// `Collapse` trait as well. Implementing this trait gives you parallelism
 /// for free as long as you adhere to the requirements described in the
 /// comments below.
-pub trait CollapsePrivate: Clone + Send + Sized + Sized {
+pub trait CollapsePrivate: Clone + Send + Sized {
     // *********************************************************** //
     // ********************* REQUIRED METHODS ******************** //
     // *********************************************************** //
@@ -85,7 +85,7 @@ pub trait CollapsePrivate: Clone + Send + Sized + Sized {
     /// - `None` means "not sure -- need more input"
     /// - `Some(true)` means "yes, this implementation should work with this string"
     /// - `Some(false)` means "no, this implementation definitely won't work"
-    fn is_applicable_(&mut self, input: &str) -> Option<bool>;
+    fn is_applicable(&mut self, input: &str) -> Option<bool>;
 
     /// This method should return the number of stacks per job to send to the threadpool.
     fn nstacks_per_job(&self) -> usize;
@@ -103,7 +103,7 @@ pub trait CollapsePrivate: Clone + Send + Sized + Sized {
     // ******************** PROVIDED METHODS ********************* //
     // *********************************************************** //
 
-    fn collapse_<R, W>(&mut self, mut reader: R, writer: W) -> io::Result<()>
+    fn collapse<R, W>(&mut self, mut reader: R, writer: W) -> io::Result<()>
     where
         R: io::BufRead,
         W: io::Write,
@@ -536,13 +536,13 @@ pub(crate) mod testing {
         for (path, bytes) in read_inputs(inputs)? {
             folder.set_nthreads(1);
             let mut writer = Vec::new();
-            folder.collapse(&bytes[..], &mut writer)?;
+            <C as Collapse>::collapse(folder, &bytes[..], &mut writer)?;
             let expected = std::str::from_utf8(&writer[..]).unwrap();
 
             for n in 2..=MAX_THREADS {
                 folder.set_nthreads(n);
                 let mut writer = Vec::new();
-                folder.collapse(&bytes[..], &mut writer)?;
+                <C as Collapse>::collapse(folder, &bytes[..], &mut writer)?;
                 let actual = std::str::from_utf8(&writer[..]).unwrap();
 
                 assert_eq!(

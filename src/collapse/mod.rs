@@ -93,10 +93,10 @@ where
         R: io::BufRead,
         W: io::Write,
     {
-        self.collapse_(reader, writer)
+        <Self as CollapsePrivate>::collapse(self, reader, writer)
     }
 
     fn is_applicable(&mut self, input: &str) -> Option<bool> {
-        self.is_applicable_(input)
+        <Self as CollapsePrivate>::is_applicable(self, input)
     }
 }
