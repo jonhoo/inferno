@@ -3,13 +3,8 @@ use std::path::PathBuf;
 
 use env_logger::Env;
 use inferno::collapse::sample::{Folder, Options};
-use inferno::collapse::{Collapse, DEFAULT_NTHREADS};
-use lazy_static::lazy_static;
+use inferno::collapse::Collapse;
 use structopt::StructOpt;
-
-lazy_static! {
-    static ref NTHREADS: String = format!("{}", *DEFAULT_NTHREADS);
-}
 
 #[derive(Debug, StructOpt)]
 #[structopt(
