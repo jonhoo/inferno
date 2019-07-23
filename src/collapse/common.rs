@@ -262,7 +262,7 @@ pub trait CollapsePrivate: Clone + Send + Sized + Sized {
                 }
             }
 
-            // The main thread needs to drop it's handle to the input sender here because we
+            // The main thread needs to drop its handle to the input sender here because we
             // that's how we signal to the worker threads that there is no more data coming
             // on the input channel, in which case they should exit.
             drop(tx_input);
