@@ -6,6 +6,7 @@ use std::process::Command;
 
 use assert_cmd::prelude::*;
 use inferno::collapse::sample::{Folder, Options};
+use inferno::collapse::Collapse;
 use log::Level;
 use pretty_assertions::assert_eq;
 
@@ -72,23 +73,38 @@ fn collapse_sample_should_log_warning_for_ending_before_call_graph_start() {
 }
 
 #[test]
-fn collapse_sample_should_log_warning_for_ending_before_call_graph_end() {
-    test_collapse_sample_logs(
-        "./tests/data/collapse-sample/end-before-call-graph-end.txt",
-        |captured_logs| {
-            let nwarnings = captured_logs
-                .into_iter()
-                .filter(|log| {
-                    log.body == "File ended before end of call graph" && log.level == Level::Warn
-                })
-                .count();
+fn collapse_sample_should_error_for_ending_before_call_graph_end() -> io::Result<()> {
+    let path = "./tests/data/collapse-sample/end-before-call-graph-end.txt";
+    let mut collapser = Folder::default();
+    match collapser.collapse_file(Some(path), io::sink()) {
+        Ok(_) => panic!(
+            "Collapsing {:?} should have returned an error, but instead it returned Ok.",
+            path
+        ),
+        Err(e) => {
+            let kind = e.kind();
+            if kind != io::ErrorKind::InvalidData {
+                panic!(
+                    "Collapsing {:?} should have returned io::ErrorKind::InvalidData, \
+                     but instead it returned {:?}",
+                    path, kind,
+                );
+            }
+            let expected_message = "File ended before end of call graph.";
+            let inner = e.into_inner().expect(&format!(
+                "Collapsing {:?} should have returned an error with message {:?},
+                 but instead it returned an error that did not contain a message",
+                path, expected_message,
+            ));
+            let s = format!("{}", inner);
             assert_eq!(
-                nwarnings, 1,
-                "warning logged {} times, but should be logged exactly once",
-                nwarnings
+                &s, expected_message,
+                "Collapsing {:?} returned an error with the wrong message",
+                path
             );
-        },
-    );
+        }
+    }
+    Ok(())
 }
 
 #[test]

@@ -92,9 +92,10 @@ impl Collapse for Folder {
         loop {
             line.clear();
             if reader.read_line(&mut line)? == 0 {
-                warn!("File ended before end of call graph");
-                self.write_stack(&mut occurrences);
-                break;
+                return Err(io::Error::new(
+                    io::ErrorKind::InvalidData,
+                    "File ended before end of call graph.",
+                ));
             }
             let line = line.trim_end();
             if line.is_empty() {

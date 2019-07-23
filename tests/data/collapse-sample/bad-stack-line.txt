@@ -32,3 +32,6 @@ Call graph:
     +                     825 std::sys::unix::thread::Thread::join::h9bc404ce70591d96  (in rg) + 16  [0x103a10800]
     +                       825 _pthread_join  (in libsystem_pthread.dylib) + 358  [0x7fff739c76de]
     +                         825 __ulock_wait  (in libsystem_kernel.dylib) + 10  [0x7fff739069de]
+
+Total number in stack (recursive counted multiple, when >=5):
+REMOVED EVERYTHING BELOW HERE BECAUSE IT'S NOT USED
