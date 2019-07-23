@@ -10,7 +10,9 @@ const LINES_PER_ITERATION: usize = 10;
 /// Folder configuration options.
 #[derive(Clone, Debug)]
 pub struct Options {
-    /// The number of threads to use. Default is the number of logical cores on your machine.
+    /// The number of threads to use.
+    ///
+    /// Default is the number of logical cores on your machine.
     pub nthreads: usize,
 }
 

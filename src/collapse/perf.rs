@@ -27,31 +27,46 @@ mod logging {
 /// `perf` folder configuration options.
 #[derive(Clone, Debug)]
 pub struct Options {
-    /// Annotate JIT functions with a `_[j]` suffix. Default is `false`.
+    /// Annotate JIT functions with a `_[j]` suffix.
+    ///
+    /// Default is `false`.
     pub annotate_jit: bool,
 
-    /// Annotate kernel functions with a `_[k]` suffix. Default is `false`.
+    /// Annotate kernel functions with a `_[k]` suffix.
+    ///
+    /// Default is `false`.
     pub annotate_kernel: bool,
 
-    /// Demangle function names. Default is `false`.
+    /// Demangle function names.
+    ///
+    /// Default is `false`.
     pub demangle: bool,
 
     /// Only consider samples of the given event type (see `perf list`). If this option is
-    /// set to `None`, it will be set to the first encountered event type. Default is `None`.
+    /// set to `None`, it will be set to the first encountered event type.
+    ///
+    /// Default is `None`.
     pub event_filter: Option<String>,
 
     /// Include raw addresses (e.g., `0xbfff0836`) where symbols can't be found.
+    ///
     /// Default is `false`.
     pub include_addrs: bool,
 
     /// Include PID in the root frame. If disabled, the root frame is given the name of the
-    /// profiled process. Default is `false`.
+    /// profiled process.
+    ///
+    /// Default is `false`.
     pub include_pid: bool,
 
-    /// Include TID and PID in the root frame. Implies `include_pid`. Default is `false`.
+    /// Include TID and PID in the root frame. Implies `include_pid`.
+    ///
+    /// Default is `false`.
     pub include_tid: bool,
 
-    /// The number of threads to use. Default is the number of logical cores on your machine.
+    /// The number of threads to use.
+    ///
+    /// Default is the number of logical cores on your machine.
     pub nthreads: usize,
 }
 

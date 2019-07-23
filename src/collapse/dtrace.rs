@@ -9,13 +9,19 @@ use crate::collapse::common::{self, CollapsePrivate, Occurrences};
 /// `dtrace` folder configuration options.
 #[derive(Clone, Debug)]
 pub struct Options {
-    /// Demangle function names. Default is `false`.
+    /// Demangle function names.
+    ///
+    /// Default is `false`.
     pub demangle: bool,
 
-    /// Include function offset (except leafs). Default is `false`.
+    /// Include function offset (except leafs).
+    ///
+    /// Default is `false`.
     pub includeoffset: bool,
 
-    /// The number of threads to use. Default is the number of logical cores on your machine.
+    /// The number of threads to use.
+    ///
+    /// Default is the number of logical cores on your machine.
     pub nthreads: usize,
 }
 
