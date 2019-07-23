@@ -18,7 +18,7 @@ fn test_collapse_perf(
     options: Options,
     strip_quotes: bool,
 ) -> io::Result<()> {
-    for n in 1..=2 {
+    for &n in &[1, 2] {
         let mut options = options.clone();
         options.nthreads = n;
         common::test_collapse(
