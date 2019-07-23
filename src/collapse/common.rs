@@ -213,14 +213,18 @@ pub trait CollapsePrivate: Clone + Send + Sized + Sized {
                 handles.push(handle);
             }
 
-            // On the main thread...
-
-            // Drop the main thread's handle to the input receiver because, while we're still
-            // sending data, the way the main thread can learn that a worker thread has already
-            // errored and so we should stop sending data is to get a `SendError` from input
-            // channel when trying to send additional data to the worker threads, which will only
-            // happen if our handle to the receiver has been dropped.
+            // On the main thread, we're about to start sending data to the worker threads,
+            // but we only want to send data to the worker threads **if** they're still alive!
+            // (if one of them produces an error, all of them will exit early). To ensure we don't try
+            // to send data to dead worker threads, drop the main thread's handle to the input receiver
+            // here. This way, if all the workers die, every handle to the input receiver will have
+            // been dropped and we'll get an error when trying to send data on the input sender,
+            // which will tell us (the main thread) to stop trying to send data and, instead,
+            // skip to trying to pull an error off the error channel.
             drop(rx_input);
+
+            // Now that we've dropped the main thread's handle to the input sender, start
+            // trying to send data to the worker threads...
 
             let buf_capacity = usize::next_power_of_two(NBYTES_PER_STACK_GUESS * nstacks_per_job);
             let mut buf = Vec::with_capacity(buf_capacity);
@@ -262,7 +266,7 @@ pub trait CollapsePrivate: Clone + Send + Sized + Sized {
                 }
             }
 
-            // The main thread needs to drop its handle to the input sender here because we
+            // The main thread needs to drop its handle to the input sender here because
             // that's how we signal to the worker threads that there is no more data coming
             // on the input channel, in which case they should exit.
             drop(tx_input);
@@ -272,21 +276,19 @@ pub trait CollapsePrivate: Clone + Send + Sized + Sized {
             // the error senders have been dropped (including ours).
             drop(tx_error);
 
-            // Now we poll the error channel, which will block until either all work has been
-            // completely successfully, in which case `maybe_error` will be `None` or an error
-            // has occurred on one of the worker theads, in which case `maybe_error` will be
-            // `Some(<io::Error>)`.
-            let maybe_error = rx_error.iter().next();
+            // Now we poll the error channel, which will block until either:
+            // * all work has been completely successfully,
+            //   in which case the expression below will evaluate to `None`, or
+            // * an error has occurred on one of the worker theads,
+            //   in which case the expression below will evaluate to `Some(<io::Error>)`.
+            if let Some(e) = rx_error.iter().next() {
+                return Err(e);
+            }
 
-            // All the worker threads will have exited by now; so join their handles.
             for handle in handles {
                 handle.join().unwrap();
             }
 
-            // If there was indeed an error from one of the worker threads, propagate it.
-            if let Some(e) = maybe_error { Err(e)?; }
-
-            // Otherwise, return successfully.
             Ok(())
         })
         .unwrap()
