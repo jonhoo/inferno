@@ -91,6 +91,7 @@ impl Collapse for Folder {
             line.clear();
             if reader.read_line(&mut line)? == 0 {
                 warn!("File ended before end of call graph");
+                self.write_stack(&mut occurrences);
                 break;
             }
             let line = line.trim_end();
