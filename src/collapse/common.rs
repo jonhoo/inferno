@@ -68,9 +68,11 @@ pub trait CollapsePrivate: Clone + Send + Sized {
     /// works across multiple threads). Implementators should parse the stack data
     /// contained in the reader and write output to the provided `Occurrences` map.
     ///
-    /// So that this method may be called multiple times, all internal
-    /// state contained in `self` (e.g. any stack buffers or the like) **must** be
-    /// reset before this method returns. Also, this method may **not** use threads.
+    /// This method may be called multiple times to process batches of incoming samples.
+    /// Therefore, make sure that when end-of-file is reached, the collapser now considers
+    /// itself back at the top-level context (e.g., not in the middle of a stack). This
+    /// means that some internal state, e.g. stack buffers, must be reset by the time this
+    /// method returns. Other internal state, e.g. caches, however, may be kept.
     fn collapse_single_threaded<R>(
         &mut self,
         reader: R,
