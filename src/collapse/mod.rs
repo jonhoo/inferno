@@ -1,12 +1,12 @@
-/// Attempts to use whichever Collapse implementation is appropriate for a given input
-pub mod guess;
-
 /// Stack collapsing for the output of [`dtrace`](https://www.joyent.com/dtrace).
 ///
 /// See the [crate-level documentation] for details.
 ///
 ///   [crate-level documentation]: ../../index.html
 pub mod dtrace;
+
+/// Attempts to use whichever Collapse implementation is appropriate for a given input
+pub mod guess;
 
 /// Stack collapsing for the output of [`perf script`](https://linux.die.net/man/1/perf-script).
 ///
@@ -22,13 +22,18 @@ pub mod perf;
 ///   [crate-level documentation]: ../../index.html
 pub mod sample;
 
-pub(crate) mod util;
+pub(crate) mod common;
+
+// DEFAULT_NTHREADS is public because we use it in the help text of the binaries,
+// but it doesn't need to be exposed to library users, hence #[doc(hidden)].
+#[doc(hidden)]
+pub use self::common::DEFAULT_NTHREADS;
 
 use std::fs::File;
-use std::io::{self, Write};
+use std::io;
 use std::path::Path;
 
-const READER_CAPACITY: usize = 128 * 1024;
+use self::common::{CollapsePrivate, CAPACITY_READER};
 
 /// The abstract behavior of stack collapsing.
 ///
@@ -49,23 +54,23 @@ pub trait Collapse {
         R: io::BufRead,
         W: io::Write;
 
-    /// Collapses the contents of a file (or of STDIN if `infile` is `None`) and writes folded
-    /// stack lines to provided `writer`.
+    /// Collapses the contents of the provided file (or of STDIN if `infile` is `None`) and
+    /// writes folded stack lines to provided `writer`.
     fn collapse_file<P, W>(&mut self, infile: Option<P>, writer: W) -> io::Result<()>
     where
         P: AsRef<Path>,
-        W: Write,
+        W: io::Write,
     {
         match infile {
             Some(ref path) => {
                 let file = File::open(path)?;
-                let reader = io::BufReader::with_capacity(READER_CAPACITY, file);
+                let reader = io::BufReader::with_capacity(CAPACITY_READER, file);
                 self.collapse(reader, writer)
             }
             None => {
                 let stdio = io::stdin();
                 let stdio_guard = stdio.lock();
-                let reader = io::BufReader::with_capacity(READER_CAPACITY, stdio_guard);
+                let reader = io::BufReader::with_capacity(CAPACITY_READER, stdio_guard);
                 self.collapse(reader, writer)
             }
         }
@@ -77,4 +82,21 @@ pub trait Collapse {
     /// - `Some(true)` means "yes, this implementation should work with this string"
     /// - `Some(false)` means "no, this implementation definitely won't work"
     fn is_applicable(&mut self, input: &str) -> Option<bool>;
+}
+
+impl<T> Collapse for T
+where
+    T: CollapsePrivate,
+{
+    fn collapse<R, W>(&mut self, reader: R, writer: W) -> io::Result<()>
+    where
+        R: io::BufRead,
+        W: io::Write,
+    {
+        <Self as CollapsePrivate>::collapse(self, reader, writer)
+    }
+
+    fn is_applicable(&mut self, input: &str) -> Option<bool> {
+        <Self as CollapsePrivate>::is_applicable(self, input)
+    }
 }

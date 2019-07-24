@@ -1,14 +1,18 @@
-use assert_cmd::prelude::*;
-use inferno::flamegraph::{
-    self, color::BackgroundColor, color::PaletteMap, Direction, Options, Palette,
-};
-use log::Level;
-use pretty_assertions::assert_eq;
+mod common;
+
 use std::fs::{self, File};
 use std::io::{self, BufRead, BufReader, Cursor};
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::str::FromStr;
+
+use assert_cmd::cargo::CommandCargoExt;
+use inferno::flamegraph::color::{BackgroundColor, PaletteMap};
+use inferno::flamegraph::{self, Direction, Options, Palette};
+use log::Level;
+use pretty_assertions::assert_eq;
+
+use common::test_logger::{self, CapturedLog};
 
 fn test_flamegraph(
     input_file: &str,
@@ -99,7 +103,7 @@ where
 
 fn test_flamegraph_logs<F>(input_file: &str, asserter: F)
 where
-    F: Fn(&Vec<testing_logger::CapturedLog>),
+    F: Fn(&Vec<CapturedLog>),
 {
     test_flamegraph_logs_with_options(input_file, asserter, Default::default());
 }
@@ -109,13 +113,13 @@ fn test_flamegraph_logs_with_options<F>(
     asserter: F,
     mut options: flamegraph::Options<'_>,
 ) where
-    F: Fn(&Vec<testing_logger::CapturedLog>),
+    F: Fn(&Vec<CapturedLog>),
 {
-    testing_logger::setup();
+    test_logger::init();
     let r = File::open(input_file).unwrap();
     let sink = io::sink();
     let _ = flamegraph::from_reader(&mut options, r, sink);
-    testing_logger::validate(asserter);
+    test_logger::validate(asserter);
 }
 
 #[test]
@@ -246,10 +250,10 @@ fn flamegraph_nameattr_duplicate_attributes() {
 
 #[test]
 fn flamegraph_nameattr_should_warn_about_duplicate_attributes() {
-    testing_logger::setup();
+    test_logger::init();
     let nameattr_file = "./tests/data/flamegraph/nameattr/nameattr_duplicate_attributes.txt";
     let _ = flamegraph::FuncFrameAttrsMap::from_file(&PathBuf::from(nameattr_file));
-    testing_logger::validate(|captured_logs| {
+    test_logger::validate(|captured_logs| {
         let nwarnings = captured_logs
             .into_iter()
             .filter(|log| log.body.starts_with("duplicate attribute") && log.level == Level::Warn)
@@ -264,10 +268,10 @@ fn flamegraph_nameattr_should_warn_about_duplicate_attributes() {
 
 #[test]
 fn flamegraph_nameattr_should_warn_about_invalid_attribute() {
-    testing_logger::setup();
+    test_logger::init();
     let nameattr_file = "./tests/data/flamegraph/nameattr/nameattr_invalid_attribute.txt";
     let _ = flamegraph::FuncFrameAttrsMap::from_file(&PathBuf::from(nameattr_file));
-    testing_logger::validate(|captured_logs| {
+    test_logger::validate(|captured_logs| {
         let nwarnings = captured_logs
             .into_iter()
             .filter(|log| log.body.starts_with("invalid attribute") && log.level == Level::Warn)
@@ -366,10 +370,10 @@ fn flamegraph_palette_map() {
 
 #[test]
 fn flamegraph_palette_map_should_warn_about_invalid_lines() {
-    testing_logger::setup();
+    test_logger::init();
     let palette_file = "./tests/data/flamegraph/palette-map/palette_invalid.map";
     let _ = load_palette_map_file(palette_file);
-    testing_logger::validate(|captured_logs| {
+    test_logger::validate(|captured_logs| {
         let nwarnings = captured_logs
             .into_iter()
             .filter(|log| {

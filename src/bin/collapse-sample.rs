@@ -1,10 +1,10 @@
-use env_logger::Env;
 use std::io;
 use std::path::PathBuf;
-use structopt::StructOpt;
 
+use env_logger::Env;
 use inferno::collapse::sample::{Folder, Options};
 use inferno::collapse::Collapse;
+use structopt::StructOpt;
 
 #[derive(Debug, StructOpt)]
 #[structopt(
@@ -15,6 +15,9 @@ use inferno::collapse::Collapse;
             sample 1234 -file out.sample_stacks"
 )]
 struct Opt {
+    // ************* //
+    // *** FLAGS *** //
+    // ************* //
     /// Don't include modules with function names
     #[structopt(long = "no-modules")]
     no_modules: bool,
@@ -27,7 +30,11 @@ struct Opt {
     #[structopt(short = "v", long = "verbose", parse(from_occurrences))]
     verbose: usize,
 
+    // ************ //
+    // *** ARGS *** //
+    // ************ //
     /// sample output file, or STDIN if not specified
+    #[structopt(value_name = "PATH")]
     infile: Option<PathBuf>,
 }
 

@@ -1,0 +1,73 @@
+language: rust
+cache: cargo
+rust:
+  - 1.32.0 # uniform paths
+  - stable
+  - beta
+  - nightly
+os: linux
+# Currently must run tests with `--test-threads=1` because we're testing
+# the contents of log messages in our tests and the current logging
+# infrastructure does not support that well for multithreaded code.
+# See comment at top of `tests/common/test_logger.rs` for more detail.
+# We plan to switch out our logging infrastructure for a solution that
+# is more robust to multithreaded code in the future. See issue #TBD.
+script: cargo test --no-fail-fast --verbose --all -- --test-threads=1
+
+# always test things that aren't pushes (like PRs)
+# never test tags or pushes to non-master branches (wait for PR)
+# https://github.com/travis-ci/travis-ci/issues/2200#issuecomment-441395545)
+if: type != push OR (tag IS blank AND branch = master)
+
+jobs:
+  allow_failures:
+    - rust: nightly
+  include:
+    - stage: check # do a pre-screen to make sure this is even worth testing
+      script: cargo check --all-targets
+      rust: stable
+    - stage: test
+      rust: stable
+      os: osx
+    - rust: stable
+      os: windows
+    - stage: lint # we lint on beta to future-proof
+      name: "Rust: beta, rustfmt"
+      rust: beta
+      os: linux
+      script:
+        - rustup component add rustfmt-preview
+        - cargo fmt -v -- --check
+    - name: "Rust: nightly, rustfmt" # and on nightly with allow_fail
+      rust: nightly
+      os: linux
+      script:
+        - rustup component add rustfmt-preview
+        - cargo fmt -v -- --check
+    - name: "Rust: beta, clippy"
+      rust: beta
+      os: linux
+      script:
+        - rustup component add clippy-preview
+        - touch ./src/lib.rs && cargo clippy -- -D warnings
+    - name: "Rust: nightly, clippy"
+      rust: nightly
+      os: linux
+      script:
+        - rustup component add clippy-preview
+        - touch ./src/lib.rs && cargo clippy -- -D warnings
+    - os: linux
+      stage: coverage
+      sudo: required
+      dist: trusty
+      cache: false
+      services:
+        - docker
+      script:
+        - docker run --security-opt seccomp=unconfined -v "$PWD:/volume" xd009642/tarpaulin:latest sh -c "cargo tarpaulin --out Xml"
+        - bash <(curl -s https://codecov.io/bash)
+stages:
+ - check
+ - test
+ - lint
+ - coverage

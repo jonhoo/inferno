@@ -1,13 +1,13 @@
-use super::{Direction, Options};
-use quick_xml::{
-    events::{BytesEnd, BytesStart, BytesText, Event},
-    Writer,
-};
 use std::borrow::Cow;
 use std::cell::RefCell;
 use std::io::prelude::*;
 use std::iter;
+
+use quick_xml::events::{BytesEnd, BytesStart, BytesText, Event};
+use quick_xml::Writer;
 use str_stack::StrStack;
+
+use super::{Direction, Options};
 
 pub(super) enum TextArgument<'a> {
     String(Cow<'a, str>),

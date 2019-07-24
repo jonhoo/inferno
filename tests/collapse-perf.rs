@@ -1,14 +1,16 @@
-mod collapse_common;
+mod common;
 
-use assert_cmd::prelude::*;
-use collapse_common::*;
-use inferno::collapse::perf::{Folder, Options};
-use log::Level;
-use pretty_assertions::assert_eq;
 use std::fs::File;
 use std::io::{self, BufReader, Cursor};
 use std::path::Path;
 use std::process::{Command, Stdio};
+
+use assert_cmd::cargo::CommandCargoExt;
+use inferno::collapse::perf::{Folder, Options};
+use log::Level;
+use pretty_assertions::assert_eq;
+
+use common::test_logger::CapturedLog;
 
 fn test_collapse_perf(
     test_file: &str,
@@ -16,26 +18,32 @@ fn test_collapse_perf(
     options: Options,
     strip_quotes: bool,
 ) -> io::Result<()> {
-    test_collapse(
-        Folder::from(options),
-        test_file,
-        expected_file,
-        strip_quotes,
-    )
+    for &n in &[1, 2] {
+        let mut options = options.clone();
+        options.nthreads = n;
+        common::test_collapse(
+            Folder::from(options),
+            test_file,
+            expected_file,
+            strip_quotes,
+        )?;
+    }
+    Ok(())
+}
+
+fn test_collapse_perf_logs_with_options<F>(input_file: &str, asserter: F, mut options: Options)
+where
+    F: Fn(&Vec<CapturedLog>),
+{
+    options.nthreads = 2;
+    common::test_collapse_logs(Folder::from(options), input_file, asserter);
 }
 
 fn test_collapse_perf_logs<F>(input_file: &str, asserter: F)
 where
-    F: Fn(&Vec<testing_logger::CapturedLog>),
+    F: Fn(&Vec<CapturedLog>),
 {
     test_collapse_perf_logs_with_options(input_file, asserter, Options::default());
-}
-
-fn test_collapse_perf_logs_with_options<F>(input_file: &str, asserter: F, options: Options)
-where
-    F: Fn(&Vec<testing_logger::CapturedLog>),
-{
-    test_collapse_logs(Folder::from(options), input_file, asserter);
 }
 
 fn options_from_vec(opt_vec: Vec<&str>) -> Options {
@@ -98,9 +106,7 @@ macro_rules! collapse_perf_tests_inner {
                 results_path.join(result_file).to_str().unwrap(),
                 options_from_vec(options),
                 $strip_quotes
-            )
-
-                .unwrap()
+            ).unwrap()
         }
     )*
     }
@@ -245,7 +251,7 @@ fn collapse_perf_should_warn_about_empty_input_lines() {
             let nwarnings = captured_logs
                 .into_iter()
                 .filter(|log| {
-                    log.body.starts_with("weird event line: ") && log.level == Level::Warn
+                    log.body.starts_with("Weird event line: ") && log.level == Level::Warn
                 })
                 .count();
             assert_eq!(
@@ -265,7 +271,7 @@ fn collapse_perf_should_warn_about_weird_input_lines() {
             let nwarnings = captured_logs
                 .into_iter()
                 .filter(|log| {
-                    log.body.starts_with("weird stack line: ") && log.level == Level::Warn
+                    log.body.starts_with("Weird stack line: ") && log.level == Level::Warn
                 })
                 .count();
             assert_eq!(
@@ -306,7 +312,7 @@ fn collapse_perf_cli() {
         .output()
         .expect("failed to execute process");
     let expected = BufReader::new(File::open(expected_file).unwrap());
-    compare_results(Cursor::new(output.stdout), expected, expected_file, true);
+    common::compare_results(Cursor::new(output.stdout), expected, expected_file, true);
 
     // Test with STDIN
     let mut child = Command::cargo_bin("inferno-collapse-perf")
@@ -321,5 +327,5 @@ fn collapse_perf_cli() {
     io::copy(&mut input, stdin).unwrap();
     let output = child.wait_with_output().expect("Failed to read stdout");
     let expected = BufReader::new(File::open(expected_file).unwrap());
-    compare_results(Cursor::new(output.stdout), expected, expected_file, true);
+    common::compare_results(Cursor::new(output.stdout), expected, expected_file, true);
 }

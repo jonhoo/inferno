@@ -1,9 +1,9 @@
+use std::fs::File;
+use std::io::{self, prelude::*};
+use std::path::Path;
+
 use fnv::FnvHashMap;
 use log::warn;
-use std::fs::File;
-use std::io;
-use std::io::prelude::*;
-use std::path::Path;
 
 const READER_CAPACITY: usize = 128 * 1024;
 

@@ -85,10 +85,3 @@ CPU     ID                    FUNCTION:NAME
               libsystem_pthread.dylib`_pthread_start+0x42
               libsystem_pthread.dylib`thread_start+0xd
                 1
-
-              rg`__ZN6memchr3x863avx6memchr17hc74ea6bdc6b1e860E+0xa6
-              rg`__ZN75_$LT$grep_regex..matcher..RegexMatcher$u20$as$u20$grep_matcher..Matcher$GT$19find_candidate_line17h33f9c077c6589c2aE+0x14e
-              rg`__ZN76_$LT$grep_searcher..searcher..core..Core$LT$$u27$s$C$$u20$M$C$$u20$S$GT$$GT$13match_by_line17hed1d0226a7a67d03E+0x813
-              rg`__ZN91_$LT$grep_searcher..searcher..glue..ReadByLine$LT$$u27$s$C$$u20$M$C$$u20$R$C$$u20$S$GT$$GT$3run17h30ecedc997ad7e32E+0x26f
-              rg`__ZN13grep_searcher8searcher8Searcher11search_path17h4867309d69f27419E+0xb59
-              rg`__ZN42_$LT$rg..search..SearchWorker$LT$W$GT$$GT$11search_impl17hcf61284e58f410e0E.llvm.17269878581919215071+0x1585

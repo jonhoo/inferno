@@ -9,25 +9,24 @@ pub mod color;
 mod merge;
 mod svg;
 
-pub use attrs::FuncFrameAttrsMap;
-pub use color::Palette;
-
-use crate::flamegraph::color::{Color, SearchColor};
-use attrs::FrameAttrs;
-use log::{error, warn};
-use num_format::Locale;
-use quick_xml::{
-    events::{BytesEnd, BytesStart, BytesText, Event},
-    Writer,
-};
 use std::fs::File;
 use std::io::prelude::*;
 use std::io::{self, BufReader};
 use std::iter;
 use std::path::PathBuf;
 use std::str::FromStr;
+
+use log::{error, warn};
+use num_format::Locale;
+use quick_xml::events::{BytesEnd, BytesStart, BytesText, Event};
+use quick_xml::Writer;
 use str_stack::StrStack;
-use svg::{Dimension, StyleOptions};
+
+use self::attrs::FrameAttrs;
+pub use self::attrs::FuncFrameAttrsMap;
+pub use self::color::Palette;
+use self::color::{Color, SearchColor};
+use self::svg::{Dimension, StyleOptions};
 
 const XPAD: usize = 10; // pad left and right
 const FRAMEPAD: usize = 1; // vertical padding for frames

@@ -1,18 +1,50 @@
-use super::Collapse;
-use super::{dtrace, perf, sample};
-use log::{error, info};
 use std::io::prelude::*;
 use std::io::{self, Cursor};
 
+use log::{error, info};
+
+use crate::collapse::{self, dtrace, perf, sample, Collapse};
+
 const LINES_PER_ITERATION: usize = 10;
+
+/// Folder configuration options.
+#[derive(Clone, Debug)]
+pub struct Options {
+    /// The number of threads to use.
+    ///
+    /// Default is the number of logical cores on your machine.
+    pub nthreads: usize,
+}
+
+impl Default for Options {
+    fn default() -> Self {
+        Self {
+            nthreads: *collapse::DEFAULT_NTHREADS,
+        }
+    }
+}
 
 /// A collapser that tries to find an appropriate implementation of `Collapse`
 /// based on the input, then delegates to that collapser if one is found.
 ///
 /// If no applicable collapser is found, an error will be logged and
 /// nothing will be written.
-#[derive(Default)]
-pub struct Folder {}
+#[derive(Clone)]
+pub struct Folder {
+    opt: Options,
+}
+
+impl From<Options> for Folder {
+    fn from(opt: Options) -> Self {
+        Self { opt }
+    }
+}
+
+impl Default for Folder {
+    fn default() -> Self {
+        Options::default().into()
+    }
+}
 
 impl Collapse for Folder {
     fn collapse<R, W>(&mut self, mut reader: R, writer: W) -> io::Result<()>
@@ -20,9 +52,17 @@ impl Collapse for Folder {
         R: io::BufRead,
         W: io::Write,
     {
-        let mut perf = perf::Folder::from(perf::Options::default());
-        let mut dtrace = dtrace::Folder::from(dtrace::Options::default());
-        let mut sample = sample::Folder::from(sample::Options::default());
+        let mut dtrace = {
+            let mut options = dtrace::Options::default();
+            options.nthreads = self.opt.nthreads;
+            dtrace::Folder::from(options)
+        };
+        let mut perf = {
+            let mut options = perf::Options::default();
+            options.nthreads = self.opt.nthreads;
+            perf::Folder::from(options)
+        };
+        let mut sample = sample::Folder::default();
 
         // Each Collapse impl gets its own flag in this array.
         // It gets set to true when the impl has been ruled out.

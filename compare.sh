@@ -18,3 +18,13 @@ cargo build --release --bin inferno-collapse-dtrace
 f=flamegraph/example-dtrace-stacks.txt
 echo "==>  dtrace  <=="
 hyperfine --warmup 20 -m 50 "$BIN/inferno-collapse-dtrace $f" "./flamegraph/stackcollapse.pl $f"
+
+echo
+echo
+
+cargo build --release --bin inferno-collapse-sample
+f=tests/data/collapse-sample/large.txt
+zcat tests/data/collapse-sample/large.txt.gz > "$f"
+echo "==>  sample  <=="
+hyperfine --warmup 20 -m 50 "$BIN/inferno-collapse-sample $f" "./flamegraph/stackcollapse-sample.awk $f"
+rm "$f"

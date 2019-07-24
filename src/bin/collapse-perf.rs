@@ -1,10 +1,15 @@
-use env_logger::Env;
 use std::io;
 use std::path::PathBuf;
+
+use env_logger::Env;
+use inferno::collapse::perf::{Folder, Options};
+use inferno::collapse::{Collapse, DEFAULT_NTHREADS};
+use lazy_static::lazy_static;
 use structopt::StructOpt;
 
-use inferno::collapse::perf::{Folder, Options};
-use inferno::collapse::Collapse;
+lazy_static! {
+    static ref NTHREADS: String = format!("{}", *DEFAULT_NTHREADS);
+}
 
 #[derive(Debug, StructOpt)]
 #[structopt(
@@ -18,33 +23,36 @@ use inferno::collapse::Collapse;
     If you save this output add --header on Linux >= 3.14 to include perf info."
 )]
 struct Opt {
-    /// include PID with process names [1]
-    #[structopt(long = "pid")]
-    include_pid: bool,
-
-    /// include TID and PID with process names [1]
-    #[structopt(long = "tid")]
-    include_tid: bool,
-
-    /// include raw addresses where symbols can't be found
+    // ************* //
+    // *** FLAGS *** //
+    // ************* //
+    /// Include raw addresses where symbols can't be found
     #[structopt(long = "addrs")]
-    include_addrs: bool,
+    addrs: bool,
 
-    /// annotate jit functions with a _[j]
-    #[structopt(long = "jit")]
-    annotate_jit: bool,
-
-    /// annotate kernel functions with a _[k]
-    #[structopt(long = "kernel")]
-    annotate_kernel: bool,
-
-    /// all annotations (--kernel --jit)
+    /// All annotations (--kernel --jit)
     #[structopt(long = "all")]
-    annotate_all: bool,
+    all: bool,
 
-    /// event name filter, defaults to first encountered event
-    #[structopt(long = "event-filter", value_name = "EVENT")]
-    event_filter: Option<String>,
+    /// Demangle function names
+    #[structopt(long = "demangle")]
+    demangle: bool,
+
+    /// Annotate jit functions with a _[j]
+    #[structopt(long = "jit")]
+    jit: bool,
+
+    /// Annotate kernel functions with a _[k]
+    #[structopt(long = "kernel")]
+    kernel: bool,
+
+    /// Include PID with process names
+    #[structopt(long = "pid")]
+    pid: bool,
+
+    /// Include TID and PID with process names
+    #[structopt(long = "tid")]
+    tid: bool,
 
     /// Silence all log output
     #[structopt(short = "q", long = "quiet")]
@@ -54,11 +62,27 @@ struct Opt {
     #[structopt(short = "v", long = "verbose", parse(from_occurrences))]
     verbose: usize,
 
-    /// Demangle function names
-    #[structopt(long = "demangle")]
-    demangle: bool,
+    // *************** //
+    // *** OPTIONS *** //
+    // *************** //
+    /// Event filter [default: first encountered event]
+    #[structopt(long = "event-filter", value_name = "STRING")]
+    event_filter: Option<String>,
 
-    /// perf script output file, or STDIN if not specified
+    /// Number of threads to use
+    #[structopt(
+        short = "n",
+        long = "nthreads",
+        raw(default_value = "&NTHREADS"),
+        value_name = "UINT"
+    )]
+    nthreads: usize,
+
+    // ************ //
+    // *** ARGS *** //
+    // ************ //
+    #[structopt(value_name = "PATH")]
+    /// Perf script output file, or STDIN if not specified
     infile: Option<PathBuf>,
 }
 
@@ -67,13 +91,14 @@ impl Opt {
         (
             self.infile,
             Options {
-                include_pid: self.include_pid,
-                include_tid: self.include_tid,
-                include_addrs: self.include_addrs,
-                annotate_jit: self.annotate_jit || self.annotate_all,
-                annotate_kernel: self.annotate_kernel || self.annotate_all,
-                event_filter: self.event_filter,
+                include_pid: self.pid,
+                include_tid: self.tid,
+                include_addrs: self.addrs,
+                annotate_jit: self.jit || self.all,
+                annotate_kernel: self.kernel || self.all,
                 demangle: self.demangle,
+                event_filter: self.event_filter,
+                nthreads: self.nthreads,
             },
         )
     }

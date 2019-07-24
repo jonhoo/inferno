@@ -1,10 +1,15 @@
-use env_logger::Env;
 use std::io;
 use std::path::PathBuf;
+
+use env_logger::Env;
+use inferno::collapse::dtrace::{Folder, Options};
+use inferno::collapse::{Collapse, DEFAULT_NTHREADS};
+use lazy_static::lazy_static;
 use structopt::StructOpt;
 
-use inferno::collapse::dtrace::{Folder, Options};
-use inferno::collapse::Collapse;
+lazy_static! {
+    static ref NTHREADS: String = format!("{}", *DEFAULT_NTHREADS);
+}
 
 #[derive(Debug, StructOpt)]
 #[structopt(
@@ -18,6 +23,17 @@ use inferno::collapse::Collapse;
     "
 )]
 struct Opt {
+    // ************* //
+    // *** FLAGS *** //
+    // ************* //
+    /// Demangle function names
+    #[structopt(long = "demangle")]
+    demangle: bool,
+
+    /// Include offsets
+    #[structopt(long = "includeoffset")]
+    includeoffset: bool,
+
     /// Silence all log output
     #[structopt(short = "q", long = "quiet")]
     quiet: bool,
@@ -26,15 +42,23 @@ struct Opt {
     #[structopt(short = "v", long = "verbose", parse(from_occurrences))]
     verbose: usize,
 
-    /// Include offsets
-    #[structopt(long = "includeoffset")]
-    includeoffset: bool,
+    // *************** //
+    // *** OPTIONS *** //
+    // *************** //
+    /// Number of threads to use.
+    #[structopt(
+        short = "n",
+        long = "nthreads",
+        raw(default_value = "&NTHREADS"),
+        value_name = "UINT"
+    )]
+    nthreads: usize,
 
-    /// Demangle function names
-    #[structopt(long = "demangle")]
-    demangle: bool,
-
-    /// perf script output file, or STDIN if not specified
+    // ************ //
+    // *** ARGS *** //
+    // ************ //
+    #[structopt(value_name = "PATH")]
+    /// Dtrace script output file, or STDIN if not specified
     infile: Option<PathBuf>,
 }
 
@@ -43,8 +67,9 @@ impl Opt {
         (
             self.infile,
             Options {
-                includeoffset: self.includeoffset,
                 demangle: self.demangle,
+                includeoffset: self.includeoffset,
+                nthreads: self.nthreads,
             },
         )
     }

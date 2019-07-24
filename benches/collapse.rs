@@ -1,71 +1,102 @@
-use criterion::*;
-use inferno::collapse::dtrace;
-use inferno::collapse::perf;
-use inferno::collapse::sample;
-use inferno::collapse::Collapse;
-use libflate::gzip::Decoder;
 use std::fs::File;
-use std::io::{self, BufReader, Read};
+use std::io::{self, Read};
 
-fn collapse_benchmark<C>(c: &mut Criterion, mut collapser: C, id: &str, infile: &str)
-where
-    C: 'static + Collapse,
-{
-    let mut f = File::open(infile).expect("file not found");
+use criterion::*;
+use inferno::collapse::{dtrace, perf, sample, Collapse};
+use lazy_static::lazy_static;
+use libflate::gzip::Decoder;
 
-    let mut bytes = Vec::new();
+const INFILE_DTRACE: &str = "flamegraph/example-dtrace-stacks.txt";
+const INFILE_PERF: &str = "flamegraph/example-perf-stacks.txt.gz";
+const INFILE_SAMPLE: &str = "tests/data/collapse-sample/large.txt.gz";
+const SAMPLE_SIZE: usize = 100;
+
+lazy_static! {
+    static ref NTHREADS: usize = num_cpus::get();
+}
+
+fn read_infile(infile: &str, buf: &mut Vec<u8>) -> io::Result<()> {
+    let mut f = File::open(infile)?;
     if infile.ends_with(".gz") {
-        let mut r = BufReader::new(Decoder::new(f).unwrap());
-        r.read_to_end(&mut bytes).expect("Could not read file");
+        let mut r = io::BufReader::new(Decoder::new(f)?);
+        r.read_to_end(buf)?;
     } else {
-        f.read_to_end(&mut bytes).expect("Could not read file");
+        f.read_to_end(buf)?;
     }
+    Ok(())
+}
 
-    c.bench(
-        "collapse",
-        ParameterizedBenchmark::new(
-            id,
-            move |b, data| {
-                b.iter(|| {
-                    let reader = BufReader::new(data.as_slice());
-                    let _folder = collapser.collapse(reader, io::sink());
+macro_rules! benchmark_single {
+    ($name:ident, $name_str:expr, $infile:expr) => {
+        fn $name(c: &mut Criterion) {
+            let mut bytes = Vec::new();
+            read_infile($infile, &mut bytes).unwrap();
+
+            let mut collapser = $name::Folder::default();
+
+            c.bench(
+                "collapse",
+                ParameterizedBenchmark::new(
+                    $name_str,
+                    move |b, data| {
+                        b.iter(|| {
+                            let _result = collapser.collapse(data.as_slice(), io::sink());
+                        })
+                    },
+                    vec![bytes],
+                )
+                .throughput(|bytes| Throughput::Bytes(bytes.len() as u32))
+                .sample_size(SAMPLE_SIZE),
+            );
+        }
+    };
+}
+
+macro_rules! benchmark_multi {
+    ($name:ident, $name_str:expr, $infile:expr) => {
+        fn $name(c: &mut Criterion) {
+            let mut bytes = Vec::new();
+            read_infile($infile, &mut bytes).unwrap();
+
+            let mut collapser1 = {
+                let mut options = $name::Options::default();
+                options.nthreads = 1;
+                $name::Folder::from(options)
+            };
+
+            let mut collapser2 = {
+                let mut options = $name::Options::default();
+                options.nthreads = *NTHREADS;
+                $name::Folder::from(options)
+            };
+
+            c.bench(
+                "collapse",
+                ParameterizedBenchmark::new(
+                    format!("{}/1", $name_str),
+                    move |b, data| {
+                        b.iter(|| {
+                            let _result = collapser1.collapse(data.as_slice(), io::sink());
+                        })
+                    },
+                    vec![bytes],
+                )
+                .with_function(format!("{}/{}", $name_str, *NTHREADS), move |b, data| {
+                    b.iter(|| {
+                        let _result = collapser2.collapse(data.as_slice(), io::sink());
+                    })
                 })
-            },
-            vec![bytes],
-        )
-        .throughput(|bytes| Throughput::Bytes(bytes.len() as u32)),
-    );
+                .throughput(|bytes| Throughput::Bytes(bytes.len() as u32))
+                .sample_size(SAMPLE_SIZE),
+            );
+        }
+    };
 }
 
-fn dtrace(c: &mut Criterion) {
-    let infile = "flamegraph/example-dtrace-stacks.txt";
-    collapse_benchmark(
-        c,
-        dtrace::Folder::from(dtrace::Options::default()),
-        "dtrace",
-        infile,
-    );
-}
-
-fn perf(c: &mut Criterion) {
-    let infile = "flamegraph/example-perf-stacks.txt.gz";
-    collapse_benchmark(
-        c,
-        perf::Folder::from(perf::Options::default()),
-        "perf",
-        infile,
-    );
-}
-
-fn sample(c: &mut Criterion) {
-    let infile = "tests/data/collapse-sample/sample.txt";
-    collapse_benchmark(
-        c,
-        sample::Folder::from(sample::Options::default()),
-        "sample",
-        infile,
-    );
-}
+benchmark_multi!(dtrace, "dtrace", INFILE_DTRACE);
+benchmark_multi!(perf, "perf", INFILE_PERF);
+benchmark_single!(sample, "sample", INFILE_SAMPLE);
 
 criterion_group!(benches, dtrace, perf, sample);
+
 criterion_main!(benches);

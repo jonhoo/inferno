@@ -1,58 +1,87 @@
-use super::util::fix_partially_demangled_rust_symbol;
-use super::Collapse;
-use fnv::FnvHashMap;
-use log::warn;
 use std::collections::VecDeque;
-use std::io;
-use std::io::prelude::*;
+use std::io::{self, BufRead};
+
 use symbolic_demangle::demangle;
+
+use crate::collapse::common::{self, CollapsePrivate, Occurrences};
 
 const TIDY_GENERIC: bool = true;
 const TIDY_JAVA: bool = true;
 
-/// Settings that change how frames are named from the incoming stack traces.
-///
-/// All options default to off.
-#[derive(Clone, Debug, Default)]
+mod logging {
+    use log::{info, warn};
+
+    pub(super) fn filtering_for_events_of_type(ty: &str) {
+        info!("Filtering for events of type: {}", ty);
+    }
+
+    pub(super) fn weird_event_line(line: &str) {
+        warn!("Weird event line: {}", line);
+    }
+
+    pub(super) fn weird_stack_line(line: &str) {
+        warn!("Weird stack line: {}", line);
+    }
+}
+
+/// `perf` folder configuration options.
+#[derive(Clone, Debug)]
 pub struct Options {
-    /// Include PID in the root frame.
-    ///
-    /// If disabled, the root frame is given the name of the profiled process.
-    pub include_pid: bool,
-
-    /// Include TID and PID in the root frame.
-    ///
-    /// Implies `include_pid`.
-    pub include_tid: bool,
-
-    /// Include raw addresses (e.g., `0xbfff0836`) where symbols can't be found.
-    pub include_addrs: bool,
-
     /// Annotate JIT functions with a `_[j]` suffix.
+    ///
+    /// Default is `false`.
     pub annotate_jit: bool,
 
     /// Annotate kernel functions with a `_[k]` suffix.
+    ///
+    /// Default is `false`.
     pub annotate_kernel: bool,
 
-    /// Demangle function names
+    /// Demangle function names.
+    ///
+    /// Default is `false`.
     pub demangle: bool,
 
-    /// Only consider samples of the given event type (see `perf list`).
+    /// Only consider samples of the given event type (see `perf list`). If this option is
+    /// set to `None`, it will be set to the first encountered event type.
     ///
-    /// If this option is set to `None`, it will be set to the first encountered event type.
+    /// Default is `None`.
     pub event_filter: Option<String>,
+
+    /// Include raw addresses (e.g., `0xbfff0836`) where symbols can't be found.
+    ///
+    /// Default is `false`.
+    pub include_addrs: bool,
+
+    /// Include PID in the root frame. If disabled, the root frame is given the name of the
+    /// profiled process.
+    ///
+    /// Default is `false`.
+    pub include_pid: bool,
+
+    /// Include TID and PID in the root frame. Implies `include_pid`.
+    ///
+    /// Default is `false`.
+    pub include_tid: bool,
+
+    /// The number of threads to use.
+    ///
+    /// Default is the number of logical cores on your machine.
+    pub nthreads: usize,
 }
 
-#[derive(Copy, Clone, Debug)]
-enum EventFilterState {
-    None,
-    Defaulted,
-    Warned,
-}
-
-impl Default for EventFilterState {
+impl Default for Options {
     fn default() -> Self {
-        EventFilterState::None
+        Self {
+            annotate_jit: false,
+            annotate_kernel: false,
+            demangle: false,
+            event_filter: None,
+            include_addrs: false,
+            include_pid: false,
+            include_tid: false,
+            nthreads: *common::DEFAULT_NTHREADS,
+        }
     }
 }
 
@@ -60,10 +89,32 @@ impl Default for EventFilterState {
 ///
 /// To construct one, either use `perf::Folder::default()` or create an [`Options`] and use
 /// `perf::Folder::from(options)`.
-#[derive(Default)]
 pub struct Folder {
+    // State...
+    /// General String cache that can be used while processing lines. Currently only used to keep
+    /// track of functions for Java inlining.
+    cache_line: Vec<String>,
+
+    /// Similar to, but different from, the `event_filter` field on `Options`
+    ///
+    /// * Field on `Options` represents user's provided configuration and will never change.
+    /// * This field, on the other hand, although initially set to the user's provided
+    ///   configuration, represents state that may change as data is processed. In particular, if
+    ///   the user provided `None` for their initial configuration, this field **will** change to
+    ///   `Some(<event type>)` when we encounter the first event during processing. Merging together
+    ///   different event types, such as instructions and cycles, would produce misleading results.
+    event_filter: Option<String>,
+
     /// All lines until the next empty line are stack lines.
     in_event: bool,
+
+    /// The number of stacks per job to send to the threadpool.
+    nstacks_per_job: usize,
+
+    /// Current comm name.
+    ///
+    /// Called pname after original stackcollapse-perf source.
+    pname: String,
 
     /// Skip all stack lines in this event.
     skip_stack: bool,
@@ -71,53 +122,81 @@ pub struct Folder {
     /// Function entries on the stack in this entry thus far.
     stack: VecDeque<String>,
 
-    /// General String cache that can be used while processing lines.
-    /// Currently only used to keep track of functions for Java inlining.
-    cache_line: Vec<String>,
-
-    /// Number of times each call stack has been seen.
-    occurrences: FnvHashMap<String, usize>,
-
-    /// Current comm name.
-    ///
-    /// Called pname after original stackcollapse-perf source.
-    pname: String,
-
-    event_filtering: EventFilterState,
-
+    // Options...
     opt: Options,
 }
 
-impl Collapse for Folder {
-    fn collapse<R, W>(&mut self, mut reader: R, writer: W) -> io::Result<()>
-    where
-        R: BufRead,
-        W: Write,
-    {
-        let mut line = String::new();
-        loop {
-            line.clear();
-
-            if reader.read_line(&mut line)? == 0 {
-                break;
-            }
-
-            if line.starts_with('#') {
-                continue;
-            }
-
-            let line = line.trim_end();
-            if line.is_empty() {
-                self.after_event();
-            } else {
-                self.on_line(line.trim_end());
-            }
+impl From<Options> for Folder {
+    fn from(mut opt: Options) -> Self {
+        if opt.nthreads == 0 {
+            opt.nthreads = 1;
         }
-        self.finish(writer)
+        opt.include_pid = opt.include_pid || opt.include_tid;
+        Self {
+            cache_line: Vec::default(),
+            event_filter: opt.event_filter.clone(),
+            in_event: false,
+            nstacks_per_job: common::DEFAULT_NSTACKS_PER_JOB,
+            pname: String::default(),
+            skip_stack: false,
+            stack: VecDeque::default(),
+            opt,
+        }
+    }
+}
+
+impl Default for Folder {
+    fn default() -> Self {
+        Options::default().into()
+    }
+}
+
+impl CollapsePrivate for Folder {
+    fn pre_process<R>(&mut self, reader: &mut R, occurrences: &mut Occurrences) -> io::Result<()>
+    where
+        R: io::BufRead,
+    {
+        // If user has provided an event filter, do nothing...
+        if self.event_filter.is_some() {
+            return Ok(());
+        }
+
+        // Otherwise, we don't know what the event filter should be; so process
+        // the first stack to figure it out (the worker threads need this
+        // information to get started). Only read one stack, however, as we would
+        // like the remaining stacks to be processed on the worker threads.
+        let mut line_buffer = String::new();
+        self.process_single_stack(&mut line_buffer, reader, occurrences)?;
+
+        // If we didn't find an event filter, there is something wrong with
+        // our processing code.
+        assert!(self.event_filter.is_some());
+
+        Ok(())
     }
 
-    // Check if the input has an event line followed by a stack line.
+    fn collapse_single_threaded<R>(
+        &mut self,
+        mut reader: R,
+        occurrences: &mut Occurrences,
+    ) -> io::Result<()>
+    where
+        R: io::BufRead,
+    {
+        // While there are still stacks left to process, process them...
+        let mut line_buffer = String::new();
+        while !self.process_single_stack(&mut line_buffer, &mut reader, occurrences)? {}
+
+        // Reset state...
+        self.in_event = false;
+        self.skip_stack = false;
+        self.stack.clear();
+        Ok(())
+    }
+
     fn is_applicable(&mut self, input: &str) -> Option<bool> {
+        // Check if the input has an event line followed by a stack line.
+
         let mut last_line_was_event_line = false;
         let mut input = input.as_bytes();
         let mut line = String::new();
@@ -155,30 +234,69 @@ impl Collapse for Folder {
         }
         None
     }
-}
 
-impl From<Options> for Folder {
-    fn from(mut opt: Options) -> Self {
-        opt.include_pid = opt.include_pid || opt.include_tid;
+    fn would_end_stack(&mut self, line: &[u8]) -> bool {
+        line.iter().all(|b| (*b as char).is_whitespace())
+    }
+
+    fn clone_and_reset_stack_context(&self) -> Self {
         Self {
+            cache_line: self.cache_line.clone(),
+            event_filter: self.event_filter.clone(),
             in_event: false,
+            nstacks_per_job: self.nstacks_per_job,
+            pname: String::new(),
             skip_stack: false,
             stack: VecDeque::default(),
-            cache_line: Vec::default(),
-            occurrences: FnvHashMap::with_capacity_and_hasher(512, fnv::FnvBuildHasher::default()),
-            pname: String::new(),
-            event_filtering: EventFilterState::None,
-            opt,
+            opt: self.opt.clone(),
         }
+    }
+
+    fn nstacks_per_job(&self) -> usize {
+        self.nstacks_per_job
+    }
+
+    fn set_nstacks_per_job(&mut self, n: usize) {
+        self.nstacks_per_job = n;
+    }
+
+    fn nthreads(&self) -> usize {
+        self.opt.nthreads
+    }
+
+    fn set_nthreads(&mut self, n: usize) {
+        self.opt.nthreads = n;
     }
 }
 
 impl Folder {
-    fn on_line(&mut self, line: &str) {
-        if !self.in_event {
-            self.on_event_line(line)
-        } else {
-            self.on_stack_line(line)
+    /// Processes a stack. On success, returns `true` if at end of data; `false` otherwise.
+    fn process_single_stack<R>(
+        &mut self,
+        line_buffer: &mut String,
+        reader: &mut R,
+        occurrences: &mut Occurrences,
+    ) -> io::Result<bool>
+    where
+        R: io::BufRead,
+    {
+        loop {
+            line_buffer.clear();
+            if reader.read_line(line_buffer)? == 0 {
+                return Ok(true);
+            }
+            if line_buffer.starts_with('#') {
+                continue;
+            }
+            let line = line_buffer.trim_end();
+            if line.is_empty() {
+                self.after_event(occurrences);
+                return Ok(false);
+            } else if self.in_event {
+                self.on_stack_line(line);
+            } else {
+                self.on_event_line(line);
+            }
         }
     }
 
@@ -236,24 +354,17 @@ impl Folder {
                 if event.ends_with(':') {
                     let event = &event[..(event.len() - 1)];
 
-                    if let Some(ref filter) = self.opt.event_filter {
-                        if event != filter {
-                            if let EventFilterState::Defaulted = self.event_filtering {
-                                // only print this warning if necessary:
-                                // when we defaulted and there was
-                                // multiple event types.
-                                warn!("Filtering for events of type: {}", event);
-                                self.event_filtering = EventFilterState::Warned;
-                            }
+                    if let Some(ref event_filter) = self.event_filter {
+                        if event != event_filter {
                             self.skip_stack = true;
                             return;
                         }
                     } else {
-                        // By default only show events of the first encountered
-                        // event type. Merging together different types, such as
-                        // instructions and cycles, produces misleading results.
-                        self.opt.event_filter = Some(event.to_string());
-                        self.event_filtering = EventFilterState::Defaulted;
+                        // By default only show events of the first encountered event type.
+                        // Merging together different types, such as instructions and cycles,
+                        // produces misleading results.
+                        logging::filtering_for_events_of_type(event);
+                        self.event_filter = Some(event.to_string());
                     }
                 }
             }
@@ -270,7 +381,7 @@ impl Folder {
                 self.pname.push_str(pid);
             }
         } else {
-            warn!("weird event line: {}", line);
+            logging::weird_event_line(line);
             self.in_event = false;
         }
     }
@@ -337,7 +448,7 @@ impl Folder {
             } else {
                 // perf mostly demangles Rust symbols,
                 // but this will fix the things it gets wrong
-                fix_partially_demangled_rust_symbol(rawfunc)
+                common::fix_partially_demangled_rust_symbol(rawfunc)
             };
 
             // Support Java inlining by splitting on "->". After the first func, the
@@ -386,11 +497,11 @@ impl Folder {
                 self.stack.push_front(func);
             }
         } else {
-            warn!("weird stack line: {}", line);
+            logging::weird_stack_line(line);
         }
     }
 
-    fn after_event(&mut self) {
+    fn after_event(&mut self, occurrences: &mut Occurrences) {
         // end of stack, so emit stack entry
         if !self.skip_stack {
             // allocate a string that is long enough to hold the entire stack string
@@ -407,22 +518,13 @@ impl Folder {
             }
 
             // count it!
-            *self.occurrences.entry(stack_str).or_insert(0) += 1;
+            occurrences.insert_or_add(stack_str, 1);
         }
 
         // reset for the next event
         self.in_event = false;
         self.skip_stack = false;
         self.stack.clear();
-    }
-
-    fn finish<W: Write>(&self, mut writer: W) -> io::Result<()> {
-        let mut keys: Vec<_> = self.occurrences.iter().collect();
-        keys.sort();
-        for (key, value) in keys {
-            writeln!(writer, "{} {}", key, value)?;
-        }
-        Ok(())
     }
 }
 
@@ -511,4 +613,139 @@ fn tidy_java(mut func: String) -> String {
     }
 
     func
+}
+
+#[cfg(test)]
+mod tests {
+    use std::fs;
+    use std::io::Read;
+    use std::path::PathBuf;
+
+    use lazy_static::lazy_static;
+    use pretty_assertions::assert_eq;
+    use rand::{Rng, SeedableRng};
+
+    use super::*;
+    use crate::collapse::common;
+    use crate::collapse::Collapse;
+
+    lazy_static! {
+        static ref INPUT: Vec<PathBuf> = {
+            [
+                "./flamegraph/example-perf-stacks.txt.gz",
+                "./flamegraph/test/perf-cycles-instructions-01.txt",
+                "./flamegraph/test/perf-dd-stacks-01.txt",
+                "./flamegraph/test/perf-funcab-cmd-01.txt",
+                "./flamegraph/test/perf-funcab-pid-01.txt",
+                "./flamegraph/test/perf-iperf-stacks-pidtid-01.txt",
+                "./flamegraph/test/perf-java-faults-01.txt",
+                "./flamegraph/test/perf-java-stacks-01.txt",
+                "./flamegraph/test/perf-java-stacks-02.txt",
+                "./flamegraph/test/perf-js-stacks-01.txt",
+                "./flamegraph/test/perf-mirageos-stacks-01.txt",
+                "./flamegraph/test/perf-numa-stacks-01.txt",
+                "./flamegraph/test/perf-rust-Yamakaky-dcpu.txt",
+                "./flamegraph/test/perf-vertx-stacks-01.txt",
+                "./tests/data/collapse-perf/empty-line.txt",
+                "./tests/data/collapse-perf/go-stacks.txt",
+                "./tests/data/collapse-perf/java-inline.txt",
+                "./tests/data/collapse-perf/weird-stack-line.txt",
+            ]
+            .into_iter()
+            .map(PathBuf::from)
+            .collect::<Vec<_>>()
+        };
+    }
+
+    #[test]
+    fn test_collapse_multi_perf() -> io::Result<()> {
+        let mut folder = Folder::default();
+        common::testing::test_collapse_multi(&mut folder, &INPUT)
+    }
+
+    #[test]
+    #[ignore]
+    fn test_collapse_multi_perf_simple() -> io::Result<()> {
+        let path = "./flamegraph/test/perf-cycles-instructions-01.txt";
+        let mut file = fs::File::open(path)?;
+        let mut bytes = Vec::new();
+        file.read_to_end(&mut bytes)?;
+        let mut folder = Folder::default();
+        <Folder as Collapse>::collapse(&mut folder, &bytes[..], io::sink())
+    }
+
+    /// Varies the nstacks_per_job parameter and outputs the 10 fastests configurations by file.
+    ///
+    /// Command: `cargo test bench_nstacks_perf --release -- --ignored --nocapture`
+    #[test]
+    #[ignore]
+    fn bench_nstacks_perf() -> io::Result<()> {
+        let mut folder = Folder::default();
+        common::testing::bench_nstacks(&mut folder, &INPUT)
+    }
+
+    #[test]
+    #[ignore]
+    /// Fuzz test the multithreaded collapser.
+    ///
+    /// Command: `cargo test fuzz_collapse_perf --release -- --ignored --nocapture`
+    fn fuzz_collapse_perf() -> io::Result<()> {
+        let seed = rand::thread_rng().gen::<u64>();
+        println!("Random seed: {}", seed);
+        let mut rng = rand::rngs::SmallRng::seed_from_u64(seed);
+
+        let mut buf_actual = Vec::new();
+        let mut buf_expected = Vec::new();
+        let mut count = 0;
+
+        let inputs = common::testing::read_inputs(&INPUT)?;
+
+        loop {
+            let nstacks_per_job = rng.gen_range(1, 500 + 1);
+            let options = Options {
+                annotate_jit: rng.gen(),
+                annotate_kernel: rng.gen(),
+                demangle: rng.gen(),
+                event_filter: None,
+                include_addrs: rng.gen(),
+                include_pid: rng.gen(),
+                include_tid: rng.gen(),
+                nthreads: rng.gen_range(2, 32 + 1),
+            };
+
+            for (path, input) in inputs.iter() {
+                buf_actual.clear();
+                buf_expected.clear();
+
+                let mut folder = {
+                    let mut options = options.clone();
+                    options.nthreads = 1;
+                    Folder::from(options)
+                };
+                folder.nstacks_per_job = nstacks_per_job;
+                <Folder as Collapse>::collapse(&mut folder, &input[..], &mut buf_expected)?;
+                let expected = std::str::from_utf8(&buf_expected[..]).unwrap();
+
+                let mut folder = Folder::from(options.clone());
+                folder.nstacks_per_job = nstacks_per_job;
+                <Folder as Collapse>::collapse(&mut folder, &input[..], &mut buf_actual)?;
+                let actual = std::str::from_utf8(&buf_actual[..]).unwrap();
+
+                if actual != expected {
+                    eprintln!(
+                        "Failed on file: {}\noptions: {:#?}\n",
+                        path.display(),
+                        options
+                    );
+                    assert_eq!(actual, expected);
+                }
+            }
+
+            count += 1;
+            if count % 10 == 0 {
+                println!("Successfully ran {} fuzz tests.", count);
+            }
+        }
+    }
+
 }

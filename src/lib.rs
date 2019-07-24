@@ -29,9 +29,9 @@
 //! Since profiling tools produce stack traces in a myriad of different formats, and the flame
 //! graph plotter expects input in a particular folded stack trace format, each profiler needs a
 //! separate collapse implementation. While the original Perl implementation supports _lots_ of
-//! profilers, Inferno currently only supports two: the widely used [`perf`] tool (specifically the
-//! output from `perf script`) and [DTrace]. Support for xdebug is [hopefully coming soon], and
-//! [`bpftrace`] should get [native support] before too long.
+//! profilers, Inferno currently only supports three: the widely used [`perf`] tool (specifically
+//! the output from `perf script`), [DTrace], and [sample]. Support for xdebug is [hopefully coming
+//! soon], and [`bpftrace`] should get [native support] before too long.
 //!
 //! Inferno supports profiles from applications written in any language, but we'll walk through an
 //! example with a Rust program. To profile a Rust application, you would first set
@@ -121,8 +121,13 @@
 //!   [NodeJS's ustack helper]: http://dtrace.org/blogs/dap/2012/01/05/where-does-your-node-program-spend-its-time/
 //!   [a series of live coding sessions]: https://www.youtube.com/watch?v=jTpK-bNZiA4&list=PLqbS7AVVErFimAvMW-kIJUwxpPvcPBCsz
 //!   [differential flame graphs]: http://www.brendangregg.com/blog/2014-11-09/differential-flame-graphs.html
+//!   [sample]: https://gist.github.com/loderunner/36724cc9ee8db66db305#profiling-with-sample
 
 #![deny(missing_docs)]
+#![cfg_attr(all(test, feature = "nightly"), feature(test))]
+
+#[cfg(all(test, feature = "nightly"))]
+extern crate test;
 
 /// Stack collapsing for various input formats.
 ///
@@ -131,16 +136,16 @@
 ///   [crate-level documentation]: ../index.html
 pub mod collapse;
 
-/// Tools for producing flame graphs from folded stack traces.
-///
-/// See the [crate-level documentation] for details.
-///
-///   [crate-level documentation]: ../index.html
-pub mod flamegraph;
-
 /// Tool for creating an output required to generate differential flame graphs.
 ///
 /// See the [crate-level documentation] for details.
 ///
 ///   [crate-level documentation]: ../index.html
 pub mod differential;
+
+/// Tools for producing flame graphs from folded stack traces.
+///
+/// See the [crate-level documentation] for details.
+///
+///   [crate-level documentation]: ../index.html
+pub mod flamegraph;

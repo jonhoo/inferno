@@ -1,30 +1,33 @@
-mod collapse_common;
+mod common;
 
-use assert_cmd::prelude::*;
-use collapse_common::*;
-use inferno::collapse::sample::{Folder, Options};
-use log::Level;
-use pretty_assertions::assert_eq;
 use std::fs::File;
 use std::io::{self, BufReader, Cursor};
 use std::process::Command;
 
-fn test_collapse_sample(test_file: &str, expected_file: &str, options: Options) -> io::Result<()> {
-    test_collapse(Folder::from(options), test_file, expected_file, false)
-}
+use assert_cmd::prelude::*;
+use inferno::collapse::sample::{Folder, Options};
+use inferno::collapse::Collapse;
+use log::Level;
+use pretty_assertions::assert_eq;
 
-fn test_collapse_sample_logs<F>(input_file: &str, asserter: F)
-where
-    F: Fn(&Vec<testing_logger::CapturedLog>),
-{
-    test_collapse_sample_logs_with_options(input_file, asserter, Options::default());
+use common::test_logger::CapturedLog;
+
+fn test_collapse_sample(test_file: &str, expected_file: &str, options: Options) -> io::Result<()> {
+    common::test_collapse(Folder::from(options), test_file, expected_file, false)
 }
 
 fn test_collapse_sample_logs_with_options<F>(input_file: &str, asserter: F, options: Options)
 where
-    F: Fn(&Vec<testing_logger::CapturedLog>),
+    F: Fn(&Vec<CapturedLog>),
 {
-    test_collapse_logs(Folder::from(options), input_file, asserter);
+    common::test_collapse_logs(Folder::from(options), input_file, asserter);
+}
+
+fn test_collapse_sample_logs<F>(input_file: &str, asserter: F)
+where
+    F: Fn(&Vec<CapturedLog>),
+{
+    test_collapse_sample_logs_with_options(input_file, asserter, Options::default());
 }
 
 #[test]
@@ -70,23 +73,38 @@ fn collapse_sample_should_log_warning_for_ending_before_call_graph_start() {
 }
 
 #[test]
-fn collapse_sample_should_log_warning_for_ending_before_call_graph_end() {
-    test_collapse_sample_logs(
-        "./tests/data/collapse-sample/end-before-call-graph-end.txt",
-        |captured_logs| {
-            let nwarnings = captured_logs
-                .into_iter()
-                .filter(|log| {
-                    log.body == "File ended before end of call graph" && log.level == Level::Warn
-                })
-                .count();
+fn collapse_sample_should_error_for_ending_before_call_graph_end() -> io::Result<()> {
+    let path = "./tests/data/collapse-sample/end-before-call-graph-end.txt";
+    let mut collapser = Folder::default();
+    match collapser.collapse_file(Some(path), io::sink()) {
+        Ok(_) => panic!(
+            "Collapsing {:?} should have returned an error, but instead it returned Ok.",
+            path
+        ),
+        Err(e) => {
+            let kind = e.kind();
+            if kind != io::ErrorKind::InvalidData {
+                panic!(
+                    "Collapsing {:?} should have returned io::ErrorKind::InvalidData, \
+                     but instead it returned {:?}",
+                    path, kind,
+                );
+            }
+            let expected_message = "File ended before end of call graph.";
+            let inner = e.into_inner().expect(&format!(
+                "Collapsing {:?} should have returned an error with message {:?},
+                 but instead it returned an error that did not contain a message",
+                path, expected_message,
+            ));
+            let s = format!("{}", inner);
             assert_eq!(
-                nwarnings, 1,
-                "warning logged {} times, but should be logged exactly once",
-                nwarnings
+                &s, expected_message,
+                "Collapsing {:?} returned an error with the wrong message",
+                path
             );
-        },
-    );
+        }
+    }
+    Ok(())
 }
 
 #[test]
@@ -228,7 +246,7 @@ fn collapse_sample_cli() {
         .output()
         .expect("failed to execute process");
     let expected = BufReader::new(File::open(expected_file).unwrap());
-    compare_results(Cursor::new(output.stdout), expected, expected_file, false);
+    common::compare_results(Cursor::new(output.stdout), expected, expected_file, false);
 
     // This is commented out because it times out on Travis CI (on Windows).
     //
@@ -244,5 +262,5 @@ fn collapse_sample_cli() {
     // io::copy(&mut input, stdin).unwrap();
     // let output = child.wait_with_output().expect("Failed to read stdout");
     // let expected = BufReader::new(File::open(expected_file).unwrap());
-    // compare_results(Cursor::new(output.stdout), expected, expected_file, false);
+    // common::compare_results(Cursor::new(output.stdout), expected, expected_file, false);
 }

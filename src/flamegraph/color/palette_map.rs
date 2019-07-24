@@ -1,12 +1,12 @@
-use crate::flamegraph::color::Color;
-use log::warn;
 use std::collections::HashMap;
-use std::fs::File;
-use std::fs::OpenOptions;
-use std::io;
-use std::io::{BufRead, BufReader};
+use std::fs::{File, OpenOptions};
+use std::io::{self, BufRead, BufReader};
 use std::path::Path;
 use std::str::FromStr;
+
+use log::warn;
+
+use crate::flamegraph::color::Color;
 
 /// Mapping of the association between a function name and the color used when drawing information
 /// from this function.
