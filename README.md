@@ -102,44 +102,57 @@ To run Inferno's performance comparison, run `./compare.sh`.
 It requires [hyperfine](https://github.com/sharkdp/hyperfine), and you
 must make sure you also check out Inferno's
 [submodules](https://github.blog/2016-02-01-working-with-submodules/).
+In general, Inferno's perf and dtrace collapsers are ~20x faster than
+`stackcollapse-*`, and the sample collapser is ~10x faster.
 
 ### Benchmarks
 
 Inferno includes [criterion](https://github.com/bheisler/criterion.rs)
-benchmarkss in [`benches/`](benches/). Criterion saves its results in
+benchmarks in [`benches/`](benches/). Criterion saves its results in
 `target/criterion/`, and uses that to recognize changes in performance,
 which should make it easy to detect performance regressions while
 developing bugfixes and improvements.
 
 You can run the benchmarks with `cargo bench`. Some results (YMMV):
 
-My desktop computer (AMD Ryzen 5 2600X) gets:
+My desktop computer (AMD Ryzen 5 2600X) gets (`/N` means `N` cores):
 
 ```
-collapse/dtrace         time:   [6.0078 ms 6.0145 ms 6.0213 ms]
-                        thrpt:  [218.96 MiB/s 219.21 MiB/s 219.45 MiB/s]
+collapse/dtrace/1       time:   [8.2767 ms 8.2817 ms 8.2878 ms]
+                        thrpt:  [159.08 MiB/s 159.20 MiB/s 159.29 MiB/s]
+collapse/dtrace/12      time:   [3.8631 ms 3.8819 ms 3.9019 ms]
+                        thrpt:  [337.89 MiB/s 339.63 MiB/s 341.28 MiB/s]
 
-collapse/perf           time:   [14.856 ms 14.863 ms 14.871 ms]
-                        thrpt:  [201.31 MiB/s 201.42 MiB/s 201.52 MiB/s]
+collapse/perf/1         time:   [16.386 ms 16.401 ms 16.416 ms]
+                        thrpt:  [182.37 MiB/s 182.53 MiB/s 182.70 MiB/s]
+collapse/perf/12        time:   [4.8056 ms 4.8254 ms 4.8460 ms]
+                        thrpt:  [617.78 MiB/s 620.41 MiB/s 622.97 MiB/s]
 
-flamegraph              time:   [21.511 ms 21.521 ms 21.531 ms]
-                        thrpt:  [28.634 MiB/s 28.647 MiB/s 28.660 MiB/s]
+collapse/sample         time:   [8.9132 ms 8.9196 ms 8.9264 ms]
+                        thrpt:  [155.49 MiB/s 155.61 MiB/s 155.72 MiB/s]
+
+flamegraph              time:   [16.071 ms 16.118 ms 16.215 ms]
+                        thrpt:  [38.022 MiB/s 38.250 MiB/s 38.363 MiB/s]
 ```
 
-My laptop (Intel Core i7-8650U) get:
+My laptop (Intel Core i7-8650U) gets:
 
 ```
-collapse/dtrace         time:   [5.1843 ms 5.1845 ms 5.1848 ms]
-                        thrpt:  [254.29 MiB/s 254.30 MiB/s 254.31 MiB/s]
+collapse/dtrace/1       time:   [8.3612 ms 8.3839 ms 8.4114 ms]
+                        thrpt:  [156.74 MiB/s 157.25 MiB/s 157.68 MiB/s]
+collapse/dtrace/8       time:   [3.4623 ms 3.4826 ms 3.5014 ms]
+                        thrpt:  [376.54 MiB/s 378.58 MiB/s 380.79 MiB/s]
 
-collapse/perf           time:   [12.956 ms 12.956 ms 12.957 ms]
-                        thrpt:  [231.06 MiB/s 231.07 MiB/s 231.07 MiB/s]
+collapse/perf/1         time:   [15.723 ms 15.756 ms 15.798 ms]
+                        thrpt:  [189.51 MiB/s 190.01 MiB/s 190.41 MiB/s]
+collapse/perf/8         time:   [6.1391 ms 6.1554 ms 6.1715 ms]
+                        thrpt:  [485.09 MiB/s 486.36 MiB/s 487.65 MiB/s]
 
-flamegraph/dtrace       time:   [854.91 us 855.12 us 855.39 us]
-                        thrpt:  [88.814 MiB/s 88.842 MiB/s 88.864 MiB/s]
+collapse/sample         time:   [9.3194 ms 9.3429 ms 9.3719 ms]
+                        thrpt:  [148.10 MiB/s 148.56 MiB/s 148.94 MiB/s]
 
-flamegraph/perf         time:   [2.9885 ms 2.9888 ms 2.9892 ms]
-                        thrpt:  [206.25 MiB/s 206.27 MiB/s 206.30 MiB/s]
+flamegraph              time:   [16.490 ms 16.503 ms 16.518 ms]
+                        thrpt:  [37.324 MiB/s 37.358 MiB/s 37.388 MiB/s]
 ```
 
 ## License
