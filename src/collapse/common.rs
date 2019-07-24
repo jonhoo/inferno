@@ -37,7 +37,7 @@ lazy_static! {
 /// `Collapse` trait as well. Implementing this trait gives you parallelism
 /// for free as long as you adhere to the requirements described in the
 /// comments below.
-pub trait CollapsePrivate: Clone + Send + Sized {
+pub trait CollapsePrivate: Send + Sized {
     // *********************************************************** //
     // ********************* REQUIRED METHODS ******************** //
     // *********************************************************** //
@@ -95,6 +95,15 @@ pub trait CollapsePrivate: Clone + Send + Sized {
     /// method will be called for every line of input data (excluding those consumed by the
     /// `pre_process` method).
     fn would_end_stack(&mut self, line: &[u8]) -> bool;
+
+    /// Creates a copy and prepares it to be sent to a different thread.
+    ///
+    /// This method creates a copy of `self` in order to sent it to a different thread.
+    /// As such, it should clone all the internal fields of `Self` **except** those that
+    /// should be reset because the collapser will now operate in a different stack context.
+    /// For example, any options should be cloned, but any stack buffers or similar "stack state"
+    /// should be reset to, for example, an empty vector before this method returns.
+    fn clone_and_reset_stack_context(&self) -> Self;
 
     /// Determine if this format corresponds to the input data.
     ///
@@ -180,7 +189,7 @@ pub trait CollapsePrivate: Clone + Send + Sized {
                 let rx_input = rx_input.clone();
                 let (tx_stop, rx_stop) = (tx_stop.clone(), rx_stop.clone());
 
-                let mut folder = self.clone();
+                let mut folder = self.clone_and_reset_stack_context();
                 let mut occurrences = occurrences.clone();
 
                 // Launch the worker thread...

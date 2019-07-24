@@ -39,7 +39,6 @@ impl Default for Options {
 ///
 /// To construct one, either use `dtrace::Folder::default()` or create an [`Options`] and use
 /// `dtrace::Folder::from(options)`.
-#[derive(Clone)]
 pub struct Folder {
     /// Vector for processing java stuff
     cache_inlines: Vec<String>,
@@ -232,6 +231,16 @@ impl CollapsePrivate for Folder {
             }
         }
         true
+    }
+
+    fn clone_and_reset_stack_context(&self) -> Self {
+        Self {
+            cache_inlines: self.cache_inlines.clone(),
+            nstacks_per_job: self.nstacks_per_job,
+            stack: VecDeque::default(),
+            stack_str_size: 0,
+            opt: self.opt.clone(),
+        }
     }
 
     fn nstacks_per_job(&self) -> usize {

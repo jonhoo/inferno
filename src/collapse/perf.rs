@@ -89,7 +89,6 @@ impl Default for Options {
 ///
 /// To construct one, either use `perf::Folder::default()` or create an [`Options`] and use
 /// `perf::Folder::from(options)`.
-#[derive(Clone)]
 pub struct Folder {
     // State...
     /// General String cache that can be used while processing lines. Currently only used to keep
@@ -238,6 +237,19 @@ impl CollapsePrivate for Folder {
 
     fn would_end_stack(&mut self, line: &[u8]) -> bool {
         line.iter().all(|b| (*b as char).is_whitespace())
+    }
+
+    fn clone_and_reset_stack_context(&self) -> Self {
+        Self {
+            cache_line: self.cache_line.clone(),
+            event_filter: self.event_filter.clone(),
+            in_event: false,
+            nstacks_per_job: self.nstacks_per_job,
+            pname: String::new(),
+            skip_stack: false,
+            stack: VecDeque::default(),
+            opt: self.opt.clone(),
+        }
     }
 
     fn nstacks_per_job(&self) -> usize {
