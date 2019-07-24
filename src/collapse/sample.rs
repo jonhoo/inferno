@@ -169,7 +169,6 @@ impl Folder {
         let mut module = "";
         if !self.opt.no_modules {
             // Modules are shown with "(in libfoo.dylib)" or "(in AppKit)".
-            // We've arleady split on "(in " above.
             let mut line = line.rsplitn(2, "(in ");
             if let Some(line) = line.next() {
                 if let Some(close) = line.find(')') {
