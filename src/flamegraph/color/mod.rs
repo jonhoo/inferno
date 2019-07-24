@@ -7,8 +7,7 @@ use std::borrow::Cow;
 use std::fmt;
 use std::str::FromStr;
 
-use rand::rngs::ThreadRng;
-use rand::Rng;
+use rand::prelude::*;
 use rgb::RGB8;
 
 pub use self::palette_map::PaletteMap;

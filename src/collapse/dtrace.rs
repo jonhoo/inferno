@@ -425,7 +425,7 @@ mod tests {
 
     use lazy_static::lazy_static;
     use pretty_assertions::assert_eq;
-    use rand::{Rng, SeedableRng};
+    use rand::prelude::*;
 
     use super::*;
     use crate::collapse::common;
@@ -533,9 +533,9 @@ mod tests {
     ///
     /// Command: `cargo test fuzz_collapse_dtrace --release -- --ignored --nocapture`
     fn fuzz_collapse_dtrace() -> io::Result<()> {
-        let seed = rand::thread_rng().gen::<u64>();
+        let seed = thread_rng().gen::<u64>();
         println!("Random seed: {}", seed);
-        let mut rng = rand::rngs::SmallRng::seed_from_u64(seed);
+        let mut rng = SmallRng::seed_from_u64(seed);
 
         let mut buf_actual = Vec::new();
         let mut buf_expected = Vec::new();
