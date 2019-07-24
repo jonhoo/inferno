@@ -14,8 +14,8 @@ the `flamegraph` plotting tool. So far, the focus has been on parsing
 profiling results from
 [`perf`](https://perf.wiki.kernel.org/index.php/Main_Page) and
 [DTrace](https://www.joyent.com/dtrace). At the time of writing,
-`inferno-collapse-perf` is ~9x faster than `stackcollapse-perf.pl` and
-`inferno-collapse-dtrace` is ~10x faster than `stackcollapse.pl` (see
+`inferno-collapse-perf` is ~20x faster than `stackcollapse-perf.pl` and
+`inferno-collapse-dtrace` is ~20x faster than `stackcollapse.pl` (see
 `compare.sh`).
 
 It is developed in part through live coding sessions, which you can find
