@@ -98,8 +98,8 @@ pub trait CollapsePrivate: Send + Sized {
 
     /// Creates a copy and prepares it to be sent to a different thread.
     ///
-    /// This method creates a copy of `self` in order to sent it to a different thread.
-    /// As such, it should clone all the internal fields of `Self` **except** those that
+    /// This method creates a copy of `self` in order to send it to a different thread.
+    /// As such, it should clone all the internal fields of `self` **except** those that
     /// should be reset because the collapser will now operate in a different stack context.
     /// For example, any options should be cloned, but any stack buffers or similar "stack state"
     /// should be reset to, for example, an empty vector before this method returns.
