@@ -1,0 +1,35 @@
+
+[package]
+name = "inferno-fuzz"
+version = "0.0.1"
+authors = ["Automatically generated"]
+publish = false
+edition = "2018"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies.inferno]
+path = ".."
+[dependencies.libfuzzer-sys]
+git = "https://github.com/rust-fuzz/libfuzzer-sys.git"
+
+# Prevent this from interfering with workspaces
+[workspace]
+members = ["."]
+
+[[bin]]
+name = "perf"
+path = "fuzz_targets/perf.rs"
+
+[[bin]]
+name = "dtrace"
+path = "fuzz_targets/dtrace.rs"
+
+[[bin]]
+name = "sample"
+path = "fuzz_targets/sample.rs"
+
+[[bin]]
+name = "guess"
+path = "fuzz_targets/guess.rs"

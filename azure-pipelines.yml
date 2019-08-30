@@ -3,6 +3,29 @@ stages:
    parameters:
      codecov_token: $(CODECOV_TOKEN_SECRET)
      single_threaded: true
+ - stage: fuzz
+   displayName: fuzzing tests
+   jobs:
+     - job: fuzz
+       displayName: cargo +nightly fuzz
+       pool:
+         vmImage: ubuntu-16.04
+       steps:
+         - template: azure/install-rust.yml@templates
+           parameters:
+             rust: nightly
+         - checkout: self
+           submodules: recursive
+         - script: cargo install cargo-fuzz
+           displayName: Install cargo fuzz
+         - script: cargo fuzz run perf -- -max_total_time=30
+           displayName: Fuzz perf collapser
+         - script: cargo fuzz run dtrace -- -max_total_time=30
+           displayName: Fuzz DTrace collapser
+         - script: cargo fuzz run sample -- -max_total_time=30
+           displayName: Fuzz sample collapser
+         - script: cargo fuzz run guess -- -max_total_time=30
+           displayName: Fuzz guessing collapser
 
 resources:
   repositories:
