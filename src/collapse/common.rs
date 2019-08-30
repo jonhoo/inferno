@@ -738,7 +738,6 @@ pub(crate) mod testing {
 
         Ok(())
     }
-
 }
 
 #[cfg(test)]
