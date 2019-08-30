@@ -27,6 +27,9 @@ stages:
            displayName: Fuzz sample collapser
          - script: cargo fuzz run guess -- -max_total_time=30
            displayName: Fuzz guessing collapser
+         - publish: $(System.DefaultWorkingDirectory)/fuzz/artifacts/
+           condition: failed()
+           artifact: fuzz
 
 resources:
   repositories:
