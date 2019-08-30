@@ -193,6 +193,8 @@ pub trait CollapsePrivate: Send + Sized {
                 let mut occurrences = occurrences.clone();
 
                 // Launch the worker thread...
+                // TODO: https://github.com/crossbeam-rs/crossbeam/issues/404
+                #[allow(clippy::drop_copy, clippy::zero_ptr)]
                 let handle = scope.spawn(move |_| loop {
                     channel::select! {
                         recv(rx_input) -> input => {
