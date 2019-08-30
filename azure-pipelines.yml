@@ -5,6 +5,7 @@ stages:
      single_threaded: true
  - stage: fuzz
    displayName: fuzzing tests
+   dependsOn: test
    jobs:
      - job: fuzz
        displayName: cargo +nightly fuzz
