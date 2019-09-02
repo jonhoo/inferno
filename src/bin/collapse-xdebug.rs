@@ -1,10 +1,15 @@
-use env_logger::Env;
 use std::io;
 use std::path::PathBuf;
+
+use env_logger::Env;
+use inferno::collapse::xdebug::{Folder, Options};
+use inferno::collapse::{Collapse, DEFAULT_NTHREADS};
+use lazy_static::lazy_static;
 use structopt::StructOpt;
 
-use inferno::collapse::xdebug::{Folder, Options};
-use inferno::collapse::Collapse;
+lazy_static! {
+    static ref NTHREADS: String = format!("{}", *DEFAULT_NTHREADS);
+}
 
 #[derive(Debug, StructOpt)]
 #[structopt(
@@ -26,7 +31,23 @@ struct Opt {
     #[structopt(short = "v", long = "verbose", parse(from_occurrences))]
     verbose: usize,
 
-    /// perf script output file, or STDIN if not specified
+    // *************** //
+    // *** OPTIONS *** //
+    // *************** //
+    /// Number of threads to use.
+    #[structopt(
+        short = "n",
+        long = "nthreads",
+        raw(default_value = "&NTHREADS"),
+        value_name = "UINT"
+    )]
+    nthreads: usize,
+
+    // ************ //
+    // *** ARGS *** //
+    // ************ //
+    #[structopt(value_name = "PATH")]
+    /// Xdebug script output file, or STDIN if not specified
     infile: Option<PathBuf>,
 }
 
@@ -34,13 +55,15 @@ impl Opt {
     fn into_parts(self) -> (Option<PathBuf>, Options) {
         (
             self.infile,
-            Options {}
+            Options {
+                nthreads: self.nthreads,
+            },
         )
     }
 }
 
 fn main() -> io::Result<()> {
-        let opt = Opt::from_args();
+    let opt = Opt::from_args();
 
     // Initialize logger
     if !opt.quiet {

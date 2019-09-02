@@ -7,6 +7,7 @@ use std::hash::{BuildHasher, Hash, Hasher};
 use std::io::prelude::*;
 use std::io::{self, Write};
 use std::rc::Rc;
+use crate::collapse::common;
 // Ideas: str_stack and colosseum to keep allocations closer together or something.
 
 const SCALE_FACTOR: f32 = 1_000_000.0;
@@ -16,8 +17,21 @@ const TRACE_START: &str = "TRACE START";
 const TRACE_END: &str = "TRACE END";
 
 /// Options for the Xdebug collapser
-#[derive(Clone, Debug, Default)]
-pub struct Options;
+#[derive(Clone, Debug)]
+pub struct Options {
+    /// The number of threads to use.
+    ///
+    /// Default is the number of logical cores on your machine.
+    pub nthreads: usize,
+}
+
+impl Default for Options {
+    fn default() -> Self {
+        Self {
+            nthreads: *common::DEFAULT_NTHREADS,
+        }
+    }
+}
 
 /// A unique key for an interned string.
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
