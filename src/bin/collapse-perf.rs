@@ -34,10 +34,6 @@ struct Opt {
     #[structopt(long = "all")]
     all: bool,
 
-    /// Demangle function names
-    #[structopt(long = "demangle")]
-    demangle: bool,
-
     /// Annotate jit functions with a _[j]
     #[structopt(long = "jit")]
     jit: bool,
@@ -96,7 +92,6 @@ impl Opt {
                 include_addrs: self.addrs,
                 annotate_jit: self.jit || self.all,
                 annotate_kernel: self.kernel || self.all,
-                demangle: self.demangle,
                 event_filter: self.event_filter,
                 nthreads: self.nthreads,
             },

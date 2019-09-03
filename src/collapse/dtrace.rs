@@ -9,11 +9,6 @@ use crate::collapse::common::{self, CollapsePrivate, Occurrences};
 /// `dtrace` folder configuration options.
 #[derive(Clone, Debug)]
 pub struct Options {
-    /// Demangle function names.
-    ///
-    /// Default is `false`.
-    pub demangle: bool,
-
     /// Include function offset (except leafs).
     ///
     /// Default is `false`.
@@ -28,7 +23,6 @@ pub struct Options {
 impl Default for Options {
     fn default() -> Self {
         Self {
-            demangle: false,
             includeoffset: false,
             nthreads: *common::DEFAULT_NTHREADS,
         }
@@ -301,17 +295,16 @@ impl Folder {
         )
     }
 
-    // Transforms the function part of a frame with the given function.
-    fn transform_function_name<'a, F>(&self, frame: &'a str, transform: F) -> Cow<'a, str>
-    where
-        F: Fn(&'a str) -> Cow<'a, str>,
-    {
+    // DTrace doesn't properly demangle Rust function names, so fix those.
+    fn fix_rust_symbol<'a>(&self, frame: &'a str) -> Cow<'a, str> {
         let mut parts = frame.splitn(2, '`');
         if let (Some(pname), Some(func)) = (parts.next(), parts.next()) {
             if self.opt.includeoffset {
                 let mut parts = func.rsplitn(2, '+');
                 if let (Some(offset), Some(func)) = (parts.next(), parts.next()) {
-                    if let Cow::Owned(func) = transform(func.trim_end()) {
+                    if let Cow::Owned(func) =
+                        common::fix_partially_demangled_rust_symbol(func.trim_end())
+                    {
                         return Cow::Owned(format!("{}`{}+{}", pname, func, offset));
                     } else {
                         return Cow::Borrowed(frame);
@@ -319,22 +312,12 @@ impl Folder {
                 }
             }
 
-            if let Cow::Owned(func) = transform(func.trim_end()) {
+            if let Cow::Owned(func) = common::fix_partially_demangled_rust_symbol(func.trim_end()) {
                 return Cow::Owned(format!("{}`{}", pname, func));
             }
         }
 
         Cow::Borrowed(frame)
-    }
-
-    // Demangle the function name if it's mangled.
-    fn demangle<'a>(&self, frame: &'a str) -> Cow<'a, str> {
-        self.transform_function_name(frame, symbolic_demangle::demangle)
-    }
-
-    // DTrace doesn't properly demangle Rust function names, so fix those.
-    fn fix_rust_symbol<'a>(&self, frame: &'a str) -> Cow<'a, str> {
-        self.transform_function_name(frame, common::fix_partially_demangled_rust_symbol)
     }
 
     // we have a stack line that shows one stack entry from the preceeding event, like:
@@ -357,8 +340,6 @@ impl Folder {
 
         let frame = if frame.is_empty() {
             Cow::Borrowed("-")
-        } else if self.opt.demangle {
-            self.demangle(frame)
         } else {
             self.fix_rust_symbol(frame)
         };
@@ -546,7 +527,6 @@ mod tests {
         loop {
             let nstacks_per_job = rng.gen_range(1, 500 + 1);
             let options = Options {
-                demangle: rng.gen(),
                 includeoffset: rng.gen(),
                 nthreads: rng.gen_range(2, 32 + 1),
             };

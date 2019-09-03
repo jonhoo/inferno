@@ -284,22 +284,6 @@ fn collapse_perf_should_warn_about_weird_input_lines() {
 }
 
 #[test]
-fn collapse_perf_demangle() {
-    let test_file = "./tests/data/collapse-perf/mangled.txt";
-    let result_file = "./tests/data/collapse-perf/results/demangled.txt";
-    test_collapse_perf(
-        test_file,
-        result_file,
-        Options {
-            demangle: true,
-            ..Default::default()
-        },
-        false,
-    )
-    .unwrap()
-}
-
-#[test]
 fn collapse_perf_cli() {
     let input_file = "./flamegraph/test/perf-vertx-stacks-01.txt";
     let expected_file = "./flamegraph/test/results/perf-vertx-stacks-01-collapsed-all.txt";

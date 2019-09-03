@@ -126,37 +126,6 @@ fn collapse_dtrace_rust_names() {
 }
 
 #[test]
-fn collapse_dtrace_demangle() {
-    let test_file = "./tests/data/collapse-dtrace/mangled.txt";
-    let result_file = "./tests/data/collapse-dtrace/results/demangled.txt";
-    test_collapse_dtrace(
-        test_file,
-        result_file,
-        Options {
-            demangle: true,
-            ..Default::default()
-        },
-    )
-    .unwrap()
-}
-
-#[test]
-fn collapse_dtrace_demangle_includeoffset() {
-    let test_file = "./tests/data/collapse-dtrace/mangled.txt";
-    let result_file = "./tests/data/collapse-dtrace/results/demangled_with_offsets.txt";
-    test_collapse_dtrace(
-        test_file,
-        result_file,
-        Options {
-            demangle: true,
-            includeoffset: true,
-            ..Default::default()
-        },
-    )
-    .unwrap()
-}
-
-#[test]
 fn collapse_dtrace_cli() {
     let input_file = "./flamegraph/example-dtrace-stacks.txt";
     let expected_file = "./tests/data/collapse-dtrace/results/dtrace-example.txt";

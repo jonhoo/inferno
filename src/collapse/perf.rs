@@ -1,8 +1,6 @@
 use std::collections::VecDeque;
 use std::io::{self, BufRead};
 
-use symbolic_demangle::demangle;
-
 use crate::collapse::common::{self, CollapsePrivate, Occurrences};
 
 const TIDY_GENERIC: bool = true;
@@ -37,11 +35,6 @@ pub struct Options {
     /// Default is `false`.
     pub annotate_kernel: bool,
 
-    /// Demangle function names.
-    ///
-    /// Default is `false`.
-    pub demangle: bool,
-
     /// Only consider samples of the given event type (see `perf list`). If this option is
     /// set to `None`, it will be set to the first encountered event type.
     ///
@@ -75,7 +68,6 @@ impl Default for Options {
         Self {
             annotate_jit: false,
             annotate_kernel: false,
-            demangle: false,
             event_filter: None,
             include_addrs: false,
             include_pid: false,
@@ -443,13 +435,9 @@ impl Folder {
                 return;
             }
 
-            let rawfunc = if self.opt.demangle {
-                demangle(rawfunc)
-            } else {
-                // perf mostly demangles Rust symbols,
-                // but this will fix the things it gets wrong
-                common::fix_partially_demangled_rust_symbol(rawfunc)
-            };
+            // perf mostly demangles Rust symbols,
+            // but this will fix the things it gets wrong
+            let rawfunc = common::fix_partially_demangled_rust_symbol(rawfunc);
 
             // Support Java inlining by splitting on "->". After the first func, the
             // rest are annotated with "_[i]" to mark them as inlined.
@@ -705,7 +693,6 @@ mod tests {
             let options = Options {
                 annotate_jit: rng.gen(),
                 annotate_kernel: rng.gen(),
-                demangle: rng.gen(),
                 event_filter: None,
                 include_addrs: rng.gen(),
                 include_pid: rng.gen(),
