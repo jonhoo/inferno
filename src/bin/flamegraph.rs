@@ -3,7 +3,11 @@ use std::path::{Path, PathBuf};
 
 use env_logger::Env;
 use inferno::flamegraph::color::{BackgroundColor, PaletteMap, SearchColor};
-use inferno::flamegraph::{self, defaults, Direction, FuncFrameAttrsMap, Options, Palette};
+use inferno::flamegraph::{self, defaults, Direction, Options, Palette};
+
+#[cfg(feature = "nameattr")]
+use inferno::flamegraph::FuncFrameAttrsMap;
+
 use structopt::StructOpt;
 
 #[derive(Debug, StructOpt)]
@@ -133,6 +137,7 @@ struct Opt {
     /// File containing attributes to use for the SVG frames of particular functions.
     /// Each line in the file should be a function name followed by a tab,
     /// then a sequence of tab separated name=value pairs
+    #[cfg(feature = "nameattr")]
     #[structopt(long = "nameattr", value_name = "PATH")]
     nameattr: Option<PathBuf>,
 
@@ -187,14 +192,9 @@ impl<'a> Opt {
         options.colors = self.colors;
         options.bgcolors = self.bgcolors;
         options.hash = self.hash;
-        if let Some(file) = self.nameattr {
-            match FuncFrameAttrsMap::from_file(&file) {
-                Ok(m) => {
-                    options.func_frameattrs = m;
-                }
-                Err(e) => panic!("Error reading {}: {:?}", file.display(), e),
-            }
-        };
+
+        self.set_func_frameattrs(&mut options);
+
         if self.inverted {
             options.direction = Direction::Inverted;
             if self.title == defaults::TITLE {
@@ -226,6 +226,21 @@ impl<'a> Opt {
         options.search_color = self.search_color;
         (self.infiles, options)
     }
+
+    #[cfg(feature = "nameattr")]
+    fn set_func_frameattrs(&self, options: &mut Options) {
+        if let Some(file) = &self.nameattr {
+            match FuncFrameAttrsMap::from_file(&file) {
+                Ok(m) => {
+                    options.func_frameattrs = m;
+                }
+                Err(e) => panic!("Error reading {}: {:?}", file.display(), e),
+            }
+        };
+    }
+
+    #[cfg(not(feature = "nameattr"))]
+    fn set_func_frameattrs(&self, _: &mut Options) {}
 }
 
 const PALETTE_MAP_FILE: &str = "palette.map"; // default name for the palette map file
