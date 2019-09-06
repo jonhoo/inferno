@@ -26,10 +26,6 @@ struct Opt {
     // ************* //
     // *** FLAGS *** //
     // ************* //
-    /// Demangle function names
-    #[structopt(long = "demangle")]
-    demangle: bool,
-
     /// Include offsets
     #[structopt(long = "includeoffset")]
     includeoffset: bool,
@@ -67,7 +63,6 @@ impl Opt {
         (
             self.infile,
             Options {
-                demangle: self.demangle,
                 includeoffset: self.includeoffset,
                 nthreads: self.nthreads,
             },
