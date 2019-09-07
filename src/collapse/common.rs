@@ -3,8 +3,11 @@ use std::io;
 use std::mem;
 use std::sync::Arc;
 
+#[cfg(feature = "multithreaded")]
 use chashmap::CHashMap;
+#[cfg(feature = "multithreaded")]
 use crossbeam::channel;
+
 use fnv::FnvHashMap;
 use lazy_static::lazy_static;
 
@@ -26,9 +29,16 @@ const NBYTES_PER_STACK_GUESS: usize = 1024;
 
 const RUST_HASH_LENGTH: usize = 17;
 
+#[cfg(feature = "multithreaded")]
 lazy_static! {
     #[doc(hidden)]
     pub static ref DEFAULT_NTHREADS: usize = num_cpus::get();
+}
+
+#[cfg(not(feature = "multithreaded"))]
+lazy_static! {
+    #[doc(hidden)]
+    pub static ref DEFAULT_NTHREADS: usize = 1;
 }
 
 /// Private trait for internal library authors.
@@ -154,6 +164,15 @@ pub trait CollapsePrivate: Send + Sized {
         occurrences.write_and_clear(writer)
     }
 
+    #[cfg(not(feature = "multithreaded"))]
+    fn collapse_multi_threaded<R>(&mut self, _: R, _: &mut Occurrences) -> io::Result<()>
+    where
+        R: io::BufRead,
+    {
+        unimplemented!();
+    }
+
+    #[cfg(feature = "multithreaded")]
     fn collapse_multi_threaded<R>(
         &mut self,
         mut reader: R,
@@ -332,23 +351,38 @@ pub trait CollapsePrivate: Send + Sized {
 #[derive(Clone, Debug)]
 pub enum Occurrences {
     SingleThreaded(FnvHashMap<String, usize>),
+    #[cfg(feature = "multithreaded")]
     MultiThreaded(Arc<CHashMap<String, usize>>),
 }
 
 impl Occurrences {
+    #[cfg(feature = "multithreaded")]
     pub(crate) fn new(nthreads: usize) -> Self {
         assert_ne!(nthreads, 0);
         if nthreads == 1 {
-            let map = FnvHashMap::with_capacity_and_hasher(
-                CAPACITY_HASHMAP,
-                fnv::FnvBuildHasher::default(),
-            );
-            Occurrences::SingleThreaded(map)
+            Self::new_single_threaded()
         } else {
-            let map = CHashMap::with_capacity(CAPACITY_HASHMAP);
-            let arc = Arc::new(map);
-            Occurrences::MultiThreaded(arc)
+            Self::new_multi_threaded()
         }
+    }
+
+    #[cfg(not(feature = "multithreaded"))]
+    pub(crate) fn new(nthreads: usize) -> Self {
+        assert_ne!(nthreads, 0);
+        Self::new_single_threaded()
+    }
+
+    fn new_single_threaded() -> Self {
+        let map =
+            FnvHashMap::with_capacity_and_hasher(CAPACITY_HASHMAP, fnv::FnvBuildHasher::default());
+        Occurrences::SingleThreaded(map)
+    }
+
+    #[cfg(feature = "multithreaded")]
+    fn new_multi_threaded() -> Self {
+        let map = CHashMap::with_capacity(CAPACITY_HASHMAP);
+        let arc = Arc::new(map);
+        Occurrences::MultiThreaded(arc)
     }
 
     /// Inserts a key-count pair into the map. If the map did not have this key
@@ -358,6 +392,7 @@ impl Occurrences {
         use self::Occurrences::*;
         match self {
             SingleThreaded(map) => map.insert(key, count),
+            #[cfg(feature = "multithreaded")]
             MultiThreaded(arc) => arc.insert(key, count),
         }
     }
@@ -369,6 +404,7 @@ impl Occurrences {
         use self::Occurrences::*;
         match self {
             SingleThreaded(map) => *map.entry(key).or_insert(0) += count,
+            #[cfg(feature = "multithreaded")]
             MultiThreaded(arc) => arc.upsert(key, || count, |v| *v += count),
         }
     }
@@ -377,6 +413,7 @@ impl Occurrences {
         use self::Occurrences::*;
         match self {
             SingleThreaded(_) => false,
+            #[cfg(feature = "multithreaded")]
             MultiThreaded(_) => true,
         }
     }
@@ -394,6 +431,7 @@ impl Occurrences {
                     writeln!(writer, "{} {}", key, value)?;
                 }
             }
+            #[cfg(feature = "multithreaded")]
             MultiThreaded(ref mut arc) => {
                 let map = match Arc::get_mut(arc) {
                     Some(map) => map,
