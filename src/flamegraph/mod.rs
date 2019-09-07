@@ -7,6 +7,7 @@ macro_rules! args {
 mod attrs;
 pub mod color;
 mod merge;
+mod rand;
 mod svg;
 
 use std::fs::File;

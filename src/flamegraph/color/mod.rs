@@ -7,7 +7,6 @@ use std::borrow::Cow;
 use std::fmt;
 use std::str::FromStr;
 
-use rand::prelude::*;
 use rgb::RGB8;
 
 pub use self::palette_map::PaletteMap;
@@ -328,14 +327,19 @@ fn rgb_components_for_palette(palette: Palette, name: &str, v1: f32, v2: f32, v3
     }
 }
 
-pub(super) fn color(palette: Palette, hash: bool, name: &str, thread_rng: &mut ThreadRng) -> Color {
+pub(super) fn color(
+    palette: Palette,
+    hash: bool,
+    name: &str,
+    mut rng: impl FnMut() -> f32,
+) -> Color {
     let (v1, v2, v3) = if hash {
         let name_hash = namehash(name.bytes());
         let reverse_name_hash = namehash(name.bytes().rev());
 
         (name_hash, reverse_name_hash, reverse_name_hash)
     } else {
-        (thread_rng.gen(), thread_rng.gen(), thread_rng.gen())
+        (rng(), rng(), rng())
     };
 
     rgb_components_for_palette(palette, name, v1, v2, v3)
