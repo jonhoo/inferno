@@ -14,7 +14,7 @@ lazy_static! {
 #[derive(Debug, StructOpt)]
 #[structopt(
     name = "inferno-collapse-guess",
-    author = "",
+    about,
     after_help = "\
 [1] Attempts to find an appropriate collapser to use based on the input.
                   "
@@ -38,7 +38,7 @@ struct Opt {
     #[structopt(
         short = "n",
         long = "nthreads",
-        raw(default_value = "&NTHREADS"),
+        default_value = &NTHREADS,
         value_name = "UINT"
     )]
     nthreads: usize,

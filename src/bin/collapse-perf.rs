@@ -14,7 +14,7 @@ lazy_static! {
 #[derive(Debug, StructOpt)]
 #[structopt(
     name = "inferno-collapse-perf",
-    author = "",
+    about,
     after_help = "\
 [1] perf script must emit both PID and TIDs for these to work; eg, Linux < 4.1:
         perf script -f comm,pid,tid,cpu,time,event,ip,sym,dso,trace
@@ -69,7 +69,7 @@ struct Opt {
     #[structopt(
         short = "n",
         long = "nthreads",
-        raw(default_value = "&NTHREADS"),
+        default_value = &NTHREADS,
         value_name = "UINT"
     )]
     nthreads: usize,

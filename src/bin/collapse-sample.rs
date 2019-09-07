@@ -9,7 +9,7 @@ use structopt::StructOpt;
 #[derive(Debug, StructOpt)]
 #[structopt(
     name = "inferno-collapse-sample",
-    author = "",
+    about,
     after_help = "\
 [1] This processes the result of the sample command on macOS:
             sample 1234 -file out.sample_stacks"

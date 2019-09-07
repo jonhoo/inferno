@@ -8,7 +8,7 @@ use structopt::StructOpt;
 #[derive(Debug, StructOpt)]
 #[structopt(
     name = "inferno-diff-folded",
-    author = "",
+    about,
     after_help = "\
 Creates a differential between two folded stack profiles that can be passed
 to inferno-flamegraph to generate a differential flame graph.
