@@ -3,6 +3,7 @@ stages:
    parameters:
      codecov_token: $(CODECOV_TOKEN_SECRET)
      single_threaded: true
+     nightly_coverage: false
 
 resources:
   repositories:
