@@ -7,7 +7,7 @@ use inferno::flamegraph::{self, defaults, Direction, FuncFrameAttrsMap, Options,
 use structopt::StructOpt;
 
 #[derive(Debug, StructOpt)]
-#[structopt(name = "inferno-flamegraph", author = "")]
+#[structopt(name = "inferno-flamegraph", about)]
 struct Opt {
     // ************* //
     // *** FLAGS *** //
@@ -32,7 +32,7 @@ struct Opt {
     /// This flag is hidden since it's only meant to be used in
     /// tests so we don't have to include the same static
     /// JavaScript in all of the test files
-    #[structopt(raw(hidden = "true"), long = "no-javascript")]
+    #[structopt(hidden = true, long = "no-javascript")]
     no_javascript: bool,
 
     /// Don't sort the input lines.
@@ -68,10 +68,8 @@ struct Opt {
     #[structopt(
         short = "c",
         long = "colors",
-        raw(default_value = "defaults::COLORS"),
-        raw(
-            possible_values = r#"&["aqua","blue","green","hot","io","java","js","mem","orange","perl","purple","red","wakeup","yellow"]"#
-        ),
+        default_value = defaults::COLORS,
+        possible_values = &["aqua","blue","green","hot","io","java","js","mem","orange","perl","purple","red","wakeup","yellow"],
         value_name = "STRING"
     )]
     colors: Palette,
@@ -79,7 +77,7 @@ struct Opt {
     /// Count type label
     #[structopt(
         long = "countname",
-        raw(default_value = "defaults::COUNT_NAME"),
+        default_value = defaults::COUNT_NAME,
         value_name = "STRING"
     )]
     countname: String,
@@ -87,7 +85,7 @@ struct Opt {
     /// Factor to scale sample counts by
     #[structopt(
         long = "factor",
-        raw(default_value = "&defaults::str::FACTOR"),
+        default_value = &defaults::str::FACTOR,
         value_name = "FLOAT"
     )]
     factor: f64,
@@ -95,7 +93,7 @@ struct Opt {
     /// Font size
     #[structopt(
         long = "fontsize",
-        raw(default_value = "&defaults::str::FONT_SIZE"),
+        default_value = &defaults::str::FONT_SIZE,
         value_name = "UINT"
     )]
     fontsize: usize,
@@ -103,7 +101,7 @@ struct Opt {
     /// Font type
     #[structopt(
         long = "fonttype",
-        raw(default_value = "defaults::FONT_TYPE"),
+        default_value = defaults::FONT_TYPE,
         value_name = "STRING"
     )]
     fonttype: String,
@@ -111,7 +109,7 @@ struct Opt {
     /// Font width
     #[structopt(
         long = "fontwidth",
-        raw(default_value = "&defaults::str::FONT_WIDTH"),
+        default_value = &defaults::str::FONT_WIDTH,
         value_name = "FLOAT"
     )]
     fontwidth: f64,
@@ -119,7 +117,7 @@ struct Opt {
     /// Height of each frame
     #[structopt(
         long = "height",
-        raw(default_value = "&defaults::str::FRAME_HEIGHT"),
+        default_value = &defaults::str::FRAME_HEIGHT,
         value_name = "UINT"
     )]
     height: usize,
@@ -127,7 +125,7 @@ struct Opt {
     /// Omit functions smaller than <FLOAT> pixels
     #[structopt(
         long = "minwidth",
-        raw(default_value = "&defaults::str::MIN_WIDTH"),
+        default_value = &defaults::str::MIN_WIDTH,
         value_name = "FLOAT"
     )]
     minwidth: f64,
@@ -141,7 +139,7 @@ struct Opt {
     /// Name type label
     #[structopt(
         long = "nametype",
-        raw(default_value = "defaults::NAME_TYPE"),
+        default_value = defaults::NAME_TYPE,
         value_name = "STRING"
     )]
     nametype: String,
@@ -153,7 +151,7 @@ struct Opt {
     /// Search color
     #[structopt(
         long = "search-color",
-        raw(default_value = "defaults::SEARCH_COLOR"),
+        default_value = defaults::SEARCH_COLOR,
         value_name = "STRING"
     )]
     search_color: SearchColor,
@@ -165,7 +163,7 @@ struct Opt {
     /// Change title text
     #[structopt(
         long = "title",
-        raw(default_value = "defaults::TITLE"),
+        default_value = defaults::TITLE,
         value_name = "STRING"
     )]
     title: String,

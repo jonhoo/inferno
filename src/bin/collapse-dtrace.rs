@@ -14,7 +14,7 @@ lazy_static! {
 #[derive(Debug, StructOpt)]
 #[structopt(
     name = "inferno-collapse-dtrace",
-    author = "",
+    about,
     after_help = "\
 [1] This processes the result of the dtrace ustack() as run with:
         dtrace -x ustackframes=100 -n 'profile-97 /pid == 12345 && arg1/ { @[ustack()] = count(); } tick-60s { exit(0); }'
@@ -45,7 +45,7 @@ struct Opt {
     #[structopt(
         short = "n",
         long = "nthreads",
-        raw(default_value = "&NTHREADS"),
+        default_value = &NTHREADS,
         value_name = "UINT"
     )]
     nthreads: usize,
