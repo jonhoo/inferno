@@ -185,6 +185,7 @@ fn flamegraph_factor() {
 }
 
 #[test]
+#[cfg(feature = "nameattr")]
 fn flamegraph_nameattr() {
     let input_file = "./flamegraph/test/results/perf-cycles-instructions-01-collapsed-all.txt";
     let expected_result_file = "./tests/data/flamegraph/nameattr/nameattr.svg";
@@ -201,6 +202,7 @@ fn flamegraph_nameattr() {
 }
 
 #[test]
+#[cfg(feature = "nameattr")]
 fn flamegraph_nameattr_empty_line() {
     let input_file = "./flamegraph/test/results/perf-cycles-instructions-01-collapsed-all.txt";
     let expected_result_file = "./tests/data/flamegraph/nameattr/nameattr.svg";
@@ -217,6 +219,7 @@ fn flamegraph_nameattr_empty_line() {
 }
 
 #[test]
+#[cfg(feature = "nameattr")]
 fn flamegraph_nameattr_empty_attribute() {
     let input_file = "./flamegraph/test/results/perf-cycles-instructions-01-collapsed-all.txt";
     let expected_result_file = "./tests/data/flamegraph/nameattr/nameattr.svg";
@@ -233,6 +236,7 @@ fn flamegraph_nameattr_empty_attribute() {
 }
 
 #[test]
+#[cfg(feature = "nameattr")]
 fn flamegraph_nameattr_duplicate_attributes() {
     let input_file = "./flamegraph/test/results/perf-cycles-instructions-01-collapsed-all.txt";
     let expected_result_file = "./tests/data/flamegraph/nameattr/nameattr_duplicate_attributes.svg";
@@ -249,6 +253,7 @@ fn flamegraph_nameattr_duplicate_attributes() {
 }
 
 #[test]
+#[cfg(feature = "nameattr")]
 fn flamegraph_nameattr_should_warn_about_duplicate_attributes() {
     test_logger::init();
     let nameattr_file = "./tests/data/flamegraph/nameattr/nameattr_duplicate_attributes.txt";
@@ -267,6 +272,7 @@ fn flamegraph_nameattr_should_warn_about_duplicate_attributes() {
 }
 
 #[test]
+#[cfg(feature = "nameattr")]
 fn flamegraph_nameattr_should_warn_about_invalid_attribute() {
     test_logger::init();
     let nameattr_file = "./tests/data/flamegraph/nameattr/nameattr_invalid_attribute.txt";

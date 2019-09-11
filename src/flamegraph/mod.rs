@@ -4,7 +4,9 @@ macro_rules! args {
     }};
 }
 
+#[cfg(feature = "nameattr")]
 mod attrs;
+
 pub mod color;
 mod merge;
 mod rand;
@@ -23,8 +25,12 @@ use quick_xml::events::{BytesEnd, BytesStart, BytesText, Event};
 use quick_xml::Writer;
 use str_stack::StrStack;
 
+#[cfg(feature = "nameattr")]
 use self::attrs::FrameAttrs;
+
+#[cfg(feature = "nameattr")]
 pub use self::attrs::FuncFrameAttrsMap;
+
 pub use self::color::Palette;
 use self::color::{Color, SearchColor};
 use self::svg::{Dimension, StyleOptions};
@@ -115,6 +121,7 @@ pub struct Options<'a> {
     ///
     /// In particular, if a function appears in the given map, it will have extra attributes set in
     /// the resulting SVG based on its value in the map.
+    #[cfg(feature = "nameattr")]
     pub func_frameattrs: FuncFrameAttrsMap,
 
     /// Whether to plot a plot that grows top-to-bottom or bottom-up (the default).
@@ -254,13 +261,15 @@ impl<'a> Default for Options<'a> {
             bgcolors: Default::default(),
             hash: Default::default(),
             palette_map: Default::default(),
-            func_frameattrs: Default::default(),
             direction: Default::default(),
             negate_differentials: Default::default(),
             pretty_xml: Default::default(),
             no_sort: Default::default(),
             reverse_stack_order: Default::default(),
             no_javascript: Default::default(),
+
+            #[cfg(feature = "nameattr")]
+            func_frameattrs: Default::default(),
         }
     }
 }
@@ -521,28 +530,14 @@ where
             }
         };
 
-        let frame_attributes = opt
-            .func_frameattrs
-            .frameattrs_for_func(frame.location.function);
-
-        let mut has_href = false;
-        let mut title = &buffer[info];
-        if let Some(frame_attributes) = frame_attributes {
-            if frame_attributes.attrs.contains_key("xlink:href") {
-                write_container_attributes(&mut cache_a, &frame_attributes);
-                svg.write_event(&cache_a)?;
-                has_href = true;
-            } else {
-                write_container_attributes(&mut cache_g, &frame_attributes);
-                svg.write_event(&cache_g)?;
-            }
-            if let Some(ref t) = frame_attributes.title {
-                title = t.as_str();
-            }
-        } else if let Event::Start(ref mut c) = cache_g {
-            c.clear_attributes();
-            svg.write_event(&cache_g)?;
-        }
+        let (has_href, title) = write_container_start(
+            opt,
+            &mut svg,
+            &mut cache_a,
+            &mut cache_g,
+            &frame,
+            &buffer[info],
+        )?;
 
         svg.write_event(Event::Start(BytesStart::borrowed_name(b"title")))?;
         svg.write_event(Event::Text(BytesText::from_plain_str(title)))?;
@@ -627,7 +622,59 @@ where
     Ok(())
 }
 
+#[cfg(feature = "nameattr")]
+fn write_container_start<'a, W: Write>(
+    opt: &'a Options<'a>,
+    svg: &mut Writer<W>,
+    cache_a: &mut Event<'_>,
+    cache_g: &mut Event<'_>,
+    frame: &merge::TimedFrame<'_>,
+    mut title: &'a str,
+) -> quick_xml::Result<(bool, &'a str)> {
+    let frame_attributes = opt
+        .func_frameattrs
+        .frameattrs_for_func(frame.location.function);
+
+    let mut has_href = false;
+    if let Some(frame_attributes) = frame_attributes {
+        if frame_attributes.attrs.contains_key("xlink:href") {
+            write_container_attributes(cache_a, &frame_attributes);
+            svg.write_event(&cache_a)?;
+            has_href = true;
+        } else {
+            write_container_attributes(cache_g, &frame_attributes);
+            svg.write_event(&cache_g)?;
+        }
+        if let Some(ref t) = frame_attributes.title {
+            title = t.as_str();
+        }
+    } else if let Event::Start(ref mut c) = cache_g {
+        c.clear_attributes();
+        svg.write_event(&cache_g)?;
+    }
+
+    Ok((has_href, title))
+}
+
+#[cfg(not(feature = "nameattr"))]
+fn write_container_start<'a, W: Write>(
+    _opt: &Options<'_>,
+    svg: &mut Writer<W>,
+    _cache_a: &mut Event<'_>,
+    cache_g: &mut Event<'_>,
+    _frame: &merge::TimedFrame<'_>,
+    title: &'a str,
+) -> quick_xml::Result<(bool, &'a str)> {
+    if let Event::Start(ref mut c) = cache_g {
+        c.clear_attributes();
+        svg.write_event(&cache_g)?;
+    }
+
+    Ok((false, title))
+}
+
 /// Writes atributes to the container, container could be g or a
+#[cfg(feature = "nameattr")]
 fn write_container_attributes(event: &mut Event<'_>, frame_attributes: &FrameAttrs) {
     if let Event::Start(ref mut c) = event {
         c.clear_attributes();
