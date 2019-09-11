@@ -5,6 +5,28 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+
+### Changed
+
+### Removed
+
+## [0.9.0] - 2019-09-11
+### Changed
+- Support for multi-threaded collapsing was moved behind the
+  `multithreaded` feature flag which is on by default (#146).
+- The `structopt` dependency has been updated, which bumps the minimum
+  supported Rust version to 1.36.0 (#145).
+- Support for nameattr files was moved behind the `nameattr` feature
+  flag which is on by default (#147).
+
+### Removed
+- The `demangle` option for collapsers; we instead rely on the sample
+  generator to demangle names, and then just do some post-processing
+  fixups for common issues (#144).
+- The dependency on `rand`. Reduces the footprint of the crate, and also
+  makes the random color choices seeded by the same number each run
+  (#146).
 
 ## [0.8.0] - 2019-07-24
 ### Added
@@ -24,5 +46,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Moved to `IndexMap` and FNV hashing (#127)
 - Moved CI to Azure DevOps Pipelines
 
-[Unreleased]: https://github.com/jonhoo/inferno/compare/v0.8.0...HEAD
+[Unreleased]: https://github.com/jonhoo/inferno/compare/v0.9.0...HEAD
+[0.9.0]: https://github.com/jonhoo/inferno/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/jonhoo/inferno/compare/v0.7.0...v0.8.0
