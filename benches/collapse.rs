@@ -45,7 +45,7 @@ macro_rules! benchmark_single {
                     },
                     vec![bytes],
                 )
-                .throughput(|bytes| Throughput::Bytes(bytes.len() as u32))
+                .throughput(|bytes| Throughput::Bytes(bytes.len() as u64))
                 .sample_size(SAMPLE_SIZE),
             );
         }
@@ -86,7 +86,7 @@ macro_rules! benchmark_multi {
                         let _result = collapser2.collapse(data.as_slice(), io::sink());
                     })
                 })
-                .throughput(|bytes| Throughput::Bytes(bytes.len() as u32))
+                .throughput(|bytes| Throughput::Bytes(bytes.len() as u64))
                 .sample_size(SAMPLE_SIZE),
             );
         }

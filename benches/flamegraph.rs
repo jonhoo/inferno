@@ -22,7 +22,7 @@ fn flamegraph_benchmark(c: &mut Criterion, id: &str, infile: &str, mut opt: Opti
             },
             vec![bytes],
         )
-        .throughput(|bytes| Throughput::Bytes(bytes.len() as u32)),
+        .throughput(|bytes| Throughput::Bytes(bytes.len() as u64)),
     );
 }
 
