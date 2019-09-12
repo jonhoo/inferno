@@ -253,13 +253,6 @@ impl Folder {
                 }
             }
         }
-        let mut key = String::new();
-        for (i, frame) in self.stack.iter().enumerate() {
-            if i > 0 {
-                key.push(';');
-            }
-            key.push_str(frame);
-        }
-        occurrences.insert(key, self.current_samples);
+        occurrences.insert(self.stack.join(";"), self.current_samples);
     }
 }
