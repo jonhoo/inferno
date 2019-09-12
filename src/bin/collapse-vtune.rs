@@ -11,9 +11,9 @@ use structopt::StructOpt;
     name = "inferno-collapse-vtune",
     about,
     after_help = "\
-[1] This processes the CSV output of the Intel VTune `amplxe-cl` tool created as follows:
-        amplxe-cl -collect hotspots -r result_vtune_tachyon -- ./tachyon_find_hotspots
-        amplxe-cl -R top-down -call-stack-mode all -column=\"CPU Time:Self\",\"Module\" -report-out result_vtune_tachyon.csv -filter \"Function Stack\" -format csv -csv-delimiter comma -r result_vtune_tachyon
+[1] This processes the CSV output of the Intel VTune `amplxe-cl` tool, created as follows:
+        amplxe-cl -collect hotspots -r <result-dir> -- <program-to-profile>
+        amplxe-cl -R top-down -call-stack-mode all -column=\"CPU Time:Self\",\"Module\" -report-out result.csv -filter \"Function Stack\" -format csv -csv-delimiter comma -r <result-dir>
     "
 )]
 struct Opt {
