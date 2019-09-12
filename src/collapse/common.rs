@@ -11,6 +11,15 @@ use crossbeam::channel;
 use fnv::FnvHashMap;
 use lazy_static::lazy_static;
 
+macro_rules! invalid_data_error {
+    ($($arg:tt)*) => {{
+        Err(io::Error::new(
+            io::ErrorKind::InvalidData,
+            format!($($arg)*),
+        ))
+    }};
+}
+
 const CAPACITY_HASHMAP: usize = 512;
 
 pub(crate) const CAPACITY_READER: usize = 128 * 1024;

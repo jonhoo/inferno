@@ -5,15 +5,6 @@ use log::warn;
 use crate::collapse::common::Occurrences;
 use crate::collapse::Collapse;
 
-macro_rules! invalid_data {
-    ($($arg:tt)*) => {{
-        return Err(io::Error::new(
-            io::ErrorKind::InvalidData,
-            format!($($arg)*),
-        ));
-    }};
-}
-
 // The call graph begins after this line.
 static HEADER: &str = "Function Stack,CPU Time:Self,Module";
 
@@ -162,7 +153,7 @@ impl Folder {
                     self.stack.pop();
                 }
             } else if depth > prev_depth + 1 {
-                invalid_data!("Skipped indentation level at line:\n{}", line);
+                return invalid_data_error!("Skipped indentation level at line:\n{}", line);
             }
 
             if let Some((func, time, module)) = self.line_parts(&line[spaces..]) {
@@ -177,10 +168,10 @@ impl Folder {
                         self.write_stack(occurrences, time_ms);
                     }
                 } else {
-                    invalid_data!("Invalid `CPU Time:Self` field: {}", time);
+                    return invalid_data_error!("Invalid `CPU Time:Self` field: {}", time);
                 }
             } else {
-                invalid_data!("Unable to parse stack line:\n{}", line);
+                return invalid_data_error!("Unable to parse stack line:\n{}", line);
             }
         }
 
