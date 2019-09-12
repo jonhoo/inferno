@@ -22,6 +22,13 @@ pub mod perf;
 ///   [crate-level documentation]: ../../index.html
 pub mod sample;
 
+/// Stack collapsing for the output of [`VTune`](https://software.intel.com/en-us/vtune-amplifier-help-command-line-interface).
+///
+/// See the [crate-level documentation] for details.
+///
+///   [crate-level documentation]: ../../index.html
+pub mod vtune;
+
 pub(crate) mod common;
 
 // DEFAULT_NTHREADS is public because we use it in the help text of the binaries,
