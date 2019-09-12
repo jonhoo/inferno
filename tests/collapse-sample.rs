@@ -2,11 +2,10 @@ mod common;
 
 use std::fs::File;
 use std::io::{self, BufReader, Cursor};
-use std::process::Command;
+use std::process::{Command, Stdio};
 
 use assert_cmd::prelude::*;
 use inferno::collapse::sample::{Folder, Options};
-use inferno::collapse::Collapse;
 use log::Level;
 use pretty_assertions::assert_eq;
 
@@ -14,6 +13,10 @@ use common::test_logger::CapturedLog;
 
 fn test_collapse_sample(test_file: &str, expected_file: &str, options: Options) -> io::Result<()> {
     common::test_collapse(Folder::from(options), test_file, expected_file, false)
+}
+
+fn test_collapse_sample_error(test_file: &str, options: Options) -> io::Error {
+    common::test_collapse_error(Folder::from(options), test_file)
 }
 
 fn test_collapse_sample_logs_with_options<F>(input_file: &str, asserter: F, options: Options)
@@ -73,165 +76,69 @@ fn collapse_sample_should_log_warning_for_ending_before_call_graph_start() {
 }
 
 #[test]
-fn collapse_sample_should_error_for_ending_before_call_graph_end() -> io::Result<()> {
-    let path = "./tests/data/collapse-sample/end-before-call-graph-end.txt";
-    let mut collapser = Folder::default();
-    match collapser.collapse_file(Some(path), io::sink()) {
-        Ok(_) => panic!(
-            "Collapsing {:?} should have returned an error, but instead it returned Ok.",
-            path
-        ),
-        Err(e) => {
-            let kind = e.kind();
-            if kind != io::ErrorKind::InvalidData {
-                panic!(
-                    "Collapsing {:?} should have returned io::ErrorKind::InvalidData, \
-                     but instead it returned {:?}",
-                    path, kind,
-                );
-            }
-            let expected_message = "File ended before end of call graph.";
-            let inner = e.into_inner().expect(&format!(
-                "Collapsing {:?} should have returned an error with message {:?},
-                 but instead it returned an error that did not contain a message",
-                path, expected_message,
-            ));
-            let s = format!("{}", inner);
-            assert_eq!(
-                &s, expected_message,
-                "Collapsing {:?} returned an error with the wrong message",
-                path
-            );
-        }
-    }
-    Ok(())
+fn collapse_sample_should_return_error_for_ending_before_call_graph_end() {
+    let test_file = "./tests/data/collapse-sample/end-before-call-graph-end.txt";
+    let error = test_collapse_sample_error(test_file, Options::default());
+    assert_eq!(error.kind(), io::ErrorKind::InvalidData);
+    assert!(error
+        .to_string()
+        .starts_with("File ended before end of call graph"));
 }
 
 #[test]
-fn collapse_sample_should_log_error_for_no_four_spaces() {
-    test_collapse_sample_logs(
-        "./tests/data/collapse-sample/no-four-spaces.txt",
-        |captured_logs| {
-            let nerrors = captured_logs
-                .into_iter()
-                .filter(|log| {
-                    log.body
-                        .starts_with("Stack line doesn't start with 4 spaces")
-                        && log.level == Level::Error
-                })
-                .count();
-            assert_eq!(
-                nerrors, 1,
-                "error logged {} times, but should be logged exactly once",
-                nerrors
-            );
-        },
-    );
+fn collapse_sample_should_return_error_for_no_four_spaces() {
+    let test_file = "./tests/data/collapse-sample/no-four-spaces.txt";
+    let error = test_collapse_sample_error(test_file, Options::default());
+    assert_eq!(error.kind(), io::ErrorKind::InvalidData);
+    assert!(error
+        .to_string()
+        .starts_with("Stack line doesn't start with 4 spaces"));
 }
 
 #[test]
-fn collapse_sample_should_log_error_for_odd_number_of_indent_chars() {
-    test_collapse_sample_logs(
-        "./tests/data/collapse-sample/odd-indentation.txt",
-        |captured_logs| {
-            let nerrors = captured_logs
-                .into_iter()
-                .filter(|log| {
-                    log.body
-                        .starts_with("Odd number of indentation characters for line")
-                        && log.level == Level::Error
-                })
-                .count();
-            assert_eq!(
-                nerrors, 1,
-                "error logged {} times, but should be logged exactly once",
-                nerrors
-            );
-        },
-    );
+fn collapse_sample_should_return_error_for_odd_number_of_indent_chars() {
+    let test_file = "./tests/data/collapse-sample/odd-indentation.txt";
+    let error = test_collapse_sample_error(test_file, Options::default());
+    assert_eq!(error.kind(), io::ErrorKind::InvalidData);
+    assert!(error
+        .to_string()
+        .starts_with("Odd number of indentation characters for line"));
 }
 
 #[test]
-fn collapse_sample_should_log_error_for_skipped_indent_level() {
-    test_collapse_sample_logs(
-        "./tests/data/collapse-sample/skipped-indentation.txt",
-        |captured_logs| {
-            let nerrors = captured_logs
-                .into_iter()
-                .filter(|log| {
-                    log.body.starts_with("Skipped indentation level at line")
-                        && log.level == Level::Error
-                })
-                .count();
-            assert_eq!(
-                nerrors, 1,
-                "error logged {} times, but should be logged exactly once",
-                nerrors
-            );
-        },
-    );
+fn collapse_sample_should_return_error_for_skipped_indent_level() {
+    let test_file = "./tests/data/collapse-sample/skipped-indentation.txt";
+    let error = test_collapse_sample_error(test_file, Options::default());
+    assert_eq!(error.kind(), io::ErrorKind::InvalidData);
+    assert!(error
+        .to_string()
+        .starts_with("Skipped indentation level at line"));
 }
 
 #[test]
-fn collapse_sample_should_log_error_for_invalid_samples_field() {
-    test_collapse_sample_logs(
-        "./tests/data/collapse-sample/invalid-samples-field.txt",
-        |captured_logs| {
-            let nerrors = captured_logs
-                .into_iter()
-                .filter(|log| {
-                    log.body.starts_with("Invalid samples field") && log.level == Level::Error
-                })
-                .count();
-            assert_eq!(
-                nerrors, 1,
-                "error logged {} times, but should be logged exactly once",
-                nerrors
-            );
-        },
-    );
+fn collapse_sample_should_return_error_for_invalid_samples_field() {
+    let test_file = "./tests/data/collapse-sample/invalid-samples-field.txt";
+    let error = test_collapse_sample_error(test_file, Options::default());
+    assert_eq!(error.kind(), io::ErrorKind::InvalidData);
+    assert!(error.to_string().starts_with("Invalid samples field"));
 }
 
 #[test]
-fn collapse_sample_should_log_error_for_bad_stack_line() {
-    test_collapse_sample_logs(
-        "./tests/data/collapse-sample/bad-stack-line.txt",
-        |captured_logs| {
-            let nerrors = captured_logs
-                .into_iter()
-                .filter(|log| {
-                    log.body.starts_with("Unable to parse stack line") && log.level == Level::Error
-                })
-                .count();
-            assert_eq!(
-                nerrors, 1,
-                "error logged {} times, but should be logged exactly once",
-                nerrors
-            );
-        },
-    );
+fn collapse_sample_should_return_error_for_bad_stack_line() {
+    let test_file = "./tests/data/collapse-sample/bad-stack-line.txt";
+    let error = test_collapse_sample_error(test_file, Options::default());
+    assert_eq!(error.kind(), io::ErrorKind::InvalidData);
+    assert!(error.to_string().starts_with("Unable to parse stack line"));
 }
 
 #[test]
-fn collapse_sample_should_log_error_for_stack_line_with_only_indent_chars() {
-    test_collapse_sample_logs(
-        "./tests/data/collapse-sample/stack-line-only-indent-chars.txt",
-        |captured_logs| {
-            let nerrors = captured_logs
-                .into_iter()
-                .filter(|log| {
-                    log.body
-                        .starts_with("Found stack line with only indent characters")
-                        && log.level == Level::Error
-                })
-                .count();
-            assert_eq!(
-                nerrors, 1,
-                "error logged {} times, but should be logged exactly once",
-                nerrors
-            );
-        },
-    );
+fn collapse_sample_should_return_error_for_stack_line_with_only_indent_chars() {
+    let test_file = "./tests/data/collapse-sample/stack-line-only-indent-chars.txt";
+    let error = test_collapse_sample_error(test_file, Options::default());
+    assert_eq!(error.kind(), io::ErrorKind::InvalidData);
+    assert!(error
+        .to_string()
+        .starts_with("Found stack line with only indent characters"));
 }
 
 #[test]
@@ -248,19 +155,17 @@ fn collapse_sample_cli() {
     let expected = BufReader::new(File::open(expected_file).unwrap());
     common::compare_results(Cursor::new(output.stdout), expected, expected_file, false);
 
-    // This is commented out because it times out on Travis CI (on Windows).
-    //
     // Test with STDIN
-    // let mut child = Command::cargo_bin("inferno-collapse-sample")
-    //     .unwrap()
-    //     .stdin(Stdio::piped())
-    //     .stdout(Stdio::piped())
-    //     .spawn()
-    //     .expect("Failed to spawn child process");
-    // let mut input = BufReader::new(File::open(input_file).unwrap());
-    // let stdin = child.stdin.as_mut().expect("Failed to open stdin");
-    // io::copy(&mut input, stdin).unwrap();
-    // let output = child.wait_with_output().expect("Failed to read stdout");
-    // let expected = BufReader::new(File::open(expected_file).unwrap());
-    // common::compare_results(Cursor::new(output.stdout), expected, expected_file, false);
+    let mut child = Command::cargo_bin("inferno-collapse-sample")
+        .unwrap()
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .spawn()
+        .expect("Failed to spawn child process");
+    let mut input = BufReader::new(File::open(input_file).unwrap());
+    let stdin = child.stdin.as_mut().expect("Failed to open stdin");
+    io::copy(&mut input, stdin).unwrap();
+    let output = child.wait_with_output().expect("Failed to read stdout");
+    let expected = BufReader::new(File::open(expected_file).unwrap());
+    common::compare_results(Cursor::new(output.stdout), expected, expected_file, false);
 }

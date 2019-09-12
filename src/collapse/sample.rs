@@ -1,6 +1,6 @@
 use std::io::{self, BufRead};
 
-use log::{error, warn};
+use log::warn;
 
 use crate::collapse::common::{self, Occurrences};
 use crate::collapse::Collapse;
@@ -92,21 +92,18 @@ impl Collapse for Folder {
         loop {
             line.clear();
             if reader.read_line(&mut line)? == 0 {
-                return Err(io::Error::new(
-                    io::ErrorKind::InvalidData,
-                    "File ended before end of call graph.",
-                ));
+                return invalid_data_error!("File ended before end of call graph");
             }
             let line = line.trim_end();
             if line.is_empty() {
                 continue;
             } else if line.starts_with("    ") {
-                self.on_line(line, &mut occurrences);
+                self.on_line(line, &mut occurrences)?;
             } else if line.starts_with(END_LINE) {
                 self.write_stack(&mut occurrences);
                 break;
             } else {
-                error!("Stack line doesn't start with 4 spaces:\n{}", line);
+                return invalid_data_error!("Stack line doesn't start with 4 spaces:\n{}", line);
             }
         }
 
@@ -197,11 +194,14 @@ impl Folder {
     //    +   ! 4282 __doworkq_kernreturn  (in libsystem_kernel.dylib) ...
     //    +   848 _pthread_wqthread  (in libsystem_pthread.dylib) ...
     //    +     848 __doworkq_kernreturn  (in libsystem_kernel.dylib) ...
-    fn on_line(&mut self, line: &str, occurrences: &mut Occurrences) {
+    fn on_line(&mut self, line: &str, occurrences: &mut Occurrences) -> io::Result<()> {
         if let Some(indent_chars) = line[4..].find(|c| !Self::is_indent_char(c)) {
             // Each indent is two characters
             if indent_chars % 2 != 0 {
-                error!("Odd number of indentation characters for line:\n{}", line);
+                return invalid_data_error!(
+                    "Odd number of indentation characters for line:\n{}",
+                    line
+                );
             }
 
             let prev_depth = self.stack.len();
@@ -217,7 +217,7 @@ impl Folder {
                     self.stack.pop();
                 }
             } else if depth > prev_depth + 1 {
-                error!("Skipped indentation level at line:\n{}", line);
+                return invalid_data_error!("Skipped indentation level at line:\n{}", line);
             }
 
             if let Some((samples, func, module)) = self.line_parts(&line[4 + indent_chars..]) {
@@ -234,14 +234,16 @@ impl Folder {
                         self.stack.push(format!("{}`{}", module, func));
                     }
                 } else {
-                    error!("Invalid samples field: {}", samples);
+                    return invalid_data_error!("Invalid samples field: {}", samples);
                 }
             } else {
-                error!("Unable to parse stack line:\n{}", line);
+                return invalid_data_error!("Unable to parse stack line:\n{}", line);
             }
         } else {
-            error!("Found stack line with only indent characters:\n{}", line);
+            return invalid_data_error!("Found stack line with only indent characters:\n{}", line);
         }
+
+        Ok(())
     }
 
     fn write_stack(&self, occurrences: &mut Occurrences) {
