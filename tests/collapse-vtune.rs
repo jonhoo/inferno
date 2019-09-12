@@ -78,7 +78,9 @@ fn collapse_vtune_should_return_error_for_skipped_indent_level() {
     let test_file = "./tests/data/collapse-vtune/skipped-indentation.csv";
     let error = test_collapse_vtune_error(test_file, Options::default());
     assert_eq!(error.kind(), io::ErrorKind::InvalidData);
-    assert!(error.to_string().starts_with("Skipped indentation level at line"));
+    assert!(error
+        .to_string()
+        .starts_with("Skipped indentation level at line"));
 }
 
 #[test]
@@ -86,7 +88,9 @@ fn collapse_vtune_should_return_error_for_invalid_time_field() {
     let test_file = "./tests/data/collapse-vtune/invalid-time-field.csv";
     let error = test_collapse_vtune_error(test_file, Options::default());
     assert_eq!(error.kind(), io::ErrorKind::InvalidData);
-    assert!(error.to_string().starts_with("Invalid `CPU Time:Self` field"));
+    assert!(error
+        .to_string()
+        .starts_with("Invalid `CPU Time:Self` field"));
 }
 
 #[test]

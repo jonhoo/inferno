@@ -105,10 +105,7 @@ where
     test_logger::validate(asserter);
 }
 
-pub fn test_collapse_error<C>(
-    mut collapser: C,
-    test_filename: &str,
-) -> io::Error
+pub fn test_collapse_error<C>(mut collapser: C, test_filename: &str) -> io::Error
 where
     C: Collapse,
 {

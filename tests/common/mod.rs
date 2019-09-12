@@ -3,4 +3,4 @@
 mod collapse;
 pub mod test_logger;
 
-pub use self::collapse::{compare_results, test_collapse, test_collapse_logs, test_collapse_error};
+pub use self::collapse::{compare_results, test_collapse, test_collapse_error, test_collapse_logs};
