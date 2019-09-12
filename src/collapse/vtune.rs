@@ -177,13 +177,6 @@ impl Folder {
     }
 
     fn write_stack(&self, occurrences: &mut Occurrences, time: usize) {
-        let mut key = String::new();
-        for (i, frame) in self.stack.iter().enumerate() {
-            if i > 0 {
-                key.push(';');
-            }
-            key.push_str(frame);
-        }
-        occurrences.insert(key, time);
+        occurrences.insert(self.stack.join(";"), time);
     }
 }
