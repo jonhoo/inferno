@@ -104,3 +104,27 @@ where
     collapser.collapse(r, std::io::sink()).unwrap();
     test_logger::validate(asserter);
 }
+
+pub fn test_collapse_error<C>(
+    mut collapser: C,
+    test_filename: &str,
+) -> io::Error
+where
+    C: Collapse,
+{
+    if fs::metadata(test_filename).is_err() {
+        panic!("Failed to open input file '{}'", test_filename);
+    }
+
+    let mut collapse = move |out: &mut dyn io::Write| {
+        if test_filename.ends_with(".gz") {
+            let test_file = File::open(test_filename)?;
+            let r = BufReader::new(Decoder::new(test_file).unwrap());
+            collapser.collapse(r, out)
+        } else {
+            collapser.collapse_file(Some(test_filename), out)
+        }
+    };
+
+    collapse(&mut io::sink()).expect_err("Expected an error")
+}

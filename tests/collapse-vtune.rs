@@ -15,6 +15,10 @@ fn test_collapse_vtune(test_file: &str, expected_file: &str, options: Options) -
     common::test_collapse(Folder::from(options), test_file, expected_file, false)
 }
 
+fn test_collapse_vtune_error(test_file: &str, options: Options) -> io::Error {
+    common::test_collapse_error(Folder::from(options), test_file)
+}
+
 fn test_collapse_vtune_logs_with_options<F>(input_file: &str, asserter: F, options: Options)
 where
     F: Fn(&Vec<CapturedLog>),
@@ -70,65 +74,27 @@ fn collapse_vtune_should_log_warning_for_ending_before_header() {
 }
 
 #[test]
-fn collapse_vtune_should_log_error_for_skipped_indent_level() {
-    test_collapse_vtune_logs(
-        "./tests/data/collapse-vtune/skipped-indentation.csv",
-        |captured_logs| {
-            let nerrors = captured_logs
-                .into_iter()
-                .filter(|log| {
-                    log.body.starts_with("Skipped indentation level at line")
-                        && log.level == Level::Error
-                })
-                .count();
-            assert_eq!(
-                nerrors, 1,
-                "error logged {} times, but should be logged exactly once",
-                nerrors
-            );
-        },
-    );
+fn collapse_vtune_should_return_error_for_skipped_indent_level() {
+    let test_file = "./tests/data/collapse-vtune/skipped-indentation.csv";
+    let error = test_collapse_vtune_error(test_file, Options::default());
+    assert_eq!(error.kind(), io::ErrorKind::InvalidData);
+    assert!(error.to_string().starts_with("Skipped indentation level at line"));
 }
 
 #[test]
-fn collapse_vtune_should_log_error_for_invalid_time_field() {
-    test_collapse_vtune_logs(
-        "./tests/data/collapse-vtune/invalid-time-field.csv",
-        |captured_logs| {
-            let nerrors = captured_logs
-                .into_iter()
-                .filter(|log| {
-                    log.body.starts_with("Invalid `CPU Time:Self` field")
-                        && log.level == Level::Error
-                })
-                .count();
-            assert_eq!(
-                nerrors, 1,
-                "error logged {} times, but should be logged exactly once",
-                nerrors
-            );
-        },
-    );
+fn collapse_vtune_should_return_error_for_invalid_time_field() {
+    let test_file = "./tests/data/collapse-vtune/invalid-time-field.csv";
+    let error = test_collapse_vtune_error(test_file, Options::default());
+    assert_eq!(error.kind(), io::ErrorKind::InvalidData);
+    assert!(error.to_string().starts_with("Invalid `CPU Time:Self` field"));
 }
 
 #[test]
-fn collapse_vtune_should_log_error_for_bad_stack_line() {
-    test_collapse_vtune_logs(
-        "./tests/data/collapse-vtune/bad-stack-line.csv",
-        |captured_logs| {
-            let nerrors = captured_logs
-                .into_iter()
-                .filter(|log| {
-                    log.body.starts_with("Unable to parse stack line") && log.level == Level::Error
-                })
-                .count();
-            assert_eq!(
-                nerrors, 1,
-                "error logged {} times, but should be logged exactly once",
-                nerrors
-            );
-        },
-    );
+fn collapse_vtune_should_return_error_for_bad_stack_line() {
+    let test_file = "./tests/data/collapse-vtune/bad-stack-line.csv";
+    let error = test_collapse_vtune_error(test_file, Options::default());
+    assert_eq!(error.kind(), io::ErrorKind::InvalidData);
+    assert!(error.to_string().starts_with("Unable to parse stack line"));
 }
 
 #[test]

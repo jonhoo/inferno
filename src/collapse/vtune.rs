@@ -1,9 +1,18 @@
 use std::io::{self, BufRead};
 
-use log::{error, warn};
+use log::warn;
 
 use crate::collapse::common::Occurrences;
 use crate::collapse::Collapse;
+
+macro_rules! invalid_data {
+    ($($arg:tt)*) => {{
+        return Err(io::Error::new(
+            io::ErrorKind::InvalidData,
+            format!($($arg)*),
+        ));
+    }};
+}
 
 // The call graph begins after this line.
 static HEADER: &str = "Function Stack,CPU Time:Self,Module";
@@ -74,7 +83,7 @@ impl Collapse for Folder {
             if line.is_empty() {
                 continue;
             } else {
-                self.on_line(line, &mut occurrences);
+                self.on_line(line, &mut occurrences)?;
             }
         }
 
@@ -140,7 +149,7 @@ impl Folder {
         Some((func, time, module))
     }
 
-    fn on_line(&mut self, line: &str, occurrences: &mut Occurrences) {
+    fn on_line(&mut self, line: &str, occurrences: &mut Occurrences) -> io::Result<()> {
         if let Some(spaces) = line.find(|c| c != ' ') {
             let prev_depth = self.stack.len();
             let depth = spaces + 1;
@@ -153,7 +162,7 @@ impl Folder {
                     self.stack.pop();
                 }
             } else if depth > prev_depth + 1 {
-                error!("Skipped indentation level at line:\n{}", line);
+                invalid_data!("Skipped indentation level at line:\n{}", line);
             }
 
             if let Some((func, time, module)) = self.line_parts(&line[spaces..]) {
@@ -168,12 +177,14 @@ impl Folder {
                         self.write_stack(occurrences, time_ms);
                     }
                 } else {
-                    error!("Invalid `CPU Time:Self` field: {}", time);
+                    invalid_data!("Invalid `CPU Time:Self` field: {}", time);
                 }
             } else {
-                error!("Unable to parse stack line:\n{}", line);
+                invalid_data!("Unable to parse stack line:\n{}", line);
             }
         }
+
+        Ok(())
     }
 
     fn write_stack(&self, occurrences: &mut Occurrences, time: usize) {
