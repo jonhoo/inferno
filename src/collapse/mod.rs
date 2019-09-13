@@ -1,3 +1,6 @@
+#[macro_use]
+pub(crate) mod common;
+
 /// Stack collapsing for the output of [`dtrace`](https://www.joyent.com/dtrace).
 ///
 /// See the [crate-level documentation] for details.
@@ -22,7 +25,12 @@ pub mod perf;
 ///   [crate-level documentation]: ../../index.html
 pub mod sample;
 
-pub(crate) mod common;
+/// Stack collapsing for the output of [`VTune`](https://software.intel.com/en-us/vtune-amplifier-help-command-line-interface).
+///
+/// See the [crate-level documentation] for details.
+///
+///   [crate-level documentation]: ../../index.html
+pub mod vtune;
 
 // DEFAULT_NTHREADS is public because we use it in the help text of the binaries,
 // but it doesn't need to be exposed to library users, hence #[doc(hidden)].
