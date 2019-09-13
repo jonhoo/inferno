@@ -8,8 +8,7 @@ use assert_cmd::cargo::CommandCargoExt;
 use inferno::collapse::guess::Folder;
 use log::Level;
 use pretty_assertions::assert_eq;
-
-use common::test_logger::CapturedLog;
+use testing_logger::CapturedLog;
 
 fn test_collapse_guess(test_file: &str, expected_file: &str, strip_quotes: bool) -> io::Result<()> {
     common::test_collapse(Folder::default(), test_file, expected_file, strip_quotes)

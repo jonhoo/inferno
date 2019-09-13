@@ -8,8 +8,7 @@ use assert_cmd::prelude::*;
 use inferno::collapse::vtune::{Folder, Options};
 use log::Level;
 use pretty_assertions::assert_eq;
-
-use common::test_logger::CapturedLog;
+use testing_logger::CapturedLog;
 
 fn test_collapse_vtune(test_file: &str, expected_file: &str, options: Options) -> io::Result<()> {
     common::test_collapse(Folder::from(options), test_file, expected_file, false)

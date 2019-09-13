@@ -8,8 +8,7 @@ use assert_cmd::cargo::CommandCargoExt;
 use inferno::differential::{self, Options};
 use log::Level;
 use pretty_assertions::assert_eq;
-
-use common::test_logger::{self, CapturedLog};
+use testing_logger::CapturedLog;
 
 fn test_diff_folded(
     infile1: &str,
@@ -97,12 +96,12 @@ fn test_diff_folded_logs_with_options<F>(
 ) where
     F: Fn(&Vec<CapturedLog>),
 {
-    test_logger::init();
+    testing_logger::setup();
     let r1 = BufReader::new(File::open(infile1).unwrap());
     let r2 = BufReader::new(File::open(infile2).unwrap());
     let sink = io::sink();
     let _ = differential::from_readers(options, r1, r2, sink);
-    test_logger::validate(asserter);
+    testing_logger::validate(asserter);
 }
 
 #[test]

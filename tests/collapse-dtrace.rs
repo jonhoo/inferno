@@ -8,8 +8,7 @@ use assert_cmd::cargo::CommandCargoExt;
 use inferno::collapse::dtrace::{Folder, Options};
 use log::Level;
 use pretty_assertions::assert_eq;
-
-use common::test_logger::CapturedLog;
+use testing_logger::CapturedLog;
 
 fn test_collapse_dtrace(test_file: &str, expected_file: &str, options: Options) -> io::Result<()> {
     for &n in &[1, 2] {
@@ -24,7 +23,8 @@ fn test_collapse_dtrace_logs_with_options<F>(input_file: &str, asserter: F, mut 
 where
     F: Fn(&Vec<CapturedLog>),
 {
-    options.nthreads = 2;
+    // We must run log tests in a single thread to play nicely with `testing_logger`.
+    options.nthreads = 1;
     common::test_collapse_logs(Folder::from(options), input_file, asserter);
 }
 

@@ -11,8 +11,7 @@ use inferno::flamegraph::color::{BackgroundColor, PaletteMap};
 use inferno::flamegraph::{self, Direction, Options, Palette};
 use log::Level;
 use pretty_assertions::assert_eq;
-
-use common::test_logger::{self, CapturedLog};
+use testing_logger::CapturedLog;
 
 fn test_flamegraph(
     input_file: &str,
@@ -115,11 +114,11 @@ fn test_flamegraph_logs_with_options<F>(
 ) where
     F: Fn(&Vec<CapturedLog>),
 {
-    test_logger::init();
+    testing_logger::setup();
     let r = File::open(input_file).unwrap();
     let sink = io::sink();
     let _ = flamegraph::from_reader(&mut options, r, sink);
-    test_logger::validate(asserter);
+    testing_logger::validate(asserter);
 }
 
 #[test]
@@ -255,10 +254,10 @@ fn flamegraph_nameattr_duplicate_attributes() {
 #[test]
 #[cfg(feature = "nameattr")]
 fn flamegraph_nameattr_should_warn_about_duplicate_attributes() {
-    test_logger::init();
+    testing_logger::setup();
     let nameattr_file = "./tests/data/flamegraph/nameattr/nameattr_duplicate_attributes.txt";
     let _ = flamegraph::FuncFrameAttrsMap::from_file(&PathBuf::from(nameattr_file));
-    test_logger::validate(|captured_logs| {
+    testing_logger::validate(|captured_logs| {
         let nwarnings = captured_logs
             .into_iter()
             .filter(|log| log.body.starts_with("duplicate attribute") && log.level == Level::Warn)
@@ -274,10 +273,10 @@ fn flamegraph_nameattr_should_warn_about_duplicate_attributes() {
 #[test]
 #[cfg(feature = "nameattr")]
 fn flamegraph_nameattr_should_warn_about_invalid_attribute() {
-    test_logger::init();
+    testing_logger::setup();
     let nameattr_file = "./tests/data/flamegraph/nameattr/nameattr_invalid_attribute.txt";
     let _ = flamegraph::FuncFrameAttrsMap::from_file(&PathBuf::from(nameattr_file));
-    test_logger::validate(|captured_logs| {
+    testing_logger::validate(|captured_logs| {
         let nwarnings = captured_logs
             .into_iter()
             .filter(|log| log.body.starts_with("invalid attribute") && log.level == Level::Warn)
@@ -376,10 +375,10 @@ fn flamegraph_palette_map() {
 
 #[test]
 fn flamegraph_palette_map_should_warn_about_invalid_lines() {
-    test_logger::init();
+    testing_logger::setup();
     let palette_file = "./tests/data/flamegraph/palette-map/palette_invalid.map";
     let _ = load_palette_map_file(palette_file);
-    test_logger::validate(|captured_logs| {
+    testing_logger::validate(|captured_logs| {
         let nwarnings = captured_logs
             .into_iter()
             .filter(|log| {
