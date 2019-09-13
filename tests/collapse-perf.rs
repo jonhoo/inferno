@@ -9,8 +9,7 @@ use assert_cmd::cargo::CommandCargoExt;
 use inferno::collapse::perf::{Folder, Options};
 use log::Level;
 use pretty_assertions::assert_eq;
-
-use common::test_logger::CapturedLog;
+use testing_logger::CapturedLog;
 
 fn test_collapse_perf(
     test_file: &str,
@@ -35,7 +34,8 @@ fn test_collapse_perf_logs_with_options<F>(input_file: &str, asserter: F, mut op
 where
     F: Fn(&Vec<CapturedLog>),
 {
-    options.nthreads = 2;
+    // We must run log tests in a single thread to play nicely with `testing_logger`.
+    options.nthreads = 1;
     common::test_collapse_logs(Folder::from(options), input_file, asserter);
 }
 

@@ -4,8 +4,7 @@ use std::io::{self, BufRead, BufReader, Cursor};
 use inferno::collapse::Collapse;
 use libflate::gzip::Decoder;
 use pretty_assertions::assert_eq;
-
-use super::test_logger::{self, CapturedLog};
+use testing_logger::CapturedLog;
 
 pub fn compare_results<R, E>(result: R, mut expected: E, expected_file: &str, strip_quotes: bool)
 where
@@ -99,10 +98,10 @@ where
     C: Collapse,
     F: Fn(&Vec<CapturedLog>),
 {
-    test_logger::init();
+    testing_logger::setup();
     let r = BufReader::new(File::open(input_file).unwrap());
     collapser.collapse(r, std::io::sink()).unwrap();
-    test_logger::validate(asserter);
+    testing_logger::validate(asserter);
 }
 
 pub fn test_collapse_error<C>(mut collapser: C, test_filename: &str) -> io::Error

@@ -8,8 +8,7 @@ use assert_cmd::prelude::*;
 use inferno::collapse::sample::{Folder, Options};
 use log::Level;
 use pretty_assertions::assert_eq;
-
-use common::test_logger::CapturedLog;
+use testing_logger::CapturedLog;
 
 fn test_collapse_sample(test_file: &str, expected_file: &str, options: Options) -> io::Result<()> {
     common::test_collapse(Folder::from(options), test_file, expected_file, false)
