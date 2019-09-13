@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support for collapsing the CSV output of the VTune `amplxe-cl` tool ([#148](https://github.com/jonhoo/inferno/pull/148) by [@jasonrhansen](https://github.com/jasonrhansen)).
 
 ### Changed
+- The `sample` collapser now returns errors where it used to just log them in places where it doesn't make sense to continue.
 
 ### Removed
 
