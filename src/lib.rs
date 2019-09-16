@@ -29,9 +29,9 @@
 //! Since profiling tools produce stack traces in a myriad of different formats, and the flame
 //! graph plotter expects input in a particular folded stack trace format, each profiler needs a
 //! separate collapse implementation. While the original Perl implementation supports _lots_ of
-//! profilers, Inferno currently only supports three: the widely used [`perf`] tool (specifically
-//! the output from `perf script`), [DTrace], and [sample]. Support for xdebug is [hopefully coming
-//! soon], and [`bpftrace`] should get [native support] before too long.
+//! profilers, Inferno currently only supports four: the widely used [`perf`] tool (specifically
+//! the output from `perf script`), [DTrace], [sample], and [VTune]. Support for xdebug is
+//! [hopefully coming soon], and [`bpftrace`] should get [native support] before too long.
 //!
 //! Inferno supports profiles from applications written in any language, but we'll walk through an
 //! example with a Rust program. To profile a Rust application, you would first set
@@ -64,6 +64,23 @@
 //!
 //! For more advanced uses, see also upstream FlameGraph's [DTrace examples].
 //! You may also be interested in something like [NodeJS's ustack helper].
+//!
+//! ### sample (macOS)
+//!
+//! ```console
+//! $ target/release/mybin &
+//! $ pid=$!
+//! $ sample $pid 30 -file sample.txt
+//! $ inferno-collapse-sample sample.txt > stacks.folded
+//! ```
+//!
+//! ### VTune (Windows and Linux)
+//!
+//! ```console
+//! $ amplxe-cl -collect hotspots -r resultdir -- target/release/mybin
+//! $ amplxe-cl -R top-down -call-stack-mode all -column=\"CPU Time:Self\",\"Module\" -report-out result.csv -filter \"Function Stack\" -format csv -csv-delimiter comma -r resultdir
+//! $ inferno-collapse-vtune result.csv > stacks.folded
+//! ```
 //!
 //! ## Producing a flame graph
 //!
@@ -122,6 +139,7 @@
 //!   [a series of live coding sessions]: https://www.youtube.com/watch?v=jTpK-bNZiA4&list=PLqbS7AVVErFimAvMW-kIJUwxpPvcPBCsz
 //!   [differential flame graphs]: http://www.brendangregg.com/blog/2014-11-09/differential-flame-graphs.html
 //!   [sample]: https://gist.github.com/loderunner/36724cc9ee8db66db305#profiling-with-sample
+//!   [VTune]: https://software.intel.com/en-us/vtune-amplifier-help-command-line-interface
 
 #![deny(missing_docs)]
 #![cfg_attr(all(test, feature = "nightly"), feature(test))]
