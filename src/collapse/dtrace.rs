@@ -422,7 +422,7 @@ mod tests {
                 "./tests/data/collapse-dtrace/only-header-lines.txt",
                 "./tests/data/collapse-dtrace/scope_with_no_argument_list.txt",
             ]
-            .into_iter()
+            .iter()
             .map(PathBuf::from)
             .collect::<Vec<_>>()
         };

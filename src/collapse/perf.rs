@@ -639,7 +639,7 @@ mod tests {
                 "./tests/data/collapse-perf/java-inline.txt",
                 "./tests/data/collapse-perf/weird-stack-line.txt",
             ]
-            .into_iter()
+            .iter()
             .map(PathBuf::from)
             .collect::<Vec<_>>()
         };
