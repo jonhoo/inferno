@@ -1,6 +1,6 @@
 macro_rules! args {
     ($($key:expr => $value:expr),*) => {{
-        [$(($key, $value),)*].into_iter().map(|(k, v): &(&str, &str)| (*k, *v))
+        [$(($key, $value),)*].iter().map(|(k, v): &(&str, &str)| (*k, *v))
     }};
 }
 
