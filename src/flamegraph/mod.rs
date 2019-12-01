@@ -12,6 +12,7 @@ mod merge;
 mod rand;
 mod svg;
 
+use std::cmp;
 use std::fs::File;
 use std::io::prelude::*;
 use std::io::{self, BufReader};
@@ -142,6 +143,11 @@ pub struct Options<'a> {
     /// Defaults to None.
     pub subtitle: Option<String>,
 
+    /// # of samples to size the flame graph width to
+    ///
+    /// Defaults to None, which means it will be determined by the input being charted.
+    pub total_samples: Option<usize>,
+
     /// Width of the flame graph
     ///
     /// Defaults to None, which means the width will be "fluid".
@@ -255,6 +261,7 @@ impl<'a> Default for Options<'a> {
             count_name: defaults::COUNT_NAME.to_string(),
             name_type: defaults::NAME_TYPE.to_string(),
             factor: defaults::FACTOR,
+            total_samples: Default::default(),
             image_width: Default::default(),
             notes: Default::default(),
             subtitle: Default::default(),
@@ -408,8 +415,12 @@ where
         )));
     }
 
+    let timemax = cmp::max(opt.total_samples.unwrap_or(time), time);
+    if opt.total_samples.unwrap_or(time) < time {
+        warn!("Specified --total {} is less than actual total {}, so ignored", opt.total_samples.unwrap(), time);
+    }
+
     let image_width = opt.image_width.unwrap_or(DEFAULT_IMAGE_WIDTH) as f64;
-    let timemax = time;
     let widthpertime_pct = 100.0 / timemax as f64;
     let minwidth_time = opt.min_width / widthpertime_pct;
 
