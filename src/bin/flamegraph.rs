@@ -173,6 +173,10 @@ struct Opt {
     )]
     title: String,
 
+    /// Set total width to this many samples
+    #[structopt(long = "total", value_name = "UINT")]
+    total: Option<usize>,
+
     /// Width of image
     #[structopt(long = "width", value_name = "UINT")]
     width: Option<usize>,
@@ -210,6 +214,7 @@ impl<'a> Opt {
 
         // set style options
         options.subtitle = self.subtitle;
+        options.total_samples = self.total;
         options.image_width = self.width;
         options.frame_height = self.height;
         options.min_width = self.minwidth;
@@ -365,6 +370,7 @@ mod tests {
             colors: Palette::from_str("purple").unwrap(),
             search_color: color::SearchColor::from_str("#203040").unwrap(),
             title: "Test Title".to_string(),
+            total_samples: None,
             image_width: Some(100),
             frame_height: 500,
             min_width: 90.1,
