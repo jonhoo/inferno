@@ -142,7 +142,7 @@ pub struct Options<'a> {
     /// Defaults to None.
     pub subtitle: Option<String>,
 
-    /// # of samples to size the flame graph width to. This is useful for comparing flame graphs 
+    /// # of samples to size the flame graph width to. This is useful for comparing flame graphs
     /// with different amounts of samples so the contents are sized relative to each other.
     ///
     /// Defaults to None, which means it will be determined by the input being charted.
@@ -420,10 +420,12 @@ where
         None => time,
         Some(total) => {
             if total < time {
-                warn!("Specified --total {} is less than actual total {}, so ignored", total, time);
+                warn!(
+                    "Specified --total {} is less than actual total {}, so ignored", 
+                    total, time
+                );
                 time
-            }
-            else {
+            } else {
                 total
             }
         }
