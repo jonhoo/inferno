@@ -421,7 +421,7 @@ where
         Some(total) => {
             if total < time {
                 warn!(
-                    "Specified --total {} is less than actual total {}, so ignored", 
+                    "Specified --total {} is less than actual total {}, so ignored",
                     total, time
                 );
                 time
