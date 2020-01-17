@@ -83,7 +83,7 @@ fn collapse_guess_unknown_format_should_log_error() {
         "./tests/data/collapse-guess/unknown-format.txt",
         |captured_logs| {
             let nerrors = captured_logs
-                .into_iter()
+                .iter()
                 .filter(|log| {
                     log.level == Level::Error
                         && log.body == "No applicable collapse implementation found for input"
@@ -104,7 +104,7 @@ fn collapse_guess_invalid_perf_should_log_error() {
         "./tests/data/collapse-guess/invalid-perf-with-empty-line-after-event-line.txt",
         |captured_logs| {
             let nerrors = captured_logs
-                .into_iter()
+                .iter()
                 .filter(|log| {
                     log.level == Level::Error
                         && log.body == "No applicable collapse implementation found for input"

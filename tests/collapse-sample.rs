@@ -43,15 +43,7 @@ fn collapse_sample_default() {
 fn collapse_sample_no_modules() {
     let test_file = "./tests/data/collapse-sample/sample.txt";
     let result_file = "./tests/data/collapse-sample/results/sample-no-modules.txt";
-    test_collapse_sample(
-        test_file,
-        result_file,
-        Options {
-            no_modules: true,
-            ..Default::default()
-        },
-    )
-    .unwrap()
+    test_collapse_sample(test_file, result_file, Options { no_modules: true }).unwrap()
 }
 
 #[test]
@@ -60,7 +52,7 @@ fn collapse_sample_should_log_warning_for_ending_before_call_graph_start() {
         "./tests/data/collapse-sample/end-before-call-graph-start.txt",
         |captured_logs| {
             let nwarnings = captured_logs
-                .into_iter()
+                .iter()
                 .filter(|log| {
                     log.body == "File ended before start of call graph" && log.level == Level::Warn
                 })

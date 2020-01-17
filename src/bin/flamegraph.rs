@@ -256,7 +256,7 @@ fn main() -> quick_xml::Result<()> {
             2 => "debug",
             _ => "trace",
         }))
-        .default_format_timestamp(false)
+        .format_timestamp(None)
         .init();
     }
 

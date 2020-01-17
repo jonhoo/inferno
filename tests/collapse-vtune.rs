@@ -43,15 +43,7 @@ fn collapse_vtune_default() {
 fn collapse_vtune_no_modules() {
     let test_file = "./tests/data/collapse-vtune/vtune.csv";
     let result_file = "./tests/data/collapse-vtune/results/vtune-no-modules.txt";
-    test_collapse_vtune(
-        test_file,
-        result_file,
-        Options {
-            no_modules: true,
-            ..Default::default()
-        },
-    )
-    .unwrap()
+    test_collapse_vtune(test_file, result_file, Options { no_modules: true }).unwrap()
 }
 
 #[test]
@@ -60,7 +52,7 @@ fn collapse_vtune_should_log_warning_for_ending_before_header() {
         "./tests/data/collapse-vtune/end-before-header.csv",
         |captured_logs| {
             let nwarnings = captured_logs
-                .into_iter()
+                .iter()
                 .filter(|log| log.body == "File ended before header" && log.level == Level::Warn)
                 .count();
             assert_eq!(

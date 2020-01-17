@@ -4,11 +4,10 @@ use std::mem;
 use std::sync::Arc;
 
 #[cfg(feature = "multithreaded")]
-use chashmap::CHashMap;
-#[cfg(feature = "multithreaded")]
 use crossbeam::channel;
-
-use fnv::FnvHashMap;
+#[cfg(feature = "multithreaded")]
+use dashmap::DashMap;
+use fxhash::FxHashMap;
 use lazy_static::lazy_static;
 
 macro_rules! invalid_data_error {
@@ -355,13 +354,13 @@ pub trait CollapsePrivate: Send + Sized {
 }
 
 /// Occurrences is a HashMap, which uses:
-/// * Fnv if single-threaded
-/// * CHashMap if multi-threaded
+/// * FxHashMap if single-threaded
+/// * DashMap if multi-threaded
 #[derive(Clone, Debug)]
 pub enum Occurrences {
-    SingleThreaded(FnvHashMap<String, usize>),
+    SingleThreaded(FxHashMap<String, usize>),
     #[cfg(feature = "multithreaded")]
-    MultiThreaded(Arc<CHashMap<String, usize>>),
+    MultiThreaded(Arc<DashMap<String, usize>>),
 }
 
 impl Occurrences {
@@ -383,15 +382,15 @@ impl Occurrences {
 
     fn new_single_threaded() -> Self {
         let map =
-            FnvHashMap::with_capacity_and_hasher(CAPACITY_HASHMAP, fnv::FnvBuildHasher::default());
+            FxHashMap::with_capacity_and_hasher(CAPACITY_HASHMAP, fxhash::FxBuildHasher::default());
         Occurrences::SingleThreaded(map)
     }
 
     #[cfg(feature = "multithreaded")]
     fn new_multi_threaded() -> Self {
-        let map = CHashMap::with_capacity(CAPACITY_HASHMAP);
-        let arc = Arc::new(map);
-        Occurrences::MultiThreaded(arc)
+        let map =
+            DashMap::with_capacity_and_hasher(CAPACITY_HASHMAP, fxhash::FxBuildHasher::default());
+        Occurrences::MultiThreaded(Arc::new(map))
     }
 
     /// Inserts a key-count pair into the map. If the map did not have this key
@@ -414,7 +413,7 @@ impl Occurrences {
         match self {
             SingleThreaded(map) => *map.entry(key).or_insert(0) += count,
             #[cfg(feature = "multithreaded")]
-            MultiThreaded(arc) => arc.upsert(key, || count, |v| *v += count),
+            MultiThreaded(arc) => *arc.entry(key).or_insert(0) += count,
         }
     }
 
@@ -450,10 +449,17 @@ impl Occurrences {
                          not allowed."
                     ),
                 };
-                let map = mem::replace(map, CHashMap::with_capacity(CAPACITY_HASHMAP));
-                let mut contents: Vec<_> = map.into_iter().collect();
-                contents.sort();
-                for (key, value) in contents {
+                let map = mem::replace(
+                    map,
+                    DashMap::with_capacity_and_hasher(
+                        CAPACITY_HASHMAP,
+                        fxhash::FxBuildHasher::default(),
+                    ),
+                );
+                let contents = map.iter().collect::<Vec<_>>();
+                let mut pairs = contents.iter().map(|pair| pair.pair()).collect::<Vec<_>>();
+                pairs.sort();
+                for (key, value) in pairs {
                     writeln!(writer, "{} {}", key, value)?;
                 }
             }
@@ -692,7 +698,7 @@ pub(crate) mod testing {
                     let avg_duration =
                         (durations.iter().sum::<u128>() as f64 / durations.len() as f64) as u64;
                     results.insert(nstacks_per_job, avg_duration);
-                    stdout.write(&[b'.'])?;
+                    stdout.write_all(&[b'.'])?;
                     stdout.flush()?;
                 }
                 Ok(Some(Self {
@@ -774,10 +780,10 @@ pub(crate) mod testing {
             if let Some(foo) = Foo::new(folder, path, bytes, &mut stdout)? {
                 foos.push(foo);
             }
-            stdout.write(&[b'\n'])?;
+            stdout.write_all(&[b'\n'])?;
             stdout.flush()?;
         }
-        stdout.write(&[b'\n'])?;
+        stdout.write_all(&[b'\n'])?;
         stdout.flush()?;
         foos.sort_by(|a, b| b.nstacks.cmp(&a.nstacks));
         for foo in foos {
