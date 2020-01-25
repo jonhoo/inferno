@@ -176,7 +176,7 @@ function update_text(e) {
     // Fit in full text width
     if (/^ *\$/.test(txt) || t.getComputedTextLength() < w)
         return;
-    if (text_truncate_right) {
+    if (truncate_text_right) {
         // Truncate the right side of the text.
         for (var x = txt.length - 2; x > 0; x--) {
             if (t.getSubStringLength(0, x + 2) <= w) {
@@ -186,9 +186,9 @@ function update_text(e) {
         }
     } else {
         // Truncate the left side of the text.
-        for (var x = 2; x < text.length; x++) {
-            if (t.getSubStringLength(x - 2, text.length) <= w) {
-                t.textContent = ".." + txt.substring(x, text.length);
+        for (var x = 2; x < txt.length; x++) {
+            if (t.getSubStringLength(x - 2, txt.length) <= w) {
+                t.textContent = ".." + txt.substring(x, txt.length);
                 return;
             }
         }
