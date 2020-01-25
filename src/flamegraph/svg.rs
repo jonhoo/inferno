@@ -7,7 +7,7 @@ use quick_xml::events::{BytesEnd, BytesStart, BytesText, Event};
 use quick_xml::Writer;
 use str_stack::StrStack;
 
-use super::{Direction, Options};
+use super::{Direction, Options, TextTruncateDirection};
 
 pub(super) enum TextArgument<'a> {
     String(Cow<'a, str>),
@@ -140,14 +140,16 @@ var fontwidth = {};
 var xpad = {};
 var inverted = {};
 var searchcolor = '{}';
-var fluiddrawing = {};",
+var fluiddrawing = {};
+var truncate_text_right = {};",
         enquote('\'', &opt.name_type),
         opt.font_size,
         opt.font_width,
         super::XPAD,
         opt.direction == Direction::Inverted,
         opt.search_color,
-        opt.image_width.is_none()
+        opt.image_width.is_none(),
+        opt.text_truncate_direction == TextTruncateDirection::Right
     ))))?;
     if !opt.no_javascript {
         svg.write_event(Event::CData(BytesText::from_escaped_str(include_str!(

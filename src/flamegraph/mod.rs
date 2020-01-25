@@ -172,6 +172,11 @@ pub struct Options<'a> {
     /// [Default value](defaults::FONT_WIDTH).
     pub font_width: f64,
 
+    /// When text doesn't fit in a frame, should we cut off left side or right side?
+    ///
+    /// [Default value](defaults::TEXT_TRUNCATE_DIRECTION)
+    pub text_truncate_direction: TextTruncateDirection,
+
     /// Count type label for the flame graph.
     ///
     /// [Default value](defaults::COUNT_NAME).
@@ -252,6 +257,7 @@ impl<'a> Default for Options<'a> {
             font_type: defaults::FONT_TYPE.to_string(),
             font_size: defaults::FONT_SIZE,
             font_width: defaults::FONT_WIDTH,
+            text_truncate_direction: Default::default(),
             count_name: defaults::COUNT_NAME.to_string(),
             name_type: defaults::NAME_TYPE.to_string(),
             factor: defaults::FACTOR,
@@ -291,6 +297,22 @@ pub enum Direction {
 impl Default for Direction {
     fn default() -> Self {
         Direction::Straight
+    }
+}
+
+/// The direction text is truncated when it's too long.
+#[derive(Debug, Clone, Copy, Eq, PartialEq)]
+pub enum TextTruncateDirection {
+    /// Truncate text on the left.
+    Left,
+
+    /// Truncate text on the right.
+    Right,
+}
+
+impl Default for TextTruncateDirection {
+    fn default() -> Self {
+        TextTruncateDirection::Left
     }
 }
 
