@@ -25,14 +25,14 @@ fn test_diff_folded(
                 differential::from_files(options, &infile1, &infile2, &mut f)?;
                 fs::metadata(expected_result_file).unwrap()
             } else {
-                return Err(e.into());
+                return Err(e);
             }
         }
     };
 
     let expected_len = metadata.len() as usize;
     let mut result = Cursor::new(Vec::with_capacity(expected_len));
-    let return_value = differential::from_files(options, infile1, infile2, &mut result)?;
+    differential::from_files(options, infile1, infile2, &mut result)?;
     let expected = BufReader::new(File::open(expected_result_file).unwrap());
     // write out the expected result to /tmp for easy restoration
     result.set_position(0);
@@ -44,7 +44,7 @@ fn test_diff_folded(
     // and then compare
     result.set_position(0);
     compare_results(result, expected, expected_result_file);
-    Ok(return_value)
+    Ok(())
 }
 
 fn compare_results<R, E>(result: R, expected: E, expected_file: &str)
@@ -155,7 +155,7 @@ fn diff_folded_should_log_warning_on_bad_input_line() {
         "./tests/data/diff-folded/after.txt",
         |captured_logs| {
             let nwarnings = captured_logs
-                .into_iter()
+                .iter()
                 .filter(|log| {
                     log.body.starts_with("Unable to parse line: ") && log.level == Level::Warn
                 })
@@ -176,7 +176,7 @@ fn diff_folded_should_log_warning_about_fractional_samples() {
         "./tests/data/diff-folded/after.txt",
         |captured_logs| {
             let nwarnings = captured_logs
-                .into_iter()
+                .iter()
                 .filter(|log| {
                     log.body == "The input data has fractional sample counts that will be truncated to integers" && log.level == Level::Warn
                 })
