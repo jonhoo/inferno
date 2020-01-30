@@ -36,6 +36,7 @@ fn collapse_guess_dtrace_java() {
 }
 
 #[test]
+#[cfg_attr(windows, ignore)]
 fn collapse_guess_dtrace_hex_addresses() {
     let test_file = "./tests/data/collapse-dtrace/hex-addresses.txt";
     let result_file = "./tests/data/collapse-dtrace/results/hex-addresses.txt";
