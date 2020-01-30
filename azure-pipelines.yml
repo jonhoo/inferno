@@ -3,6 +3,8 @@ jobs:
     parameters:
       codecov_token: $(CODECOV_TOKEN_SECRET)
       minrust: 1.36.0
+      env:
+        RUST_BACKTRACE: 1
 
 resources:
   repositories:
