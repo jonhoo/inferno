@@ -5,6 +5,9 @@ jobs:
       minrust: 1.36.0
       env:
         RUST_BACKTRACE: 1
+      setup:
+       - checkout: self
+         submodules: recursive
 
 resources:
   repositories:
