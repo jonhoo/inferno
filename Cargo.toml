@@ -27,10 +27,10 @@ multithreaded = ["dashmap", "crossbeam", "num_cpus"]
 nameattr = ["indexmap"]
 
 [dependencies]
+ahash = "0.3"
 crossbeam = { version = "0.7", optional = true }
 dashmap = { version = "3", optional = true }
 env_logger = { version = "0.7", optional = true }
-fxhash = "0.2"
 indexmap = { version = "1.0", optional = true }
 itoa = "0.4.3"
 lazy_static = "1.3.0"

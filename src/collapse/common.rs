@@ -3,11 +3,11 @@ use std::io;
 use std::mem;
 use std::sync::Arc;
 
+use ahash::AHashMap;
 #[cfg(feature = "multithreaded")]
 use crossbeam::channel;
 #[cfg(feature = "multithreaded")]
 use dashmap::DashMap;
-use fxhash::FxHashMap;
 use lazy_static::lazy_static;
 
 macro_rules! invalid_data_error {
@@ -354,11 +354,11 @@ pub trait CollapsePrivate: Send + Sized {
 }
 
 /// Occurrences is a HashMap, which uses:
-/// * FxHashMap if single-threaded
+/// * AHashMap if single-threaded
 /// * DashMap if multi-threaded
 #[derive(Clone, Debug)]
 pub enum Occurrences {
-    SingleThreaded(FxHashMap<String, usize>),
+    SingleThreaded(AHashMap<String, usize>),
     #[cfg(feature = "multithreaded")]
     MultiThreaded(Arc<DashMap<String, usize>>),
 }
@@ -382,14 +382,14 @@ impl Occurrences {
 
     fn new_single_threaded() -> Self {
         let map =
-            FxHashMap::with_capacity_and_hasher(CAPACITY_HASHMAP, fxhash::FxBuildHasher::default());
+            AHashMap::with_capacity_and_hasher(CAPACITY_HASHMAP, ahash::RandomState::default());
         Occurrences::SingleThreaded(map)
     }
 
     #[cfg(feature = "multithreaded")]
     fn new_multi_threaded() -> Self {
         let map =
-            DashMap::with_capacity_and_hasher(CAPACITY_HASHMAP, fxhash::FxBuildHasher::default());
+            DashMap::with_capacity_and_hasher(CAPACITY_HASHMAP, ahash::RandomState::default());
         Occurrences::MultiThreaded(Arc::new(map))
     }
 
@@ -453,7 +453,7 @@ impl Occurrences {
                     map,
                     DashMap::with_capacity_and_hasher(
                         CAPACITY_HASHMAP,
-                        fxhash::FxBuildHasher::default(),
+                        ahash::RandomState::default(),
                     ),
                 );
                 let contents = map.iter().collect::<Vec<_>>();
