@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 ### Changed
+- Replace `chashmap` with `dashmap` ([#155](https://github.com/jonhoo/inferno/pull/155) by [@koushiro](https://github.com/koushiro))
+- Replace `fnv` with `ahash` ([#155](https://github.com/jonhoo/inferno/pull/155) by [@koushiro](https://github.com/koushiro))
+- Update some outdated dependencies ([#155](https://github.com/jonhoo/inferno/pull/155) by [@koushiro](https://github.com/koushiro))
+- Upgrade MSRV to 1.40.0 (required by `dashmap`) ([#155](https://github.com/jonhoo/inferno/pull/155) by [@koushiro](https://github.com/koushiro))
 
 ### Removed
 
