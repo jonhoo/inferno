@@ -360,7 +360,7 @@ pub trait CollapsePrivate: Send + Sized {
 pub enum Occurrences {
     SingleThreaded(AHashMap<String, usize>),
     #[cfg(feature = "multithreaded")]
-    MultiThreaded(Arc<DashMap<String, usize>>),
+    MultiThreaded(Arc<DashMap<String, usize, ahash::RandomState>>),
 }
 
 impl Occurrences {
