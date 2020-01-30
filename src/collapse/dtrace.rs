@@ -488,7 +488,6 @@ mod tests {
     }
 
     #[test]
-    #[ignore]
     fn test_collapse_multi_dtrace_simple() -> io::Result<()> {
         let path = "./flamegraph/example-dtrace-stacks.txt";
         let mut file = fs::File::open(path)?;
