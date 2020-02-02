@@ -176,10 +176,21 @@ function update_text(e) {
     // Fit in full text width
     if (/^ *\$/.test(txt) || t.getComputedTextLength() < w)
         return;
-    for (var x = txt.length - 2; x > 0; x--) {
-        if (t.getSubStringLength(0, x + 2) <= w) {
-            t.textContent = txt.substring(0, x) + "..";
-            return;
+    if (truncate_text_right) {
+        // Truncate the right side of the text.
+        for (var x = txt.length - 2; x > 0; x--) {
+            if (t.getSubStringLength(0, x + 2) <= w) {
+                t.textContent = txt.substring(0, x) + "..";
+                return;
+            }
+        }
+    } else {
+        // Truncate the left side of the text.
+        for (var x = 2; x < txt.length; x++) {
+            if (t.getSubStringLength(x - 2, txt.length) <= w) {
+                t.textContent = ".." + txt.substring(x, txt.length);
+                return;
+            }
         }
     }
     t.textContent = "";

@@ -3,7 +3,7 @@ use std::path::{Path, PathBuf};
 
 use env_logger::Env;
 use inferno::flamegraph::color::{BackgroundColor, PaletteMap, SearchColor};
-use inferno::flamegraph::{self, defaults, Direction, Options, Palette};
+use inferno::flamegraph::{self, defaults, Direction, Options, Palette, TextTruncateDirection};
 
 #[cfg(feature = "nameattr")]
 use inferno::flamegraph::FuncFrameAttrsMap;
@@ -27,6 +27,10 @@ struct Opt {
     /// Plot the flame graph up-side-down
     #[structopt(short = "i", long = "inverted")]
     inverted: bool,
+
+    /// If text doesn't fit in frame, truncate right side.
+    #[structopt(long = "truncate-text-right")]
+    truncate_text_right: bool,
 
     /// Switch differential hues (green<->red)
     #[structopt(long = "negate")]
@@ -201,6 +205,9 @@ impl<'a> Opt {
                 options.title = "Icicle Graph".to_string();
             }
         }
+        if self.truncate_text_right {
+            options.text_truncate_direction = TextTruncateDirection::Right;
+        }
         options.negate_differentials = self.negate;
         options.factor = self.factor;
         options.pretty_xml = self.pretty_xml;
@@ -301,7 +308,7 @@ fn save_consistent_palette_if_needed(
 #[cfg(test)]
 mod tests {
     use super::Opt;
-    use inferno::flamegraph::{color, Direction, Options, Palette};
+    use inferno::flamegraph::{color, Direction, Options, Palette, TextTruncateDirection};
     use pretty_assertions::assert_eq;
     use std::path::PathBuf;
     use std::str::FromStr;
@@ -320,6 +327,7 @@ mod tests {
         let args = vec![
             "inferno-flamegraph",
             "--inverted",
+            "--truncate-text-right",
             "--colors",
             "purple",
             "--bgcolors",
@@ -371,6 +379,7 @@ mod tests {
             font_type: "Helvetica".to_string(),
             font_size: 13,
             font_width: 10.5,
+            text_truncate_direction: TextTruncateDirection::Right,
             count_name: "test count name".to_string(),
             name_type: "test name type".to_string(),
             factor: 0.1,

@@ -8,7 +8,7 @@ use std::str::FromStr;
 
 use assert_cmd::cargo::CommandCargoExt;
 use inferno::flamegraph::color::{BackgroundColor, PaletteMap};
-use inferno::flamegraph::{self, Direction, Options, Palette};
+use inferno::flamegraph::{self, Direction, Options, Palette, TextTruncateDirection};
 use log::Level;
 use pretty_assertions::assert_eq;
 use testing_logger::CapturedLog;
@@ -883,4 +883,20 @@ fn flamegraph_cli() {
         .expect("failed to execute process");
     let expected = BufReader::new(File::open(expected_file).unwrap());
     compare_results(Cursor::new(output.stdout), expected, expected_file);
+}
+
+#[test]
+fn flamegraph_colors_truncate_right() {
+    let input_file = "./flamegraph/test/results/perf-java-stacks-01-collapsed-all.txt";
+    let expected_result_file = "./tests/data/flamegraph/options/truncate-right.svg";
+
+    let options = flamegraph::Options {
+        colors: Palette::from_str("java").unwrap(),
+        text_truncate_direction: TextTruncateDirection::Right,
+        bgcolors: Some(BackgroundColor::from_str("blue").unwrap()),
+        hash: true,
+        ..Default::default()
+    };
+
+    test_flamegraph(input_file, expected_result_file, options).unwrap();
 }
