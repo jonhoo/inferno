@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Fix bug where subtitles would often be hidden ([#161](https://github.com/jonhoo/inferno/pull/161) by [@itamarst](https://github.com/itamarst))
+
 ### Removed
 
 ## [0.9.3] - 2020-02-02
