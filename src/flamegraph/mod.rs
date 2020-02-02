@@ -235,9 +235,14 @@ pub struct Options<'a> {
 }
 
 impl<'a> Options<'a> {
-    /// Calculate pad top, including title
+    /// Calculate pad top, including title and subtitle
     pub(super) fn ypad1(&self) -> usize {
-        self.font_size * 3
+        let subtitle_height = if let Some(_) = self.subtitle {
+            self.font_size * 2
+        } else {
+            0
+        };
+        self.font_size * 3 + subtitle_height
     }
 
     /// Calculate pad bottom, including labels
@@ -826,4 +831,23 @@ fn write_usize(buffer: &mut StrStack, value: usize) -> usize {
     // OK to unwrap here because this `fmt::Write` implementation never returns an error.
     itoa::fmt(&mut writer, value).unwrap();
     writer.finish()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::Options;
+
+    #[test]
+    fn top_ypadding_adjusts_for_subtitle() {
+        let height_without_subtitle = Options {
+            ..Default::default()
+        }
+        .ypad1();
+        let height_with_subtitle = Options {
+            subtitle: Some(String::from("hello!")),
+            ..Default::default()
+        }
+        .ypad1();
+        assert!(height_with_subtitle > height_without_subtitle);
+    }
 }
