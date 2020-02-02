@@ -7,13 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 
-* Overly long frame lanes can be shortened either on the left or the right ([#157](https://github.com/jonhoo/inferno/pull/157) by [@itamarst](https://github.com/itamarst))
-
 ### Changed
 
-* By default, overly long frame lines are now shortened on the left ([#157](https://github.com/jonhoo/inferno/pull/157) by [@itamarst](https://github.com/itamarst))
-
 ### Removed
+
+## [0.9.3] - 2020-02-02
+### Added
+- Overly long frame lanes can be shortened either on the left or the right ([#157](https://github.com/jonhoo/inferno/pull/157) by [@itamarst](https://github.com/itamarst))
+
+### Changed
+- By default, overly long frame lines are now shortened on the left ([#157](https://github.com/jonhoo/inferno/pull/157) by [@itamarst](https://github.com/itamarst))
 
 ## [0.9.2] - 2020-01-30
 ### Changed
@@ -64,7 +67,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Moved to `IndexMap` and FNV hashing ([#127](https://github.com/jonhoo/inferno/pull/127))
 - Moved CI to Azure DevOps Pipelines
 
-[Unreleased]: https://github.com/jonhoo/inferno/compare/v0.9.2...HEAD
+[Unreleased]: https://github.com/jonhoo/inferno/compare/v0.9.3...HEAD
+[0.9.3]: https://github.com/jonhoo/inferno/compare/v0.9.2...v0.9.3
 [0.9.2]: https://github.com/jonhoo/inferno/compare/v0.9.1...v0.9.2
 [0.9.1]: https://github.com/jonhoo/inferno/compare/v0.9.0...v0.9.1
 [0.9.0]: https://github.com/jonhoo/inferno/compare/v0.8.0...v0.9.0
