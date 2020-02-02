@@ -7,7 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 
+* Overly long frame lanes can be shortened either on the left or the right ([#157](https://github.com/jonhoo/inferno/pull/157) by [@itamarst](https://github.com/itamarst))
+
 ### Changed
+
+* By default, overly long frame lines are now shortened on the left ([#157](https://github.com/jonhoo/inferno/pull/157) by [@itamarst](https://github.com/itamarst))
 
 ### Removed
 
