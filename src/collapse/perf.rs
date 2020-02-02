@@ -652,7 +652,6 @@ mod tests {
     }
 
     #[test]
-    #[ignore]
     fn test_collapse_multi_perf_simple() -> io::Result<()> {
         let path = "./flamegraph/test/perf-cycles-instructions-01.txt";
         let mut file = fs::File::open(path)?;

@@ -249,7 +249,7 @@ fn collapse_perf_should_warn_about_empty_input_lines() {
         "./tests/data/collapse-perf/empty-line.txt",
         |captured_logs| {
             let nwarnings = captured_logs
-                .into_iter()
+                .iter()
                 .filter(|log| {
                     log.body.starts_with("Weird event line: ") && log.level == Level::Warn
                 })
@@ -269,7 +269,7 @@ fn collapse_perf_should_warn_about_weird_input_lines() {
         "./tests/data/collapse-perf/weird-stack-line.txt",
         |captured_logs| {
             let nwarnings = captured_logs
-                .into_iter()
+                .iter()
                 .filter(|log| {
                     log.body.starts_with("Weird stack line: ") && log.level == Level::Warn
                 })

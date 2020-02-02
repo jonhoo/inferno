@@ -97,7 +97,7 @@ fn collapse_dtrace_should_log_warning_for_only_header_lines() {
         "./tests/data/collapse-dtrace/only-header-lines.txt",
         |captured_logs| {
             let nwarnings = captured_logs
-                .into_iter()
+                .iter()
                 .filter(|log| {
                     log.body == "File ended while skipping headers" && log.level == Level::Warn
                 })

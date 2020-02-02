@@ -2,11 +2,11 @@ use std::fs::File;
 use std::io::{self, BufRead, BufReader};
 use std::path::PathBuf;
 
-use fnv::FnvHashMap;
+use ahash::AHashMap;
 use indexmap::map::Entry;
 use log::warn;
 
-type AttrMap<K, V> = indexmap::IndexMap<K, V, fnv::FnvBuildHasher>;
+type AttrMap<K, V> = indexmap::IndexMap<K, V, ahash::RandomState>;
 
 macro_rules! unwrap_or_continue {
     ($e:expr) => {{
@@ -20,7 +20,7 @@ macro_rules! unwrap_or_continue {
 
 /// Provides a way to customize the attributes on the SVG elements for a frame.
 #[derive(PartialEq, Eq, Debug, Default)]
-pub struct FuncFrameAttrsMap(FnvHashMap<String, FrameAttrs>);
+pub struct FuncFrameAttrsMap(AHashMap<String, FrameAttrs>);
 
 impl FuncFrameAttrsMap {
     /// Parse frame attributes from a file.
@@ -179,7 +179,7 @@ impl<'a> Iterator for AttrIter<'a> {
 #[cfg(test)]
 mod test {
     use super::*;
-    use fnv::FnvHashMap;
+    use ahash::AHashMap;
     use maplit::{convert_args, hashmap};
     use pretty_assertions::assert_eq;
 
@@ -213,7 +213,7 @@ mod test {
         let s = vec![foo, bar].join("\n");
         let r = s.as_bytes();
 
-        let mut expected_inner = FnvHashMap::default();
+        let mut expected_inner = AHashMap::default();
         let foo_attrs: AttrMap<String, String> = convert_args!(hashmap!(
             "class" => "foo class",
             "xlink:href" => "foo href",

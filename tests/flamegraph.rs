@@ -52,7 +52,7 @@ fn test_flamegraph_multiple_files(
 
     let expected_len = metadata.len() as usize;
     let mut result = Cursor::new(Vec::with_capacity(expected_len));
-    let return_value = flamegraph::from_files(&mut options, &input_files, &mut result)?;
+    flamegraph::from_files(&mut options, &input_files, &mut result)?;
     let expected = BufReader::new(File::open(expected_result_file).unwrap());
     // write out the expected result to /tmp for easy restoration
     result.set_position(0);
@@ -64,7 +64,7 @@ fn test_flamegraph_multiple_files(
     // and then compare
     result.set_position(0);
     compare_results(result, expected, expected_result_file);
-    Ok(return_value)
+    Ok(())
 }
 
 fn compare_results<R, E>(result: R, mut expected: E, expected_file: &str)
@@ -259,7 +259,7 @@ fn flamegraph_nameattr_should_warn_about_duplicate_attributes() {
     let _ = flamegraph::FuncFrameAttrsMap::from_file(&PathBuf::from(nameattr_file));
     testing_logger::validate(|captured_logs| {
         let nwarnings = captured_logs
-            .into_iter()
+            .iter()
             .filter(|log| log.body.starts_with("duplicate attribute") && log.level == Level::Warn)
             .count();
         assert_eq!(
@@ -278,7 +278,7 @@ fn flamegraph_nameattr_should_warn_about_invalid_attribute() {
     let _ = flamegraph::FuncFrameAttrsMap::from_file(&PathBuf::from(nameattr_file));
     testing_logger::validate(|captured_logs| {
         let nwarnings = captured_logs
-            .into_iter()
+            .iter()
             .filter(|log| log.body.starts_with("invalid attribute") && log.level == Level::Warn)
             .count();
         assert_eq!(
@@ -295,7 +295,7 @@ fn flamegraph_should_warn_about_fractional_samples() {
         "./tests/data/flamegraph/fractional-samples/fractional.txt",
         |captured_logs| {
             let nwarnings = captured_logs
-                .into_iter()
+                .iter()
                 .filter(|log| {
                     log.body
                         .starts_with("The input data has fractional sample counts")
@@ -317,7 +317,7 @@ fn flamegraph_should_not_warn_about_zero_fractional_samples() {
         "./tests/data/flamegraph/fractional-samples/zero-fractionals.txt",
         |captured_logs| {
             let nwarnings = captured_logs
-                .into_iter()
+                .iter()
                 .filter(|log| {
                     log.body
                         .starts_with("The input data has fractional sample counts")
@@ -338,7 +338,7 @@ fn flamegraph_should_not_warn_about_fractional_sample_with_tricky_stack() {
         "./tests/data/flamegraph/fractional-samples/tricky-stack.txt",
         |captured_logs| {
             let nwarnings = captured_logs
-                .into_iter()
+                .iter()
                 .filter(|log| {
                     log.body
                         .starts_with("The input data has fractional sample counts")
@@ -380,7 +380,7 @@ fn flamegraph_palette_map_should_warn_about_invalid_lines() {
     let _ = load_palette_map_file(palette_file);
     testing_logger::validate(|captured_logs| {
         let nwarnings = captured_logs
-            .into_iter()
+            .iter()
             .filter(|log| {
                 log.body == ("Ignored 5 lines with invalid format") && log.level == Level::Warn
             })
@@ -399,7 +399,7 @@ fn flamegraph_should_warn_about_bad_input_lines() {
         "./tests/data/flamegraph/bad-lines/bad-lines.txt",
         |captured_logs| {
             let nwarnings = captured_logs
-                .into_iter()
+                .iter()
                 .filter(|log| {
                     log.body.starts_with("Ignored")
                         && log.body.ends_with(" lines with invalid format")
@@ -419,7 +419,7 @@ fn flamegraph_should_warn_about_bad_input_lines() {
 fn flamegraph_should_warn_about_empty_input() {
     test_flamegraph_logs("./tests/data/flamegraph/empty/empty.txt", |captured_logs| {
         let nwarnings = captured_logs
-            .into_iter()
+            .iter()
             .filter(|log| log.body == "No stack counts found" && log.level == Level::Error)
             .count();
         assert_eq!(
@@ -793,7 +793,7 @@ fn flamegraph_should_warn_about_no_sort_when_reversing_stack_ordering() {
         "./flamegraph/test/results/perf-funcab-cmd-01-collapsed-all.txt",
         |captured_logs| {
             let nwarnings = captured_logs
-            .into_iter()
+            .iter()
             .filter(|log| log.body == "Input lines are always sorted when `reverse_stack_order` is `true`. The `no_sort` option is being ignored." && log.level == Level::Warn)
             .count();
             assert_eq!(
@@ -816,7 +816,7 @@ fn flamegraph_should_warn_about_bad_input_lines_with_reversed_stack_ordering() {
         "./tests/data/flamegraph/bad-lines/bad-lines.txt",
         |captured_logs| {
             let nwarnings = captured_logs
-                .into_iter()
+                .iter()
                 .filter(|log| {
                     log.body.starts_with("Ignored")
                         && log.body.ends_with(" lines with invalid format")

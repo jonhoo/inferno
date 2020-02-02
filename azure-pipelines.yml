@@ -1,12 +1,18 @@
-stages:
-  - template: azure/stages.yml@templates
+jobs:
+  - template: default.yml@templates
     parameters:
       codecov_token: $(CODECOV_TOKEN_SECRET)
-      minrust: 1.36.0
+      minrust: 1.40.0
+      env:
+        RUST_BACKTRACE: 1
+      setup:
+       - checkout: self
+         submodules: recursive
 
 resources:
   repositories:
     - repository: templates
       type: github
       name: crate-ci/azure-pipelines
+      ref: refs/heads/v0.3
       endpoint: jonhoo

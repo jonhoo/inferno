@@ -4,6 +4,7 @@ mod palette_map;
 mod palettes;
 
 use std::borrow::Cow;
+use std::cmp::Ordering;
 use std::fmt;
 use std::str::FromStr;
 
@@ -233,7 +234,7 @@ impl NamehashVariables {
     }
 
     fn result(&self) -> f32 {
-        (1.0 - self.vector / self.max)
+        1.0 - self.vector / self.max
     }
 }
 
@@ -346,22 +347,24 @@ pub(super) fn color(
 }
 
 pub(super) fn color_scale(value: isize, max: usize) -> Color {
-    if value == 0 {
-        Color {
+    match value.cmp(&0) {
+        Ordering::Equal => Color {
             r: 255,
             g: 255,
             b: 255,
+        },
+        Ordering::Greater => {
+            // A positive value indicates _more_ samples,
+            // and hence more time spent, so we give it a red hue.
+            let c = (210 * (max as isize - value) / max as isize) as u8;
+            Color { r: 255, g: c, b: c }
         }
-    } else if value > 0 {
-        // A positive value indicates _more_ samples,
-        // and hence more time spent, so we give it a red hue.
-        let c = (210 * (max as isize - value) / max as isize) as u8;
-        Color { r: 255, g: c, b: c }
-    } else {
-        // A negative value indicates _fewer_ samples,
-        // or a speed-up, so we give it a green hue.
-        let c = (210 * (max as isize + value) / max as isize) as u8;
-        Color { r: c, g: c, b: 255 }
+        Ordering::Less => {
+            // A negative value indicates _fewer_ samples,
+            // or a speed-up, so we give it a green hue.
+            let c = (210 * (max as isize + value) / max as isize) as u8;
+            Color { r: c, g: c, b: 255 }
+        }
     }
 }
 
