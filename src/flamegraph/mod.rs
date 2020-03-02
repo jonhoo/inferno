@@ -232,6 +232,9 @@ pub struct Options<'a> {
     /// This is only meant to be used in tests.
     #[doc(hidden)]
     pub no_javascript: bool,
+
+    /// Diffusion-based color: the wider the frame, the brighter the color.
+    pub color_diffusion: bool,
 }
 
 impl<'a> Options<'a> {
@@ -278,6 +281,7 @@ impl<'a> Default for Options<'a> {
             no_sort: Default::default(),
             reverse_stack_order: Default::default(),
             no_javascript: Default::default(),
+            color_diffusion: Default::default(),
 
             #[cfg(feature = "nameattr")]
             func_frameattrs: Default::default(),
@@ -575,6 +579,8 @@ where
             color::VDGREY
         } else if frame.location.function == "-" {
             color::DGREY
+        } else if opt.color_diffusion {
+            color::color_scale((x2_pct - x1_pct) as isize, 100)
         } else if let Some(mut delta) = frame.delta {
             if opt.negate_differentials {
                 delta = -delta;
