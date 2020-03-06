@@ -580,7 +580,12 @@ where
         } else if frame.location.function == "-" {
             color::DGREY
         } else if opt.color_diffusion {
-            color::color_scale((x2_pct - x1_pct) as isize, 100)
+            // We want to visually highlight high priority regions for
+            // optimization: wider frames are redder. Typically when optimizing,
+            // a frame that is 50% of width is high priority, so it seems wrong
+            // to give it half the saturation of 100%. So we use sqrt to make
+            // the red dropoff less linear.
+            color::color_scale((((x2_pct - x1_pct) / 100.0).sqrt() * 2000.0) as isize, 2000)
         } else if let Some(mut delta) = frame.delta {
             if opt.negate_differentials {
                 delta = -delta;
