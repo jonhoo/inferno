@@ -172,6 +172,17 @@ fn flamegraph_differential_negated() {
 }
 
 #[test]
+fn flamegraph_collor_diffusion() {
+    let input_file = "./flamegraph/test/results/perf-vertx-stacks-01-collapsed-all.txt";
+    let expected_result_file = "./tests/data/flamegraph/options/colordiffusion.svg";
+    let options = Options {
+        color_diffusion: true,
+        ..Default::default()
+    };
+    test_flamegraph(input_file, expected_result_file, options).unwrap();
+}
+
+#[test]
 fn flamegraph_factor() {
     let input_file = "./flamegraph/test/results/perf-vertx-stacks-01-collapsed-all.txt";
     let expected_result_file = "./tests/data/flamegraph/factor/factor-2.5.svg";

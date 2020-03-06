@@ -349,20 +349,20 @@ pub(super) fn color(
 pub(super) fn color_scale(value: isize, max: usize) -> Color {
     match value.cmp(&0) {
         Ordering::Equal => Color {
-            r: 210,
-            g: 210,
-            b: 210,
+            r: 230,
+            g: 230,
+            b: 230,
         },
         Ordering::Greater => {
             // A positive value indicates _more_ samples,
             // and hence more time spent, so we give it a red hue.
-            let c = (210 * (max as isize - value) / max as isize) as u8;
+            let c = (230 * (max as isize - value) / max as isize) as u8;
             Color { r: 255, g: c, b: c }
         }
         Ordering::Less => {
             // A negative value indicates _fewer_ samples,
             // or a speed-up, so we give it a blue hue.
-            let c = (210 * (max as isize + value) / max as isize) as u8;
+            let c = (230 * (max as isize + value) / max as isize) as u8;
             Color { r: c, g: c, b: 255 }
         }
     }
