@@ -37,102 +37,102 @@ var truncate_text_right = false;]]>
     <svg id="frames" x="10" width="1180">
         <g>
             <title>_start (56 test-samples, 10.92%; 0.00%)</title>
-            <rect x="0.0000%" y="165" width="10.9162%" height="15" fill="rgb(230,230,230)"/>
+            <rect x="0.0000%" y="165" width="10.9162%" height="15" fill="rgb(250,250,250)"/>
             <text x="0.2500%" y="175.50">_start</text>
         </g>
         <g>
             <title>__libc_start_main (56 test-samples, 10.92%; 0.00%)</title>
-            <rect x="0.0000%" y="149" width="10.9162%" height="15" fill="rgb(230,230,230)"/>
+            <rect x="0.0000%" y="149" width="10.9162%" height="15" fill="rgb(250,250,250)"/>
             <text x="0.2500%" y="159.50">__libc_start_main</text>
         </g>
         <g>
             <title>main (56 test-samples, 10.92%; 0.00%)</title>
-            <rect x="0.0000%" y="133" width="10.9162%" height="15" fill="rgb(230,230,230)"/>
+            <rect x="0.0000%" y="133" width="10.9162%" height="15" fill="rgb(250,250,250)"/>
             <text x="0.2500%" y="143.50">main</text>
         </g>
         <g>
             <title>cksum (56 test-samples, 10.92%; +4.87%)</title>
-            <rect x="0.0000%" y="117" width="10.9162%" height="15" fill="rgb(255,189,189)"/>
+            <rect x="0.0000%" y="117" width="10.9162%" height="15" fill="rgb(255,223,223)"/>
             <text x="0.2500%" y="127.50">cksum</text>
         </g>
         <g>
             <title>cksum (5 test-samples, 0.97%; -0.78%)</title>
-            <rect x="10.9162%" y="165" width="0.9747%" height="15" fill="rgb(223,223,255)"/>
+            <rect x="10.9162%" y="165" width="0.9747%" height="15" fill="rgb(245,245,255)"/>
             <text x="11.1662%" y="175.50"></text>
         </g>
         <g>
             <title>__GI___fread_unlocked (3 test-samples, 0.58%; 0.00%)</title>
-            <rect x="11.3060%" y="149" width="0.5848%" height="15" fill="rgb(230,230,230)"/>
+            <rect x="11.3060%" y="149" width="0.5848%" height="15" fill="rgb(250,250,250)"/>
             <text x="11.5560%" y="159.50"></text>
         </g>
         <g>
             <title>_IO_file_xsgetn (3 test-samples, 0.58%; 0.00%)</title>
-            <rect x="11.3060%" y="133" width="0.5848%" height="15" fill="rgb(230,230,230)"/>
+            <rect x="11.3060%" y="133" width="0.5848%" height="15" fill="rgb(250,250,250)"/>
             <text x="11.5560%" y="143.50"></text>
         </g>
         <g>
             <title>_IO_file_read (3 test-samples, 0.58%; 0.00%)</title>
-            <rect x="11.3060%" y="117" width="0.5848%" height="15" fill="rgb(230,230,230)"/>
+            <rect x="11.3060%" y="117" width="0.5848%" height="15" fill="rgb(250,250,250)"/>
             <text x="11.5560%" y="127.50"></text>
         </g>
         <g>
             <title>entry_SYSCALL_64_fastpath (3 test-samples, 0.58%; 0.00%)</title>
-            <rect x="11.3060%" y="101" width="0.5848%" height="15" fill="rgb(230,230,230)"/>
+            <rect x="11.3060%" y="101" width="0.5848%" height="15" fill="rgb(250,250,250)"/>
             <text x="11.5560%" y="111.50"></text>
         </g>
         <g>
             <title>sys_read (3 test-samples, 0.58%; 0.00%)</title>
-            <rect x="11.3060%" y="85" width="0.5848%" height="15" fill="rgb(230,230,230)"/>
+            <rect x="11.3060%" y="85" width="0.5848%" height="15" fill="rgb(250,250,250)"/>
             <text x="11.5560%" y="95.50"></text>
         </g>
         <g>
             <title>vfs_read (3 test-samples, 0.58%; 0.00%)</title>
-            <rect x="11.3060%" y="69" width="0.5848%" height="15" fill="rgb(230,230,230)"/>
+            <rect x="11.3060%" y="69" width="0.5848%" height="15" fill="rgb(250,250,250)"/>
             <text x="11.5560%" y="79.50"></text>
         </g>
         <g>
             <title>__vfs_read (3 test-samples, 0.58%; 0.00%)</title>
-            <rect x="11.3060%" y="53" width="0.5848%" height="15" fill="rgb(230,230,230)"/>
+            <rect x="11.3060%" y="53" width="0.5848%" height="15" fill="rgb(250,250,250)"/>
             <text x="11.5560%" y="63.50"></text>
         </g>
         <g>
             <title>ext4_file_read_iter (3 test-samples, 0.58%; +0.39%)</title>
-            <rect x="11.3060%" y="37" width="0.5848%" height="15" fill="rgb(255,226,226)"/>
+            <rect x="11.3060%" y="37" width="0.5848%" height="15" fill="rgb(255,247,247)"/>
             <text x="11.5560%" y="47.50"></text>
         </g>
         <g>
             <title>cksum (96 test-samples, 18.71%; 0.00%)</title>
-            <rect x="0.0000%" y="181" width="18.7135%" height="15" fill="rgb(230,230,230)"/>
+            <rect x="0.0000%" y="181" width="18.7135%" height="15" fill="rgb(250,250,250)"/>
             <text x="0.2500%" y="191.50">cksum</text>
         </g>
         <g>
             <title>main (35 test-samples, 6.82%; 0.00%)</title>
-            <rect x="11.8908%" y="165" width="6.8226%" height="15" fill="rgb(230,230,230)"/>
+            <rect x="11.8908%" y="165" width="6.8226%" height="15" fill="rgb(250,250,250)"/>
             <text x="12.1408%" y="175.50">main</text>
         </g>
         <g>
             <title>cksum (35 test-samples, 6.82%; +3.12%)</title>
-            <rect x="11.8908%" y="149" width="6.8226%" height="15" fill="rgb(255,203,203)"/>
+            <rect x="11.8908%" y="149" width="6.8226%" height="15" fill="rgb(255,232,232)"/>
             <text x="12.1408%" y="159.50">cksum</text>
         </g>
         <g>
             <title>[unknown] (2 test-samples, 0.39%; 0.00%)</title>
-            <rect x="18.7135%" y="165" width="0.3899%" height="15" fill="rgb(230,230,230)"/>
+            <rect x="18.7135%" y="165" width="0.3899%" height="15" fill="rgb(250,250,250)"/>
             <text x="18.9635%" y="175.50"></text>
         </g>
         <g>
             <title>all (513 test-samples, 100%)</title>
-            <rect x="0.0000%" y="197" width="100.0000%" height="15" fill="rgb(230,230,230)"/>
+            <rect x="0.0000%" y="197" width="100.0000%" height="15" fill="rgb(250,250,250)"/>
             <text x="0.2500%" y="207.50"></text>
         </g>
         <g>
             <title>noploop (417 test-samples, 81.29%; 0.00%)</title>
-            <rect x="18.7135%" y="181" width="81.2865%" height="15" fill="rgb(230,230,230)"/>
+            <rect x="18.7135%" y="181" width="81.2865%" height="15" fill="rgb(250,250,250)"/>
             <text x="18.9635%" y="191.50">noploop</text>
         </g>
         <g>
             <title>main (415 test-samples, 80.90%; +27.49%)</title>
-            <rect x="19.1033%" y="165" width="80.8967%" height="15" fill="rgb(255,0,0)"/>
+            <rect x="19.1033%" y="165" width="80.8967%" height="15" fill="rgb(255,100,100)"/>
             <text x="19.3533%" y="175.50">main</text>
         </g>
     </svg>
