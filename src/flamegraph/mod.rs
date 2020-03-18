@@ -233,7 +233,12 @@ pub struct Options<'a> {
     #[doc(hidden)]
     pub no_javascript: bool,
 
-    /// Diffusion-based color: the wider the frame, the brighter the color.
+    /// Diffusion-based color: the wider the frame, the more red it is. This
+    /// helps visually draw the eye towards frames that are wider, and therefore
+    /// more likely to need to be optimized. This is redundant information,
+    /// insofar as it's the same as the width of frames, but it still provides a
+    /// useful visual cue of what to focus on, especially if you are showing
+    /// flamegraphs to someone for the first time.
     pub color_diffusion: bool,
 }
 
