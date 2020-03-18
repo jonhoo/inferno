@@ -82,6 +82,10 @@ struct Opt {
     )]
     colors: Palette,
 
+    /// Color frames based on their width, highlighting expensive codepaths
+    #[structopt(long = "colordiffusion", conflicts_with = "colors")]
+    color_diffusion: bool,
+
     /// Count type label
     #[structopt(
         long = "countname",
@@ -213,6 +217,7 @@ impl<'a> Opt {
         options.pretty_xml = self.pretty_xml;
         options.no_sort = self.no_sort;
         options.no_javascript = self.no_javascript;
+        options.color_diffusion = self.color_diffusion;
         options.reverse_stack_order = self.reverse;
 
         // set style options
@@ -395,6 +400,7 @@ mod tests {
             no_sort: false,
             reverse_stack_order: true,
             no_javascript: true,
+            color_diffusion: false,
         };
 
         assert_eq!(options, expected_options);

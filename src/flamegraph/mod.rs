@@ -232,6 +232,14 @@ pub struct Options<'a> {
     /// This is only meant to be used in tests.
     #[doc(hidden)]
     pub no_javascript: bool,
+
+    /// Diffusion-based color: the wider the frame, the more red it is. This
+    /// helps visually draw the eye towards frames that are wider, and therefore
+    /// more likely to need to be optimized. This is redundant information,
+    /// insofar as it's the same as the width of frames, but it still provides a
+    /// useful visual cue of what to focus on, especially if you are showing
+    /// flamegraphs to someone for the first time.
+    pub color_diffusion: bool,
 }
 
 impl<'a> Options<'a> {
@@ -278,6 +286,7 @@ impl<'a> Default for Options<'a> {
             no_sort: Default::default(),
             reverse_stack_order: Default::default(),
             no_javascript: Default::default(),
+            color_diffusion: Default::default(),
 
             #[cfg(feature = "nameattr")]
             func_frameattrs: Default::default(),
@@ -575,6 +584,13 @@ where
             color::VDGREY
         } else if frame.location.function == "-" {
             color::DGREY
+        } else if opt.color_diffusion {
+            // We want to visually highlight high priority regions for
+            // optimization: wider frames are redder. Typically when optimizing,
+            // a frame that is 50% of width is high priority, so it seems wrong
+            // to give it half the saturation of 100%. So we use sqrt to make
+            // the red dropoff less linear.
+            color::color_scale((((x2_pct - x1_pct) / 100.0).sqrt() * 2000.0) as isize, 2000)
         } else if let Some(mut delta) = frame.delta {
             if opt.negate_differentials {
                 delta = -delta;
