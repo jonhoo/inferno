@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 
+- Add a new color option, color diffusion, that makes wider frames redder. This visually draws the eye towards places that need optimization. [#165](https://github.com/jonhoo/inferno/pull/165) by [@itamarst](https://github.com/itamarst).
+
 ### Changed
 
 ### Removed
