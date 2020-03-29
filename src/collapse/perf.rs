@@ -281,6 +281,9 @@ impl Folder {
         loop {
             line_buffer.clear();
             if reader.read_line(line_buffer)? == 0 {
+                if !self.stack.is_empty() {
+                    self.after_event(occurrences);
+                }
                 return Ok(true);
             }
             if line_buffer.starts_with('#') {
