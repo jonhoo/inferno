@@ -158,7 +158,13 @@ impl CollapsePrivate for Folder {
         // information to get started). Only read one stack, however, as we would
         // like the remaining stacks to be processed on the worker threads.
         let mut line_buffer = String::new();
-        self.process_single_stack(&mut line_buffer, reader, occurrences)?;
+        let eof = self.process_single_stack(&mut line_buffer, reader, occurrences)?;
+
+        if eof {
+            // If we hit EOF, it may be that the input was completely empty.
+            // In that case, we don't do the event_filter assertion below.
+            return Ok(());
+        }
 
         // If we didn't find an event filter, there is something wrong with
         // our processing code.
