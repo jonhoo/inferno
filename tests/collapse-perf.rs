@@ -228,6 +228,7 @@ macro_rules! collapse_perf_tests {
 }
 
 collapse_perf_tests! {
+    collapse_perf_single_line_stacks,
     collapse_perf_go_stacks,
     collapse_perf_java_inline
 }

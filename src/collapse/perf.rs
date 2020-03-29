@@ -287,12 +287,17 @@ impl Folder {
             } else if self.in_event {
                 self.on_stack_line(line);
             } else {
+                assert!(self.stack.is_empty());
                 self.on_event_line(line);
+                if !self.stack.is_empty() {
+                    // we must have hit a combined event/stack line
+                    self.after_event(occurrences);
+                }
             }
         }
     }
 
-    fn event_line_parts(line: &str) -> Option<(&str, &str, &str)> {
+    fn event_line_parts(line: &str) -> Option<(&str, &str, &str, usize)> {
         let mut word_start = 0;
         let mut all_digits = false;
         let mut last_was_space = false;
@@ -310,7 +315,7 @@ impl Folder {
                     };
                     // also trim comm in case multiple spaces were used to separate
                     let comm = line[..(word_start - 1)].trim();
-                    return Some((comm, pid, tid));
+                    return Some((comm, pid, tid, idx + 1));
                 }
                 word_start = idx + 1;
                 all_digits = true;
@@ -338,28 +343,56 @@ impl Folder {
     //     java 12688/12764 6544038.708352: cpu-clock:
     //     V8 WorkerThread 24636/25607 [000] 94564.109216: cycles:
     //     vote   913    72.176760:     257597 cycles:uppp:
+    //     false 64414 20110.539270:      34467 cycles:u:  ffffffff9aa3c8de [unknown] ([unknown])
     fn on_event_line(&mut self, line: &str) {
         self.in_event = true;
 
-        if let Some((comm, pid, tid)) = Self::event_line_parts(line) {
-            if let Some(event) = line.rsplitn(2, ' ').next() {
-                if event.ends_with(':') {
-                    let event = &event[..(event.len() - 1)];
-
-                    if let Some(ref event_filter) = self.event_filter {
-                        if event != event_filter {
-                            self.skip_stack = true;
-                            return;
-                        }
-                    } else {
-                        // By default only show events of the first encountered event type.
-                        // Merging together different types, such as instructions and cycles,
-                        // produces misleading results.
-                        logging::filtering_for_events_of_type(event);
-                        self.event_filter = Some(event.to_string());
+        if let Some((comm, pid, tid, end)) = Self::event_line_parts(line) {
+            let mut by_colons = line[end..].splitn(3, ':').skip(1);
+            let event = by_colons
+                .next()
+                .and_then(|has_event| has_event.rsplit(' ').next());
+            if let Some(event) = event {
+                if let Some(ref event_filter) = self.event_filter {
+                    if event != event_filter {
+                        self.skip_stack = true;
+                        return;
                     }
+                } else {
+                    // By default only show events of the first encountered event type.
+                    // Merging together different types, such as instructions and cycles,
+                    // produces misleading results.
+                    logging::filtering_for_events_of_type(event);
+                    self.event_filter = Some(event.to_string());
                 }
             }
+
+            // some event lines _include_ a stack line if the stack only has one frame.
+            // in that case, the event will be followed by the stack.
+            let single_stack = if let Some(post_event) = by_colons.next() {
+                // we need to deal with a couple of cases here:
+                //
+                //     vote   913    72.176760:     257597 cycles:uppp:
+                //     false 64414 20110.539270:      34467 cycles:u:  ffffffff9aa3c8de [unknown] ([unknown])
+                //     false 64414 20110.539270:      34467 cycles:  ffffffff9aa3c8de [unknown] ([unknown])
+                //
+                // the first should not be handled as a stack, whereas the latter two both should
+                // the trick is going to be to trim until we encounter a space or a :, whichever
+                // comes first, and then evaluate from there.
+                let post_event_start = post_event
+                    .find(|c| c == ':' || c == ' ')
+                    .map(|i| i + 1)
+                    .unwrap_or(0);
+                let post_event = post_event[post_event_start..].trim();
+                if !post_event.is_empty() {
+                    // we have a stack!
+                    Some(post_event)
+                } else {
+                    None
+                }
+            } else {
+                None
+            };
 
             // XXX: re-use existing memory in pname if possible
             self.pname = comm.replace(' ', "_");
@@ -371,6 +404,11 @@ impl Folder {
             } else if self.opt.include_pid {
                 self.pname.push_str("-");
                 self.pname.push_str(pid);
+            }
+
+            if let Some(stack_line) = single_stack {
+                self.on_stack_line(stack_line);
+                self.in_event = false;
             }
         } else {
             logging::weird_event_line(line);
