@@ -172,9 +172,7 @@ pub struct Options<'a> {
     /// [Default value](defaults::FONT_WIDTH).
     pub font_width: f64,
 
-    /// When text doesn't fit in a frame, should we cut off left side or right side?
-    ///
-    /// [Default value](defaults::TEXT_TRUNCATE_DIRECTION)
+    /// When text doesn't fit in a frame, should we cut off left side (the default) or right side?
     pub text_truncate_direction: TextTruncateDirection,
 
     /// Count type label for the flame graph.
