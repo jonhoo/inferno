@@ -477,8 +477,8 @@ where
     let mut thread_rng = rand::thread_rng();
 
     // structs to reuse accross loops to avoid allocations
-    let mut cache_g = Event::Start({ BytesStart::owned_name("g") });
-    let mut cache_a = Event::Start({ BytesStart::owned_name("a") });
+    let mut cache_g = Event::Start(BytesStart::owned_name("g"));
+    let mut cache_a = Event::Start(BytesStart::owned_name("a"));
     let mut cache_rect = Event::Empty(BytesStart::owned_name("rect"));
     let cache_g_end = Event::End(BytesEnd::borrowed(b"g"));
     let cache_a_end = Event::End(BytesEnd::borrowed(b"a"));
