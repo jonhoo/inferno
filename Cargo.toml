@@ -43,9 +43,9 @@ str_stack = "0.1"
 structopt = { version = "0.3", optional = true }
 
 [dev-dependencies]
-assert_cmd = "0.12"
+assert_cmd = "1"
 criterion = "0.3"
-libflate = "0.1"
+libflate = "1"
 maplit = "1.0.1"
 pretty_assertions = "0.6"
 rand = { version = "0.7", features = ["small_rng"] }
