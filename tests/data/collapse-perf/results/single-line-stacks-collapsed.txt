@@ -1,0 +1,2 @@
+false;[unknown] 1
+false;_dl_start 1

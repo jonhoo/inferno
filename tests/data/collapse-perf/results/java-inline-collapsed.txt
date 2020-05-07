@@ -1,6 +1,6 @@
 java;[unknown];__GI___libc_write 6
 java;[unknown];__GI___libc_write;entry_SYSCALL_64_after_hwframe;do_syscall_64 2
-java;[unknown];__GI___libc_write;entry_SYSCALL_64_after_hwframe;do_syscall_64;ksys_write;__fdget_pos;__fget_light 2
+java;[unknown];__GI___libc_write;entry_SYSCALL_64_after_hwframe;do_syscall_64;ksys_write;__fdget_pos;__fget_light 3
 java;[unknown];__GI___libc_write;entry_SYSCALL_64_after_hwframe;do_syscall_64;ksys_write;fput 1
 java;[unknown];__GI___libc_write;entry_SYSCALL_64_after_hwframe;do_syscall_64;ksys_write;vfs_write;__vfs_write;tty_write;n_tty_write 1
 java;[unknown];__GI___libc_write;entry_SYSCALL_64_after_hwframe;do_syscall_64;ksys_write;vfs_write;__vfs_write;tty_write;n_tty_write;_raw_spin_unlock_irqrestore 1
