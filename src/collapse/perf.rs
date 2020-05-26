@@ -609,25 +609,59 @@ fn tidy_generic(mut func: String) -> String {
     //    see https://github.com/brendangregg/FlameGraph/pull/72
     //  - C++ anonymous namespace annotations.
     //    see https://github.com/brendangregg/FlameGraph/pull/93
-    if let Some(first_paren) = func.find('(') {
-        if func[first_paren..].starts_with("anonymous namespace)") {
-            // C++ anonymous namespace
-        } else {
-            let mut is_go = false;
-            if let Some(c) = func.get((first_paren - 1)..first_paren) {
-                // if .get(-1) is None, can't be a dot
-                if c == "." {
-                    // assume it's a Go method name, so do nothing
-                    is_go = true;
-                }
+    let mut angle_bracket_depth = 0;
+    let mut parentheses_depth = 0;
+    let mut is_go_function = false;
+    let mut last_dot_index = Option::<usize>::None;
+    let mut idx = 0usize;
+    let mut end_of_param_list = false;
+    func = func
+        .chars()
+        .filter_map(|c| {
+            if parentheses_depth == 0 {
+                is_go_function = false;
             }
 
-            if !is_go {
-                // kill it with fire!
-                func.truncate(first_paren);
+            match c {
+                '<' => {
+                    angle_bracket_depth += 1;
+                }
+                '>' => {
+                    angle_bracket_depth -= 1;
+                }
+                '(' => {
+                    // ignore parentheses inside Rust/C++ templates
+                    if angle_bracket_depth == 0 {
+                        if parentheses_depth == 0 && last_dot_index == Some(idx) {
+                            is_go_function = true;
+                        }
+                        parentheses_depth += 1;
+                    }
+                }
+                ')' => {
+                    if angle_bracket_depth == 0 {
+                        parentheses_depth -= 1;
+                        // Filter everything after the closing parenthesis of the parameter list
+                        // to keep the behavior consistent with the previous implementation
+                        end_of_param_list = !is_go_function && parentheses_depth == 0;
+                    }
+                }
+                '.' => {
+                    // insert index + 1 so we can associate it with the opening parentheses for Golang
+                    last_dot_index = Some(idx + 1);
+                }
+                _ => (),
+            };
+
+            idx += 1usize;
+            // Filter chars depending on state
+            if !is_go_function && (end_of_param_list || parentheses_depth > 0) {
+                None
+            } else {
+                Some(c)
             }
-        }
-    }
+        })
+        .collect();
 
     // The perl version here strips ' and "; we don't do that.
     // see https://github.com/brendangregg/FlameGraph/commit/817c6ea3b92417349605e5715fe6a7cb8cbc9776
@@ -685,6 +719,7 @@ mod tests {
                 "./tests/data/collapse-perf/go-stacks.txt",
                 "./tests/data/collapse-perf/java-inline.txt",
                 "./tests/data/collapse-perf/weird-stack-line.txt",
+                "./tests/data/collapse-perf/cpp-stacks-std-function.txt",
             ]
             .iter()
             .map(PathBuf::from)
