@@ -1,0 +1,8 @@
+perf_stacks;[unknown];std::ostream::sentry::sentry 1
+perf_stacks;_dl_start;[[kernel.kallsyms]] 1
+perf_stacks;_start;[[kernel.kallsyms]] 6
+perf_stacks;_start;__libc_start_main;__libc_csu_init;_GLOBAL__sub_I_main;__static_initialization_and_destruction_0;std::ios_base::Init::Init;std::locale::locale;[libstdc++.so.6.0.25];std::locale::_Impl::_Impl;std::__timepunct<wchar_t>::__timepunct;std::__timepunct<wchar_t>::_M_initialize_timepunct 1
+perf_stacks;_start;__libc_start_main;main;std::endl<char, std::char_traits<char> >;std::ostream::put;_IO_new_file_overflow;_IO_new_do_write;new_do_write;_IO_new_file_write;__GI___libc_write;[[kernel.kallsyms]] 34
+perf_stacks;_start;__libc_start_main;main;std::function<int (int, int)>::operator;std::_Function_handler<int (int, int), main::{lambda(int, int)#1}>::_M_invoke 1
+perf_stacks;_start;__libc_start_main;main;std::ostream::flush 1
+perf_stacks;_start;_dl_start;_dl_start_final;_dl_sysdep_start;dl_main;_dl_map_object_deps;_dl_catch_exception;openaux;_dl_map_object;_dl_map_object_from_fd;_dl_map_segments;__mmap64;[[kernel.kallsyms]] 1

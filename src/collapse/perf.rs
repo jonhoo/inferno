@@ -609,25 +609,44 @@ fn tidy_generic(mut func: String) -> String {
     //    see https://github.com/brendangregg/FlameGraph/pull/72
     //  - C++ anonymous namespace annotations.
     //    see https://github.com/brendangregg/FlameGraph/pull/93
-    if let Some(first_paren) = func.find('(') {
-        if func[first_paren..].starts_with("anonymous namespace)") {
-            // C++ anonymous namespace
-        } else {
-            let mut is_go = false;
-            if let Some(c) = func.get((first_paren - 1)..first_paren) {
-                // if .get(-1) is None, can't be a dot
-                if c == "." {
-                    // assume it's a Go method name, so do nothing
-                    is_go = true;
+    let mut angle_bracket_depth = 0;
+    let mut parentheses_depth = 0;
+    let mut last_dot_index = Option::<usize>::None;
+    let mut length_without_parameters = func.len();
+    for (idx, c) in func.char_indices() {
+        match c {
+            '<' => {
+                angle_bracket_depth += 1;
+            }
+            '>' => {
+                angle_bracket_depth -= 1;
+            }
+            '(' => {
+                // ignore parentheses inside Rust/C++ templates
+                if angle_bracket_depth == 0 {
+                    // Don't remove go functions starting with .(
+                    let is_go_function = parentheses_depth == 0 && last_dot_index == Some(idx);
+                    if !is_go_function {
+                        // found start of parameter list
+                        length_without_parameters = idx;
+                        break;
+                    }
+                    parentheses_depth += 1;
                 }
             }
-
-            if !is_go {
-                // kill it with fire!
-                func.truncate(first_paren);
+            ')' => {
+                if angle_bracket_depth == 0 {
+                    parentheses_depth -= 1;
+                }
             }
-        }
+            '.' => {
+                // insert index + 1 so we can associate it with the opening parentheses for Golang
+                last_dot_index = Some(idx + 1);
+            }
+            _ => (),
+        };
     }
+    func.truncate(length_without_parameters);
 
     // The perl version here strips ' and "; we don't do that.
     // see https://github.com/brendangregg/FlameGraph/commit/817c6ea3b92417349605e5715fe6a7cb8cbc9776
@@ -664,6 +683,28 @@ mod tests {
     use crate::collapse::common;
     use crate::collapse::Collapse;
 
+    // Test some interesting edge cased for tidy_generic
+    #[test]
+    fn test_tidy_generic() {
+        let test_expectations = [
+            (
+                "go/build.(*importReader).readByte",
+                "go/build.(*importReader).readByte",
+            ),
+            ("foo<Vec::<usize>>(Vec<usize>)", "foo<Vec::<usize>>"),
+            (".run()V", ".run"),
+            ("base(BasicType) const", "base"),
+            (
+                "std::function<void (int, int)>::operator(int, int)",
+                "std::function<void (int, int)>::operator",
+            ),
+        ];
+
+        for (input, expected) in test_expectations.iter() {
+            assert_eq!(&tidy_generic(input.to_string()), expected);
+        }
+    }
+
     lazy_static! {
         static ref INPUT: Vec<PathBuf> = {
             [
@@ -685,6 +726,7 @@ mod tests {
                 "./tests/data/collapse-perf/go-stacks.txt",
                 "./tests/data/collapse-perf/java-inline.txt",
                 "./tests/data/collapse-perf/weird-stack-line.txt",
+                "./tests/data/collapse-perf/cpp-stacks-std-function.txt",
             ]
             .iter()
             .map(PathBuf::from)

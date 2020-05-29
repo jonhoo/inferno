@@ -58,6 +58,13 @@ fn collapse_guess_perf_go_stacks() {
 }
 
 #[test]
+fn collapse_guess_perf_cpp_stacks() {
+    let test_file = "./tests/data/collapse-perf/cpp-stacks-std-function.txt";
+    let result_file = "./tests/data/collapse-perf/results/cpp-stacks-std-function-collapsed.txt";
+    test_collapse_guess(test_file, result_file, true).unwrap()
+}
+
+#[test]
 fn collapse_guess_perf_java_inline() {
     let test_file = "./tests/data/collapse-perf/java-inline.txt";
     let result_file = "./tests/data/collapse-perf/results/java-inline-collapsed.txt";
