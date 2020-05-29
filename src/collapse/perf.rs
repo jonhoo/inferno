@@ -611,57 +611,42 @@ fn tidy_generic(mut func: String) -> String {
     //    see https://github.com/brendangregg/FlameGraph/pull/93
     let mut angle_bracket_depth = 0;
     let mut parentheses_depth = 0;
-    let mut is_go_function = false;
     let mut last_dot_index = Option::<usize>::None;
-    let mut idx = 0usize;
-    let mut end_of_param_list = false;
-    func = func
-        .chars()
-        .filter_map(|c| {
-            if parentheses_depth == 0 {
-                is_go_function = false;
+    let mut length_without_parameters = func.len();
+    for (idx, c) in func.char_indices() {
+        match c {
+            '<' => {
+                angle_bracket_depth += 1;
             }
-
-            match c {
-                '<' => {
-                    angle_bracket_depth += 1;
-                }
-                '>' => {
-                    angle_bracket_depth -= 1;
-                }
-                '(' => {
-                    // ignore parentheses inside Rust/C++ templates
-                    if angle_bracket_depth == 0 {
-                        if parentheses_depth == 0 && last_dot_index == Some(idx) {
-                            is_go_function = true;
-                        }
-                        parentheses_depth += 1;
-                    }
-                }
-                ')' => {
-                    if angle_bracket_depth == 0 {
-                        parentheses_depth -= 1;
-                        // Filter everything after the closing parenthesis of the parameter list
-                        // to keep the behavior consistent with the previous implementation
-                        end_of_param_list = !is_go_function && parentheses_depth == 0;
-                    }
-                }
-                '.' => {
-                    // insert index + 1 so we can associate it with the opening parentheses for Golang
-                    last_dot_index = Some(idx + 1);
-                }
-                _ => (),
-            };
-
-            idx += 1usize;
-            // Filter chars depending on state
-            if !is_go_function && (end_of_param_list || parentheses_depth > 0) {
-                None
-            } else {
-                Some(c)
+            '>' => {
+                angle_bracket_depth -= 1;
             }
-        })
-        .collect();
+            '(' => {
+                // ignore parentheses inside Rust/C++ templates
+                if angle_bracket_depth == 0 {
+                    // Don't remove go functions starting with .(
+                    let is_go_function = parentheses_depth == 0 && last_dot_index == Some(idx);
+                    if !is_go_function {
+                        // found start of parameter list
+                        length_without_parameters = idx;
+                        break;
+                    }
+                    parentheses_depth += 1;
+                }
+            }
+            ')' => {
+                if angle_bracket_depth == 0 {
+                    parentheses_depth -= 1;
+                }
+            }
+            '.' => {
+                // insert index + 1 so we can associate it with the opening parentheses for Golang
+                last_dot_index = Some(idx + 1);
+            }
+            _ => (),
+        };
+    }
+    func.truncate(length_without_parameters);
 
     // The perl version here strips ' and "; we don't do that.
     // see https://github.com/brendangregg/FlameGraph/commit/817c6ea3b92417349605e5715fe6a7cb8cbc9776
