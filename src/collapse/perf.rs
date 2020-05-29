@@ -698,6 +698,28 @@ mod tests {
     use crate::collapse::common;
     use crate::collapse::Collapse;
 
+    // Test some interesting edge cased for tidy_generic
+    #[test]
+    fn test_tidy_generic() {
+        let test_expectations = [
+            (
+                "go/build.(*importReader).readByte",
+                "go/build.(*importReader).readByte",
+            ),
+            ("foo<Vec::<usize>>(Vec<usize>)", "foo<Vec::<usize>>"),
+            (".run()V", ".run"),
+            ("base(BasicType) const", "base"),
+            (
+                "std::function<void (int, int)>::operator(int, int)",
+                "std::function<void (int, int)>::operator",
+            ),
+        ];
+
+        for (input, expected) in test_expectations.iter() {
+            assert_eq!(&tidy_generic(input.to_string()), expected);
+        }
+    }
+
     lazy_static! {
         static ref INPUT: Vec<PathBuf> = {
             [
