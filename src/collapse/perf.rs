@@ -609,35 +609,32 @@ fn tidy_generic(mut func: String) -> String {
     //    see https://github.com/brendangregg/FlameGraph/pull/72
     //  - C++ anonymous namespace annotations.
     //    see https://github.com/brendangregg/FlameGraph/pull/93
-    let mut angle_bracket_depth = 0;
-    let mut parentheses_depth = 0;
+    let mut bracket_depth = 0;
     let mut last_dot_index = Option::<usize>::None;
     let mut length_without_parameters = func.len();
     for (idx, c) in func.char_indices() {
         match c {
-            '<' => {
-                angle_bracket_depth += 1;
+            '<' | '{' | '[' => {
+                bracket_depth += 1;
             }
-            '>' => {
-                angle_bracket_depth -= 1;
+            '>' | '}' | ']' | ')' => {
+                bracket_depth -= 1;
             }
             '(' => {
-                // ignore parentheses inside Rust/C++ templates
-                if angle_bracket_depth == 0 {
+                // ignore parentheses inside Rust/C++ templates, or C++ lambda stacks {lambda(...)#1}
+                // by only considering top-level parentheses
+                if bracket_depth == 0 {
                     // Don't remove go functions starting with .(
-                    let is_go_function = parentheses_depth == 0 && last_dot_index == Some(idx);
-                    if !is_go_function {
+                    let is_go_function = last_dot_index == Some(idx);
+                    // Don't remove C++ anonymous namespaces
+                    let is_anonymous_namespace = func[idx..].starts_with("(anonymous namespace)");
+                    if !is_go_function && !is_anonymous_namespace {
                         // found start of parameter list
                         length_without_parameters = idx;
                         break;
                     }
-                    parentheses_depth += 1;
                 }
-            }
-            ')' => {
-                if angle_bracket_depth == 0 {
-                    parentheses_depth -= 1;
-                }
+                bracket_depth += 1;
             }
             '.' => {
                 // insert index + 1 so we can associate it with the opening parentheses for Golang
@@ -698,6 +695,16 @@ mod tests {
                 "std::function<void (int, int)>::operator(int, int)",
                 "std::function<void (int, int)>::operator",
             ),
+            (
+                "{lambda(int, int)#2}::operator()",
+                "{lambda(int, int)#2}::operator",
+            ),
+            (
+                "(anonymous namespace)::myBar()",
+                "(anonymous namespace)::myBar",
+            ),
+            // Didn't see this anywhere, but it seems like some language may have [] brackets containing parentheses
+            ("[(foo)]::bar()", "[(foo)]::bar"),
         ];
 
         for (input, expected) in test_expectations.iter() {
