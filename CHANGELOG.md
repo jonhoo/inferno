@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [0.9.8] - 2020-05-30
+### Changed
+
+ - Fixes a regression where anonymous namespaces would be pruned. [#175](https://github.com/jonhoo/inferno/pull/175)
+ - Adds support for lambda expressions in curly braces in C++ function names. [#175](https://github.com/jonhoo/inferno/pull/175)
+
 ## [0.9.7] - 2020-05-29
 ### Changed
 
@@ -90,7 +96,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Moved to `IndexMap` and FNV hashing ([#127](https://github.com/jonhoo/inferno/pull/127))
 - Moved CI to Azure DevOps Pipelines
 
-[Unreleased]: https://github.com/jonhoo/inferno/compare/v0.9.7...HEAD
+[Unreleased]: https://github.com/jonhoo/inferno/compare/v0.9.8...HEAD
+[0.9.8]: https://github.com/jonhoo/inferno/compare/v0.9.7...v0.9.8
 [0.9.7]: https://github.com/jonhoo/inferno/compare/v0.9.6...v0.9.7
 [0.9.6]: https://github.com/jonhoo/inferno/compare/v0.9.5...v0.9.6
 [0.9.5]: https://github.com/jonhoo/inferno/compare/v0.9.4...v0.9.5
