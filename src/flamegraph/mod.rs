@@ -251,14 +251,22 @@ impl<'a> Options<'a> {
         if self.direction == Direction::Straight {
             self.font_size * 3 + subtitle_height
         } else {
-            // Inverted (icicle) mode, put the details on top:
+            // Inverted (icicle) mode, put the details on top. The +4 is to add
+            // a little bit more space between the title (or subtitle if there
+            // is one) and the details.
             self.font_size * 4 + subtitle_height + 4
         }
     }
 
     /// Calculate pad bottom, including labels
     pub(super) fn ypad2(&self) -> usize {
-        self.font_size * 2 + 10
+        if self.direction == Direction::Straight {
+            self.font_size * 2 + 10
+        } else {
+            // Inverted (icicle) mode, put the details on top, so don't need
+            // room at the bottom.
+            self.font_size + 10
+        }
     }
 }
 
