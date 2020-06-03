@@ -202,7 +202,7 @@ var truncate_text_right = {};",
         TextItem {
             x: Dimension::Pixels(super::XPAD),
             y: if opt.direction == Direction::Straight {
-                (style_options.imageheight - (opt.ypad2() / 2))
+                style_options.imageheight - (opt.ypad2() / 2)
             } else {
                 // Inverted (icicle) mode, put the details on top:
                 opt.ypad1() - opt.font_size
