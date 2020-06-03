@@ -248,7 +248,12 @@ impl<'a> Options<'a> {
         } else {
             0
         };
-        self.font_size * 3 + subtitle_height
+        if self.direction == Direction::Straight {
+            self.font_size * 3 + subtitle_height
+        } else {
+            // Inverted (icicle) mode, put the details on top:
+            self.font_size * 4 + subtitle_height + 4
+        }
     }
 
     /// Calculate pad bottom, including labels
