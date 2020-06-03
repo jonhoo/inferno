@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- In icicle/inverted mode, the details bar is now at the top where it can actually be seen. [#177](https://github.com/jonhoo/inferno/pull/177)
+
 ### Removed
 
 ## [0.9.8] - 2020-05-30

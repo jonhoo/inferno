@@ -201,7 +201,12 @@ var truncate_text_right = {};",
         &mut buf,
         TextItem {
             x: Dimension::Pixels(super::XPAD),
-            y: (style_options.imageheight - (opt.ypad2() / 2)) as f64,
+            y: if opt.direction == Direction::Straight {
+                (style_options.imageheight - (opt.ypad2() / 2))
+            } else {
+                // Inverted (icicle) mode, put the details on top:
+                opt.ypad1() - opt.font_size
+            } as f64,
             text: " ".into(),
             extra: iter::once(("id", "details")),
         },

@@ -248,12 +248,25 @@ impl<'a> Options<'a> {
         } else {
             0
         };
-        self.font_size * 3 + subtitle_height
+        if self.direction == Direction::Straight {
+            self.font_size * 3 + subtitle_height
+        } else {
+            // Inverted (icicle) mode, put the details on top. The +4 is to add
+            // a little bit more space between the title (or subtitle if there
+            // is one) and the details.
+            self.font_size * 4 + subtitle_height + 4
+        }
     }
 
     /// Calculate pad bottom, including labels
     pub(super) fn ypad2(&self) -> usize {
-        self.font_size * 2 + 10
+        if self.direction == Direction::Straight {
+            self.font_size * 2 + 10
+        } else {
+            // Inverted (icicle) mode, put the details on top, so don't need
+            // room at the bottom.
+            self.font_size + 10
+        }
     }
 }
 
@@ -849,8 +862,9 @@ fn write_usize(buffer: &mut StrStack, value: usize) -> usize {
 
 #[cfg(test)]
 mod tests {
-    use super::Options;
+    use super::{Direction, Options};
 
+    // If there's a subtitle, we need to adjust the top height:
     #[test]
     fn top_ypadding_adjusts_for_subtitle() {
         let height_without_subtitle = Options {
@@ -863,5 +877,20 @@ mod tests {
         }
         .ypad1();
         assert!(height_with_subtitle > height_without_subtitle);
+    }
+
+    // In inverted (icicle) mode, the details move from bottom to top, so
+    // ypadding shifts accordingly.
+    #[test]
+    fn ypadding_adjust_for_inverted_mode() {
+        let regular = Options {
+            ..Default::default()
+        };
+        let inverted = Options {
+            direction: Direction::Inverted,
+            ..Default::default()
+        };
+        assert!(inverted.ypad1() > regular.ypad1());
+        assert!(inverted.ypad2() < regular.ypad2());
     }
 }
