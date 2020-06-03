@@ -862,8 +862,9 @@ fn write_usize(buffer: &mut StrStack, value: usize) -> usize {
 
 #[cfg(test)]
 mod tests {
-    use super::Options;
+    use super::{Direction, Options};
 
+    // If there's a subtitle, we need to adjust the top height:
     #[test]
     fn top_ypadding_adjusts_for_subtitle() {
         let height_without_subtitle = Options {
@@ -876,5 +877,20 @@ mod tests {
         }
         .ypad1();
         assert!(height_with_subtitle > height_without_subtitle);
+    }
+
+    // In inverted (icicle) mode, the details move from bottom to top, so
+    // ypadding shifts accordingly.
+    #[test]
+    fn ypadding_adjust_for_inverted_mode() {
+        let regular = Options {
+            ..Default::default()
+        };
+        let inverted = Options {
+            direction: Direction::Inverted,
+            ..Default::default()
+        };
+        assert!(inverted.ypad1() > regular.ypad1());
+        assert!(inverted.ypad2() < regular.ypad2());
     }
 }
