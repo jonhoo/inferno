@@ -41,6 +41,7 @@ quick-xml = { version = "0.18", default-features = false }
 rgb = "0.8.13"
 str_stack = "0.1"
 structopt = { version = "0.3", optional = true }
+rustc-demangle = "0.1"
 
 [dev-dependencies]
 assert_cmd = "1"

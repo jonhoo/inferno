@@ -299,6 +299,10 @@ impl Folder {
     fn fix_rust_symbol<'a>(&self, frame: &'a str) -> Cow<'a, str> {
         let mut parts = frame.splitn(2, '`');
         if let (Some(pname), Some(func)) = (parts.next(), parts.next()) {
+            // Support rust symbol mangling (v0)
+            if let Ok(demangled_func) = rustc_demangle::try_demangle(func) {
+                return Cow::Owned(format!("{}`{}", pname, demangled_func));
+            }
             if self.opt.includeoffset {
                 let mut parts = func.rsplitn(2, '+');
                 if let (Some(offset), Some(func)) = (parts.next(), parts.next()) {
