@@ -60,13 +60,10 @@ struct Opt {
 
 impl Opt {
     fn into_parts(self) -> (Option<PathBuf>, Options) {
-        (
-            self.infile,
-            Options {
-                includeoffset: self.includeoffset,
-                nthreads: self.nthreads,
-            },
-        )
+        let mut options = Options::default();
+        options.includeoffset = self.includeoffset;
+        options.nthreads = self.nthreads;
+        (self.infile, options)
     }
 }
 

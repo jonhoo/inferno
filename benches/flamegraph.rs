@@ -42,5 +42,5 @@ macro_rules! flamegraph_benchmarks {
 
 flamegraph_benchmarks! {
     flamegraph: ("tests/data/collapse-perf/results/example-perf-stacks-collapsed.txt",
-                     Options { reverse_stack_order: true, ..Default::default() })
+                 { let mut opt = Options::default(); opt.reverse_stack_order = true; opt })
 }

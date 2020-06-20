@@ -1,13 +1,25 @@
 jobs:
-  - template: default.yml@templates
-    parameters:
-      codecov_token: $(CODECOV_TOKEN_SECRET)
-      minrust: 1.40.0
-      env:
-        RUST_BACKTRACE: 1
-      setup:
-       - checkout: self
-         submodules: recursive
+ - template: default.yml@templates
+   parameters:
+     codecov_token: $(CODECOV_TOKEN_SECRET)
+     minrust: 1.40.0
+     env:
+       RUST_BACKTRACE: 1
+     setup:
+      - checkout: self
+        submodules: recursive
+ - job: features
+   displayName: "Check feature combinations"
+   pool:
+     vmImage: ubuntu-latest
+   steps:
+     - template: install-rust.yml@templates
+       parameters:
+         rust: stable
+     - script: cargo install cargo-hack
+       displayName: install cargo-hack
+     - script: cargo hack
+       displayName: cargo hack --feature-powerset check --all-targets
 
 resources:
   repositories:

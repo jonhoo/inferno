@@ -42,12 +42,9 @@ struct Opt {
 
 impl Opt {
     fn into_parts(self) -> (Option<PathBuf>, Options) {
-        (
-            self.infile,
-            Options {
-                no_modules: self.no_modules,
-            },
-        )
+        let mut options = Options::default();
+        options.no_modules = self.no_modules;
+        (self.infile, options)
     }
 }
 

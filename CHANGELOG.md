@@ -6,9 +6,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
-- Flame chart mode. Flame charts put the passage of time on the x-axis instead of the alphabet. [#125](https://github.com/jonhoo/inferno/pull/125)
+
+ - Flame chart mode. Flame charts put the passage of time on the x-axis instead of the alphabet. [#125](https://github.com/jonhoo/inferno/pull/125)
+ - `cargo hack` to check that all features compile. [#181](https://github.com/jonhoo/inferno/pull/181)
 
 ### Changed
+
+ - All `Options` are now marked as `#[non_exhaustive]` so that we can
+   add options without making that a breaking change. This also makes
+   feature-dependent fields (like `func_nameattr` on `flamegraph`) okay.
+   Unfortunately, it also means that function record update syntax won't
+   work any more (`Options { ..., ..Default::default() }`). See
+   https://github.com/rust-lang/rust/issues/70564#issuecomment-647031324
+   for details. [#181](https://github.com/jonhoo/inferno/pull/181)
 
 ### Removed
 

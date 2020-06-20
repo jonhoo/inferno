@@ -24,6 +24,7 @@ mod logging {
 
 /// `perf` folder configuration options.
 #[derive(Clone, Debug)]
+#[non_exhaustive]
 pub struct Options {
     /// Annotate JIT functions with a `_[j]` suffix.
     ///

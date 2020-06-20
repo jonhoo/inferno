@@ -30,6 +30,7 @@ static END_LINE: &str = "Total number in stack";
 
 /// `sample` folder configuration options.
 #[derive(Clone, Debug)]
+#[non_exhaustive]
 pub struct Options {
     /// Don't include modules with function names.
     ///

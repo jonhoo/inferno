@@ -10,6 +10,7 @@ static HEADER: &str = "Function Stack,CPU Time:Self,Module";
 
 /// `vtune` folder configuration options.
 #[derive(Clone, Debug)]
+#[non_exhaustive]
 pub struct Options {
     /// Don't include modules with function names.
     ///

@@ -9,6 +9,7 @@ const LINES_PER_ITERATION: usize = 10;
 
 /// Folder configuration options.
 #[derive(Clone, Debug)]
+#[non_exhaustive]
 pub struct Options {
     /// The number of threads to use.
     ///

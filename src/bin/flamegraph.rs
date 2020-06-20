@@ -387,36 +387,31 @@ mod tests {
         ];
         let opt = Opt::from_iter_safe(args).unwrap();
         let (infiles, options) = opt.into_parts();
-        let expected_options = Options {
-            colors: Palette::from_str("purple").unwrap(),
-            search_color: color::SearchColor::from_str("#203040").unwrap(),
-            title: "Test Title".to_string(),
-            image_width: Some(100),
-            frame_height: 500,
-            min_width: 90.1,
-            font_type: "Helvetica".to_string(),
-            font_size: 13,
-            font_width: 10.5,
-            text_truncate_direction: TextTruncateDirection::Right,
-            count_name: "test count name".to_string(),
-            name_type: "test name type".to_string(),
-            factor: 0.1,
-            notes: "Test notes".to_string(),
-            subtitle: Some("Test Subtitle".to_string()),
-            bgcolors: Some(color::BackgroundColor::Blue),
-            hash: true,
-            palette_map: Default::default(),
-            #[cfg(feature = "nameattr")]
-            func_frameattrs: Default::default(),
-            direction: Direction::Inverted,
-            negate_differentials: true,
-            pretty_xml: true,
-            no_sort: false,
-            reverse_stack_order: true,
-            no_javascript: true,
-            color_diffusion: false,
-            flame_chart: false,
-        };
+        let mut expected_options = Options::default();
+        expected_options.colors = Palette::from_str("purple").unwrap();
+        expected_options.search_color = color::SearchColor::from_str("#203040").unwrap();
+        expected_options.title = "Test Title".to_string();
+        expected_options.image_width = Some(100);
+        expected_options.frame_height = 500;
+        expected_options.min_width = 90.1;
+        expected_options.font_type = "Helvetica".to_string();
+        expected_options.font_size = 13;
+        expected_options.font_width = 10.5;
+        expected_options.text_truncate_direction = TextTruncateDirection::Right;
+        expected_options.count_name = "test count name".to_string();
+        expected_options.name_type = "test name type".to_string();
+        expected_options.factor = 0.1;
+        expected_options.notes = "Test notes".to_string();
+        expected_options.subtitle = Some("Test Subtitle".to_string());
+        expected_options.bgcolors = Some(color::BackgroundColor::Blue);
+        expected_options.hash = true;
+        expected_options.direction = Direction::Inverted;
+        expected_options.negate_differentials = true;
+        expected_options.pretty_xml = true;
+        expected_options.no_sort = false;
+        expected_options.reverse_stack_order = true;
+        expected_options.no_javascript = true;
+        expected_options.color_diffusion = false;
 
         assert_eq!(options, expected_options);
         assert_eq!(infiles.len(), 2, "expected 2 input files");
