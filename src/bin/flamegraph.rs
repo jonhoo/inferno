@@ -393,6 +393,7 @@ mod tests {
             bgcolors: Some(color::BackgroundColor::Blue),
             hash: true,
             palette_map: Default::default(),
+            #[cfg(feature = "nameattr")]
             func_frameattrs: Default::default(),
             direction: Direction::Inverted,
             negate_differentials: true,
