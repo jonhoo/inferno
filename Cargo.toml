@@ -96,7 +96,9 @@ required-features = ["cli"]
 [[bench]]
 name = "collapse"
 harness = false
+required-features = ["multithreaded"]
 
 [[bench]]
 name = "flamegraph"
 harness = false
+required-features = ["multithreaded"]

@@ -126,12 +126,10 @@ fn flamegraph_colors_java() {
     let input_file = "./flamegraph/test/results/perf-java-stacks-01-collapsed-all.txt";
     let expected_result_file = "./tests/data/flamegraph/colors/java.svg";
 
-    let options = flamegraph::Options {
-        colors: Palette::from_str("java").unwrap(),
-        bgcolors: Some(BackgroundColor::from_str("blue").unwrap()),
-        hash: true,
-        ..Default::default()
-    };
+    let mut options = flamegraph::Options::default();
+    options.colors = Palette::from_str("java").unwrap();
+    options.bgcolors = Some(BackgroundColor::from_str("blue").unwrap());
+    options.hash = true;
 
     test_flamegraph(input_file, expected_result_file, options).unwrap();
 }
@@ -141,12 +139,10 @@ fn flamegraph_colors_js() {
     let input_file = "./flamegraph/test/results/perf-js-stacks-01-collapsed-all.txt";
     let expected_result_file = "./tests/data/flamegraph/colors/js.svg";
 
-    let options = flamegraph::Options {
-        colors: Palette::from_str("js").unwrap(),
-        bgcolors: Some(BackgroundColor::from_str("green").unwrap()),
-        hash: true,
-        ..Default::default()
-    };
+    let mut options = flamegraph::Options::default();
+    options.colors = Palette::from_str("js").unwrap();
+    options.bgcolors = Some(BackgroundColor::from_str("green").unwrap());
+    options.hash = true;
 
     test_flamegraph(input_file, expected_result_file, options).unwrap();
 }
@@ -164,10 +160,8 @@ fn flamegraph_differential_negated() {
     let input_file =
         "./tests/data/flamegraph/differential/perf-cycles-instructions-01-collapsed-all-diff.txt";
     let expected_result_file = "./tests/data/flamegraph/differential/diff-negated.svg";
-    let options = Options {
-        negate_differentials: true,
-        ..Default::default()
-    };
+    let mut options = flamegraph::Options::default();
+    options.negate_differentials = true;
     test_flamegraph(input_file, expected_result_file, options).unwrap();
 }
 
@@ -175,10 +169,8 @@ fn flamegraph_differential_negated() {
 fn flamegraph_collor_diffusion() {
     let input_file = "./flamegraph/test/results/perf-vertx-stacks-01-collapsed-all.txt";
     let expected_result_file = "./tests/data/flamegraph/options/colordiffusion.svg";
-    let options = Options {
-        color_diffusion: true,
-        ..Default::default()
-    };
+    let mut options = flamegraph::Options::default();
+    options.color_diffusion = true;
     test_flamegraph(input_file, expected_result_file, options).unwrap();
 }
 
@@ -186,11 +178,9 @@ fn flamegraph_collor_diffusion() {
 fn flamegraph_factor() {
     let input_file = "./flamegraph/test/results/perf-vertx-stacks-01-collapsed-all.txt";
     let expected_result_file = "./tests/data/flamegraph/factor/factor-2.5.svg";
-    let options = Options {
-        factor: 2.5,
-        hash: true,
-        ..Default::default()
-    };
+    let mut options = flamegraph::Options::default();
+    options.factor = 2.5;
+    options.hash = true;
     test_flamegraph(input_file, expected_result_file, options).unwrap();
 }
 
@@ -201,12 +191,10 @@ fn flamegraph_nameattr() {
     let expected_result_file = "./tests/data/flamegraph/nameattr/nameattr.svg";
     let nameattr_file = "./tests/data/flamegraph/nameattr/nameattr.txt";
 
-    let options = flamegraph::Options {
-        hash: true,
-        func_frameattrs: flamegraph::FuncFrameAttrsMap::from_file(&PathBuf::from(nameattr_file))
-            .unwrap(),
-        ..Default::default()
-    };
+    let mut options = flamegraph::Options::default();
+    options.hash = true;
+    options.func_frameattrs =
+        flamegraph::FuncFrameAttrsMap::from_file(&PathBuf::from(nameattr_file)).unwrap();
 
     test_flamegraph(input_file, expected_result_file, options).unwrap();
 }
@@ -218,12 +206,10 @@ fn flamegraph_nameattr_empty_line() {
     let expected_result_file = "./tests/data/flamegraph/nameattr/nameattr.svg";
     let nameattr_file = "./tests/data/flamegraph/nameattr/nameattr_empty_first_line.txt";
 
-    let options = flamegraph::Options {
-        hash: true,
-        func_frameattrs: flamegraph::FuncFrameAttrsMap::from_file(&PathBuf::from(nameattr_file))
-            .unwrap(),
-        ..Default::default()
-    };
+    let mut options = flamegraph::Options::default();
+    options.hash = true;
+    options.func_frameattrs =
+        flamegraph::FuncFrameAttrsMap::from_file(&PathBuf::from(nameattr_file)).unwrap();
 
     test_flamegraph(input_file, expected_result_file, options).unwrap();
 }
@@ -235,12 +221,10 @@ fn flamegraph_nameattr_empty_attribute() {
     let expected_result_file = "./tests/data/flamegraph/nameattr/nameattr.svg";
     let nameattr_file = "./tests/data/flamegraph/nameattr/nameattr_empty_attribute.txt";
 
-    let options = flamegraph::Options {
-        hash: true,
-        func_frameattrs: flamegraph::FuncFrameAttrsMap::from_file(&PathBuf::from(nameattr_file))
-            .unwrap(),
-        ..Default::default()
-    };
+    let mut options = flamegraph::Options::default();
+    options.hash = true;
+    options.func_frameattrs =
+        flamegraph::FuncFrameAttrsMap::from_file(&PathBuf::from(nameattr_file)).unwrap();
 
     test_flamegraph(input_file, expected_result_file, options).unwrap();
 }
@@ -252,12 +236,10 @@ fn flamegraph_nameattr_duplicate_attributes() {
     let expected_result_file = "./tests/data/flamegraph/nameattr/nameattr_duplicate_attributes.svg";
     let nameattr_file = "./tests/data/flamegraph/nameattr/nameattr_duplicate_attributes.txt";
 
-    let options = flamegraph::Options {
-        hash: true,
-        func_frameattrs: flamegraph::FuncFrameAttrsMap::from_file(&PathBuf::from(nameattr_file))
-            .unwrap(),
-        ..Default::default()
-    };
+    let mut options = flamegraph::Options::default();
+    options.hash = true;
+    options.func_frameattrs =
+        flamegraph::FuncFrameAttrsMap::from_file(&PathBuf::from(nameattr_file)).unwrap();
 
     test_flamegraph(input_file, expected_result_file, options).unwrap();
 }
@@ -376,10 +358,8 @@ fn flamegraph_palette_map() {
     let palette_file = "./tests/data/flamegraph/palette-map/palette.map";
     let mut palette_map = load_palette_map_file(palette_file);
 
-    let options = flamegraph::Options {
-        palette_map: Some(&mut palette_map),
-        ..Default::default()
-    };
+    let mut options = flamegraph::Options::default();
+    options.palette_map = Some(&mut palette_map);
 
     test_flamegraph(input_file, expected_result_file, options).unwrap();
 }
@@ -458,10 +438,8 @@ fn flamegraph_unsorted_multiple_input_files() {
     ];
     let expected_result_file =
         "./tests/data/flamegraph/perf-vertx-stacks/perf-vertx-stacks-01-collapsed-all.svg";
-    let options = Options {
-        hash: true,
-        ..Default::default()
-    };
+    let mut options = flamegraph::Options::default();
+    options.hash = true;
     test_flamegraph_multiple_files(input_files, expected_result_file, options).unwrap();
 }
 
@@ -470,10 +448,8 @@ fn flamegraph_should_prune_narrow_blocks() {
     let input_file = "./tests/data/flamegraph/narrow-blocks/narrow-blocks.txt";
     let expected_result_file = "./tests/data/flamegraph/narrow-blocks/narrow-blocks.svg";
 
-    let options = flamegraph::Options {
-        hash: true,
-        ..Default::default()
-    };
+    let mut options = flamegraph::Options::default();
+    options.hash = true;
 
     test_flamegraph(input_file, expected_result_file, options).unwrap();
 }
@@ -483,12 +459,10 @@ fn flamegraph_inverted() {
     let input_file = "./flamegraph/test/results/perf-vertx-stacks-01-collapsed-all.txt";
     let expected_result_file = "./tests/data/flamegraph/inverted/inverted.svg";
 
-    let options = flamegraph::Options {
-        hash: true,
-        title: "Icicle Graph".to_string(),
-        direction: Direction::Inverted,
-        ..Default::default()
-    };
+    let mut options = flamegraph::Options::default();
+    options.hash = true;
+    options.title = "Icicle Graph".to_string();
+    options.direction = Direction::Inverted;
 
     test_flamegraph(input_file, expected_result_file, options).unwrap();
 }
@@ -498,10 +472,8 @@ fn flamegraph_grey_frames() {
     let input_file = "./tests/data/flamegraph/grey-frames/grey-frames.txt";
     let expected_result_file = "./tests/data/flamegraph/grey-frames/grey-frames.svg";
 
-    let options = flamegraph::Options {
-        hash: true,
-        ..Default::default()
-    };
+    let mut options = flamegraph::Options::default();
+    options.hash = true;
 
     test_flamegraph(input_file, expected_result_file, options).unwrap();
 }
@@ -514,10 +486,8 @@ fn flamegraph_example_perf_stacks() {
     let palette_file = "./tests/data/flamegraph/example-perf-stacks/palette.map";
     let mut palette_map = load_palette_map_file(palette_file);
 
-    let options = flamegraph::Options {
-        palette_map: Some(&mut palette_map),
-        ..Default::default()
-    };
+    let mut options = flamegraph::Options::default();
+    options.palette_map = Some(&mut palette_map);
 
     test_flamegraph(input_file, expected_result_file, options).unwrap();
 }
@@ -539,10 +509,8 @@ fn flamegraph_title_simple() {
         "./tests/data/flamegraph/differential/perf-cycles-instructions-01-collapsed-all-diff.txt";
     let expected_result_file = "./tests/data/flamegraph/options/title_simple.svg";
 
-    let options = flamegraph::Options {
-        title: "Test Graph".to_owned(),
-        ..Default::default()
-    };
+    let mut options = flamegraph::Options::default();
+    options.title = "Test Graph".to_owned();
 
     test_flamegraph(input_file, expected_result_file, options).unwrap();
 }
@@ -553,10 +521,8 @@ fn flamegraph_title_with_symbols() {
         "./tests/data/flamegraph/differential/perf-cycles-instructions-01-collapsed-all-diff.txt";
     let expected_result_file = "./tests/data/flamegraph/options/title_with_symbols.svg";
 
-    let options = flamegraph::Options {
-        title: "Test <& ' \"".to_owned(),
-        ..Default::default()
-    };
+    let mut options = flamegraph::Options::default();
+    options.title = "Test <& ' \"".to_owned();
 
     test_flamegraph(input_file, expected_result_file, options).unwrap();
 }
@@ -567,10 +533,8 @@ fn flamegraph_subtitle_simple() {
         "./tests/data/flamegraph/differential/perf-cycles-instructions-01-collapsed-all-diff.txt";
     let expected_result_file = "./tests/data/flamegraph/options/subtitle_simple.svg";
 
-    let options = flamegraph::Options {
-        subtitle: Some("Test Subtitle".to_owned()),
-        ..Default::default()
-    };
+    let mut options = flamegraph::Options::default();
+    options.subtitle = Some("Test Subtitle".to_owned());
 
     test_flamegraph(input_file, expected_result_file, options).unwrap();
 }
@@ -581,10 +545,8 @@ fn flamegraph_subtitle_with_symbols() {
         "./tests/data/flamegraph/differential/perf-cycles-instructions-01-collapsed-all-diff.txt";
     let expected_result_file = "./tests/data/flamegraph/options/subtitle_with_symbols.svg";
 
-    let options = flamegraph::Options {
-        subtitle: Some("Test Subtitle <& ' \"".to_owned()),
-        ..Default::default()
-    };
+    let mut options = flamegraph::Options::default();
+    options.subtitle = Some("Test Subtitle <& ' \"".to_owned());
 
     test_flamegraph(input_file, expected_result_file, options).unwrap();
 }
@@ -595,10 +557,8 @@ fn flamegraph_notes_simple() {
         "./tests/data/flamegraph/differential/perf-cycles-instructions-01-collapsed-all-diff.txt";
     let expected_result_file = "./tests/data/flamegraph/options/notes_simple.svg";
 
-    let options = flamegraph::Options {
-        notes: "Test Notes".to_owned(),
-        ..Default::default()
-    };
+    let mut options = flamegraph::Options::default();
+    options.notes = "Test Notes".to_owned();
 
     test_flamegraph(input_file, expected_result_file, options).unwrap();
 }
@@ -609,10 +569,8 @@ fn flamegraph_notes_with_symbols() {
         "./tests/data/flamegraph/differential/perf-cycles-instructions-01-collapsed-all-diff.txt";
     let expected_result_file = "./tests/data/flamegraph/options/notes_with_symbols.svg";
 
-    let options = flamegraph::Options {
-        notes: "Test Notes <& ' \"".to_owned(),
-        ..Default::default()
-    };
+    let mut options = flamegraph::Options::default();
+    options.notes = "Test Notes <& ' \"".to_owned();
 
     test_flamegraph(input_file, expected_result_file, options).unwrap();
 }
@@ -623,10 +581,8 @@ fn flamegraph_count_name_simple() {
         "./tests/data/flamegraph/differential/perf-cycles-instructions-01-collapsed-all-diff.txt";
     let expected_result_file = "./tests/data/flamegraph/options/count_name_simple.svg";
 
-    let options = flamegraph::Options {
-        count_name: "test-samples".to_owned(),
-        ..Default::default()
-    };
+    let mut options = flamegraph::Options::default();
+    options.count_name = "test-samples".to_owned();
 
     test_flamegraph(input_file, expected_result_file, options).unwrap();
 }
@@ -637,10 +593,8 @@ fn flamegraph_count_name_with_symbols() {
         "./tests/data/flamegraph/differential/perf-cycles-instructions-01-collapsed-all-diff.txt";
     let expected_result_file = "./tests/data/flamegraph/options/count_name_with_symbols.svg";
 
-    let options = flamegraph::Options {
-        count_name: "test-samples <& ' \"".to_owned(),
-        ..Default::default()
-    };
+    let mut options = flamegraph::Options::default();
+    options.count_name = "test-samples <& ' \"".to_owned();
 
     test_flamegraph(input_file, expected_result_file, options).unwrap();
 }
@@ -651,10 +605,8 @@ fn flamegraph_name_type_simple() {
         "./tests/data/flamegraph/differential/perf-cycles-instructions-01-collapsed-all-diff.txt";
     let expected_result_file = "./tests/data/flamegraph/options/name_type_simple.svg";
 
-    let options = flamegraph::Options {
-        name_type: "Tfunction:".to_owned(),
-        ..Default::default()
-    };
+    let mut options = flamegraph::Options::default();
+    options.name_type = "Tfunction:".to_owned();
 
     test_flamegraph(input_file, expected_result_file, options).unwrap();
 }
@@ -665,10 +617,8 @@ fn flamegraph_name_type_with_quote() {
         "./tests/data/flamegraph/differential/perf-cycles-instructions-01-collapsed-all-diff.txt";
     let expected_result_file = "./tests/data/flamegraph/options/name_type_with_quote.svg";
 
-    let options = flamegraph::Options {
-        name_type: "Test: '".to_owned(),
-        ..Default::default()
-    };
+    let mut options = flamegraph::Options::default();
+    options.name_type = "Test: '".to_owned();
 
     test_flamegraph(input_file, expected_result_file, options).unwrap();
 }
@@ -679,10 +629,8 @@ fn flamegraph_name_type_with_backslash() {
         "./tests/data/flamegraph/differential/perf-cycles-instructions-01-collapsed-all-diff.txt";
     let expected_result_file = "./tests/data/flamegraph/options/name_type_with_backslash.svg";
 
-    let options = flamegraph::Options {
-        name_type: "Test: \\".to_owned(),
-        ..Default::default()
-    };
+    let mut options = flamegraph::Options::default();
+    options.name_type = "Test: \\".to_owned();
 
     test_flamegraph(input_file, expected_result_file, options).unwrap();
 }
@@ -693,10 +641,8 @@ fn flamegraph_font_type_simple() {
         "./tests/data/flamegraph/differential/perf-cycles-instructions-01-collapsed-all-diff.txt";
     let expected_result_file = "./tests/data/flamegraph/options/font_type_simple.svg";
 
-    let options = flamegraph::Options {
-        font_type: "Andale Mono".to_owned(),
-        ..Default::default()
-    };
+    let mut options = flamegraph::Options::default();
+    options.font_type = "Andale Mono".to_owned();
 
     test_flamegraph(input_file, expected_result_file, options).unwrap();
 }
@@ -707,10 +653,8 @@ fn flamegraph_font_type_with_quote() {
         "./tests/data/flamegraph/differential/perf-cycles-instructions-01-collapsed-all-diff.txt";
     let expected_result_file = "./tests/data/flamegraph/options/font_type_with_quote.svg";
 
-    let options = flamegraph::Options {
-        font_type: "Andale Mono\"".to_owned(),
-        ..Default::default()
-    };
+    let mut options = flamegraph::Options::default();
+    options.font_type = "Andale Mono\"".to_owned();
 
     test_flamegraph(input_file, expected_result_file, options).unwrap();
 }
@@ -721,10 +665,8 @@ fn search_color_non_default() {
         "./tests/data/flamegraph/differential/perf-cycles-instructions-01-collapsed-all-diff.txt";
     let expected_result_file = "./tests/data/flamegraph/options/search_color.svg";
 
-    let options = flamegraph::Options {
-        search_color: "#7d7d7d".parse().unwrap(),
-        ..Default::default()
-    };
+    let mut options = flamegraph::Options::default();
+    options.search_color = "#7d7d7d".parse().unwrap();
 
     test_flamegraph(input_file, expected_result_file, options).unwrap();
 }
@@ -734,10 +676,10 @@ fn flamegraph_sorted_input_file() {
     let input_file = "./flamegraph/test/results/perf-vertx-stacks-01-collapsed-all.txt";
     let expected_result_file =
         "./tests/data/flamegraph/perf-vertx-stacks/perf-vertx-stacks-01-collapsed-all.svg";
-    let options = Options {
-        hash: true,
-        ..Default::default()
-    };
+
+    let mut options = flamegraph::Options::default();
+    options.hash = true;
+
     test_flamegraph(input_file, expected_result_file, options).unwrap();
 }
 
@@ -747,10 +689,10 @@ fn flamegraph_unsorted_input_file() {
         "./tests/data/flamegraph/unsorted-input/perf-vertx-stacks-01-collapsed-all-unsorted.txt";
     let expected_result_file =
         "./tests/data/flamegraph/perf-vertx-stacks/perf-vertx-stacks-01-collapsed-all.svg";
-    let options = Options {
-        hash: true,
-        ..Default::default()
-    };
+
+    let mut options = flamegraph::Options::default();
+    options.hash = true;
+
     test_flamegraph(input_file, expected_result_file, options).unwrap();
 }
 
@@ -760,10 +702,10 @@ fn flamegraph_no_sort_should_return_error_on_unsorted_input() {
         "./tests/data/flamegraph/unsorted-input/perf-vertx-stacks-01-collapsed-all-unsorted.txt";
     let expected_result_file =
         "./tests/data/flamegraph/perf-vertx-stacks/perf-vertx-stacks-01-collapsed-all.svg";
-    let options = Options {
-        no_sort: true,
-        ..Default::default()
-    };
+
+    let mut options = flamegraph::Options::default();
+    options.no_sort = true;
+
     assert!(test_flamegraph(input_file, expected_result_file, options).is_err());
 }
 
@@ -773,11 +715,11 @@ fn flamegraph_reversed_stack_ordering() {
         "./tests/data/flamegraph/unsorted-input/perf-vertx-stacks-01-collapsed-all-unsorted.txt";
     let expected_result_file =
         "./tests/data/flamegraph/perf-vertx-stacks/perf-vertx-stacks-01-collapsed-all-reversed-stacks.svg";
-    let options = Options {
-        hash: true,
-        reverse_stack_order: true,
-        ..Default::default()
-    };
+
+    let mut options = flamegraph::Options::default();
+    options.hash = true;
+    options.reverse_stack_order = true;
+
     test_flamegraph(input_file, expected_result_file, options).unwrap();
 }
 
@@ -785,21 +727,20 @@ fn flamegraph_reversed_stack_ordering() {
 fn flamegraph_reversed_stack_ordering_with_fractional_samples() {
     let input_file = "./tests/data/flamegraph/fractional-samples/fractional.txt";
     let expected_result_file = "./tests/data/flamegraph/fractional-samples/fractional-reversed.svg";
-    let options = Options {
-        hash: true,
-        reverse_stack_order: true,
-        ..Default::default()
-    };
+
+    let mut options = flamegraph::Options::default();
+    options.hash = true;
+    options.reverse_stack_order = true;
+
     test_flamegraph(input_file, expected_result_file, options).unwrap();
 }
 
 #[test]
 fn flamegraph_should_warn_about_no_sort_when_reversing_stack_ordering() {
-    let options = Options {
-        no_sort: true,
-        reverse_stack_order: true,
-        ..Default::default()
-    };
+    let mut options = flamegraph::Options::default();
+    options.no_sort = true;
+    options.reverse_stack_order = true;
+
     test_flamegraph_logs_with_options(
         "./flamegraph/test/results/perf-funcab-cmd-01-collapsed-all.txt",
         |captured_logs| {
@@ -819,10 +760,9 @@ fn flamegraph_should_warn_about_no_sort_when_reversing_stack_ordering() {
 
 #[test]
 fn flamegraph_should_warn_about_bad_input_lines_with_reversed_stack_ordering() {
-    let options = Options {
-        reverse_stack_order: true,
-        ..Default::default()
-    };
+    let mut options = flamegraph::Options::default();
+    options.reverse_stack_order = true;
+
     test_flamegraph_logs_with_options(
         "./tests/data/flamegraph/bad-lines/bad-lines.txt",
         |captured_logs| {
@@ -901,15 +841,13 @@ fn flamegraph_colors_truncate_right() {
     let input_file = "./flamegraph/test/results/perf-java-stacks-01-collapsed-all.txt";
     let expected_result_file = "./tests/data/flamegraph/options/truncate-right.svg";
 
-    let options = flamegraph::Options {
-        colors: Palette::from_str("java").unwrap(),
-        text_truncate_direction: TextTruncateDirection::Right,
-        bgcolors: Some(BackgroundColor::from_str("blue").unwrap()),
-        hash: true,
-        ..Default::default()
-    };
+    let mut opts = flamegraph::Options::default();
+    opts.colors = Palette::from_str("java").unwrap();
+    opts.text_truncate_direction = TextTruncateDirection::Right;
+    opts.bgcolors = Some(BackgroundColor::from_str("blue").unwrap());
+    opts.hash = true;
 
-    test_flamegraph(input_file, expected_result_file, options).unwrap();
+    test_flamegraph(input_file, expected_result_file, opts).unwrap();
 }
 
 #[test]
@@ -917,11 +855,9 @@ fn flamegraph_flamechart() {
     let input_file = "./tests/data/flamegraph/flamechart/flames.txt";
     let expected_result_file = "./tests/data/flamegraph/flamechart/flame.svg";
 
-    let options = flamegraph::Options {
-        title: flamegraph::defaults::CHART_TITLE.to_owned(),
-        flame_chart: true,
-        ..Default::default()
-    };
+    let mut opts = flamegraph::Options::default();
+    opts.title = flamegraph::defaults::CHART_TITLE.to_owned();
+    opts.flame_chart = true;
 
-    test_flamegraph(input_file, expected_result_file, options).unwrap();
+    test_flamegraph(input_file, expected_result_file, opts).unwrap();
 }

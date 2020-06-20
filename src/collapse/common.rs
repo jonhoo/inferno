@@ -1,6 +1,8 @@
 use std::borrow::Cow;
 use std::io;
+#[cfg(feature = "multithreaded")]
 use std::mem;
+#[cfg(feature = "multithreaded")]
 use std::sync::Arc;
 
 use ahash::AHashMap;
@@ -33,6 +35,7 @@ pub(crate) const DEFAULT_NSTACKS_PER_JOB: usize = 100;
 /// A guess at the number of bytes contained in any given stack of any given format.
 /// Used to calculate the initial capacity of the vector used for sending input
 /// data across threads.
+#[cfg(feature = "multithreaded")]
 const NBYTES_PER_STACK_GUESS: usize = 1024;
 
 const RUST_HASH_LENGTH: usize = 17;

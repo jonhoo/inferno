@@ -46,15 +46,11 @@ fn collapse_dtrace_compare_to_upstream() {
 fn collapse_dtrace_compare_to_upstream_with_offsets() {
     let test_file = "./flamegraph/example-dtrace-stacks.txt";
     let result_file = "./tests/data/collapse-dtrace/results/dtrace-example-offsets.txt";
-    test_collapse_dtrace(
-        test_file,
-        result_file,
-        Options {
-            includeoffset: true,
-            ..Default::default()
-        },
-    )
-    .unwrap()
+
+    let mut options = Options::default();
+    options.includeoffset = true;
+
+    test_collapse_dtrace(test_file, result_file, options).unwrap()
 }
 
 #[test]
@@ -80,15 +76,11 @@ fn collapse_dtrace_compare_to_flamegraph_bug() {
     // https://github.com/brendangregg/FlameGraph/issues/202
     let test_file = "./tests/data/collapse-dtrace/flamegraph-bug.txt";
     let result_file = "./tests/data/collapse-dtrace/results/flamegraph-bug.txt";
-    test_collapse_dtrace(
-        test_file,
-        result_file,
-        Options {
-            includeoffset: true,
-            ..Default::default()
-        },
-    )
-    .unwrap()
+
+    let mut options = Options::default();
+    options.includeoffset = true;
+
+    test_collapse_dtrace(test_file, result_file, options).unwrap()
 }
 
 #[test]

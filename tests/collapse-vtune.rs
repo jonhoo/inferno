@@ -43,7 +43,11 @@ fn collapse_vtune_default() {
 fn collapse_vtune_no_modules() {
     let test_file = "./tests/data/collapse-vtune/vtune.csv";
     let result_file = "./tests/data/collapse-vtune/results/vtune-no-modules.txt";
-    test_collapse_vtune(test_file, result_file, Options { no_modules: true }).unwrap()
+
+    let mut options = Options::default();
+    options.no_modules = true;
+
+    test_collapse_vtune(test_file, result_file, options).unwrap()
 }
 
 #[test]

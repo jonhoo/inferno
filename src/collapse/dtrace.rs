@@ -8,6 +8,7 @@ use crate::collapse::common::{self, CollapsePrivate, Occurrences};
 
 /// `dtrace` folder configuration options.
 #[derive(Clone, Debug)]
+#[non_exhaustive]
 pub struct Options {
     /// Include function offset (except leafs).
     ///

@@ -43,7 +43,11 @@ fn collapse_sample_default() {
 fn collapse_sample_no_modules() {
     let test_file = "./tests/data/collapse-sample/sample.txt";
     let result_file = "./tests/data/collapse-sample/results/sample-no-modules.txt";
-    test_collapse_sample(test_file, result_file, Options { no_modules: true }).unwrap()
+
+    let mut options = Options::default();
+    options.no_modules = true;
+
+    test_collapse_sample(test_file, result_file, options).unwrap()
 }
 
 #[test]

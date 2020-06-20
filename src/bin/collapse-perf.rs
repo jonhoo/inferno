@@ -84,18 +84,15 @@ struct Opt {
 
 impl Opt {
     fn into_parts(self) -> (Option<PathBuf>, Options) {
-        (
-            self.infile,
-            Options {
-                include_pid: self.pid,
-                include_tid: self.tid,
-                include_addrs: self.addrs,
-                annotate_jit: self.jit || self.all,
-                annotate_kernel: self.kernel || self.all,
-                event_filter: self.event_filter,
-                nthreads: self.nthreads,
-            },
-        )
+        let mut options = Options::default();
+        options.include_pid = self.pid;
+        options.include_tid = self.tid;
+        options.include_addrs = self.addrs;
+        options.annotate_jit = self.jit || self.all;
+        options.annotate_kernel = self.kernel || self.all;
+        options.event_filter = self.event_filter;
+        options.nthreads = self.nthreads;
+        (self.infile, options)
     }
 }
 
