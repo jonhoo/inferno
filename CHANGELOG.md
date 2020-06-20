@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 
+### Changed
+
+### Removed
+
+## [0.10.0] - 2020-06-20
+### Added
+
  - Flame chart mode. Flame charts put the passage of time on the x-axis instead of the alphabet. [#125](https://github.com/jonhoo/inferno/pull/125)
  - `cargo hack` to check that all features compile. [#181](https://github.com/jonhoo/inferno/pull/181)
 
@@ -19,8 +26,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
    work any more (`Options { ..., ..Default::default() }`). See
    https://github.com/rust-lang/rust/issues/70564#issuecomment-647031324
    for details. [#181](https://github.com/jonhoo/inferno/pull/181)
-
-### Removed
 
 ## [0.9.9] - 2020-06-03
 ### Changed
@@ -112,7 +117,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Moved to `IndexMap` and FNV hashing ([#127](https://github.com/jonhoo/inferno/pull/127))
 - Moved CI to Azure DevOps Pipelines
 
-[Unreleased]: https://github.com/jonhoo/inferno/compare/v0.9.8...HEAD
+[Unreleased]: https://github.com/jonhoo/inferno/compare/v0.10.0...HEAD
+[0.10.0]: https://github.com/jonhoo/inferno/compare/v0.9.9...v0.10.0
+[0.9.9]: https://github.com/jonhoo/inferno/compare/v0.9.7...v0.9.9
 [0.9.8]: https://github.com/jonhoo/inferno/compare/v0.9.7...v0.9.8
 [0.9.7]: https://github.com/jonhoo/inferno/compare/v0.9.6...v0.9.7
 [0.9.6]: https://github.com/jonhoo/inferno/compare/v0.9.5...v0.9.6

@@ -1,6 +1,6 @@
 [package]
 name = "inferno"
-version = "0.9.9"
+version = "0.10.0"
 edition = "2018"
 authors = ["Jon Gjengset <jon@thesquareplanet.com>"]
 
