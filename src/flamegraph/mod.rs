@@ -78,6 +78,7 @@ pub mod defaults {
         COLORS: &str = "hot",
         SEARCH_COLOR: &str = "#e600e6",
         TITLE: &str = "Flame Graph",
+        CHART_TITLE: &str = "Flame Chart",
         FRAME_HEIGHT: usize = 16,
         MIN_WIDTH: f64 = 0.1,
         FONT_TYPE: &str = "Verdana",

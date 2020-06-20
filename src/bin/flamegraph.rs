@@ -230,7 +230,7 @@ impl<'a> Opt {
         options.flame_chart = self.flame_chart;
 
         if self.flame_chart && self.title == defaults::TITLE {
-            options.title = "Flame Chart".to_string();
+            options.title = defaults::CHART_TITLE.to_owned();
         }
 
         // set style options
