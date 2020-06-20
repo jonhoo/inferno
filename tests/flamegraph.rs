@@ -911,3 +911,17 @@ fn flamegraph_colors_truncate_right() {
 
     test_flamegraph(input_file, expected_result_file, options).unwrap();
 }
+
+#[test]
+fn flamegraph_flamechart() {
+    let input_file = "./tests/data/flamegraph/flamechart/flames.txt";
+    let expected_result_file = "./tests/data/flamegraph/flamechart/flame.svg";
+
+    let options = flamegraph::Options {
+        title: flamegraph::defaults::CHART_TITLE.to_owned(),
+        flame_chart: true,
+        ..Default::default()
+    };
+
+    test_flamegraph(input_file, expected_result_file, options).unwrap();
+}

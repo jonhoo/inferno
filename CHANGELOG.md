@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- Flame chart mode. Flame charts put the passage of time on the x-axis instead of the alphabet. [#125](https://github.com/jonhoo/inferno/pull/125)
 
 ### Changed
 
