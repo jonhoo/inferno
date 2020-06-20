@@ -243,7 +243,7 @@ pub struct Options<'a> {
 impl<'a> Options<'a> {
     /// Calculate pad top, including title and subtitle
     pub(super) fn ypad1(&self) -> usize {
-        let subtitle_height = if let Some(_) = self.subtitle {
+        let subtitle_height = if self.subtitle.is_some() {
             self.font_size * 2
         } else {
             0
