@@ -238,6 +238,11 @@ pub struct Options<'a> {
     /// useful visual cue of what to focus on, especially if you are showing
     /// flamegraphs to someone for the first time.
     pub color_diffusion: bool,
+
+    /// Produce a flame chart (sort by time, do not merge stacks)
+    ///
+    /// Note that stack is not sorted and will be reversed
+    pub flame_chart: bool,
 }
 
 impl<'a> Options<'a> {
@@ -298,6 +303,7 @@ impl<'a> Default for Options<'a> {
             reverse_stack_order: Default::default(),
             no_javascript: Default::default(),
             color_diffusion: Default::default(),
+            flame_chart: Default::default(),
 
             #[cfg(feature = "nameattr")]
             func_frameattrs: Default::default(),
@@ -408,15 +414,20 @@ where
         }
         let mut reversed: Vec<&str> = reversed.iter().collect();
         reversed.sort_unstable();
-        merge::frames(reversed)?
+        merge::frames(reversed, false)?
+    } else if opt.flame_chart {
+        // In flame chart mode, just reverse the data so time moves from left to right.
+        let mut lines: Vec<&str> = lines.into_iter().collect();
+        lines.reverse();
+        merge::frames(lines, true)?
     } else if opt.no_sort {
         // Lines don't need sorting.
-        merge::frames(lines)?
+        merge::frames(lines, false)?
     } else {
         // Sort lines by default.
         let mut lines: Vec<&str> = lines.into_iter().collect();
         lines.sort_unstable();
-        merge::frames(lines)?
+        merge::frames(lines, false)?
     };
 
     if ignored != 0 {

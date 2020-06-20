@@ -191,6 +191,14 @@ struct Opt {
     /// Collapsed perf output files. With no PATH, or PATH is -, read STDIN.
     #[structopt(name = "PATH", parse(from_os_str))]
     infiles: Vec<PathBuf>,
+
+    /// Produce a flame chart (sort by time, do not merge stacks)
+    #[structopt(
+        long = "flamechart",
+        conflicts_with = "no-sort",
+        conflicts_with = "reverse"
+    )]
+    flame_chart: bool,
 }
 
 impl<'a> Opt {
@@ -219,6 +227,11 @@ impl<'a> Opt {
         options.no_javascript = self.no_javascript;
         options.color_diffusion = self.color_diffusion;
         options.reverse_stack_order = self.reverse;
+        options.flame_chart = self.flame_chart;
+
+        if self.flame_chart && self.title == defaults::TITLE {
+            options.title = "Flame Chart".to_string();
+        }
 
         // set style options
         options.subtitle = self.subtitle;
@@ -402,6 +415,7 @@ mod tests {
             reverse_stack_order: true,
             no_javascript: true,
             color_diffusion: false,
+            flame_chart: false,
         };
 
         assert_eq!(options, expected_options);
