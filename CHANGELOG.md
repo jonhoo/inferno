@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
  - Support kernel annotations for versioned vmlinux and kernel modules in collapse-perf. [#182](https://github.com/jonhoo/inferno/pull/182)
+ - Support of AsyncProfiler generated stack trace in java palette. [#183](https://github.com/jonhoo/inferno/pull/183)
 
 ### Changed
 
