@@ -18,8 +18,8 @@ jobs:
          rust: stable
      - script: cargo install cargo-hack
        displayName: install cargo-hack
-     - script: cargo hack
-       displayName: cargo hack --feature-powerset check --all-targets
+     - script: cargo hack --feature-powerset check --all-targets
+       displayName: cargo hack
 
 resources:
   repositories:
