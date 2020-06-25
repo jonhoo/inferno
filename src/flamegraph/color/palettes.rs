@@ -317,6 +317,34 @@ mod tests {
                 input: String::from("some:thing"),
                 output: BasicPalette::Red,
             },
+            TestData {
+                input: String::from("scala.tools.nsc.Global$Run.compile"),
+                output: BasicPalette::Green,
+            },
+            TestData {
+                input: String::from("sbt.execute.work"),
+                output: BasicPalette::Green,
+            },
+            TestData {
+                input: String::from("org.scalatest.Suit.run"),
+                output: BasicPalette::Green,
+            },
+            TestData {
+                input: String::from("Compile"),
+                output: BasicPalette::Green,
+            },
+            TestData {
+                input: String::from("-[test]"),
+                output: BasicPalette::Yellow,
+            },
+            TestData {
+                input: String::from("+[test]"),
+                output: BasicPalette::Yellow,
+            },
+            TestData {
+                input: String::from("[test.event]"),
+                output: BasicPalette::Red,
+            },
         ];
 
         for item in test_names.iter() {
