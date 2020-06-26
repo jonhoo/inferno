@@ -18,6 +18,9 @@ pub mod guess;
 ///   [crate-level documentation]: ../../index.html
 pub mod perf;
 
+/// Internal string match helper functions for perf
+pub(crate) mod matcher;
+
 /// Stack collapsing for the output of [`sample`](https://gist.github.com/loderunner/36724cc9ee8db66db305#profiling-with-sample) on macOS.
 ///
 /// See the [crate-level documentation] for details.

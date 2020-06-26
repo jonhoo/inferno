@@ -2,6 +2,7 @@ use std::collections::VecDeque;
 use std::io::{self, BufRead};
 
 use crate::collapse::common::{self, CollapsePrivate, Occurrences};
+use crate::collapse::matcher::is_kernel;
 
 const TIDY_GENERIC: bool = true;
 const TIDY_JAVA: bool = true;
@@ -514,10 +515,7 @@ impl Folder {
                 //     7f722d142778 Ljava/io/PrintStream;::print (/tmp/perf-19982.map)
                 if !self.cache_line.is_empty() {
                     func.push_str("_[i]"); // inlined
-                } else if self.opt.annotate_kernel
-                    && (module.starts_with('[') || module.ends_with("vmlinux"))
-                    && module != "[unknown]"
-                {
+                } else if self.opt.annotate_kernel && is_kernel(module) {
                     func.push_str("_[k]"); // kernel
                 } else if self.opt.annotate_jit
                     && module.starts_with("/tmp/perf-")
