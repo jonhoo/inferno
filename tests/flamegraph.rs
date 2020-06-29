@@ -135,6 +135,17 @@ fn flamegraph_colors_java() {
 }
 
 #[test]
+fn flamegraph_colors_java_async_profile() {
+    let input_file = "./tests/data/flamegraph/colors/async-profiler-collapsed-part.txt";
+    let expected_result_file = "./tests/data/flamegraph/colors/async-profiler-java.svg";
+
+    let mut options = flamegraph::Options::default();
+    options.colors = Palette::from_str("java").unwrap();
+
+    test_flamegraph(input_file, expected_result_file, options).unwrap();
+}
+
+#[test]
 fn flamegraph_colors_js() {
     let input_file = "./flamegraph/test/results/perf-js-stacks-01-collapsed-all.txt";
     let expected_result_file = "./tests/data/flamegraph/colors/js.svg";

@@ -28,20 +28,18 @@ pub(super) mod java {
             name
         };
 
-        if java_prefix.starts_with("java/")
-            || java_prefix.starts_with("javax/")
-            || java_prefix.starts_with("jdk/")
-            || java_prefix.starts_with("net/")
-            || java_prefix.starts_with("org/")
-            || java_prefix.starts_with("com/")
-            || java_prefix.starts_with("io/")
-            || java_prefix.starts_with("sun/")
+        if name.contains("::") || name.starts_with("-[") || name.starts_with("+[") {
+            // C++ or Objective C
+            BasicPalette::Yellow
+        } else if java_prefix.contains("/")
+            || (java_prefix.contains(".") && !java_prefix.starts_with("["))
+            || match java_prefix.chars().next() {
+                Some(c) => c.is_ascii_uppercase(),
+                _ => false,
+            }
         {
             // Java
             BasicPalette::Green
-        } else if name.contains("::") {
-            // C++
-            BasicPalette::Yellow
         } else {
             // system
             BasicPalette::Red
@@ -269,11 +267,11 @@ mod tests {
             },
             TestData {
                 input: String::from("jdk/::[ki]"),
-                output: BasicPalette::Green,
+                output: BasicPalette::Yellow,
             },
             TestData {
                 input: String::from("Ajdk/_[ki]"),
-                output: BasicPalette::Red,
+                output: BasicPalette::Green,
             },
             TestData {
                 input: String::from("Ajdk/::[ki]"),
@@ -317,6 +315,34 @@ mod tests {
             },
             TestData {
                 input: String::from("some:thing"),
+                output: BasicPalette::Red,
+            },
+            TestData {
+                input: String::from("scala.tools.nsc.Global$Run.compile"),
+                output: BasicPalette::Green,
+            },
+            TestData {
+                input: String::from("sbt.execute.work"),
+                output: BasicPalette::Green,
+            },
+            TestData {
+                input: String::from("org.scalatest.Suit.run"),
+                output: BasicPalette::Green,
+            },
+            TestData {
+                input: String::from("Compile"),
+                output: BasicPalette::Green,
+            },
+            TestData {
+                input: String::from("-[test]"),
+                output: BasicPalette::Yellow,
+            },
+            TestData {
+                input: String::from("+[test]"),
+                output: BasicPalette::Yellow,
+            },
+            TestData {
+                input: String::from("[test.event]"),
                 output: BasicPalette::Red,
             },
         ];
