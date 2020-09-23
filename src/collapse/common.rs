@@ -7,8 +7,6 @@ use std::sync::Arc;
 
 use ahash::AHashMap;
 #[cfg(feature = "multithreaded")]
-use crossbeam::channel;
-#[cfg(feature = "multithreaded")]
 use dashmap::DashMap;
 use lazy_static::lazy_static;
 
@@ -199,19 +197,19 @@ pub trait CollapsePrivate: Send + Sized {
         assert!(nthreads > 1);
         assert!(occurrences.is_concurrent());
 
-        crossbeam::thread::scope(|scope| {
+        crossbeam_utils::thread::scope(|scope| {
             // Channel for sending an error from the worker threads to the main thread
             // in the event a worker has failed.
-            let (tx_error, rx_error) = channel::bounded::<io::Error>(1);
+            let (tx_error, rx_error) = crossbeam_channel::bounded::<io::Error>(1);
 
             // Channel for sending input data from the main thread to the worker threads.
             // We choose `2 * nthreads` as the channel size here in order to limit memory
             // usage in the case of particularly large input files.
-            let (tx_input, rx_input) = channel::bounded::<Vec<u8>>(2 * nthreads);
+            let (tx_input, rx_input) = crossbeam_channel::bounded::<Vec<u8>>(2 * nthreads);
 
             // Channel for worker threads that have errored to signal to all the other
             // worker threads that they should stop work immediately and return.
-            let (tx_stop, rx_stop) = channel::bounded::<()>(nthreads - 1);
+            let (tx_stop, rx_stop) = crossbeam_channel::bounded::<()>(nthreads - 1);
 
             let mut handles = Vec::with_capacity(nthreads);
             for _ in 0..nthreads {
@@ -226,7 +224,7 @@ pub trait CollapsePrivate: Send + Sized {
                 // TODO: https://github.com/crossbeam-rs/crossbeam/issues/404
                 #[allow(clippy::drop_copy, clippy::zero_ptr)]
                 let handle = scope.spawn(move |_| loop {
-                    channel::select! {
+                    crossbeam_channel::select! {
                         recv(rx_input) -> input => {
                             // Receive input from the main thread.
                             let data = match input {
