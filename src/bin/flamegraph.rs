@@ -20,9 +20,14 @@ struct Opt {
     #[structopt(long = "cp")]
     cp: bool,
 
-    /// Colors are keyed by function name hash
+    /// Colors are selected by hashing the function name, weighting the first characters more
+    /// heavily
     #[structopt(long = "hash")]
     hash: bool,
+
+    /// Colors are selected chaotically but the color of a function does not change between runs
+    #[structopt(long = "deterministic")]
+    deterministic: bool,
 
     /// Plot the flame graph up-side-down
     #[structopt(short = "i", long = "inverted")]
@@ -208,6 +213,7 @@ impl<'a> Opt {
         options.colors = self.colors;
         options.bgcolors = self.bgcolors;
         options.hash = self.hash;
+        options.deterministic = self.deterministic;
 
         self.set_func_frameattrs(&mut options);
 
