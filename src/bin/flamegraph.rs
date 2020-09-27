@@ -20,7 +20,7 @@ struct Opt {
     #[structopt(long = "cp")]
     cp: bool,
 
-    /// Colors are selected by hashing the function name, weighting the first characters more
+    /// Colors are selected by hashing the function name, weighting earlier characters more
     /// heavily
     #[structopt(long = "hash")]
     hash: bool,
