@@ -342,11 +342,17 @@ pub(super) fn color(
         (name_hash, reverse_name_hash, reverse_name_hash)
     } else if deterministic {
         use std::hash::Hasher;
-        let mut hasher = ahash::AHasher::default();
-        hasher.write(name.as_bytes());
-        let hash = hasher.finish() as f32 / u64::MAX as f32;
-
-        (hash, hash, hash)
+        let prefixed_hash = |name: &str, prefix: u8| {
+            let mut hasher = ahash::AHasher::default();
+            hasher.write_u8(prefix);
+            hasher.write(name.as_bytes());
+            (hasher.finish() as f64 / u64::MAX as f64) as f32
+        };
+        (
+            prefixed_hash(name, 0),
+            prefixed_hash(name, 1),
+            prefixed_hash(name, 2),
+        )
     } else {
         (rng(), rng(), rng())
     };

@@ -22,11 +22,11 @@ struct Opt {
 
     /// Colors are selected by hashing the function name, weighting the first characters more
     /// heavily
-    #[structopt(long = "hash")]
+    #[structopt(long = "hash", conflicts_with = "deterministic")]
     hash: bool,
 
     /// Colors are selected chaotically but the color of a function does not change between runs
-    #[structopt(long = "deterministic")]
+    #[structopt(long = "deterministic", conflicts_with = "hash")]
     deterministic: bool,
 
     /// Plot the flame graph up-side-down
