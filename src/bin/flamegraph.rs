@@ -25,7 +25,7 @@ struct Opt {
     #[structopt(long = "hash")]
     hash: bool,
 
-    /// Colors are selected chaotically but the color of a function does not change between runs
+    /// Colors are selected such that the color of a function does not change between runs
     #[structopt(long = "deterministic")]
     deterministic: bool,
 
