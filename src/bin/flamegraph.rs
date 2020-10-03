@@ -26,7 +26,7 @@ struct Opt {
     hash: bool,
 
     /// Colors are selected such that the color of a function does not change between runs
-    #[structopt(long = "deterministic")]
+    #[structopt(long = "deterministic", conflicts_with = "hash")]
     deterministic: bool,
 
     /// Plot the flame graph up-side-down
