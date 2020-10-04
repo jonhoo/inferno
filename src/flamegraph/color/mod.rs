@@ -342,7 +342,8 @@ pub(super) fn color(
         (name_hash, reverse_name_hash, reverse_name_hash)
     } else if deterministic {
         use std::hash::Hasher;
-        let mut hasher = ahash::AHasher::default();
+        // Do not use AHasher::default; it is seeded with a compile-time RNG
+        let mut hasher = ahash::AHasher::new_with_keys(1234, 5678);
         hasher.write(name.as_bytes());
         let hash1 = (hasher.finish() as f64 / std::u64::MAX as f64) as f32;
         hasher.write_u8(0);
