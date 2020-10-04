@@ -344,11 +344,11 @@ pub(super) fn color(
         use std::hash::Hasher;
         let mut hasher = ahash::AHasher::default();
         hasher.write(name.as_bytes());
-        let hash1 = (hasher.finish() as f64 / u64::MAX as f64) as f32;
+        let hash1 = (hasher.finish() as f64 / std::u64::MAX as f64) as f32;
         hasher.write_u8(0);
-        let hash2 = (hasher.finish() as f64 / u64::MAX as f64) as f32;
-        hasher.write_u8(1);
-        let hash3 = (hasher.finish() as f64 / u64::MAX as f64) as f32;
+        let hash2 = (hasher.finish() as f64 / std::u64::MAX as f64) as f32;
+        hasher.write_u8(0);
+        let hash3 = (hasher.finish() as f64 / std::u64::MAX as f64) as f32;
 
         (hash1, hash2, hash3)
     } else {
