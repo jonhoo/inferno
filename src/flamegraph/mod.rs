@@ -107,6 +107,10 @@ pub struct Options<'a> {
     /// This will cause similar functions to be colored similarly.
     pub hash: bool,
 
+    /// Choose names based on the hashes of function names, without the weighting scheme that
+    /// `hash` uses.
+    pub deterministic: bool,
+
     /// Store the choice of color for each function so that later invocations use the same colors.
     ///
     /// With this option enabled, a file called `palette.map` will be created the first time a
@@ -297,6 +301,7 @@ impl<'a> Default for Options<'a> {
             subtitle: Default::default(),
             bgcolors: Default::default(),
             hash: Default::default(),
+            deterministic: Default::default(),
             palette_map: Default::default(),
             direction: Default::default(),
             negate_differentials: Default::default(),
@@ -623,13 +628,15 @@ where
         } else if let Some(ref mut palette_map) = opt.palette_map {
             let colors = opt.colors;
             let hash = opt.hash;
+            let deterministic = opt.deterministic;
             palette_map.find_color_for(&frame.location.function, |name| {
-                color::color(colors, hash, name, &mut thread_rng)
+                color::color(colors, hash, deterministic, name, &mut thread_rng)
             })
         } else {
             color::color(
                 opt.colors,
                 opt.hash,
+                opt.deterministic,
                 frame.location.function,
                 &mut thread_rng,
             )

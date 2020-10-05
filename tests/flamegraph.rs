@@ -122,6 +122,17 @@ fn test_flamegraph_logs_with_options<F>(
 }
 
 #[test]
+fn flamegraph_colors_deterministic() {
+    let input_file = "./tests/data/flamegraph/colors/async-profiler-collapsed-part.txt";
+    let expected_result_file = "./tests/data/flamegraph/colors/deterministic.svg";
+
+    let mut options = flamegraph::Options::default();
+    options.deterministic = true;
+
+    test_flamegraph(input_file, expected_result_file, options).unwrap();
+}
+
+#[test]
 fn flamegraph_colors_java() {
     let input_file = "./flamegraph/test/results/perf-java-stacks-01-collapsed-all.txt";
     let expected_result_file = "./tests/data/flamegraph/colors/java.svg";

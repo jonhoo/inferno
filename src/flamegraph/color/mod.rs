@@ -331,6 +331,7 @@ fn rgb_components_for_palette(palette: Palette, name: &str, v1: f32, v2: f32, v3
 pub(super) fn color(
     palette: Palette,
     hash: bool,
+    deterministic: bool,
     name: &str,
     mut rng: impl FnMut() -> f32,
 ) -> Color {
@@ -339,6 +340,18 @@ pub(super) fn color(
         let reverse_name_hash = namehash(name.bytes().rev());
 
         (name_hash, reverse_name_hash, reverse_name_hash)
+    } else if deterministic {
+        use std::hash::Hasher;
+        // Do not use AHasher::default; it is seeded with a compile-time RNG
+        let mut hasher = ahash::AHasher::new_with_keys(1234, 5678);
+        hasher.write(name.as_bytes());
+        let hash1 = (hasher.finish() as f64 / std::u64::MAX as f64) as f32;
+        hasher.write_u8(0);
+        let hash2 = (hasher.finish() as f64 / std::u64::MAX as f64) as f32;
+        hasher.write_u8(0);
+        let hash3 = (hasher.finish() as f64 / std::u64::MAX as f64) as f32;
+
+        (hash1, hash2, hash3)
     } else {
         (rng(), rng(), rng())
     };
