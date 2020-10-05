@@ -252,7 +252,7 @@ pub(super) fn write_str<'a, W, I>(
     svg: &mut Writer<W>,
     buf: &mut StrStack,
     item: TextItem<'a, I>,
-) -> quick_xml::Result<usize>
+) -> quick_xml::Result<()>
 where
     W: Write,
     I: IntoIterator<Item = (&'a str, &'a str)>,

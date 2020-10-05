@@ -850,7 +850,7 @@ fn filled_rectangle<W: Write>(
     rect: &Rectangle,
     color: Color,
     cache_rect: &mut Event<'_>,
-) -> quick_xml::Result<usize> {
+) -> quick_xml::Result<()> {
     let x = write!(buffer, "{:.4}%", rect.x1_pct);
     let y = write_usize(buffer, rect.y1);
     let width = write!(buffer, "{:.4}%", rect.width_pct());
