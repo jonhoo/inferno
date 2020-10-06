@@ -6,14 +6,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+
+### Changed
+
+### Removed
+
+## [0.10.1] - 2020-10-05
+### Added
  - Support kernel annotations for versioned vmlinux and kernel modules in collapse-perf. [#182](https://github.com/jonhoo/inferno/pull/182)
  - Support of AsyncProfiler generated stack trace in java palette. [#183](https://github.com/jonhoo/inferno/pull/183)
  - `--deterministic` for deterministic colors without weighting. [#190](https://github.com/jonhoo/inferno/pull/190)
 
 ### Changed
  - Trimmed down a few unnecessary dependencies. [#188](https://github.com/jonhoo/inferno/pull/188)
-
-### Removed
 
 ## [0.10.0] - 2020-06-20
 ### Added
@@ -121,7 +126,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Moved to `IndexMap` and FNV hashing ([#127](https://github.com/jonhoo/inferno/pull/127))
 - Moved CI to Azure DevOps Pipelines
 
-[Unreleased]: https://github.com/jonhoo/inferno/compare/v0.10.0...HEAD
+[Unreleased]: https://github.com/jonhoo/inferno/compare/v0.10.1...HEAD
+[0.10.1]: https://github.com/jonhoo/inferno/compare/v0.10.0...v0.10.1
 [0.10.0]: https://github.com/jonhoo/inferno/compare/v0.9.9...v0.10.0
 [0.9.9]: https://github.com/jonhoo/inferno/compare/v0.9.7...v0.9.9
 [0.9.8]: https://github.com/jonhoo/inferno/compare/v0.9.7...v0.9.8
