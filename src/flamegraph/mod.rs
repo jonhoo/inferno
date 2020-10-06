@@ -844,6 +844,25 @@ fn deannotate(f: &str) -> &str {
     f
 }
 
+fn format_percentage(buffer: &mut StrStack, value: f64) -> usize {
+    if value == 0.0 {
+        return write!(buffer, "0.0000%");
+    }
+    let mut ibuf = itoa::Buffer::new();
+    let formatted = ibuf.format((value * 10_000.0).round() as u64);
+    if value >= 1.0 {
+        let len = formatted.len();
+        write!(
+            buffer,
+            "{}.{}%",
+            &formatted[..len - 4],
+            &formatted[len - 4..]
+        )
+    } else {
+        write!(buffer, "0.{:0>4}%", formatted)
+    }
+}
+
 fn filled_rectangle<W: Write>(
     svg: &mut Writer<W>,
     buffer: &mut StrStack,
@@ -851,9 +870,9 @@ fn filled_rectangle<W: Write>(
     color: Color,
     cache_rect: &mut Event<'_>,
 ) -> quick_xml::Result<()> {
-    let x = write!(buffer, "{:.4}%", rect.x1_pct);
+    let x = format_percentage(buffer, rect.x1_pct);
     let y = write_usize(buffer, rect.y1);
-    let width = write!(buffer, "{:.4}%", rect.width_pct());
+    let width = format_percentage(buffer, rect.width_pct());
     let height = write_usize(buffer, rect.height());
     let color = write!(buffer, "rgb({},{},{})", color.r, color.g, color.b);
 
