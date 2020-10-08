@@ -572,25 +572,47 @@ where
             match frame.delta {
                 None => write!(
                     buffer,
-                    "{} ({} {}, {:.2}%)",
-                    function, samples_txt, opt.count_name, pct
+                    "{} ({} {}, {}%)",
+                    function,
+                    samples_txt,
+                    opt.count_name,
+                    RoundTo(pct, 2),
                 ),
                 // Special case delta == 0 so we don't format percentage with a + sign.
                 Some(delta) if delta == 0 => write!(
                     buffer,
-                    "{} ({} {}, {:.2}%; 0.00%)",
-                    function, samples_txt, opt.count_name, pct,
+                    "{} ({} {}, {}%; 0.00%)",
+                    function,
+                    samples_txt,
+                    opt.count_name,
+                    RoundTo(pct, 2),
                 ),
                 Some(mut delta) => {
                     if opt.negate_differentials {
                         delta = -delta;
                     }
                     let delta_pct = (100 * delta) as f64 / (timemax as f64 * opt.factor);
-                    write!(
-                        buffer,
-                        "{} ({} {}, {:.2}%; {:+.2}%)",
-                        function, samples_txt, opt.count_name, pct, delta_pct
-                    )
+                    if delta > 0 {
+                        write!(
+                            buffer,
+                            "{} ({} {}, {}%; +{}%)",
+                            function,
+                            samples_txt,
+                            opt.count_name,
+                            RoundTo(pct, 2),
+                            RoundTo(delta_pct, 2),
+                        )
+                    } else {
+                        write!(
+                            buffer,
+                            "{} ({} {}, {}%; {}%)",
+                            function,
+                            samples_txt,
+                            opt.count_name,
+                            RoundTo(pct, 2),
+                            RoundTo(delta_pct, 2)
+                        )
+                    }
                 }
             }
         };
@@ -844,22 +866,34 @@ fn deannotate(f: &str) -> &str {
     f
 }
 
-fn format_percentage(buffer: &mut StrStack, value: f64) -> usize {
-    if value == 0.0 {
-        return write!(buffer, "0.0000%");
-    }
-    let mut ibuf = itoa::Buffer::new();
-    let formatted = ibuf.format((value * 10_000.0).round() as u64);
-    if value >= 1.0 {
-        let len = formatted.len();
-        write!(
-            buffer,
-            "{}.{}%",
-            &formatted[..len - 4],
-            &formatted[len - 4..]
-        )
-    } else {
-        write!(buffer, "0.{:0>4}%", formatted)
+/// Formatting helper that provides a faster display impl for a fixed number of decimal places
+pub struct RoundTo(f64, usize);
+
+impl std::fmt::Display for RoundTo {
+    #[inline]
+    fn fmt(&self, fmt: &mut std::fmt::Formatter) -> std::fmt::Result {
+        if self.0 < 0.0 {
+            write!(fmt, "-")?;
+        }
+        let value = self.0.abs();
+        let places = self.1;
+
+        if value == 0.0 {
+            return write!(fmt, "0.{:0>places$}", 0, places = places);
+        }
+        let mut ibuf = itoa::Buffer::new();
+        let formatted = ibuf.format((value * 10u64.pow(places as u32) as f64).round() as u64);
+        if value >= 1.0 {
+            let len = formatted.len();
+            write!(
+                fmt,
+                "{}.{}",
+                &formatted[..len - places],
+                &formatted[len - places..]
+            )
+        } else {
+            write!(fmt, "0.{:0>places$}", formatted, places = places)
+        }
     }
 }
 
@@ -870,9 +904,9 @@ fn filled_rectangle<W: Write>(
     color: Color,
     cache_rect: &mut Event<'_>,
 ) -> quick_xml::Result<()> {
-    let x = format_percentage(buffer, rect.x1_pct);
+    let x = write!(buffer, "{}%", RoundTo(rect.x1_pct, 4));
     let y = write_usize(buffer, rect.y1);
-    let width = format_percentage(buffer, rect.width_pct());
+    let width = write!(buffer, "{}%", RoundTo(rect.width_pct(), 4));
     let height = write_usize(buffer, rect.height());
     let color = write!(buffer, "rgb({},{},{})", color.r, color.g, color.b);
 
@@ -901,7 +935,15 @@ fn write_usize(buffer: &mut StrStack, value: usize) -> usize {
 
 #[cfg(test)]
 mod tests {
-    use super::{Direction, Options};
+    use super::{Direction, Options, RoundTo};
+
+    #[test]
+    fn display_percentage() {
+        use std::fmt::Write;
+        let mut out = String::new();
+        write!(out, "{}%", RoundTo(5.555555, 4)).unwrap();
+        assert_eq!(out, "5.5556%");
+    }
 
     // If there's a subtitle, we need to adjust the top height:
     #[test]

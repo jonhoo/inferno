@@ -7,7 +7,7 @@ use quick_xml::events::{BytesEnd, BytesStart, BytesText, Event};
 use quick_xml::Writer;
 use str_stack::StrStack;
 
-use super::{format_percentage, Direction, Options, TextTruncateDirection};
+use super::{Direction, Options, RoundTo, TextTruncateDirection};
 
 pub(super) enum TextArgument<'a> {
     String(Cow<'a, str>),
@@ -259,17 +259,9 @@ where
 {
     let x = match item.x {
         Dimension::Pixels(x) => write!(buf, "{:.2}", x),
-        Dimension::Percent(x) => format_percentage(buf, x),
+        Dimension::Percent(x) => write!(buf, "{}%", RoundTo(x, 4)),
     };
-
-    let mut ibuf = itoa::Buffer::new();
-    let formatted = ibuf.format((item.y * 100.0) as u64);
-    let y = if item.y >= 1.0 {
-        let len = formatted.len();
-        write!(buf, "{}.{}", &formatted[..len - 2], &formatted[len - 2..])
-    } else {
-        write!(buf, "0.{:0>2}", formatted)
-    };
+    let y = write!(buf, "{}", RoundTo(item.y, 2));
 
     let TextItem { text, extra, .. } = item;
 
