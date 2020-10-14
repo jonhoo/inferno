@@ -1,0 +1,7 @@
+tasks:
+  - name: Build
+    init: cargo build --bins
+  - name: Test
+    init: cargo test
+  - name: Benches
+    init: cargo bench

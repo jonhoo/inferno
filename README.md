@@ -4,6 +4,7 @@
 [![Cirrus CI Build Status](https://api.cirrus-ci.com/github/jonhoo/inferno.svg)](https://cirrus-ci.com/github/jonhoo/inferno)
 [![Codecov](https://codecov.io/github/jonhoo/inferno/coverage.svg?branch=master)](https://codecov.io/gh/jonhoo/inferno)
 [![Dependency status](https://deps.rs/repo/github/jonhoo/inferno/status.svg)](https://deps.rs/repo/github/jonhoo/inferno)
+[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/jonhoo/inferno)
 
 Inferno is a port of parts of the [flamegraph
 toolkit](http://www.brendangregg.com/flamegraphs.html) to Rust, with the
