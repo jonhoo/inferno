@@ -77,15 +77,15 @@ impl CollapsePrivate for Folder {
         R: io::BufRead,
     {
         // Consumer the header...
-        let mut line = String::new();
+        let mut line = Vec::new();
         loop {
             line.clear();
-            if reader.read_line(&mut line)? == 0 {
+            if reader.read_until(0x0A, &mut line)? == 0 {
                 // We reached the end :( this should not happen.
                 warn!("File ended while skipping headers");
                 return Ok(());
             };
-            if line.trim().is_empty() {
+            if String::from_utf8_lossy(&line).trim().is_empty() {
                 return Ok(());
             }
         }
@@ -99,13 +99,14 @@ impl CollapsePrivate for Folder {
     where
         R: io::BufRead,
     {
-        let mut line = String::new();
+        let mut line = Vec::new();
         loop {
             line.clear();
-            if reader.read_line(&mut line)? == 0 {
+            if reader.read_until(0x0A, &mut line)? == 0 {
                 break;
             }
-            let line = line.trim();
+            let s = String::from_utf8_lossy(&line);
+            let line = s.trim();
             if line.is_empty() {
                 continue;
             } else if let Ok(count) = line.parse::<usize>() {
@@ -132,10 +133,10 @@ impl CollapsePrivate for Folder {
         let mut found_empty_line = false;
         let mut found_stack_line = false;
         let mut input = input.as_bytes();
-        let mut line = String::new();
+        let mut line = Vec::new();
         loop {
             line.clear();
-            if let Ok(n) = input.read_line(&mut line) {
+            if let Ok(n) = input.read_until(0x0A, &mut line) {
                 if n == 0 {
                     break;
                 }
@@ -143,7 +144,8 @@ impl CollapsePrivate for Folder {
                 return Some(false);
             }
 
-            let line = line.trim();
+            let s = String::from_utf8_lossy(&line);
+            let line = s.trim();
             if line.is_empty() {
                 found_empty_line = true;
             } else if found_empty_line {
