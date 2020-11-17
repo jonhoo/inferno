@@ -133,10 +133,10 @@ impl CollapsePrivate for Folder {
         let mut found_empty_line = false;
         let mut found_stack_line = false;
         let mut input = input.as_bytes();
-        let mut line = Vec::new();
+        let mut line = String::new();
         loop {
             line.clear();
-            if let Ok(n) = input.read_until(0x0A, &mut line) {
+            if let Ok(n) = input.read_line(&mut line) {
                 if n == 0 {
                     break;
                 }
@@ -144,8 +144,7 @@ impl CollapsePrivate for Folder {
                 return Some(false);
             }
 
-            let s = String::from_utf8_lossy(&line);
-            let line = s.trim();
+            let line = line.trim();
             if line.is_empty() {
                 found_empty_line = true;
             } else if found_empty_line {

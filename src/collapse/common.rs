@@ -740,18 +740,19 @@ pub(crate) mod testing {
 
         fn count_lines_and_stacks(bytes: &[u8]) -> (usize, usize) {
             let mut reader = io::BufReader::new(bytes);
-            let mut line = String::new();
+            let mut line = Vec::new();
 
             let (mut nlines, mut nstacks) = (0, 0);
             loop {
                 line.clear();
-                let n = reader.read_line(&mut line).unwrap();
+                let n = reader.read_until(0x0A, &mut line).unwrap();
                 if n == 0 {
                     nstacks += 1;
                     break;
                 }
+                let l = String::from_utf8_lossy(&line);
                 nlines += 1;
-                if line.trim().is_empty() {
+                if l.trim().is_empty() {
                     nstacks += 1;
                 }
             }

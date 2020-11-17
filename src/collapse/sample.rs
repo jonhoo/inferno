@@ -76,14 +76,15 @@ impl Collapse for Folder {
         W: io::Write,
     {
         // Consume the header...
-        let mut line = String::new();
+        let mut line = Vec::new();
         loop {
             line.clear();
-            if reader.read_line(&mut line)? == 0 {
+            if reader.read_until(0x0A, &mut line)? == 0 {
                 warn!("File ended before start of call graph");
                 return Ok(());
             };
-            if line.starts_with(START_LINE) {
+            let l = String::from_utf8_lossy(&line);
+            if l.starts_with(START_LINE) {
                 break;
             }
         }
@@ -92,10 +93,11 @@ impl Collapse for Folder {
         let mut occurrences = Occurrences::new(1);
         loop {
             line.clear();
-            if reader.read_line(&mut line)? == 0 {
+            if reader.read_until(0x0A, &mut line)? == 0 {
                 return invalid_data_error!("File ended before end of call graph");
             }
-            let line = line.trim_end();
+            let l = String::from_utf8_lossy(&line);
+            let line = l.trim_end();
             if line.is_empty() {
                 continue;
             } else if line.starts_with("    ") {
