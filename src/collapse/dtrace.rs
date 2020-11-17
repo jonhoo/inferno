@@ -456,7 +456,7 @@ mod tests {
     }
 
     #[test]
-    fn test_collapse_multi_dtrace_stop_early() {
+    fn test_collapse_multi_dtrace_non_utf8() {
         let invalid_utf8 = unsafe { std::str::from_utf8_unchecked(&[0xf0, 0x28, 0x8c, 0xbc]) };
         let invalid_stack = format!("genunix`cv_broadcast+0x1{}\n1\n\n", invalid_utf8);
         let valid_stack = "genunix`cv_broadcast+0x1\n1\n\n";
@@ -473,20 +473,7 @@ mod tests {
         let mut folder = Folder::default();
         folder.nstacks_per_job = 1;
         folder.opt.nthreads = 12;
-        match <Folder as Collapse>::collapse(&mut folder, &input[..], io::sink()) {
-            Ok(_) => panic!("collapse should have return error, but instead returned Ok."),
-            Err(e) => match e.kind() {
-                io::ErrorKind::InvalidData => assert_eq!(
-                    &format!("{}", e),
-                    "stream did not contain valid UTF-8",
-                    "error message is incorrect.",
-                ),
-                k => panic!(
-                    "collapse should have returned `InvalidData` error but instead returned {:?}",
-                    k
-                ),
-            },
-        }
+        <Folder as Collapse>::collapse(&mut folder, &input[..], io::sink()).unwrap();
     }
 
     #[test]
