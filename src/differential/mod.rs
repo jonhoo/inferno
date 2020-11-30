@@ -90,17 +90,18 @@ where
     R: BufRead,
 {
     let mut total = 0;
-    let mut line = String::new();
+    let mut line = Vec::new();
     let mut stripped_fractional_samples = false;
     loop {
         line.clear();
 
-        if reader.read_line(&mut line)? == 0 {
+        if reader.read_until(0x0A, &mut line)? == 0 {
             break;
         }
 
+        let l = String::from_utf8_lossy(&line);
         if let Some((stack, count)) =
-            parse_line(&line, opt.strip_hex, &mut stripped_fractional_samples)
+            parse_line(&l, opt.strip_hex, &mut stripped_fractional_samples)
         {
             let mut counts = stack_counts.entry(stack).or_default();
             if is_first {
@@ -110,7 +111,7 @@ where
             }
             total += count;
         } else {
-            warn!("Unable to parse line: {}", line);
+            warn!("Unable to parse line: {}", l);
         }
     }
 

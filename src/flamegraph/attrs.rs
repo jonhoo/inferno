@@ -38,15 +38,16 @@ impl FuncFrameAttrsMap {
     /// tab-separated `name=value` pairs.
     pub fn from_reader<R: BufRead>(mut reader: R) -> io::Result<FuncFrameAttrsMap> {
         let mut funcattr_map = FuncFrameAttrsMap::default();
-        let mut line = String::new();
+        let mut line = Vec::new();
         loop {
             line.clear();
 
-            if reader.read_line(&mut line)? == 0 {
+            if reader.read_until(0x0A, &mut line)? == 0 {
                 break;
             }
 
-            let mut line = line.trim().splitn(2, '\t');
+            let l = String::from_utf8_lossy(&line);
+            let mut line = l.trim().splitn(2, '\t');
             let func = unwrap_or_continue!(line.next());
             if func.is_empty() {
                 continue;

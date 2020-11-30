@@ -159,7 +159,7 @@ impl CollapsePrivate for Folder {
         // the first stack to figure it out (the worker threads need this
         // information to get started). Only read one stack, however, as we would
         // like the remaining stacks to be processed on the worker threads.
-        let mut line_buffer = String::new();
+        let mut line_buffer = Vec::new();
         let eof = self.process_single_stack(&mut line_buffer, reader, occurrences)?;
 
         if eof {
@@ -184,7 +184,7 @@ impl CollapsePrivate for Folder {
         R: io::BufRead,
     {
         // While there are still stacks left to process, process them...
-        let mut line_buffer = String::new();
+        let mut line_buffer = Vec::new();
         while !self.process_single_stack(&mut line_buffer, &mut reader, occurrences)? {}
 
         // Reset state...
@@ -273,7 +273,7 @@ impl Folder {
     /// Processes a stack. On success, returns `true` if at end of data; `false` otherwise.
     fn process_single_stack<R>(
         &mut self,
-        line_buffer: &mut String,
+        line_buffer: &mut Vec<u8>,
         reader: &mut R,
         occurrences: &mut Occurrences,
     ) -> io::Result<bool>
@@ -282,16 +282,17 @@ impl Folder {
     {
         loop {
             line_buffer.clear();
-            if reader.read_line(line_buffer)? == 0 {
+            if reader.read_until(0x0A, line_buffer)? == 0 {
                 if !self.stack.is_empty() {
                     self.after_event(occurrences);
                 }
                 return Ok(true);
             }
-            if line_buffer.starts_with('#') {
+            let line = String::from_utf8_lossy(line_buffer);
+            if line.starts_with('#') {
                 continue;
             }
-            let line = line_buffer.trim_end();
+            let line = line.trim_end();
             if line.is_empty() {
                 self.after_event(occurrences);
                 return Ok(false);
