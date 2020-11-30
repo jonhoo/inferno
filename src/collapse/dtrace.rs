@@ -466,7 +466,7 @@ mod tests {
             input.extend_from_slice(valid_stack.as_bytes());
         }
         input.extend_from_slice(invalid_stack.as_bytes());
-        for _ in 0..(1024 * 1024 * 10) {
+        for _ in 0..100 {
             input.extend_from_slice(valid_stack.as_bytes());
         }
 
