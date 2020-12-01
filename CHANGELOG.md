@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
  - Support for invalid utf8 data in collapse. [#196](https://github.com/jonhoo/inferno/pull/196)
  - Bumped `ahash` to 0.6
+   - Caused a bump of minimum supported Rust version to 1.43
  - Bumped `crossbeam-channel` to 0.5
  - Bumped `crossbeam-utils` to 0.8
  - Bumped `env-logger` to 0.8
