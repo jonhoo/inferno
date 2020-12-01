@@ -8,9 +8,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 ### Changed
-- Support for invalid utf8 data in collapse. [#196](https://github.com/jonhoo/inferno/pull/196)
 
 ### Removed
+
+## [0.10.2] - 2020-11-30
+### Changed
+ - Support for invalid utf8 data in collapse. [#196](https://github.com/jonhoo/inferno/pull/196)
+ - Bumped `ahash` to 0.6
+   - Caused a bump of minimum supported Rust version to 1.43
+ - Bumped `crossbeam-channel` to 0.5
+ - Bumped `crossbeam-utils` to 0.8
+ - Bumped `env-logger` to 0.8
+ - Bumped `quick-xml` to 0.20
 
 ## [0.10.1] - 2020-10-05
 ### Added
@@ -127,7 +136,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Moved to `IndexMap` and FNV hashing ([#127](https://github.com/jonhoo/inferno/pull/127))
 - Moved CI to Azure DevOps Pipelines
 
-[Unreleased]: https://github.com/jonhoo/inferno/compare/v0.10.1...HEAD
+[Unreleased]: https://github.com/jonhoo/inferno/compare/v0.10.2...HEAD
+[0.10.2]: https://github.com/jonhoo/inferno/compare/v0.10.1...v0.10.2
 [0.10.1]: https://github.com/jonhoo/inferno/compare/v0.10.0...v0.10.1
 [0.10.0]: https://github.com/jonhoo/inferno/compare/v0.9.9...v0.10.0
 [0.9.9]: https://github.com/jonhoo/inferno/compare/v0.9.7...v0.9.9
