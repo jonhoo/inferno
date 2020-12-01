@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 ### Changed
+- Support for invalid utf8 data in collapse. [#196](https://github.com/jonhoo/inferno/pull/196)
 
 ### Removed
 
