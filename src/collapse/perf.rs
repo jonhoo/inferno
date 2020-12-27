@@ -519,8 +519,8 @@ impl Folder {
                 } else if self.opt.annotate_kernel && is_kernel(module) {
                     func.push_str("_[k]"); // kernel
                 } else if self.opt.annotate_jit
-                    && module.starts_with("/tmp/perf-")
-                    && module.ends_with(".map")
+                    && ((module.starts_with("/tmp/perf-") && module.ends_with(".map"))
+                        || (module.contains("/jitted-") && module.ends_with(".so")))
                 {
                     func.push_str("_[j]"); // jitted
                 }
