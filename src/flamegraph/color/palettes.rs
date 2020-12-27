@@ -1,26 +1,32 @@
+use crate::flamegraph::color::BasicPalette;
+
+fn resolve_annotations(name: &str) -> Option<BasicPalette> {
+    if name.ends_with(']') {
+        if let Some(ai) = name.rfind("_[") {
+            if name[ai..].len() == 4 {
+                match &name[ai + 2..ai + 3] {
+                    // kernel annotation
+                    "k" => return Some(BasicPalette::Orange),
+                    // inline annotation
+                    "i" => return Some(BasicPalette::Aqua),
+                    // jit annotation
+                    "j" => return Some(BasicPalette::Green),
+                    _ => {}
+                }
+            }
+        }
+    }
+
+    None
+}
+
 pub(super) mod annotated {
     use crate::flamegraph::color::BasicPalette;
 
     /// Handle annotations (_[j], _[i], ...; which are
     /// accurate) in a generic way.
     pub fn resolve(name: &str) -> BasicPalette {
-        if name.ends_with(']') {
-            if let Some(ai) = name.rfind("_[") {
-                if name[ai..].len() == 4 {
-                    match &name[ai + 2..ai + 3] {
-                        // kernel annotation
-                        "k" => return BasicPalette::Orange,
-                        // inline annotation
-                        "i" => return BasicPalette::Aqua,
-                        // jit annotation
-                        "j" => return BasicPalette::Green,
-                        _ => {}
-                    }
-                }
-            }
-        }
-
-        BasicPalette::Red
+        super::resolve_annotations(name).unwrap_or(BasicPalette::Red)
     }
 }
 
@@ -32,20 +38,8 @@ pub(super) mod java {
     /// best as possible. Without annotations, we get a little hacky
     /// and match on java|org|com, etc.
     pub fn resolve(name: &str) -> BasicPalette {
-        if name.ends_with(']') {
-            if let Some(ai) = name.rfind("_[") {
-                if name[ai..].len() == 4 {
-                    match &name[ai + 2..ai + 3] {
-                        // kernel annotation
-                        "k" => return BasicPalette::Orange,
-                        // inline annotation
-                        "i" => return BasicPalette::Aqua,
-                        // jit annotation
-                        "j" => return BasicPalette::Green,
-                        _ => {}
-                    }
-                }
-            }
+        if let Some(palette) = super::resolve_annotations(name) {
+            return palette;
         }
 
         let java_prefix = if name.starts_with('L') {
