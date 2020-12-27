@@ -82,7 +82,7 @@ struct Opt {
         short = "c",
         long = "colors",
         default_value = defaults::COLORS,
-        possible_values = &["aqua","blue","green","hot","io","java","js","mem","orange","perl","purple","red","wakeup","yellow"],
+        possible_values = &["annotated","aqua","blue","green","hot","io","java","js","mem","orange","perl","purple","red","wakeup","yellow"],
         value_name = "STRING"
     )]
     colors: Palette,
