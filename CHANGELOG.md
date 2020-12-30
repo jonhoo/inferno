@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - Support jit annotations in collapse-perf for runtimes using the jitdump format. [#202](https://github.com/jonhoo/inferno/pull/202)
 
 ### Changed
+ - Decreased default minimum width from 0.1% to 0.01%. [#204](https://github.com/jonhoo/inferno/pull/204)
 
 ### Removed
 

@@ -139,7 +139,7 @@ struct Opt {
     )]
     height: usize,
 
-    /// Omit functions smaller than <FLOAT> pixels
+    /// Omit functions smaller than <FLOAT> percent
     #[structopt(
         long = "minwidth",
         default_value = &defaults::str::MIN_WIDTH,
