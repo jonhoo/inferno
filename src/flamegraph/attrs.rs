@@ -158,9 +158,9 @@ impl<'a> Iterator for AttrIter<'a> {
             warn!("no value after \"=\" for extra attribute {}", name);
         }
 
-        let (value, rest) = if let Some(rest) = rest.strip_prefix('"') {
-            if let Some(eq) = rest.find('"') {
-                (&rest[..eq], &rest[eq + 1..])
+        let (value, rest) = if rest.starts_with('"') {
+            if let Some(eq) = rest[1..].find('"') {
+                (&rest[1..=eq], &rest[eq + 1..])
             } else {
                 warn!("no end quote found for extra attribute {}", name);
                 return None;

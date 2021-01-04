@@ -22,7 +22,11 @@ pub(super) mod java {
             }
         }
 
-        let java_prefix = name.strip_prefix('L').unwrap_or(name);
+        let java_prefix = if name.starts_with('L') {
+            &name[1..]
+        } else {
+            name
+        };
 
         if name.contains("::") || name.starts_with("-[") || name.starts_with("+[") {
             // C++ or Objective C
