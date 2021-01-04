@@ -80,7 +80,7 @@ pub mod defaults {
         TITLE: &str = "Flame Graph",
         CHART_TITLE: &str = "Flame Chart",
         FRAME_HEIGHT: usize = 16,
-        MIN_WIDTH: f64 = 0.1,
+        MIN_WIDTH: f64 = 0.01,
         FONT_TYPE: &str = "Verdana",
         FONT_SIZE: usize = 12,
         FONT_WIDTH: f64 = 0.59,

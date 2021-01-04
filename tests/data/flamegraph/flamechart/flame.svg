@@ -51,1348 +51,1703 @@ var truncate_text_right = false;]]>
             <text x="0.3503%" y="159.50"></text>
         </g>
         <g>
+            <title>tree_buf::internal::encodings::rle::RLE&lt;(tree_buf::internal::types::integer::Simple16Compressor,_tree_buf::internal::types::integer::BytesCompressor)&gt;::fast_size_for (100 samples, 0.02%)</title>
+            <rect x="1.0361%" y="117" width="0.0167%" height="15" fill="rgb(248,212,6)"/>
+            <text x="1.2861%" y="127.50"></text>
+        </g>
+        <g>
             <title>Needless_copy_to_u32 (700 samples, 0.12%)</title>
-            <rect x="1.2032%" y="101" width="0.1170%" height="15" fill="rgb(248,212,6)"/>
+            <rect x="1.2032%" y="101" width="0.1170%" height="15" fill="rgb(208,68,35)"/>
             <text x="1.4532%" y="111.50"></text>
         </g>
         <g>
             <title>u8::master_fast_size_for (1,800 samples, 0.30%)</title>
-            <rect x="1.0361%" y="133" width="0.3008%" height="15" fill="rgb(208,68,35)"/>
+            <rect x="1.0361%" y="133" width="0.3008%" height="15" fill="rgb(232,128,0)"/>
             <text x="1.2861%" y="143.50"></text>
         </g>
         <g>
             <title>tree_buf::internal::types::integer::Simple16Compressor::Simple16_fast_size_for (1,700 samples, 0.28%)</title>
-            <rect x="1.0528%" y="117" width="0.2841%" height="15" fill="rgb(232,128,0)"/>
+            <rect x="1.0528%" y="117" width="0.2841%" height="15" fill="rgb(207,160,47)"/>
             <text x="1.3028%" y="127.50"></text>
         </g>
         <g>
+            <title>u8::CopyToLowered (300 samples, 0.05%)</title>
+            <rect x="1.3369%" y="133" width="0.0501%" height="15" fill="rgb(228,23,34)"/>
+            <text x="1.5869%" y="143.50"></text>
+        </g>
+        <g>
             <title>Needless_copy_to_u32 (600 samples, 0.10%)</title>
-            <rect x="1.4706%" y="101" width="0.1003%" height="15" fill="rgb(207,160,47)"/>
+            <rect x="1.4706%" y="101" width="0.1003%" height="15" fill="rgb(218,30,26)"/>
             <text x="1.7206%" y="111.50"></text>
         </g>
         <g>
             <title>u8::master_fast_size_for (1,200 samples, 0.20%)</title>
-            <rect x="1.3870%" y="133" width="0.2005%" height="15" fill="rgb(228,23,34)"/>
+            <rect x="1.3870%" y="133" width="0.2005%" height="15" fill="rgb(220,122,19)"/>
             <text x="1.6370%" y="143.50"></text>
         </g>
         <g>
             <title>tree_buf::internal::types::integer::Simple16Compressor::Simple16_fast_size_for (1,200 samples, 0.20%)</title>
-            <rect x="1.3870%" y="117" width="0.2005%" height="15" fill="rgb(218,30,26)"/>
+            <rect x="1.3870%" y="117" width="0.2005%" height="15" fill="rgb(250,228,42)"/>
             <text x="1.6370%" y="127.50"></text>
         </g>
         <g>
             <title>&amp;[u8]::RLE_get_runs (2,200 samples, 0.37%)</title>
-            <rect x="1.5876%" y="133" width="0.3676%" height="15" fill="rgb(220,122,19)"/>
+            <rect x="1.5876%" y="133" width="0.3676%" height="15" fill="rgb(240,193,28)"/>
             <text x="1.8376%" y="143.50"></text>
         </g>
         <g>
             <title>tree_buf::internal::encodings::rle::RLE&lt;(tree_buf::internal::types::integer::Simple16Compressor,_tree_buf::internal::types::integer::BytesCompressor)&gt;::fast_size_for (5,700 samples, 0.95%)</title>
-            <rect x="1.0194%" y="149" width="0.9525%" height="15" fill="rgb(250,228,42)"/>
+            <rect x="1.0194%" y="149" width="0.9525%" height="15" fill="rgb(216,20,37)"/>
             <text x="1.2694%" y="159.50"></text>
         </g>
         <g>
             <title>Needless_copy_to_u32 (800 samples, 0.13%)</title>
-            <rect x="2.0889%" y="133" width="0.1337%" height="15" fill="rgb(240,193,28)"/>
+            <rect x="2.0889%" y="133" width="0.1337%" height="15" fill="rgb(206,188,39)"/>
             <text x="2.3389%" y="143.50"></text>
         </g>
         <g>
             <title>Samples (7,500 samples, 1.25%)</title>
-            <rect x="0.9860%" y="165" width="1.2533%" height="15" fill="rgb(216,20,37)"/>
+            <rect x="0.9860%" y="165" width="1.2533%" height="15" fill="rgb(217,207,13)"/>
             <text x="1.2360%" y="175.50"></text>
         </g>
         <g>
             <title>tree_buf::internal::types::integer::Simple16Compressor::Simple16_fast_size_for (1,600 samples, 0.27%)</title>
-            <rect x="1.9719%" y="149" width="0.2674%" height="15" fill="rgb(206,188,39)"/>
+            <rect x="1.9719%" y="149" width="0.2674%" height="15" fill="rgb(231,73,38)"/>
             <text x="2.2219%" y="159.50"></text>
         </g>
         <g>
             <title>u8::master_compress (13,000 samples, 2.17%)</title>
-            <rect x="0.0836%" y="181" width="2.1725%" height="15" fill="rgb(217,207,13)"/>
+            <rect x="0.0836%" y="181" width="2.1725%" height="15" fill="rgb(225,20,46)"/>
             <text x="0.3336%" y="191.50">u..</text>
         </g>
         <g>
             <title>u8::CopyToLowered (1,600 samples, 0.27%)</title>
-            <rect x="2.2560%" y="181" width="0.2674%" height="15" fill="rgb(231,73,38)"/>
+            <rect x="2.2560%" y="181" width="0.2674%" height="15" fill="rgb(210,31,41)"/>
             <text x="2.5060%" y="191.50"></text>
         </g>
         <g>
             <title>alloc::vec::Vec&lt;u64&gt;::Integer_encode_all (14,700 samples, 2.46%)</title>
-            <rect x="0.0836%" y="197" width="2.4566%" height="15" fill="rgb(225,20,46)"/>
+            <rect x="0.0836%" y="197" width="2.4566%" height="15" fill="rgb(221,200,47)"/>
             <text x="0.3336%" y="207.50">al..</text>
         </g>
         <g>
+            <title>&amp;[bool]::encode_packed_bool (400 samples, 0.07%)</title>
+            <rect x="2.5735%" y="133" width="0.0668%" height="15" fill="rgb(226,26,5)"/>
+            <text x="2.8235%" y="143.50"></text>
+        </g>
+        <g>
             <title>Final (600 samples, 0.10%)</title>
-            <rect x="2.5568%" y="165" width="0.1003%" height="15" fill="rgb(210,31,41)"/>
+            <rect x="2.5568%" y="165" width="0.1003%" height="15" fill="rgb(249,33,26)"/>
             <text x="2.8068%" y="175.50"></text>
         </g>
         <g>
+            <title>tree_buf::internal::types::boolean::PackedBoolCompressor::compress_PackedBool (500 samples, 0.08%)</title>
+            <rect x="2.5735%" y="149" width="0.0836%" height="15" fill="rgb(235,183,28)"/>
+            <text x="2.8235%" y="159.50"></text>
+        </g>
+        <g>
+            <title>tree_buf::internal::encodings::rle::RLE&lt;(tree_buf::internal::types::integer::Simple16Compressor,_tree_buf::internal::types::integer::BytesCompressor)&gt;::fast_size_for (100 samples, 0.02%)</title>
+            <rect x="2.6905%" y="133" width="0.0167%" height="15" fill="rgb(221,5,38)"/>
+            <text x="2.9405%" y="143.50"></text>
+        </g>
+        <g>
             <title>Needless_copy_to_u32 (600 samples, 0.10%)</title>
-            <rect x="2.8910%" y="117" width="0.1003%" height="15" fill="rgb(221,200,47)"/>
+            <rect x="2.8910%" y="117" width="0.1003%" height="15" fill="rgb(247,18,42)"/>
             <text x="3.1410%" y="127.50"></text>
         </g>
         <g>
             <title>u8::master_fast_size_for (1,900 samples, 0.32%)</title>
-            <rect x="2.6905%" y="149" width="0.3175%" height="15" fill="rgb(226,26,5)"/>
+            <rect x="2.6905%" y="149" width="0.3175%" height="15" fill="rgb(241,131,45)"/>
             <text x="2.9405%" y="159.50"></text>
         </g>
         <g>
             <title>tree_buf::internal::types::integer::Simple16Compressor::Simple16_fast_size_for (1,800 samples, 0.30%)</title>
-            <rect x="2.7072%" y="133" width="0.3008%" height="15" fill="rgb(249,33,26)"/>
+            <rect x="2.7072%" y="133" width="0.3008%" height="15" fill="rgb(249,31,29)"/>
             <text x="2.9572%" y="143.50"></text>
         </g>
         <g>
             <title>u8::CopyToLowered (1,900 samples, 0.32%)</title>
-            <rect x="3.0080%" y="149" width="0.3175%" height="15" fill="rgb(235,183,28)"/>
+            <rect x="3.0080%" y="149" width="0.3175%" height="15" fill="rgb(225,111,53)"/>
             <text x="3.2580%" y="159.50"></text>
         </g>
         <g>
             <title>Samples (4,100 samples, 0.69%)</title>
-            <rect x="2.6571%" y="165" width="0.6852%" height="15" fill="rgb(221,5,38)"/>
+            <rect x="2.6571%" y="165" width="0.6852%" height="15" fill="rgb(238,160,17)"/>
             <text x="2.9071%" y="175.50"></text>
         </g>
         <g>
             <title>bool::master_compress (4,900 samples, 0.82%)</title>
-            <rect x="2.5401%" y="181" width="0.8189%" height="15" fill="rgb(247,18,42)"/>
+            <rect x="2.5401%" y="181" width="0.8189%" height="15" fill="rgb(214,148,48)"/>
             <text x="2.7901%" y="191.50"></text>
         </g>
         <g>
+            <title>Final (200 samples, 0.03%)</title>
+            <rect x="3.4258%" y="101" width="0.0334%" height="15" fill="rgb(232,36,49)"/>
+            <text x="3.6758%" y="111.50"></text>
+        </g>
+        <g>
+            <title>tree_buf::internal::types::integer::PrefixVarIntCompressor::PrefixVarInt_compress (100 samples, 0.02%)</title>
+            <rect x="3.4425%" y="85" width="0.0167%" height="15" fill="rgb(209,103,24)"/>
+            <text x="3.6925%" y="95.50"></text>
+        </g>
+        <g>
+            <title>tree_buf::internal::encodings::rle::RLE&lt;(tree_buf::internal::types::integer::Simple16Compressor,_tree_buf::internal::types::integer::PrefixVarIntCompressor)&gt;::fast_size_for (200 samples, 0.03%)</title>
+            <rect x="3.4759%" y="85" width="0.0334%" height="15" fill="rgb(229,88,8)"/>
+            <text x="3.7259%" y="95.50"></text>
+        </g>
+        <g>
+            <title>tree_buf::internal::types::integer::PrefixVarIntCompressor::fast_size_for (100 samples, 0.02%)</title>
+            <rect x="3.5094%" y="85" width="0.0167%" height="15" fill="rgb(213,181,19)"/>
+            <text x="3.7594%" y="95.50"></text>
+        </g>
+        <g>
+            <title>tree_buf::internal::types::integer::Simple16Compressor::Simple16_fast_size_for (300 samples, 0.05%)</title>
+            <rect x="3.5261%" y="85" width="0.0501%" height="15" fill="rgb(254,191,54)"/>
+            <text x="3.7761%" y="95.50"></text>
+        </g>
+        <g>
+            <title>Needless_copy_to_u32 (200 samples, 0.03%)</title>
+            <rect x="3.5428%" y="69" width="0.0334%" height="15" fill="rgb(241,83,37)"/>
+            <text x="3.7928%" y="79.50"></text>
+        </g>
+        <g>
             <title>u16::master_compress (1,000 samples, 0.17%)</title>
-            <rect x="3.4258%" y="117" width="0.1671%" height="15" fill="rgb(241,131,45)"/>
+            <rect x="3.4258%" y="117" width="0.1671%" height="15" fill="rgb(233,36,39)"/>
             <text x="3.6758%" y="127.50"></text>
         </g>
         <g>
             <title>Samples (800 samples, 0.13%)</title>
-            <rect x="3.4592%" y="101" width="0.1337%" height="15" fill="rgb(249,31,29)"/>
+            <rect x="3.4592%" y="101" width="0.1337%" height="15" fill="rgb(226,3,54)"/>
             <text x="3.7092%" y="111.50"></text>
         </g>
         <g>
+            <title>u16::CopyToLowered (200 samples, 0.03%)</title>
+            <rect x="3.5929%" y="117" width="0.0334%" height="15" fill="rgb(245,192,40)"/>
+            <text x="3.8429%" y="127.50"></text>
+        </g>
+        <g>
             <title>&amp;[bool]::encode_rle_bool (2,100 samples, 0.35%)</title>
-            <rect x="3.3924%" y="149" width="0.3509%" height="15" fill="rgb(225,111,53)"/>
+            <rect x="3.3924%" y="149" width="0.3509%" height="15" fill="rgb(238,167,29)"/>
             <text x="3.6424%" y="159.50"></text>
         </g>
         <g>
             <title>alloc::vec::Vec&lt;u64&gt;::Integer_encode_all (2,000 samples, 0.33%)</title>
-            <rect x="3.4091%" y="133" width="0.3342%" height="15" fill="rgb(238,160,17)"/>
+            <rect x="3.4091%" y="133" width="0.3342%" height="15" fill="rgb(232,182,51)"/>
             <text x="3.6591%" y="143.50"></text>
         </g>
         <g>
             <title>Final (2,200 samples, 0.37%)</title>
-            <rect x="3.3924%" y="165" width="0.3676%" height="15" fill="rgb(214,148,48)"/>
+            <rect x="3.3924%" y="165" width="0.3676%" height="15" fill="rgb(231,60,39)"/>
             <text x="3.6424%" y="175.50"></text>
         </g>
         <g>
+            <title>tree_buf::internal::encodings::rle::RLE&lt;(tree_buf::internal::types::integer::Simple16Compressor,_tree_buf::internal::types::integer::BytesCompressor)&gt;::fast_size_for (100 samples, 0.02%)</title>
+            <rect x="3.7934%" y="133" width="0.0167%" height="15" fill="rgb(208,69,12)"/>
+            <text x="4.0434%" y="143.50"></text>
+        </g>
+        <g>
+            <title>tree_buf::internal::types::integer::Simple16Compressor::Simple16_fast_size_for (300 samples, 0.05%)</title>
+            <rect x="3.8102%" y="133" width="0.0501%" height="15" fill="rgb(235,93,37)"/>
+            <text x="4.0602%" y="143.50"></text>
+        </g>
+        <g>
+            <title>Needless_copy_to_u32 (200 samples, 0.03%)</title>
+            <rect x="3.8269%" y="117" width="0.0334%" height="15" fill="rgb(213,116,39)"/>
+            <text x="4.0769%" y="127.50"></text>
+        </g>
+        <g>
+            <title>u8::master_fast_size_for (500 samples, 0.08%)</title>
+            <rect x="3.7934%" y="149" width="0.0836%" height="15" fill="rgb(222,207,29)"/>
+            <text x="4.0434%" y="159.50"></text>
+        </g>
+        <g>
             <title>Samples (1,100 samples, 0.18%)</title>
-            <rect x="3.7600%" y="165" width="0.1838%" height="15" fill="rgb(232,36,49)"/>
+            <rect x="3.7600%" y="165" width="0.1838%" height="15" fill="rgb(206,96,30)"/>
             <text x="4.0100%" y="175.50"></text>
         </g>
         <g>
+            <title>u8::CopyToLowered (400 samples, 0.07%)</title>
+            <rect x="3.8770%" y="149" width="0.0668%" height="15" fill="rgb(218,138,4)"/>
+            <text x="4.1270%" y="159.50"></text>
+        </g>
+        <g>
             <title>alloc::vec::Vec&lt;bool&gt;::Boolean_encode_all (8,500 samples, 1.42%)</title>
-            <rect x="2.5401%" y="197" width="1.4205%" height="15" fill="rgb(209,103,24)"/>
+            <rect x="2.5401%" y="197" width="1.4205%" height="15" fill="rgb(250,191,14)"/>
             <text x="2.7901%" y="207.50"></text>
         </g>
         <g>
             <title>bool::master_compress (3,500 samples, 0.58%)</title>
-            <rect x="3.3757%" y="181" width="0.5849%" height="15" fill="rgb(229,88,8)"/>
+            <rect x="3.3757%" y="181" width="0.5849%" height="15" fill="rgb(239,60,40)"/>
             <text x="3.6257%" y="191.50"></text>
         </g>
         <g>
             <title>Final (2,900 samples, 0.48%)</title>
-            <rect x="4.0274%" y="149" width="0.4846%" height="15" fill="rgb(213,181,19)"/>
+            <rect x="4.0274%" y="149" width="0.4846%" height="15" fill="rgb(206,27,48)"/>
             <text x="4.2774%" y="159.50"></text>
         </g>
         <g>
             <title>tree_buf::internal::types::integer::PrefixVarIntCompressor::PrefixVarInt_compress (2,800 samples, 0.47%)</title>
-            <rect x="4.0441%" y="133" width="0.4679%" height="15" fill="rgb(254,191,54)"/>
+            <rect x="4.0441%" y="133" width="0.4679%" height="15" fill="rgb(225,35,8)"/>
             <text x="4.2941%" y="143.50"></text>
         </g>
         <g>
+            <title>tree_buf::internal::encodings::rle::RLE&lt;(tree_buf::internal::types::integer::Simple16Compressor,_tree_buf::internal::types::integer::BytesCompressor)&gt;::fast_size_for (100 samples, 0.02%)</title>
+            <rect x="4.5622%" y="101" width="0.0167%" height="15" fill="rgb(250,213,24)"/>
+            <text x="4.8122%" y="111.50"></text>
+        </g>
+        <g>
             <title>tree_buf::internal::types::integer::Simple16Compressor::Simple16_fast_size_for (1,200 samples, 0.20%)</title>
-            <rect x="4.5789%" y="101" width="0.2005%" height="15" fill="rgb(241,83,37)"/>
+            <rect x="4.5789%" y="101" width="0.2005%" height="15" fill="rgb(247,123,22)"/>
             <text x="4.8289%" y="111.50"></text>
         </g>
         <g>
             <title>Needless_copy_to_u32 (900 samples, 0.15%)</title>
-            <rect x="4.6290%" y="85" width="0.1504%" height="15" fill="rgb(233,36,39)"/>
+            <rect x="4.6290%" y="85" width="0.1504%" height="15" fill="rgb(231,138,38)"/>
             <text x="4.8790%" y="95.50"></text>
         </g>
         <g>
             <title>u8::master_fast_size_for (1,500 samples, 0.25%)</title>
-            <rect x="4.5455%" y="117" width="0.2507%" height="15" fill="rgb(226,3,54)"/>
+            <rect x="4.5455%" y="117" width="0.2507%" height="15" fill="rgb(231,145,46)"/>
             <text x="4.7955%" y="127.50"></text>
         </g>
         <g>
+            <title>u8::CopyToLowered (400 samples, 0.07%)</title>
+            <rect x="4.7961%" y="117" width="0.0668%" height="15" fill="rgb(251,118,11)"/>
+            <text x="5.0461%" y="127.50"></text>
+        </g>
+        <g>
+            <title>tree_buf::internal::types::integer::PrefixVarIntCompressor::fast_size_for (300 samples, 0.05%)</title>
+            <rect x="4.8797%" y="101" width="0.0501%" height="15" fill="rgb(217,147,25)"/>
+            <text x="5.1297%" y="111.50"></text>
+        </g>
+        <g>
             <title>Needless_copy_to_u32 (1,000 samples, 0.17%)</title>
-            <rect x="5.9993%" y="85" width="0.1671%" height="15" fill="rgb(245,192,40)"/>
+            <rect x="5.9993%" y="85" width="0.1671%" height="15" fill="rgb(247,81,37)"/>
             <text x="6.2493%" y="95.50"></text>
         </g>
         <g>
             <title>u32::master_fast_size_for (7,900 samples, 1.32%)</title>
-            <rect x="4.8630%" y="117" width="1.3202%" height="15" fill="rgb(238,167,29)"/>
+            <rect x="4.8630%" y="117" width="1.3202%" height="15" fill="rgb(209,12,38)"/>
             <text x="5.1130%" y="127.50"></text>
         </g>
         <g>
             <title>tree_buf::internal::types::integer::Simple16Compressor::Simple16_fast_size_for (7,500 samples, 1.25%)</title>
-            <rect x="4.9298%" y="101" width="1.2533%" height="15" fill="rgb(232,182,51)"/>
+            <rect x="4.9298%" y="101" width="1.2533%" height="15" fill="rgb(227,1,9)"/>
             <text x="5.1798%" y="111.50"></text>
         </g>
         <g>
             <title>&amp;[u32]::RLE_get_runs (2,000 samples, 0.33%)</title>
-            <rect x="6.1832%" y="117" width="0.3342%" height="15" fill="rgb(231,60,39)"/>
+            <rect x="6.1832%" y="117" width="0.3342%" height="15" fill="rgb(248,47,43)"/>
             <text x="6.4332%" y="127.50"></text>
         </g>
         <g>
             <title>tree_buf::internal::encodings::rle::RLE&lt;(tree_buf::internal::types::integer::Simple16Compressor,_tree_buf::internal::types::integer::DeltaZigZagCompressor,_tree_buf::internal::types::integer::PrefixVarIntCompressor)&gt;::fast_size_for (12,000 samples, 2.01%)</title>
-            <rect x="4.5287%" y="133" width="2.0053%" height="15" fill="rgb(208,69,12)"/>
+            <rect x="4.5287%" y="133" width="2.0053%" height="15" fill="rgb(221,10,30)"/>
             <text x="4.7787%" y="143.50">t..</text>
         </g>
         <g>
             <title>tree_buf::internal::types::integer::PrefixVarIntCompressor::fast_size_for (2,100 samples, 0.35%)</title>
-            <rect x="6.5341%" y="133" width="0.3509%" height="15" fill="rgb(235,93,37)"/>
+            <rect x="6.5341%" y="133" width="0.3509%" height="15" fill="rgb(210,229,1)"/>
             <text x="6.7841%" y="143.50"></text>
         </g>
         <g>
             <title>Needless_copy_to_u32 (1,100 samples, 0.18%)</title>
-            <rect x="8.0047%" y="117" width="0.1838%" height="15" fill="rgb(213,116,39)"/>
+            <rect x="8.0047%" y="117" width="0.1838%" height="15" fill="rgb(222,148,37)"/>
             <text x="8.2547%" y="127.50"></text>
         </g>
         <g>
             <title>u32::master_compress (25,100 samples, 4.19%)</title>
-            <rect x="4.0107%" y="165" width="4.1945%" height="15" fill="rgb(222,207,29)"/>
+            <rect x="4.0107%" y="165" width="4.1945%" height="15" fill="rgb(234,67,33)"/>
             <text x="4.2607%" y="175.50">u32::..</text>
         </g>
         <g>
             <title>Samples (22,100 samples, 3.69%)</title>
-            <rect x="4.5120%" y="149" width="3.6932%" height="15" fill="rgb(206,96,30)"/>
+            <rect x="4.5120%" y="149" width="3.6932%" height="15" fill="rgb(247,98,35)"/>
             <text x="4.7620%" y="159.50">Samp..</text>
         </g>
         <g>
             <title>tree_buf::internal::types::integer::Simple16Compressor::Simple16_fast_size_for (7,900 samples, 1.32%)</title>
-            <rect x="6.8850%" y="133" width="1.3202%" height="15" fill="rgb(218,138,4)"/>
+            <rect x="6.8850%" y="133" width="1.3202%" height="15" fill="rgb(247,138,52)"/>
             <text x="7.1350%" y="143.50"></text>
         </g>
         <g>
+            <title>u32::CopyToLowered (500 samples, 0.08%)</title>
+            <rect x="8.2052%" y="165" width="0.0836%" height="15" fill="rgb(213,79,30)"/>
+            <text x="8.4552%" y="175.50"></text>
+        </g>
+        <g>
             <title>tree_buf::internal::types::integer::Simple16Compressor::Simple16_compress (2,800 samples, 0.47%)</title>
-            <rect x="8.4893%" y="133" width="0.4679%" height="15" fill="rgb(250,191,14)"/>
+            <rect x="8.4893%" y="133" width="0.4679%" height="15" fill="rgb(246,177,23)"/>
             <text x="8.7393%" y="143.50"></text>
         </g>
         <g>
             <title>Needless_copy_to_u32 (1,100 samples, 0.18%)</title>
-            <rect x="8.7734%" y="117" width="0.1838%" height="15" fill="rgb(239,60,40)"/>
+            <rect x="8.7734%" y="117" width="0.1838%" height="15" fill="rgb(230,62,27)"/>
             <text x="9.0234%" y="127.50"></text>
         </g>
         <g>
             <title>Final (2,900 samples, 0.48%)</title>
-            <rect x="8.4893%" y="149" width="0.4846%" height="15" fill="rgb(206,27,48)"/>
+            <rect x="8.4893%" y="149" width="0.4846%" height="15" fill="rgb(216,154,8)"/>
             <text x="8.7393%" y="159.50"></text>
         </g>
         <g>
+            <title>tree_buf::internal::encodings::rle::RLE&lt;(tree_buf::internal::types::integer::Simple16Compressor,_tree_buf::internal::types::integer::BytesCompressor)&gt;::fast_size_for (100 samples, 0.02%)</title>
+            <rect x="9.0241%" y="101" width="0.0167%" height="15" fill="rgb(244,35,45)"/>
+            <text x="9.2741%" y="111.50"></text>
+        </g>
+        <g>
             <title>Needless_copy_to_u32 (700 samples, 0.12%)</title>
-            <rect x="9.1745%" y="85" width="0.1170%" height="15" fill="rgb(225,35,8)"/>
+            <rect x="9.1745%" y="85" width="0.1170%" height="15" fill="rgb(251,115,12)"/>
             <text x="9.4245%" y="95.50"></text>
         </g>
         <g>
             <title>u8::master_fast_size_for (1,800 samples, 0.30%)</title>
-            <rect x="9.0074%" y="117" width="0.3008%" height="15" fill="rgb(250,213,24)"/>
+            <rect x="9.0074%" y="117" width="0.3008%" height="15" fill="rgb(240,54,50)"/>
             <text x="9.2574%" y="127.50"></text>
         </g>
         <g>
             <title>tree_buf::internal::types::integer::Simple16Compressor::Simple16_fast_size_for (1,600 samples, 0.27%)</title>
-            <rect x="9.0408%" y="101" width="0.2674%" height="15" fill="rgb(247,123,22)"/>
+            <rect x="9.0408%" y="101" width="0.2674%" height="15" fill="rgb(233,84,52)"/>
             <text x="9.2908%" y="111.50"></text>
         </g>
         <g>
+            <title>u8::CopyToLowered (300 samples, 0.05%)</title>
+            <rect x="9.3082%" y="117" width="0.0501%" height="15" fill="rgb(207,117,47)"/>
+            <text x="9.5582%" y="127.50"></text>
+        </g>
+        <g>
             <title>tree_buf::internal::types::integer::Simple16Compressor::Simple16_fast_size_for (1,300 samples, 0.22%)</title>
-            <rect x="9.3583%" y="101" width="0.2172%" height="15" fill="rgb(231,138,38)"/>
+            <rect x="9.3583%" y="101" width="0.2172%" height="15" fill="rgb(249,43,39)"/>
             <text x="9.6083%" y="111.50"></text>
         </g>
         <g>
             <title>Needless_copy_to_u32 (600 samples, 0.10%)</title>
-            <rect x="9.4753%" y="85" width="0.1003%" height="15" fill="rgb(231,145,46)"/>
+            <rect x="9.4753%" y="85" width="0.1003%" height="15" fill="rgb(209,38,44)"/>
             <text x="9.7253%" y="95.50"></text>
         </g>
         <g>
             <title>u8::master_fast_size_for (1,400 samples, 0.23%)</title>
-            <rect x="9.3583%" y="117" width="0.2340%" height="15" fill="rgb(251,118,11)"/>
+            <rect x="9.3583%" y="117" width="0.2340%" height="15" fill="rgb(236,212,23)"/>
             <text x="9.6083%" y="127.50"></text>
         </g>
         <g>
             <title>&amp;[u8]::RLE_get_runs (2,200 samples, 0.37%)</title>
-            <rect x="9.5922%" y="117" width="0.3676%" height="15" fill="rgb(217,147,25)"/>
+            <rect x="9.5922%" y="117" width="0.3676%" height="15" fill="rgb(242,79,21)"/>
             <text x="9.8422%" y="127.50"></text>
         </g>
         <g>
             <title>tree_buf::internal::encodings::rle::RLE&lt;(tree_buf::internal::types::integer::Simple16Compressor,_tree_buf::internal::types::integer::BytesCompressor)&gt;::fast_size_for (6,000 samples, 1.00%)</title>
-            <rect x="8.9906%" y="133" width="1.0027%" height="15" fill="rgb(247,81,37)"/>
+            <rect x="8.9906%" y="133" width="1.0027%" height="15" fill="rgb(211,96,35)"/>
             <text x="9.2406%" y="143.50"></text>
         </g>
         <g>
             <title>tree_buf::internal::types::integer::Simple16Compressor::Simple16_fast_size_for (2,200 samples, 0.37%)</title>
-            <rect x="9.9933%" y="133" width="0.3676%" height="15" fill="rgb(209,12,38)"/>
+            <rect x="9.9933%" y="133" width="0.3676%" height="15" fill="rgb(253,215,40)"/>
             <text x="10.2433%" y="143.50"></text>
         </g>
         <g>
             <title>Needless_copy_to_u32 (900 samples, 0.15%)</title>
-            <rect x="10.2106%" y="117" width="0.1504%" height="15" fill="rgb(227,1,9)"/>
+            <rect x="10.2106%" y="117" width="0.1504%" height="15" fill="rgb(211,81,21)"/>
             <text x="10.4606%" y="127.50"></text>
         </g>
         <g>
             <title>u8::master_compress (11,400 samples, 1.91%)</title>
-            <rect x="8.4726%" y="165" width="1.9051%" height="15" fill="rgb(248,47,43)"/>
+            <rect x="8.4726%" y="165" width="1.9051%" height="15" fill="rgb(208,190,38)"/>
             <text x="8.7226%" y="175.50">u..</text>
         </g>
         <g>
             <title>Samples (8,400 samples, 1.40%)</title>
-            <rect x="8.9739%" y="149" width="1.4037%" height="15" fill="rgb(221,10,30)"/>
+            <rect x="8.9739%" y="149" width="1.4037%" height="15" fill="rgb(235,213,38)"/>
             <text x="9.2239%" y="159.50"></text>
         </g>
         <g>
             <title>u8::CopyToLowered (900 samples, 0.15%)</title>
-            <rect x="10.3777%" y="165" width="0.1504%" height="15" fill="rgb(210,229,1)"/>
+            <rect x="10.3777%" y="165" width="0.1504%" height="15" fill="rgb(237,122,38)"/>
             <text x="10.6277%" y="175.50"></text>
         </g>
         <g>
             <title>alloc::vec::Vec&lt;u64&gt;::Integer_encode_all (39,300 samples, 6.57%)</title>
-            <rect x="3.9773%" y="181" width="6.5675%" height="15" fill="rgb(222,148,37)"/>
+            <rect x="3.9773%" y="181" width="6.5675%" height="15" fill="rgb(244,218,35)"/>
             <text x="4.2273%" y="191.50">alloc::ve..</text>
         </g>
         <g>
+            <title>Final (500 samples, 0.08%)</title>
+            <rect x="10.5949%" y="133" width="0.0836%" height="15" fill="rgb(240,68,47)"/>
+            <text x="10.8449%" y="143.50"></text>
+        </g>
+        <g>
+            <title>tree_buf::internal::types::integer::BytesCompressor::Bytes_compress (400 samples, 0.07%)</title>
+            <rect x="10.6116%" y="117" width="0.0668%" height="15" fill="rgb(210,16,53)"/>
+            <text x="10.8616%" y="127.50"></text>
+        </g>
+        <g>
+            <title>bool::master_fast_size_for (500 samples, 0.08%)</title>
+            <rect x="10.7119%" y="101" width="0.0836%" height="15" fill="rgb(235,124,12)"/>
+            <text x="10.9619%" y="111.50"></text>
+        </g>
+        <g>
             <title>Needless_copy_to_u32 (800 samples, 0.13%)</title>
-            <rect x="11.2801%" y="69" width="0.1337%" height="15" fill="rgb(234,67,33)"/>
+            <rect x="11.2801%" y="69" width="0.1337%" height="15" fill="rgb(224,169,11)"/>
             <text x="11.5301%" y="79.50"></text>
         </g>
         <g>
             <title>u8::master_fast_size_for (3,800 samples, 0.64%)</title>
-            <rect x="10.7955%" y="101" width="0.6350%" height="15" fill="rgb(247,98,35)"/>
+            <rect x="10.7955%" y="101" width="0.6350%" height="15" fill="rgb(250,166,2)"/>
             <text x="11.0455%" y="111.50"></text>
         </g>
         <g>
             <title>tree_buf::internal::types::integer::Simple16Compressor::Simple16_fast_size_for (3,800 samples, 0.64%)</title>
-            <rect x="10.7955%" y="85" width="0.6350%" height="15" fill="rgb(247,138,52)"/>
+            <rect x="10.7955%" y="85" width="0.6350%" height="15" fill="rgb(242,216,29)"/>
             <text x="11.0455%" y="95.50"></text>
         </g>
         <g>
             <title>&amp;[u8]::RLE_get_runs (1,800 samples, 0.30%)</title>
-            <rect x="11.4305%" y="101" width="0.3008%" height="15" fill="rgb(213,79,30)"/>
+            <rect x="11.4305%" y="101" width="0.3008%" height="15" fill="rgb(230,116,27)"/>
             <text x="11.6805%" y="111.50"></text>
         </g>
         <g>
             <title>tree_buf::internal::encodings::rle::RLE&lt;(tree_buf::internal::types::integer::Simple16Compressor,_tree_buf::internal::types::integer::BytesCompressor)&gt;::fast_size_for (6,400 samples, 1.07%)</title>
-            <rect x="10.6952%" y="117" width="1.0695%" height="15" fill="rgb(246,177,23)"/>
+            <rect x="10.6952%" y="117" width="1.0695%" height="15" fill="rgb(228,99,48)"/>
             <text x="10.9452%" y="127.50"></text>
         </g>
         <g>
             <title>Needless_copy_to_u32 (900 samples, 0.15%)</title>
-            <rect x="12.3496%" y="101" width="0.1504%" height="15" fill="rgb(230,62,27)"/>
+            <rect x="12.3496%" y="101" width="0.1504%" height="15" fill="rgb(253,11,6)"/>
             <text x="12.5996%" y="111.50"></text>
         </g>
         <g>
             <title>Samples (11,000 samples, 1.84%)</title>
-            <rect x="10.6785%" y="133" width="1.8382%" height="15" fill="rgb(216,154,8)"/>
+            <rect x="10.6785%" y="133" width="1.8382%" height="15" fill="rgb(247,143,39)"/>
             <text x="10.9285%" y="143.50">S..</text>
         </g>
         <g>
             <title>tree_buf::internal::types::integer::Simple16Compressor::Simple16_fast_size_for (4,500 samples, 0.75%)</title>
-            <rect x="11.7647%" y="117" width="0.7520%" height="15" fill="rgb(244,35,45)"/>
+            <rect x="11.7647%" y="117" width="0.7520%" height="15" fill="rgb(236,97,10)"/>
             <text x="12.0147%" y="127.50"></text>
         </g>
         <g>
             <title>u8::master_compress (13,900 samples, 2.32%)</title>
-            <rect x="10.5949%" y="149" width="2.3229%" height="15" fill="rgb(251,115,12)"/>
+            <rect x="10.5949%" y="149" width="2.3229%" height="15" fill="rgb(233,208,19)"/>
             <text x="10.8449%" y="159.50">u..</text>
         </g>
         <g>
             <title>alloc::vec::Vec&lt;u8&gt;::Integer_encode_all (14,100 samples, 2.36%)</title>
-            <rect x="10.5782%" y="165" width="2.3563%" height="15" fill="rgb(240,54,50)"/>
+            <rect x="10.5782%" y="165" width="2.3563%" height="15" fill="rgb(216,164,2)"/>
             <text x="10.8282%" y="175.50">a..</text>
         </g>
         <g>
             <title>tree_buf::internal::types::array_fixed::_20::ArrayEncoder&lt;alloc::vec::Vec&lt;u8&gt;&gt;::ArrayFixed_flush (14,400 samples, 2.41%)</title>
-            <rect x="10.5448%" y="181" width="2.4064%" height="15" fill="rgb(233,84,52)"/>
+            <rect x="10.5448%" y="181" width="2.4064%" height="15" fill="rgb(220,129,5)"/>
             <text x="10.7948%" y="191.50">tr..</text>
         </g>
         <g>
             <title>Needless_copy_to_u32 (1,800 samples, 0.30%)</title>
-            <rect x="13.7199%" y="117" width="0.3008%" height="15" fill="rgb(207,117,47)"/>
+            <rect x="13.7199%" y="117" width="0.3008%" height="15" fill="rgb(242,17,10)"/>
             <text x="13.9699%" y="127.50"></text>
         </g>
         <g>
             <title>Final (6,400 samples, 1.07%)</title>
-            <rect x="12.9679%" y="149" width="1.0695%" height="15" fill="rgb(249,43,39)"/>
+            <rect x="12.9679%" y="149" width="1.0695%" height="15" fill="rgb(242,107,0)"/>
             <text x="13.2179%" y="159.50"></text>
         </g>
         <g>
             <title>tree_buf::internal::types::integer::Simple16Compressor::Simple16_compress (6,300 samples, 1.05%)</title>
-            <rect x="12.9846%" y="133" width="1.0528%" height="15" fill="rgb(209,38,44)"/>
+            <rect x="12.9846%" y="133" width="1.0528%" height="15" fill="rgb(251,28,31)"/>
             <text x="13.2346%" y="143.50"></text>
         </g>
         <g>
+            <title>tree_buf::internal::encodings::rle::RLE&lt;(tree_buf::internal::types::integer::Simple16Compressor,_tree_buf::internal::types::integer::BytesCompressor)&gt;::fast_size_for (100 samples, 0.02%)</title>
+            <rect x="14.0876%" y="101" width="0.0167%" height="15" fill="rgb(233,223,10)"/>
+            <text x="14.3376%" y="111.50"></text>
+        </g>
+        <g>
             <title>tree_buf::internal::types::integer::Simple16Compressor::Simple16_fast_size_for (1,500 samples, 0.25%)</title>
-            <rect x="14.1043%" y="101" width="0.2507%" height="15" fill="rgb(236,212,23)"/>
+            <rect x="14.1043%" y="101" width="0.2507%" height="15" fill="rgb(215,21,27)"/>
             <text x="14.3543%" y="111.50"></text>
         </g>
         <g>
             <title>Needless_copy_to_u32 (700 samples, 0.12%)</title>
-            <rect x="14.2380%" y="85" width="0.1170%" height="15" fill="rgb(242,79,21)"/>
+            <rect x="14.2380%" y="85" width="0.1170%" height="15" fill="rgb(232,23,21)"/>
             <text x="14.4880%" y="95.50"></text>
         </g>
         <g>
             <title>u8::master_fast_size_for (1,800 samples, 0.30%)</title>
-            <rect x="14.0709%" y="117" width="0.3008%" height="15" fill="rgb(211,96,35)"/>
+            <rect x="14.0709%" y="117" width="0.3008%" height="15" fill="rgb(244,5,23)"/>
             <text x="14.3209%" y="127.50"></text>
         </g>
         <g>
+            <title>u8::CopyToLowered (300 samples, 0.05%)</title>
+            <rect x="14.3717%" y="117" width="0.0501%" height="15" fill="rgb(226,81,46)"/>
+            <text x="14.6217%" y="127.50"></text>
+        </g>
+        <g>
             <title>tree_buf::internal::types::integer::Simple16Compressor::Simple16_fast_size_for (1,300 samples, 0.22%)</title>
-            <rect x="14.4218%" y="101" width="0.2172%" height="15" fill="rgb(253,215,40)"/>
+            <rect x="14.4218%" y="101" width="0.2172%" height="15" fill="rgb(247,70,30)"/>
             <text x="14.6718%" y="111.50"></text>
         </g>
         <g>
             <title>Needless_copy_to_u32 (700 samples, 0.12%)</title>
-            <rect x="14.5221%" y="85" width="0.1170%" height="15" fill="rgb(211,81,21)"/>
+            <rect x="14.5221%" y="85" width="0.1170%" height="15" fill="rgb(212,68,19)"/>
             <text x="14.7721%" y="95.50"></text>
         </g>
         <g>
             <title>u8::master_fast_size_for (1,400 samples, 0.23%)</title>
-            <rect x="14.4218%" y="117" width="0.2340%" height="15" fill="rgb(208,190,38)"/>
+            <rect x="14.4218%" y="117" width="0.2340%" height="15" fill="rgb(240,187,13)"/>
             <text x="14.6718%" y="127.50"></text>
         </g>
         <g>
             <title>&amp;[u8]::RLE_get_runs (2,000 samples, 0.33%)</title>
-            <rect x="14.6557%" y="117" width="0.3342%" height="15" fill="rgb(235,213,38)"/>
+            <rect x="14.6557%" y="117" width="0.3342%" height="15" fill="rgb(223,113,26)"/>
             <text x="14.9057%" y="127.50"></text>
         </g>
         <g>
             <title>tree_buf::internal::encodings::rle::RLE&lt;(tree_buf::internal::types::integer::Simple16Compressor,_tree_buf::internal::types::integer::BytesCompressor)&gt;::fast_size_for (5,700 samples, 0.95%)</title>
-            <rect x="14.0541%" y="133" width="0.9525%" height="15" fill="rgb(237,122,38)"/>
+            <rect x="14.0541%" y="133" width="0.9525%" height="15" fill="rgb(206,192,2)"/>
             <text x="14.3041%" y="143.50"></text>
         </g>
         <g>
             <title>tree_buf::internal::types::integer::Simple16Compressor::Simple16_fast_size_for (2,200 samples, 0.37%)</title>
-            <rect x="15.0067%" y="133" width="0.3676%" height="15" fill="rgb(244,218,35)"/>
+            <rect x="15.0067%" y="133" width="0.3676%" height="15" fill="rgb(241,108,4)"/>
             <text x="15.2567%" y="143.50"></text>
         </g>
         <g>
             <title>Needless_copy_to_u32 (900 samples, 0.15%)</title>
-            <rect x="15.2239%" y="117" width="0.1504%" height="15" fill="rgb(240,68,47)"/>
+            <rect x="15.2239%" y="117" width="0.1504%" height="15" fill="rgb(247,173,49)"/>
             <text x="15.4739%" y="127.50"></text>
         </g>
         <g>
             <title>u8::master_compress (14,500 samples, 2.42%)</title>
-            <rect x="12.9679%" y="165" width="2.4231%" height="15" fill="rgb(210,16,53)"/>
+            <rect x="12.9679%" y="165" width="2.4231%" height="15" fill="rgb(224,114,35)"/>
             <text x="13.2179%" y="175.50">u8..</text>
         </g>
         <g>
             <title>Samples (8,100 samples, 1.35%)</title>
-            <rect x="14.0374%" y="149" width="1.3536%" height="15" fill="rgb(235,124,12)"/>
+            <rect x="14.0374%" y="149" width="1.3536%" height="15" fill="rgb(245,159,27)"/>
             <text x="14.2874%" y="159.50"></text>
         </g>
         <g>
             <title>alloc::vec::Vec&lt;u64&gt;::Integer_encode_all (16,000 samples, 2.67%)</title>
-            <rect x="12.9512%" y="181" width="2.6738%" height="15" fill="rgb(224,169,11)"/>
+            <rect x="12.9512%" y="181" width="2.6738%" height="15" fill="rgb(245,172,44)"/>
             <text x="13.2012%" y="191.50">al..</text>
         </g>
         <g>
             <title>u8::CopyToLowered (1,400 samples, 0.23%)</title>
-            <rect x="15.3910%" y="165" width="0.2340%" height="15" fill="rgb(250,166,2)"/>
+            <rect x="15.3910%" y="165" width="0.2340%" height="15" fill="rgb(236,23,11)"/>
             <text x="15.6410%" y="175.50"></text>
         </g>
         <g>
             <title>tree_buf::internal::types::array::VecArrayEncoder&lt;graphql::schemas::treebuf::BidTreeBufEncoderArray&gt;::Array_flush (70,100 samples, 11.71%)</title>
-            <rect x="3.9606%" y="197" width="11.7146%" height="15" fill="rgb(242,216,29)"/>
+            <rect x="3.9606%" y="197" width="11.7146%" height="15" fill="rgb(205,117,38)"/>
             <text x="4.2106%" y="207.50">tree_buf::interna..</text>
         </g>
         <g>
             <title>Needless_copy_to_u32 (1,700 samples, 0.28%)</title>
-            <rect x="16.3937%" y="133" width="0.2841%" height="15" fill="rgb(230,116,27)"/>
+            <rect x="16.3937%" y="133" width="0.2841%" height="15" fill="rgb(237,72,25)"/>
             <text x="16.6437%" y="143.50"></text>
         </g>
         <g>
             <title>Final (6,000 samples, 1.00%)</title>
-            <rect x="15.6918%" y="165" width="1.0027%" height="15" fill="rgb(228,99,48)"/>
+            <rect x="15.6918%" y="165" width="1.0027%" height="15" fill="rgb(244,70,9)"/>
             <text x="15.9418%" y="175.50"></text>
         </g>
         <g>
             <title>tree_buf::internal::types::integer::Simple16Compressor::Simple16_compress (5,900 samples, 0.99%)</title>
-            <rect x="15.7086%" y="149" width="0.9860%" height="15" fill="rgb(253,11,6)"/>
+            <rect x="15.7086%" y="149" width="0.9860%" height="15" fill="rgb(217,125,39)"/>
             <text x="15.9586%" y="159.50"></text>
         </g>
         <g>
+            <title>tree_buf::internal::encodings::rle::RLE&lt;(tree_buf::internal::types::integer::Simple16Compressor,_tree_buf::internal::types::integer::BytesCompressor)&gt;::fast_size_for (100 samples, 0.02%)</title>
+            <rect x="16.7447%" y="117" width="0.0167%" height="15" fill="rgb(235,36,10)"/>
+            <text x="16.9947%" y="127.50"></text>
+        </g>
+        <g>
             <title>Needless_copy_to_u32 (700 samples, 0.12%)</title>
-            <rect x="16.8783%" y="101" width="0.1170%" height="15" fill="rgb(247,143,39)"/>
+            <rect x="16.8783%" y="101" width="0.1170%" height="15" fill="rgb(251,123,47)"/>
             <text x="17.1283%" y="111.50"></text>
         </g>
         <g>
             <title>u8::master_fast_size_for (1,700 samples, 0.28%)</title>
-            <rect x="16.7279%" y="133" width="0.2841%" height="15" fill="rgb(236,97,10)"/>
+            <rect x="16.7279%" y="133" width="0.2841%" height="15" fill="rgb(221,13,13)"/>
             <text x="16.9779%" y="143.50"></text>
         </g>
         <g>
             <title>tree_buf::internal::types::integer::Simple16Compressor::Simple16_fast_size_for (1,500 samples, 0.25%)</title>
-            <rect x="16.7614%" y="117" width="0.2507%" height="15" fill="rgb(233,208,19)"/>
+            <rect x="16.7614%" y="117" width="0.2507%" height="15" fill="rgb(238,131,9)"/>
             <text x="17.0114%" y="127.50"></text>
         </g>
         <g>
+            <title>u8::CopyToLowered (300 samples, 0.05%)</title>
+            <rect x="17.0120%" y="133" width="0.0501%" height="15" fill="rgb(211,50,8)"/>
+            <text x="17.2620%" y="143.50"></text>
+        </g>
+        <g>
             <title>Needless_copy_to_u32 (600 samples, 0.10%)</title>
-            <rect x="17.1624%" y="101" width="0.1003%" height="15" fill="rgb(216,164,2)"/>
+            <rect x="17.1624%" y="101" width="0.1003%" height="15" fill="rgb(245,182,24)"/>
             <text x="17.4124%" y="111.50"></text>
         </g>
         <g>
             <title>u8::master_fast_size_for (1,300 samples, 0.22%)</title>
-            <rect x="17.0622%" y="133" width="0.2172%" height="15" fill="rgb(220,129,5)"/>
+            <rect x="17.0622%" y="133" width="0.2172%" height="15" fill="rgb(242,14,37)"/>
             <text x="17.3122%" y="143.50"></text>
         </g>
         <g>
             <title>tree_buf::internal::types::integer::Simple16Compressor::Simple16_fast_size_for (1,200 samples, 0.20%)</title>
-            <rect x="17.0789%" y="117" width="0.2005%" height="15" fill="rgb(242,17,10)"/>
+            <rect x="17.0789%" y="117" width="0.2005%" height="15" fill="rgb(246,228,12)"/>
             <text x="17.3289%" y="127.50"></text>
         </g>
         <g>
             <title>&amp;[u8]::RLE_get_runs (2,400 samples, 0.40%)</title>
-            <rect x="17.2794%" y="133" width="0.4011%" height="15" fill="rgb(242,107,0)"/>
+            <rect x="17.2794%" y="133" width="0.4011%" height="15" fill="rgb(213,55,15)"/>
             <text x="17.5294%" y="143.50"></text>
         </g>
         <g>
             <title>tree_buf::internal::encodings::rle::RLE&lt;(tree_buf::internal::types::integer::Simple16Compressor,_tree_buf::internal::types::integer::BytesCompressor)&gt;::fast_size_for (5,900 samples, 0.99%)</title>
-            <rect x="16.7112%" y="149" width="0.9860%" height="15" fill="rgb(251,28,31)"/>
+            <rect x="16.7112%" y="149" width="0.9860%" height="15" fill="rgb(209,9,3)"/>
             <text x="16.9612%" y="159.50"></text>
         </g>
         <g>
             <title>Needless_copy_to_u32 (900 samples, 0.15%)</title>
-            <rect x="17.8476%" y="133" width="0.1504%" height="15" fill="rgb(233,223,10)"/>
+            <rect x="17.8476%" y="133" width="0.1504%" height="15" fill="rgb(230,59,30)"/>
             <text x="18.0976%" y="143.50"></text>
         </g>
         <g>
             <title>Samples (7,900 samples, 1.32%)</title>
-            <rect x="16.6945%" y="165" width="1.3202%" height="15" fill="rgb(215,21,27)"/>
+            <rect x="16.6945%" y="165" width="1.3202%" height="15" fill="rgb(209,121,21)"/>
             <text x="16.9445%" y="175.50"></text>
         </g>
         <g>
             <title>tree_buf::internal::types::integer::Simple16Compressor::Simple16_fast_size_for (1,900 samples, 0.32%)</title>
-            <rect x="17.6972%" y="149" width="0.3175%" height="15" fill="rgb(232,23,21)"/>
+            <rect x="17.6972%" y="149" width="0.3175%" height="15" fill="rgb(220,109,13)"/>
             <text x="17.9472%" y="159.50"></text>
         </g>
         <g>
             <title>u8::master_compress (14,100 samples, 2.36%)</title>
-            <rect x="15.6751%" y="181" width="2.3563%" height="15" fill="rgb(244,5,23)"/>
+            <rect x="15.6751%" y="181" width="2.3563%" height="15" fill="rgb(232,18,1)"/>
             <text x="15.9251%" y="191.50">u..</text>
         </g>
         <g>
             <title>u8::CopyToLowered (1,500 samples, 0.25%)</title>
-            <rect x="18.0314%" y="181" width="0.2507%" height="15" fill="rgb(226,81,46)"/>
+            <rect x="18.0314%" y="181" width="0.2507%" height="15" fill="rgb(215,41,42)"/>
             <text x="18.2814%" y="191.50"></text>
         </g>
         <g>
+            <title>Final (300 samples, 0.05%)</title>
+            <rect x="18.3824%" y="85" width="0.0501%" height="15" fill="rgb(224,123,36)"/>
+            <text x="18.6324%" y="95.50"></text>
+        </g>
+        <g>
+            <title>tree_buf::internal::types::integer::PrefixVarIntCompressor::PrefixVarInt_compress (200 samples, 0.03%)</title>
+            <rect x="18.3991%" y="69" width="0.0334%" height="15" fill="rgb(240,125,3)"/>
+            <text x="18.6491%" y="79.50"></text>
+        </g>
+        <g>
+            <title>tree_buf::internal::encodings::rle::RLE&lt;(tree_buf::internal::types::integer::Simple16Compressor,_tree_buf::internal::types::integer::PrefixVarIntCompressor)&gt;::fast_size_for (200 samples, 0.03%)</title>
+            <rect x="18.4492%" y="69" width="0.0334%" height="15" fill="rgb(205,98,50)"/>
+            <text x="18.6992%" y="79.50"></text>
+        </g>
+        <g>
+            <title>tree_buf::internal::types::integer::PrefixVarIntCompressor::fast_size_for (200 samples, 0.03%)</title>
+            <rect x="18.4826%" y="69" width="0.0334%" height="15" fill="rgb(205,185,37)"/>
+            <text x="18.7326%" y="79.50"></text>
+        </g>
+        <g>
+            <title>Needless_copy_to_u32 (100 samples, 0.02%)</title>
+            <rect x="18.5328%" y="53" width="0.0167%" height="15" fill="rgb(238,207,15)"/>
+            <text x="18.7828%" y="63.50"></text>
+        </g>
+        <g>
             <title>Samples (800 samples, 0.13%)</title>
-            <rect x="18.4325%" y="85" width="0.1337%" height="15" fill="rgb(247,70,30)"/>
+            <rect x="18.4325%" y="85" width="0.1337%" height="15" fill="rgb(213,199,42)"/>
             <text x="18.6825%" y="95.50"></text>
         </g>
         <g>
+            <title>tree_buf::internal::types::integer::Simple16Compressor::Simple16_fast_size_for (300 samples, 0.05%)</title>
+            <rect x="18.5160%" y="69" width="0.0501%" height="15" fill="rgb(235,201,11)"/>
+            <text x="18.7660%" y="79.50"></text>
+        </g>
+        <g>
             <title>u16::master_compress (1,300 samples, 0.22%)</title>
-            <rect x="18.3656%" y="101" width="0.2172%" height="15" fill="rgb(212,68,19)"/>
+            <rect x="18.3656%" y="101" width="0.2172%" height="15" fill="rgb(207,46,11)"/>
             <text x="18.6156%" y="111.50"></text>
         </g>
         <g>
+            <title>u16::CopyToLowered (200 samples, 0.03%)</title>
+            <rect x="18.5829%" y="101" width="0.0334%" height="15" fill="rgb(241,35,35)"/>
+            <text x="18.8329%" y="111.50"></text>
+        </g>
+        <g>
             <title>alloc::vec::Vec&lt;u64&gt;::Integer_encode_all (2,200 samples, 0.37%)</title>
-            <rect x="18.3656%" y="117" width="0.3676%" height="15" fill="rgb(240,187,13)"/>
+            <rect x="18.3656%" y="117" width="0.3676%" height="15" fill="rgb(243,32,47)"/>
             <text x="18.6156%" y="127.50"></text>
         </g>
         <g>
             <title>Final (2,500 samples, 0.42%)</title>
-            <rect x="18.3322%" y="149" width="0.4178%" height="15" fill="rgb(223,113,26)"/>
+            <rect x="18.3322%" y="149" width="0.4178%" height="15" fill="rgb(247,202,23)"/>
             <text x="18.5822%" y="159.50"></text>
         </g>
         <g>
             <title>&amp;[bool]::encode_rle_bool (2,400 samples, 0.40%)</title>
-            <rect x="18.3489%" y="133" width="0.4011%" height="15" fill="rgb(206,192,2)"/>
+            <rect x="18.3489%" y="133" width="0.4011%" height="15" fill="rgb(219,102,11)"/>
             <text x="18.5989%" y="143.50"></text>
         </g>
         <g>
+            <title>tree_buf::internal::encodings::rle::RLE&lt;(tree_buf::internal::types::integer::Simple16Compressor,_tree_buf::internal::types::integer::BytesCompressor)&gt;::fast_size_for (100 samples, 0.02%)</title>
+            <rect x="18.8001%" y="117" width="0.0167%" height="15" fill="rgb(243,110,44)"/>
+            <text x="19.0501%" y="127.50"></text>
+        </g>
+        <g>
+            <title>tree_buf::internal::types::integer::Simple16Compressor::Simple16_fast_size_for (300 samples, 0.05%)</title>
+            <rect x="18.8168%" y="117" width="0.0501%" height="15" fill="rgb(222,74,54)"/>
+            <text x="19.0668%" y="127.50"></text>
+        </g>
+        <g>
+            <title>Needless_copy_to_u32 (200 samples, 0.03%)</title>
+            <rect x="18.8336%" y="101" width="0.0334%" height="15" fill="rgb(216,99,12)"/>
+            <text x="19.0836%" y="111.50"></text>
+        </g>
+        <g>
             <title>u8::master_fast_size_for (600 samples, 0.10%)</title>
-            <rect x="18.7834%" y="133" width="0.1003%" height="15" fill="rgb(241,108,4)"/>
+            <rect x="18.7834%" y="133" width="0.1003%" height="15" fill="rgb(226,22,26)"/>
             <text x="19.0334%" y="143.50"></text>
         </g>
         <g>
+            <title>u8::CopyToLowered (400 samples, 0.07%)</title>
+            <rect x="18.8837%" y="133" width="0.0668%" height="15" fill="rgb(217,163,10)"/>
+            <text x="19.1337%" y="143.50"></text>
+        </g>
+        <g>
             <title>bool::master_compress (3,900 samples, 0.65%)</title>
-            <rect x="18.3155%" y="165" width="0.6517%" height="15" fill="rgb(247,173,49)"/>
+            <rect x="18.3155%" y="165" width="0.6517%" height="15" fill="rgb(213,25,53)"/>
             <text x="18.5655%" y="175.50"></text>
         </g>
         <g>
             <title>Samples (1,300 samples, 0.22%)</title>
-            <rect x="18.7500%" y="149" width="0.2172%" height="15" fill="rgb(224,114,35)"/>
+            <rect x="18.7500%" y="149" width="0.2172%" height="15" fill="rgb(252,105,26)"/>
             <text x="19.0000%" y="159.50"></text>
         </g>
         <g>
             <title>alloc::vec::Vec&lt;bool&gt;::Boolean_encode_all (4,800 samples, 0.80%)</title>
-            <rect x="18.3155%" y="181" width="0.8021%" height="15" fill="rgb(245,159,27)"/>
+            <rect x="18.3155%" y="181" width="0.8021%" height="15" fill="rgb(220,39,43)"/>
             <text x="18.5655%" y="191.50"></text>
         </g>
         <g>
             <title>alloc::vec::Vec&lt;u64&gt;::Integer_encode_all (20,800 samples, 3.48%)</title>
-            <rect x="15.6751%" y="197" width="3.4759%" height="15" fill="rgb(245,172,44)"/>
+            <rect x="15.6751%" y="197" width="3.4759%" height="15" fill="rgb(229,68,48)"/>
             <text x="15.9251%" y="207.50">all..</text>
         </g>
         <g>
             <title>Needless_copy_to_u32 (1,800 samples, 0.30%)</title>
-            <rect x="21.4238%" y="69" width="0.3008%" height="15" fill="rgb(236,23,11)"/>
+            <rect x="21.4238%" y="69" width="0.3008%" height="15" fill="rgb(252,8,32)"/>
             <text x="21.6738%" y="79.50"></text>
         </g>
         <g>
             <title>tree_buf::internal::types::integer::Simple16Compressor::Simple16_compress (15,000 samples, 2.51%)</title>
-            <rect x="19.2346%" y="85" width="2.5067%" height="15" fill="rgb(205,117,38)"/>
+            <rect x="19.2346%" y="85" width="2.5067%" height="15" fill="rgb(223,20,43)"/>
             <text x="19.4846%" y="95.50">tr..</text>
         </g>
         <g>
             <title>Final (15,100 samples, 2.52%)</title>
-            <rect x="19.2346%" y="101" width="2.5234%" height="15" fill="rgb(237,72,25)"/>
+            <rect x="19.2346%" y="101" width="2.5234%" height="15" fill="rgb(229,81,49)"/>
             <text x="19.4846%" y="111.50">Fi..</text>
         </g>
         <g>
+            <title>tree_buf::internal::encodings::rle::RLE&lt;(tree_buf::internal::types::integer::Simple16Compressor,_tree_buf::internal::types::integer::BytesCompressor)&gt;::fast_size_for (200 samples, 0.03%)</title>
+            <rect x="21.7914%" y="53" width="0.0334%" height="15" fill="rgb(236,28,36)"/>
+            <text x="22.0414%" y="63.50"></text>
+        </g>
+        <g>
             <title>tree_buf::internal::types::integer::Simple16Compressor::Simple16_fast_size_for (1,200 samples, 0.20%)</title>
-            <rect x="21.8249%" y="53" width="0.2005%" height="15" fill="rgb(244,70,9)"/>
+            <rect x="21.8249%" y="53" width="0.2005%" height="15" fill="rgb(249,185,26)"/>
             <text x="22.0749%" y="63.50"></text>
         </g>
         <g>
             <title>Needless_copy_to_u32 (800 samples, 0.13%)</title>
-            <rect x="21.8917%" y="37" width="0.1337%" height="15" fill="rgb(217,125,39)"/>
+            <rect x="21.8917%" y="37" width="0.1337%" height="15" fill="rgb(249,174,33)"/>
             <text x="22.1417%" y="47.50"></text>
         </g>
         <g>
             <title>u8::master_fast_size_for (1,500 samples, 0.25%)</title>
-            <rect x="21.7914%" y="69" width="0.2507%" height="15" fill="rgb(235,36,10)"/>
+            <rect x="21.7914%" y="69" width="0.2507%" height="15" fill="rgb(233,201,37)"/>
             <text x="22.0414%" y="79.50"></text>
         </g>
         <g>
+            <title>u8::CopyToLowered (400 samples, 0.07%)</title>
+            <rect x="22.0421%" y="69" width="0.0668%" height="15" fill="rgb(221,78,26)"/>
+            <text x="22.2921%" y="79.50"></text>
+        </g>
+        <g>
             <title>tree_buf::internal::types::integer::Simple16Compressor::Simple16_fast_size_for (3,200 samples, 0.53%)</title>
-            <rect x="22.1090%" y="53" width="0.5348%" height="15" fill="rgb(251,123,47)"/>
+            <rect x="22.1090%" y="53" width="0.5348%" height="15" fill="rgb(250,127,30)"/>
             <text x="22.3590%" y="63.50"></text>
         </g>
         <g>
             <title>Needless_copy_to_u32 (900 samples, 0.15%)</title>
-            <rect x="22.4933%" y="37" width="0.1504%" height="15" fill="rgb(221,13,13)"/>
+            <rect x="22.4933%" y="37" width="0.1504%" height="15" fill="rgb(230,49,44)"/>
             <text x="22.7433%" y="47.50"></text>
         </g>
         <g>
             <title>u8::master_fast_size_for (3,300 samples, 0.55%)</title>
-            <rect x="22.1090%" y="69" width="0.5515%" height="15" fill="rgb(238,131,9)"/>
+            <rect x="22.1090%" y="69" width="0.5515%" height="15" fill="rgb(229,67,23)"/>
             <text x="22.3590%" y="79.50"></text>
         </g>
         <g>
             <title>&amp;[u8]::RLE_get_runs (2,000 samples, 0.33%)</title>
-            <rect x="22.6604%" y="69" width="0.3342%" height="15" fill="rgb(211,50,8)"/>
+            <rect x="22.6604%" y="69" width="0.3342%" height="15" fill="rgb(249,83,47)"/>
             <text x="22.9104%" y="79.50"></text>
         </g>
         <g>
             <title>tree_buf::internal::encodings::rle::RLE&lt;(tree_buf::internal::types::integer::Simple16Compressor,_tree_buf::internal::types::integer::BytesCompressor)&gt;::fast_size_for (7,500 samples, 1.25%)</title>
-            <rect x="21.7747%" y="85" width="1.2533%" height="15" fill="rgb(245,182,24)"/>
+            <rect x="21.7747%" y="85" width="1.2533%" height="15" fill="rgb(215,43,3)"/>
             <text x="22.0247%" y="95.50"></text>
         </g>
         <g>
             <title>tree_buf::internal::types::integer::Simple16Compressor::Simple16_fast_size_for (3,700 samples, 0.62%)</title>
-            <rect x="23.0281%" y="85" width="0.6183%" height="15" fill="rgb(242,14,37)"/>
+            <rect x="23.0281%" y="85" width="0.6183%" height="15" fill="rgb(238,154,13)"/>
             <text x="23.2781%" y="95.50"></text>
         </g>
         <g>
             <title>Needless_copy_to_u32 (1,100 samples, 0.18%)</title>
-            <rect x="23.4626%" y="69" width="0.1838%" height="15" fill="rgb(246,228,12)"/>
+            <rect x="23.4626%" y="69" width="0.1838%" height="15" fill="rgb(219,56,2)"/>
             <text x="23.7126%" y="79.50"></text>
         </g>
         <g>
             <title>u8::master_compress (26,600 samples, 4.45%)</title>
-            <rect x="19.2179%" y="117" width="4.4452%" height="15" fill="rgb(213,55,15)"/>
+            <rect x="19.2179%" y="117" width="4.4452%" height="15" fill="rgb(233,0,4)"/>
             <text x="19.4679%" y="127.50">u8::m..</text>
         </g>
         <g>
             <title>Samples (11,400 samples, 1.91%)</title>
-            <rect x="21.7580%" y="101" width="1.9051%" height="15" fill="rgb(209,9,3)"/>
+            <rect x="21.7580%" y="101" width="1.9051%" height="15" fill="rgb(235,30,7)"/>
             <text x="22.0080%" y="111.50">S..</text>
         </g>
         <g>
             <title>u8::CopyToLowered (1,700 samples, 0.28%)</title>
-            <rect x="23.6631%" y="117" width="0.2841%" height="15" fill="rgb(230,59,30)"/>
+            <rect x="23.6631%" y="117" width="0.2841%" height="15" fill="rgb(250,79,13)"/>
             <text x="23.9131%" y="127.50"></text>
         </g>
         <g>
             <title>alloc::vec::Vec&lt;u64&gt;::Integer_encode_all (28,500 samples, 4.76%)</title>
-            <rect x="19.2012%" y="133" width="4.7627%" height="15" fill="rgb(209,121,21)"/>
+            <rect x="19.2012%" y="133" width="4.7627%" height="15" fill="rgb(211,146,34)"/>
             <text x="19.4512%" y="143.50">alloc:..</text>
         </g>
         <g>
             <title>tree_buf::internal::types::string::Utf8Compressor::Utf8_compress (2,200 samples, 0.37%)</title>
-            <rect x="23.9639%" y="117" width="0.3676%" height="15" fill="rgb(220,109,13)"/>
+            <rect x="23.9639%" y="117" width="0.3676%" height="15" fill="rgb(228,22,38)"/>
             <text x="24.2139%" y="127.50"></text>
         </g>
         <g>
             <title>&amp;alloc::string::String::master_compress (2,300 samples, 0.38%)</title>
-            <rect x="23.9639%" y="133" width="0.3844%" height="15" fill="rgb(232,18,1)"/>
+            <rect x="23.9639%" y="133" width="0.3844%" height="15" fill="rgb(235,168,5)"/>
             <text x="24.2139%" y="143.50"></text>
         </g>
         <g>
             <title>tree_buf::internal::encodings::dictionary::Dictionary&lt;(tree_buf::internal::types::string::Utf8Compressor,)&gt;::compress (79,800 samples, 13.34%)</title>
-            <rect x="19.1845%" y="149" width="13.3356%" height="15" fill="rgb(215,41,42)"/>
+            <rect x="19.1845%" y="149" width="13.3356%" height="15" fill="rgb(221,155,16)"/>
             <text x="19.4345%" y="159.50">tree_buf::internal::..</text>
         </g>
         <g>
             <title>&amp;alloc::string::String::get_lookup_table (48,900 samples, 8.17%)</title>
-            <rect x="24.3483%" y="133" width="8.1718%" height="15" fill="rgb(224,123,36)"/>
+            <rect x="24.3483%" y="133" width="8.1718%" height="15" fill="rgb(215,215,53)"/>
             <text x="24.5983%" y="143.50">&amp;alloc::str..</text>
         </g>
         <g>
             <title>Final (80,000 samples, 13.37%)</title>
-            <rect x="19.1678%" y="165" width="13.3690%" height="15" fill="rgb(240,125,3)"/>
+            <rect x="19.1678%" y="165" width="13.3690%" height="15" fill="rgb(223,4,10)"/>
             <text x="19.4178%" y="175.50">Final</text>
         </g>
         <g>
+            <title>tree_buf::internal::encodings::rle::RLE&lt;(tree_buf::internal::types::integer::Simple16Compressor,_tree_buf::internal::types::integer::BytesCompressor)&gt;::fast_size_for (100 samples, 0.02%)</title>
+            <rect x="32.6036%" y="85" width="0.0167%" height="15" fill="rgb(234,103,6)"/>
+            <text x="32.8536%" y="95.50"></text>
+        </g>
+        <g>
             <title>Needless_copy_to_u32 (800 samples, 0.13%)</title>
-            <rect x="32.7039%" y="69" width="0.1337%" height="15" fill="rgb(205,98,50)"/>
+            <rect x="32.7039%" y="69" width="0.1337%" height="15" fill="rgb(227,97,0)"/>
             <text x="32.9539%" y="79.50"></text>
         </g>
         <g>
             <title>u8::master_fast_size_for (1,500 samples, 0.25%)</title>
-            <rect x="32.6036%" y="101" width="0.2507%" height="15" fill="rgb(205,185,37)"/>
+            <rect x="32.6036%" y="101" width="0.2507%" height="15" fill="rgb(234,150,53)"/>
             <text x="32.8536%" y="111.50"></text>
         </g>
         <g>
             <title>tree_buf::internal::types::integer::Simple16Compressor::Simple16_fast_size_for (1,400 samples, 0.23%)</title>
-            <rect x="32.6203%" y="85" width="0.2340%" height="15" fill="rgb(238,207,15)"/>
+            <rect x="32.6203%" y="85" width="0.2340%" height="15" fill="rgb(228,201,54)"/>
             <text x="32.8703%" y="95.50"></text>
         </g>
         <g>
+            <title>u8::CopyToLowered (400 samples, 0.07%)</title>
+            <rect x="32.8543%" y="101" width="0.0668%" height="15" fill="rgb(222,22,37)"/>
+            <text x="33.1043%" y="111.50"></text>
+        </g>
+        <g>
             <title>Needless_copy_to_u32 (800 samples, 0.13%)</title>
-            <rect x="33.3723%" y="69" width="0.1337%" height="15" fill="rgb(213,199,42)"/>
+            <rect x="33.3723%" y="69" width="0.1337%" height="15" fill="rgb(237,53,32)"/>
             <text x="33.6223%" y="79.50"></text>
         </g>
         <g>
             <title>u8::master_fast_size_for (3,600 samples, 0.60%)</title>
-            <rect x="32.9211%" y="101" width="0.6016%" height="15" fill="rgb(235,201,11)"/>
+            <rect x="32.9211%" y="101" width="0.6016%" height="15" fill="rgb(233,25,53)"/>
             <text x="33.1711%" y="111.50"></text>
         </g>
         <g>
             <title>tree_buf::internal::types::integer::Simple16Compressor::Simple16_fast_size_for (3,500 samples, 0.58%)</title>
-            <rect x="32.9378%" y="85" width="0.5849%" height="15" fill="rgb(207,46,11)"/>
+            <rect x="32.9378%" y="85" width="0.5849%" height="15" fill="rgb(210,40,34)"/>
             <text x="33.1878%" y="95.50"></text>
         </g>
         <g>
             <title>&amp;[u8]::RLE_get_runs (2,000 samples, 0.33%)</title>
-            <rect x="33.5227%" y="101" width="0.3342%" height="15" fill="rgb(241,35,35)"/>
+            <rect x="33.5227%" y="101" width="0.3342%" height="15" fill="rgb(241,220,44)"/>
             <text x="33.7727%" y="111.50"></text>
         </g>
         <g>
             <title>tree_buf::internal::encodings::rle::RLE&lt;(tree_buf::internal::types::integer::Simple16Compressor,_tree_buf::internal::types::integer::BytesCompressor)&gt;::fast_size_for (7,700 samples, 1.29%)</title>
-            <rect x="32.5869%" y="117" width="1.2868%" height="15" fill="rgb(243,32,47)"/>
+            <rect x="32.5869%" y="117" width="1.2868%" height="15" fill="rgb(235,28,35)"/>
             <text x="32.8369%" y="127.50"></text>
         </g>
         <g>
             <title>tree_buf::internal::types::integer::Simple16Compressor::Simple16_fast_size_for (4,200 samples, 0.70%)</title>
-            <rect x="33.8737%" y="117" width="0.7019%" height="15" fill="rgb(247,202,23)"/>
+            <rect x="33.8737%" y="117" width="0.7019%" height="15" fill="rgb(210,56,17)"/>
             <text x="34.1237%" y="127.50"></text>
         </g>
         <g>
             <title>Needless_copy_to_u32 (1,000 samples, 0.17%)</title>
-            <rect x="34.4084%" y="101" width="0.1671%" height="15" fill="rgb(219,102,11)"/>
+            <rect x="34.4084%" y="101" width="0.1671%" height="15" fill="rgb(224,130,29)"/>
             <text x="34.6584%" y="111.50"></text>
         </g>
         <g>
             <title>u8::master_fast_size_for (12,100 samples, 2.02%)</title>
-            <rect x="32.5702%" y="133" width="2.0221%" height="15" fill="rgb(243,110,44)"/>
+            <rect x="32.5702%" y="133" width="2.0221%" height="15" fill="rgb(235,212,8)"/>
             <text x="32.8202%" y="143.50">u..</text>
         </g>
         <g>
             <title>u8::CopyToLowered (800 samples, 0.13%)</title>
-            <rect x="34.5922%" y="133" width="0.1337%" height="15" fill="rgb(222,74,54)"/>
+            <rect x="34.5922%" y="133" width="0.1337%" height="15" fill="rgb(223,33,50)"/>
             <text x="34.8422%" y="143.50"></text>
         </g>
         <g>
+            <title>tree_buf::internal::types::string::Utf8Compressor::Utf8_fast_size_for (200 samples, 0.03%)</title>
+            <rect x="34.7259%" y="117" width="0.0334%" height="15" fill="rgb(219,149,13)"/>
+            <text x="34.9759%" y="127.50"></text>
+        </g>
+        <g>
+            <title>&amp;alloc::string::String::master_fast_size_for (300 samples, 0.05%)</title>
+            <rect x="34.7259%" y="133" width="0.0501%" height="15" fill="rgb(250,156,29)"/>
+            <text x="34.9759%" y="143.50"></text>
+        </g>
+        <g>
             <title>&amp;alloc::string::String::get_lookup_table (19,500 samples, 3.26%)</title>
-            <rect x="34.7761%" y="133" width="3.2587%" height="15" fill="rgb(216,99,12)"/>
+            <rect x="34.7761%" y="133" width="3.2587%" height="15" fill="rgb(216,193,19)"/>
             <text x="35.0261%" y="143.50">&amp;al..</text>
         </g>
         <g>
             <title>tree_buf::internal::encodings::dictionary::Dictionary&lt;(tree_buf::internal::types::string::Utf8Compressor,)&gt;::fast_size_for (32,900 samples, 5.50%)</title>
-            <rect x="32.5535%" y="149" width="5.4980%" height="15" fill="rgb(226,22,26)"/>
+            <rect x="32.5535%" y="149" width="5.4980%" height="15" fill="rgb(216,135,14)"/>
             <text x="32.8035%" y="159.50">tree_bu..</text>
         </g>
         <g>
+            <title>tree_buf::internal::encodings::rle::RLE&lt;(tree_buf::internal::types::integer::Simple16Compressor,_tree_buf::internal::types::integer::BytesCompressor)&gt;::fast_size_for (100 samples, 0.02%)</title>
+            <rect x="38.0849%" y="117" width="0.0167%" height="15" fill="rgb(241,47,5)"/>
+            <text x="38.3349%" y="127.50"></text>
+        </g>
+        <g>
             <title>Needless_copy_to_u32 (900 samples, 0.15%)</title>
-            <rect x="38.1684%" y="101" width="0.1504%" height="15" fill="rgb(217,163,10)"/>
+            <rect x="38.1684%" y="101" width="0.1504%" height="15" fill="rgb(233,42,35)"/>
             <text x="38.4184%" y="111.50"></text>
         </g>
         <g>
             <title>u8::master_fast_size_for (1,600 samples, 0.27%)</title>
-            <rect x="38.0682%" y="133" width="0.2674%" height="15" fill="rgb(213,25,53)"/>
+            <rect x="38.0682%" y="133" width="0.2674%" height="15" fill="rgb(231,13,6)"/>
             <text x="38.3182%" y="143.50"></text>
         </g>
         <g>
             <title>tree_buf::internal::types::integer::Simple16Compressor::Simple16_fast_size_for (1,400 samples, 0.23%)</title>
-            <rect x="38.1016%" y="117" width="0.2340%" height="15" fill="rgb(252,105,26)"/>
+            <rect x="38.1016%" y="117" width="0.2340%" height="15" fill="rgb(207,181,40)"/>
             <text x="38.3516%" y="127.50"></text>
         </g>
         <g>
+            <title>u8::CopyToLowered (400 samples, 0.07%)</title>
+            <rect x="38.3356%" y="133" width="0.0668%" height="15" fill="rgb(254,173,49)"/>
+            <text x="38.5856%" y="143.50"></text>
+        </g>
+        <g>
+            <title>tree_buf::internal::types::string::Utf8Compressor::Utf8_fast_size_for (200 samples, 0.03%)</title>
+            <rect x="38.4191%" y="117" width="0.0334%" height="15" fill="rgb(221,1,38)"/>
+            <text x="38.6691%" y="127.50"></text>
+        </g>
+        <g>
+            <title>&amp;alloc::string::String::master_fast_size_for (400 samples, 0.07%)</title>
+            <rect x="38.4024%" y="133" width="0.0668%" height="15" fill="rgb(206,124,46)"/>
+            <text x="38.6524%" y="143.50"></text>
+        </g>
+        <g>
             <title>&amp;[&amp;alloc::string::String]::RLE_get_runs (3,400 samples, 0.57%)</title>
-            <rect x="38.4693%" y="133" width="0.5682%" height="15" fill="rgb(220,39,43)"/>
+            <rect x="38.4693%" y="133" width="0.5682%" height="15" fill="rgb(249,21,11)"/>
             <text x="38.7193%" y="143.50"></text>
         </g>
         <g>
             <title>tree_buf::internal::encodings::rle::RLE&lt;(tree_buf::internal::types::string::Utf8Compressor,)&gt;::fast_size_for (6,000 samples, 1.00%)</title>
-            <rect x="38.0515%" y="149" width="1.0027%" height="15" fill="rgb(229,68,48)"/>
+            <rect x="38.0515%" y="149" width="1.0027%" height="15" fill="rgb(222,201,40)"/>
             <text x="38.3015%" y="159.50"></text>
         </g>
         <g>
             <title>Samples (39,500 samples, 6.60%)</title>
-            <rect x="32.5368%" y="165" width="6.6009%" height="15" fill="rgb(252,8,32)"/>
+            <rect x="32.5368%" y="165" width="6.6009%" height="15" fill="rgb(235,61,29)"/>
             <text x="32.7868%" y="175.50">Samples</text>
         </g>
         <g>
+            <title>tree_buf::internal::types::string::Utf8Compressor::Utf8_fast_size_for (500 samples, 0.08%)</title>
+            <rect x="39.0541%" y="149" width="0.0836%" height="15" fill="rgb(219,207,3)"/>
+            <text x="39.3041%" y="159.50"></text>
+        </g>
+        <g>
             <title>&amp;alloc::string::String::master_compress (119,700 samples, 20.00%)</title>
-            <rect x="19.1511%" y="181" width="20.0033%" height="15" fill="rgb(223,20,43)"/>
+            <rect x="19.1511%" y="181" width="20.0033%" height="15" fill="rgb(222,56,46)"/>
             <text x="19.4011%" y="191.50">&amp;alloc::string::String::master_..</text>
         </g>
         <g>
             <title>tree_buf::internal::types::integer::Simple16Compressor::Simple16_compress (7,000 samples, 1.17%)</title>
-            <rect x="39.2547%" y="85" width="1.1698%" height="15" fill="rgb(229,81,49)"/>
+            <rect x="39.2547%" y="85" width="1.1698%" height="15" fill="rgb(239,76,54)"/>
             <text x="39.5047%" y="95.50"></text>
         </g>
         <g>
             <title>Needless_copy_to_u32 (1,800 samples, 0.30%)</title>
-            <rect x="40.1237%" y="69" width="0.3008%" height="15" fill="rgb(236,28,36)"/>
+            <rect x="40.1237%" y="69" width="0.3008%" height="15" fill="rgb(231,124,27)"/>
             <text x="40.3737%" y="79.50"></text>
         </g>
         <g>
             <title>Final (7,100 samples, 1.19%)</title>
-            <rect x="39.2547%" y="101" width="1.1865%" height="15" fill="rgb(249,185,26)"/>
+            <rect x="39.2547%" y="101" width="1.1865%" height="15" fill="rgb(249,195,6)"/>
             <text x="39.5047%" y="111.50"></text>
         </g>
         <g>
+            <title>tree_buf::internal::encodings::rle::RLE&lt;(tree_buf::internal::types::integer::Simple16Compressor,_tree_buf::internal::types::integer::BytesCompressor)&gt;::fast_size_for (100 samples, 0.02%)</title>
+            <rect x="40.4746%" y="53" width="0.0167%" height="15" fill="rgb(237,174,47)"/>
+            <text x="40.7246%" y="63.50"></text>
+        </g>
+        <g>
             <title>tree_buf::internal::types::integer::Simple16Compressor::Simple16_fast_size_for (1,200 samples, 0.20%)</title>
-            <rect x="40.4913%" y="53" width="0.2005%" height="15" fill="rgb(249,174,33)"/>
+            <rect x="40.4913%" y="53" width="0.2005%" height="15" fill="rgb(206,201,31)"/>
             <text x="40.7413%" y="63.50"></text>
         </g>
         <g>
             <title>Needless_copy_to_u32 (700 samples, 0.12%)</title>
-            <rect x="40.5749%" y="37" width="0.1170%" height="15" fill="rgb(233,201,37)"/>
+            <rect x="40.5749%" y="37" width="0.1170%" height="15" fill="rgb(231,57,52)"/>
             <text x="40.8249%" y="47.50"></text>
         </g>
         <g>
             <title>u8::master_fast_size_for (1,400 samples, 0.23%)</title>
-            <rect x="40.4746%" y="69" width="0.2340%" height="15" fill="rgb(221,78,26)"/>
+            <rect x="40.4746%" y="69" width="0.2340%" height="15" fill="rgb(248,177,22)"/>
             <text x="40.7246%" y="79.50"></text>
         </g>
         <g>
+            <title>u8::CopyToLowered (200 samples, 0.03%)</title>
+            <rect x="40.7086%" y="69" width="0.0334%" height="15" fill="rgb(215,211,37)"/>
+            <text x="40.9586%" y="79.50"></text>
+        </g>
+        <g>
             <title>tree_buf::internal::types::integer::Simple16Compressor::Simple16_fast_size_for (1,000 samples, 0.17%)</title>
-            <rect x="40.7587%" y="53" width="0.1671%" height="15" fill="rgb(250,127,30)"/>
+            <rect x="40.7587%" y="53" width="0.1671%" height="15" fill="rgb(241,128,51)"/>
             <text x="41.0087%" y="63.50"></text>
         </g>
         <g>
             <title>Needless_copy_to_u32 (700 samples, 0.12%)</title>
-            <rect x="40.8088%" y="37" width="0.1170%" height="15" fill="rgb(230,49,44)"/>
+            <rect x="40.8088%" y="37" width="0.1170%" height="15" fill="rgb(227,165,31)"/>
             <text x="41.0588%" y="47.50"></text>
         </g>
         <g>
             <title>u8::master_fast_size_for (1,200 samples, 0.20%)</title>
-            <rect x="40.7420%" y="69" width="0.2005%" height="15" fill="rgb(229,67,23)"/>
+            <rect x="40.7420%" y="69" width="0.2005%" height="15" fill="rgb(228,167,24)"/>
             <text x="40.9920%" y="79.50"></text>
         </g>
         <g>
             <title>&amp;[u8]::RLE_get_runs (1,700 samples, 0.28%)</title>
-            <rect x="40.9425%" y="69" width="0.2841%" height="15" fill="rgb(249,83,47)"/>
+            <rect x="40.9425%" y="69" width="0.2841%" height="15" fill="rgb(228,143,12)"/>
             <text x="41.1925%" y="79.50"></text>
         </g>
         <g>
             <title>tree_buf::internal::encodings::rle::RLE&lt;(tree_buf::internal::types::integer::Simple16Compressor,_tree_buf::internal::types::integer::BytesCompressor)&gt;::fast_size_for (4,800 samples, 0.80%)</title>
-            <rect x="40.4579%" y="85" width="0.8021%" height="15" fill="rgb(215,43,3)"/>
+            <rect x="40.4579%" y="85" width="0.8021%" height="15" fill="rgb(249,149,8)"/>
             <text x="40.7079%" y="95.50"></text>
         </g>
         <g>
             <title>Needless_copy_to_u32 (1,000 samples, 0.17%)</title>
-            <rect x="41.4271%" y="69" width="0.1671%" height="15" fill="rgb(238,154,13)"/>
+            <rect x="41.4271%" y="69" width="0.1671%" height="15" fill="rgb(243,35,44)"/>
             <text x="41.6771%" y="79.50"></text>
         </g>
         <g>
             <title>Samples (7,000 samples, 1.17%)</title>
-            <rect x="40.4412%" y="101" width="1.1698%" height="15" fill="rgb(219,56,2)"/>
+            <rect x="40.4412%" y="101" width="1.1698%" height="15" fill="rgb(246,89,9)"/>
             <text x="40.6912%" y="111.50"></text>
         </g>
         <g>
             <title>tree_buf::internal::types::integer::Simple16Compressor::Simple16_fast_size_for (2,100 samples, 0.35%)</title>
-            <rect x="41.2600%" y="85" width="0.3509%" height="15" fill="rgb(233,0,4)"/>
+            <rect x="41.2600%" y="85" width="0.3509%" height="15" fill="rgb(233,213,13)"/>
             <text x="41.5100%" y="95.50"></text>
         </g>
         <g>
             <title>u8::master_compress (14,300 samples, 2.39%)</title>
-            <rect x="39.2380%" y="117" width="2.3897%" height="15" fill="rgb(235,30,7)"/>
+            <rect x="39.2380%" y="117" width="2.3897%" height="15" fill="rgb(233,141,41)"/>
             <text x="39.4880%" y="127.50">u8..</text>
         </g>
         <g>
             <title>u8::CopyToLowered (1,900 samples, 0.32%)</title>
-            <rect x="41.6277%" y="117" width="0.3175%" height="15" fill="rgb(250,79,13)"/>
+            <rect x="41.6277%" y="117" width="0.3175%" height="15" fill="rgb(239,167,4)"/>
             <text x="41.8777%" y="127.50"></text>
         </g>
         <g>
             <title>alloc::vec::Vec&lt;u64&gt;::Integer_encode_all (16,400 samples, 2.74%)</title>
-            <rect x="39.2213%" y="133" width="2.7406%" height="15" fill="rgb(211,146,34)"/>
+            <rect x="39.2213%" y="133" width="2.7406%" height="15" fill="rgb(209,217,16)"/>
             <text x="39.4713%" y="143.50">al..</text>
         </g>
         <g>
+            <title>tree_buf::internal::types::string::Utf8Compressor::Utf8_compress (400 samples, 0.07%)</title>
+            <rect x="41.9619%" y="117" width="0.0668%" height="15" fill="rgb(219,88,35)"/>
+            <text x="42.2119%" y="127.50"></text>
+        </g>
+        <g>
+            <title>&amp;alloc::string::String::master_compress (500 samples, 0.08%)</title>
+            <rect x="41.9619%" y="133" width="0.0836%" height="15" fill="rgb(220,193,23)"/>
+            <text x="42.2119%" y="143.50"></text>
+        </g>
+        <g>
             <title>&amp;alloc::string::String::get_lookup_table (31,800 samples, 5.31%)</title>
-            <rect x="42.0455%" y="133" width="5.3142%" height="15" fill="rgb(228,22,38)"/>
+            <rect x="42.0455%" y="133" width="5.3142%" height="15" fill="rgb(230,90,52)"/>
             <text x="42.2955%" y="143.50">&amp;alloc:..</text>
         </g>
         <g>
             <title>tree_buf::internal::encodings::dictionary::Dictionary&lt;(tree_buf::internal::types::string::Utf8Compressor,)&gt;::compress (48,900 samples, 8.17%)</title>
-            <rect x="39.2045%" y="149" width="8.1718%" height="15" fill="rgb(235,168,5)"/>
+            <rect x="39.2045%" y="149" width="8.1718%" height="15" fill="rgb(252,106,19)"/>
             <text x="39.4545%" y="159.50">tree_buf::i..</text>
         </g>
         <g>
             <title>Final (49,000 samples, 8.19%)</title>
-            <rect x="39.2045%" y="165" width="8.1885%" height="15" fill="rgb(221,155,16)"/>
+            <rect x="39.2045%" y="165" width="8.1885%" height="15" fill="rgb(206,74,20)"/>
             <text x="39.4545%" y="175.50">Final</text>
         </g>
         <g>
+            <title>tree_buf::internal::encodings::rle::RLE&lt;(tree_buf::internal::types::integer::Simple16Compressor,_tree_buf::internal::types::integer::BytesCompressor)&gt;::fast_size_for (100 samples, 0.02%)</title>
+            <rect x="47.4766%" y="85" width="0.0167%" height="15" fill="rgb(230,138,44)"/>
+            <text x="47.7266%" y="95.50"></text>
+        </g>
+        <g>
             <title>tree_buf::internal::types::integer::Simple16Compressor::Simple16_fast_size_for (1,300 samples, 0.22%)</title>
-            <rect x="47.4933%" y="85" width="0.2172%" height="15" fill="rgb(215,215,53)"/>
+            <rect x="47.4933%" y="85" width="0.2172%" height="15" fill="rgb(235,182,43)"/>
             <text x="47.7433%" y="95.50"></text>
         </g>
         <g>
             <title>Needless_copy_to_u32 (700 samples, 0.12%)</title>
-            <rect x="47.5936%" y="69" width="0.1170%" height="15" fill="rgb(223,4,10)"/>
+            <rect x="47.5936%" y="69" width="0.1170%" height="15" fill="rgb(242,16,51)"/>
             <text x="47.8436%" y="79.50"></text>
         </g>
         <g>
             <title>u8::master_fast_size_for (1,600 samples, 0.27%)</title>
-            <rect x="47.4599%" y="101" width="0.2674%" height="15" fill="rgb(234,103,6)"/>
+            <rect x="47.4599%" y="101" width="0.2674%" height="15" fill="rgb(248,9,4)"/>
             <text x="47.7099%" y="111.50"></text>
         </g>
         <g>
+            <title>u8::CopyToLowered (200 samples, 0.03%)</title>
+            <rect x="47.7273%" y="101" width="0.0334%" height="15" fill="rgb(210,31,22)"/>
+            <text x="47.9773%" y="111.50"></text>
+        </g>
+        <g>
             <title>Needless_copy_to_u32 (600 samples, 0.10%)</title>
-            <rect x="47.8443%" y="69" width="0.1003%" height="15" fill="rgb(227,97,0)"/>
+            <rect x="47.8443%" y="69" width="0.1003%" height="15" fill="rgb(239,54,39)"/>
             <text x="48.0943%" y="79.50"></text>
         </g>
         <g>
             <title>u8::master_fast_size_for (1,200 samples, 0.20%)</title>
-            <rect x="47.7607%" y="101" width="0.2005%" height="15" fill="rgb(234,150,53)"/>
+            <rect x="47.7607%" y="101" width="0.2005%" height="15" fill="rgb(230,99,41)"/>
             <text x="48.0107%" y="111.50"></text>
         </g>
         <g>
             <title>tree_buf::internal::types::integer::Simple16Compressor::Simple16_fast_size_for (1,100 samples, 0.18%)</title>
-            <rect x="47.7774%" y="85" width="0.1838%" height="15" fill="rgb(228,201,54)"/>
+            <rect x="47.7774%" y="85" width="0.1838%" height="15" fill="rgb(253,106,12)"/>
             <text x="48.0274%" y="95.50"></text>
         </g>
         <g>
             <title>&amp;[u8]::RLE_get_runs (2,100 samples, 0.35%)</title>
-            <rect x="47.9612%" y="101" width="0.3509%" height="15" fill="rgb(222,22,37)"/>
+            <rect x="47.9612%" y="101" width="0.3509%" height="15" fill="rgb(213,46,41)"/>
             <text x="48.2112%" y="111.50"></text>
         </g>
         <g>
             <title>tree_buf::internal::encodings::rle::RLE&lt;(tree_buf::internal::types::integer::Simple16Compressor,_tree_buf::internal::types::integer::BytesCompressor)&gt;::fast_size_for (5,300 samples, 0.89%)</title>
-            <rect x="47.4432%" y="117" width="0.8857%" height="15" fill="rgb(237,53,32)"/>
+            <rect x="47.4432%" y="117" width="0.8857%" height="15" fill="rgb(215,133,35)"/>
             <text x="47.6932%" y="127.50"></text>
         </g>
         <g>
             <title>Needless_copy_to_u32 (900 samples, 0.15%)</title>
-            <rect x="48.5127%" y="101" width="0.1504%" height="15" fill="rgb(233,25,53)"/>
+            <rect x="48.5127%" y="101" width="0.1504%" height="15" fill="rgb(213,28,5)"/>
             <text x="48.7627%" y="111.50"></text>
         </g>
         <g>
             <title>u8::master_fast_size_for (7,400 samples, 1.24%)</title>
-            <rect x="47.4432%" y="133" width="1.2366%" height="15" fill="rgb(210,40,34)"/>
+            <rect x="47.4432%" y="133" width="1.2366%" height="15" fill="rgb(215,77,49)"/>
             <text x="47.6932%" y="143.50"></text>
         </g>
         <g>
             <title>tree_buf::internal::types::integer::Simple16Compressor::Simple16_fast_size_for (2,100 samples, 0.35%)</title>
-            <rect x="48.3289%" y="117" width="0.3509%" height="15" fill="rgb(241,220,44)"/>
+            <rect x="48.3289%" y="117" width="0.3509%" height="15" fill="rgb(248,100,22)"/>
             <text x="48.5789%" y="127.50"></text>
         </g>
         <g>
             <title>u8::CopyToLowered (700 samples, 0.12%)</title>
-            <rect x="48.6798%" y="133" width="0.1170%" height="15" fill="rgb(235,28,35)"/>
+            <rect x="48.6798%" y="133" width="0.1170%" height="15" fill="rgb(208,67,9)"/>
             <text x="48.9298%" y="143.50"></text>
         </g>
         <g>
+            <title>&amp;alloc::string::String::master_fast_size_for (200 samples, 0.03%)</title>
+            <rect x="48.7968%" y="133" width="0.0334%" height="15" fill="rgb(219,133,21)"/>
+            <text x="49.0468%" y="143.50"></text>
+        </g>
+        <g>
+            <title>tree_buf::internal::types::string::Utf8Compressor::Utf8_fast_size_for (200 samples, 0.03%)</title>
+            <rect x="48.7968%" y="117" width="0.0334%" height="15" fill="rgb(246,46,29)"/>
+            <text x="49.0468%" y="127.50"></text>
+        </g>
+        <g>
             <title>&amp;alloc::string::String::get_lookup_table (8,300 samples, 1.39%)</title>
-            <rect x="48.8302%" y="133" width="1.3870%" height="15" fill="rgb(210,56,17)"/>
+            <rect x="48.8302%" y="133" width="1.3870%" height="15" fill="rgb(246,185,52)"/>
             <text x="49.0802%" y="143.50"></text>
         </g>
         <g>
             <title>tree_buf::internal::encodings::dictionary::Dictionary&lt;(tree_buf::internal::types::string::Utf8Compressor,)&gt;::fast_size_for (16,900 samples, 2.82%)</title>
-            <rect x="47.4098%" y="149" width="2.8242%" height="15" fill="rgb(224,130,29)"/>
+            <rect x="47.4098%" y="149" width="2.8242%" height="15" fill="rgb(252,136,11)"/>
             <text x="47.6598%" y="159.50">tr..</text>
         </g>
         <g>
+            <title>tree_buf::internal::encodings::rle::RLE&lt;(tree_buf::internal::types::integer::Simple16Compressor,_tree_buf::internal::types::integer::BytesCompressor)&gt;::fast_size_for (100 samples, 0.02%)</title>
+            <rect x="50.2674%" y="117" width="0.0167%" height="15" fill="rgb(219,138,53)"/>
+            <text x="50.5174%" y="127.50"></text>
+        </g>
+        <g>
             <title>tree_buf::internal::types::integer::Simple16Compressor::Simple16_fast_size_for (1,500 samples, 0.25%)</title>
-            <rect x="50.2841%" y="117" width="0.2507%" height="15" fill="rgb(235,212,8)"/>
+            <rect x="50.2841%" y="117" width="0.2507%" height="15" fill="rgb(211,51,23)"/>
             <text x="50.5341%" y="127.50"></text>
         </g>
         <g>
             <title>Needless_copy_to_u32 (700 samples, 0.12%)</title>
-            <rect x="50.4178%" y="101" width="0.1170%" height="15" fill="rgb(223,33,50)"/>
+            <rect x="50.4178%" y="101" width="0.1170%" height="15" fill="rgb(247,221,28)"/>
             <text x="50.6678%" y="111.50"></text>
         </g>
         <g>
             <title>u8::master_fast_size_for (1,700 samples, 0.28%)</title>
-            <rect x="50.2674%" y="133" width="0.2841%" height="15" fill="rgb(219,149,13)"/>
+            <rect x="50.2674%" y="133" width="0.2841%" height="15" fill="rgb(251,222,45)"/>
             <text x="50.5174%" y="143.50"></text>
         </g>
         <g>
+            <title>u8::CopyToLowered (400 samples, 0.07%)</title>
+            <rect x="50.5515%" y="133" width="0.0668%" height="15" fill="rgb(217,162,53)"/>
+            <text x="50.8015%" y="143.50"></text>
+        </g>
+        <g>
+            <title>tree_buf::internal::types::string::Utf8Compressor::Utf8_fast_size_for (100 samples, 0.02%)</title>
+            <rect x="50.6350%" y="117" width="0.0167%" height="15" fill="rgb(229,93,14)"/>
+            <text x="50.8850%" y="127.50"></text>
+        </g>
+        <g>
+            <title>&amp;alloc::string::String::master_fast_size_for (300 samples, 0.05%)</title>
+            <rect x="50.6183%" y="133" width="0.0501%" height="15" fill="rgb(209,67,49)"/>
+            <text x="50.8683%" y="143.50"></text>
+        </g>
+        <g>
             <title>&amp;[&amp;alloc::string::String]::RLE_get_runs (4,400 samples, 0.74%)</title>
-            <rect x="50.6684%" y="133" width="0.7353%" height="15" fill="rgb(250,156,29)"/>
+            <rect x="50.6684%" y="133" width="0.7353%" height="15" fill="rgb(213,87,29)"/>
             <text x="50.9184%" y="143.50"></text>
         </g>
         <g>
             <title>tree_buf::internal::encodings::rle::RLE&lt;(tree_buf::internal::types::string::Utf8Compressor,)&gt;::fast_size_for (7,100 samples, 1.19%)</title>
-            <rect x="50.2340%" y="149" width="1.1865%" height="15" fill="rgb(216,193,19)"/>
+            <rect x="50.2340%" y="149" width="1.1865%" height="15" fill="rgb(205,151,52)"/>
             <text x="50.4840%" y="159.50"></text>
         </g>
         <g>
             <title>Samples (24,700 samples, 4.13%)</title>
-            <rect x="47.3930%" y="165" width="4.1277%" height="15" fill="rgb(216,135,14)"/>
+            <rect x="47.3930%" y="165" width="4.1277%" height="15" fill="rgb(253,215,39)"/>
             <text x="47.6430%" y="175.50">Samp..</text>
         </g>
         <g>
             <title>tree_buf::internal::types::string::Utf8Compressor::Utf8_fast_size_for (600 samples, 0.10%)</title>
-            <rect x="51.4205%" y="149" width="0.1003%" height="15" fill="rgb(241,47,5)"/>
+            <rect x="51.4205%" y="149" width="0.1003%" height="15" fill="rgb(221,220,41)"/>
             <text x="51.6705%" y="159.50"></text>
         </g>
         <g>
             <title>&amp;alloc::string::String::master_compress (73,900 samples, 12.35%)</title>
-            <rect x="39.1878%" y="181" width="12.3496%" height="15" fill="rgb(233,42,35)"/>
+            <rect x="39.1878%" y="181" width="12.3496%" height="15" fill="rgb(218,133,21)"/>
             <text x="39.4378%" y="191.50">&amp;alloc::string::St..</text>
         </g>
         <g>
             <title>alloc::vec::Vec&lt;&amp;alloc::string::String&gt;::String_EncoderArray::flush (194,200 samples, 32.45%)</title>
-            <rect x="19.1511%" y="197" width="32.4532%" height="15" fill="rgb(231,13,6)"/>
+            <rect x="19.1511%" y="197" width="32.4532%" height="15" fill="rgb(221,193,43)"/>
             <text x="19.4011%" y="207.50">alloc::vec::Vec&lt;&amp;alloc::string::String&gt;::String_Encod..</text>
         </g>
         <g>
             <title>tree_buf::internal::types::integer::Simple16Compressor::Simple16_compress (10,100 samples, 1.69%)</title>
-            <rect x="51.6377%" y="149" width="1.6878%" height="15" fill="rgb(207,181,40)"/>
+            <rect x="51.6377%" y="149" width="1.6878%" height="15" fill="rgb(240,128,52)"/>
             <text x="51.8877%" y="159.50"></text>
         </g>
         <g>
             <title>Needless_copy_to_u32 (1,800 samples, 0.30%)</title>
-            <rect x="53.0247%" y="133" width="0.3008%" height="15" fill="rgb(254,173,49)"/>
+            <rect x="53.0247%" y="133" width="0.3008%" height="15" fill="rgb(253,114,12)"/>
             <text x="53.2747%" y="143.50"></text>
         </g>
         <g>
             <title>Final (10,200 samples, 1.70%)</title>
-            <rect x="51.6377%" y="165" width="1.7045%" height="15" fill="rgb(221,1,38)"/>
+            <rect x="51.6377%" y="165" width="1.7045%" height="15" fill="rgb(215,223,47)"/>
             <text x="51.8877%" y="175.50"></text>
         </g>
         <g>
+            <title>tree_buf::internal::encodings::rle::RLE&lt;(tree_buf::internal::types::integer::Simple16Compressor,_tree_buf::internal::types::integer::BytesCompressor)&gt;::fast_size_for (100 samples, 0.02%)</title>
+            <rect x="53.3924%" y="117" width="0.0167%" height="15" fill="rgb(248,225,23)"/>
+            <text x="53.6424%" y="127.50"></text>
+        </g>
+        <g>
             <title>tree_buf::internal::types::integer::Simple16Compressor::Simple16_fast_size_for (1,500 samples, 0.25%)</title>
-            <rect x="53.4091%" y="117" width="0.2507%" height="15" fill="rgb(206,124,46)"/>
+            <rect x="53.4091%" y="117" width="0.2507%" height="15" fill="rgb(250,108,0)"/>
             <text x="53.6591%" y="127.50"></text>
         </g>
         <g>
             <title>Needless_copy_to_u32 (800 samples, 0.13%)</title>
-            <rect x="53.5261%" y="101" width="0.1337%" height="15" fill="rgb(249,21,11)"/>
+            <rect x="53.5261%" y="101" width="0.1337%" height="15" fill="rgb(228,208,7)"/>
             <text x="53.7761%" y="111.50"></text>
         </g>
         <g>
             <title>u8::master_fast_size_for (1,800 samples, 0.30%)</title>
-            <rect x="53.3757%" y="133" width="0.3008%" height="15" fill="rgb(222,201,40)"/>
+            <rect x="53.3757%" y="133" width="0.3008%" height="15" fill="rgb(244,45,10)"/>
             <text x="53.6257%" y="143.50"></text>
         </g>
         <g>
+            <title>u8::CopyToLowered (300 samples, 0.05%)</title>
+            <rect x="53.6765%" y="133" width="0.0501%" height="15" fill="rgb(207,125,25)"/>
+            <text x="53.9265%" y="143.50"></text>
+        </g>
+        <g>
             <title>tree_buf::internal::types::integer::Simple16Compressor::Simple16_fast_size_for (2,000 samples, 0.33%)</title>
-            <rect x="53.7266%" y="117" width="0.3342%" height="15" fill="rgb(235,61,29)"/>
+            <rect x="53.7266%" y="117" width="0.3342%" height="15" fill="rgb(210,195,18)"/>
             <text x="53.9766%" y="127.50"></text>
         </g>
         <g>
             <title>Needless_copy_to_u32 (800 samples, 0.13%)</title>
-            <rect x="53.9271%" y="101" width="0.1337%" height="15" fill="rgb(219,207,3)"/>
+            <rect x="53.9271%" y="101" width="0.1337%" height="15" fill="rgb(249,80,12)"/>
             <text x="54.1771%" y="111.50"></text>
         </g>
         <g>
             <title>u8::master_fast_size_for (2,100 samples, 0.35%)</title>
-            <rect x="53.7266%" y="133" width="0.3509%" height="15" fill="rgb(222,56,46)"/>
+            <rect x="53.7266%" y="133" width="0.3509%" height="15" fill="rgb(221,65,9)"/>
             <text x="53.9766%" y="143.50"></text>
         </g>
         <g>
             <title>&amp;[u8]::RLE_get_runs (2,300 samples, 0.38%)</title>
-            <rect x="54.0775%" y="133" width="0.3844%" height="15" fill="rgb(239,76,54)"/>
+            <rect x="54.0775%" y="133" width="0.3844%" height="15" fill="rgb(235,49,36)"/>
             <text x="54.3275%" y="143.50"></text>
         </g>
         <g>
             <title>tree_buf::internal::encodings::rle::RLE&lt;(tree_buf::internal::types::integer::Simple16Compressor,_tree_buf::internal::types::integer::BytesCompressor)&gt;::fast_size_for (6,800 samples, 1.14%)</title>
-            <rect x="53.3590%" y="149" width="1.1364%" height="15" fill="rgb(231,124,27)"/>
+            <rect x="53.3590%" y="149" width="1.1364%" height="15" fill="rgb(225,32,20)"/>
             <text x="53.6090%" y="159.50"></text>
         </g>
         <g>
             <title>tree_buf::internal::types::integer::Simple16Compressor::Simple16_fast_size_for (2,600 samples, 0.43%)</title>
-            <rect x="54.4953%" y="149" width="0.4345%" height="15" fill="rgb(249,195,6)"/>
+            <rect x="54.4953%" y="149" width="0.4345%" height="15" fill="rgb(215,141,46)"/>
             <text x="54.7453%" y="159.50"></text>
         </g>
         <g>
             <title>Needless_copy_to_u32 (900 samples, 0.15%)</title>
-            <rect x="54.7794%" y="133" width="0.1504%" height="15" fill="rgb(237,174,47)"/>
+            <rect x="54.7794%" y="133" width="0.1504%" height="15" fill="rgb(250,160,47)"/>
             <text x="55.0294%" y="143.50"></text>
         </g>
         <g>
             <title>u8::master_compress (19,900 samples, 3.33%)</title>
-            <rect x="51.6210%" y="181" width="3.3255%" height="15" fill="rgb(206,201,31)"/>
+            <rect x="51.6210%" y="181" width="3.3255%" height="15" fill="rgb(216,222,40)"/>
             <text x="51.8710%" y="191.50">u8:..</text>
         </g>
         <g>
             <title>Samples (9,600 samples, 1.60%)</title>
-            <rect x="53.3422%" y="165" width="1.6043%" height="15" fill="rgb(231,57,52)"/>
+            <rect x="53.3422%" y="165" width="1.6043%" height="15" fill="rgb(234,217,39)"/>
             <text x="53.5922%" y="175.50"></text>
         </g>
         <g>
             <title>u8::CopyToLowered (1,600 samples, 0.27%)</title>
-            <rect x="54.9465%" y="181" width="0.2674%" height="15" fill="rgb(248,177,22)"/>
+            <rect x="54.9465%" y="181" width="0.2674%" height="15" fill="rgb(207,178,40)"/>
             <text x="55.1965%" y="191.50"></text>
         </g>
         <g>
             <title>alloc::vec::Vec&lt;u64&gt;::Integer_encode_all (21,700 samples, 3.63%)</title>
-            <rect x="51.6043%" y="197" width="3.6263%" height="15" fill="rgb(215,211,37)"/>
+            <rect x="51.6043%" y="197" width="3.6263%" height="15" fill="rgb(221,136,13)"/>
             <text x="51.8543%" y="207.50">allo..</text>
         </g>
         <g>
             <title>tree_buf::internal::types::boolean::PackedBoolCompressor::compress_PackedBool (700 samples, 0.12%)</title>
-            <rect x="55.3643%" y="117" width="0.1170%" height="15" fill="rgb(241,128,51)"/>
+            <rect x="55.3643%" y="117" width="0.1170%" height="15" fill="rgb(249,199,10)"/>
             <text x="55.6143%" y="127.50"></text>
         </g>
         <g>
             <title>&amp;[bool]::encode_packed_bool (600 samples, 0.10%)</title>
-            <rect x="55.3810%" y="101" width="0.1003%" height="15" fill="rgb(227,165,31)"/>
+            <rect x="55.3810%" y="101" width="0.1003%" height="15" fill="rgb(249,222,13)"/>
             <text x="55.6310%" y="111.50"></text>
         </g>
         <g>
             <title>Final (900 samples, 0.15%)</title>
-            <rect x="55.3476%" y="133" width="0.1504%" height="15" fill="rgb(228,167,24)"/>
+            <rect x="55.3476%" y="133" width="0.1504%" height="15" fill="rgb(244,185,38)"/>
             <text x="55.5976%" y="143.50"></text>
         </g>
         <g>
+            <title>tree_buf::internal::encodings::rle::RLE&lt;(tree_buf::internal::types::integer::Simple16Compressor,_tree_buf::internal::types::integer::BytesCompressor)&gt;::fast_size_for (100 samples, 0.02%)</title>
+            <rect x="55.5481%" y="101" width="0.0167%" height="15" fill="rgb(236,202,9)"/>
+            <text x="55.7981%" y="111.50"></text>
+        </g>
+        <g>
             <title>tree_buf::internal::types::integer::Simple16Compressor::Simple16_fast_size_for (1,500 samples, 0.25%)</title>
-            <rect x="55.5648%" y="101" width="0.2507%" height="15" fill="rgb(228,143,12)"/>
+            <rect x="55.5648%" y="101" width="0.2507%" height="15" fill="rgb(250,229,37)"/>
             <text x="55.8148%" y="111.50"></text>
         </g>
         <g>
             <title>Needless_copy_to_u32 (900 samples, 0.15%)</title>
-            <rect x="55.6651%" y="85" width="0.1504%" height="15" fill="rgb(249,149,8)"/>
+            <rect x="55.6651%" y="85" width="0.1504%" height="15" fill="rgb(206,174,23)"/>
             <text x="55.9151%" y="95.50"></text>
         </g>
         <g>
             <title>u8::master_fast_size_for (1,800 samples, 0.30%)</title>
-            <rect x="55.5314%" y="117" width="0.3008%" height="15" fill="rgb(243,35,44)"/>
+            <rect x="55.5314%" y="117" width="0.3008%" height="15" fill="rgb(211,33,43)"/>
             <text x="55.7814%" y="127.50"></text>
         </g>
         <g>
             <title>Samples (4,000 samples, 0.67%)</title>
-            <rect x="55.4980%" y="133" width="0.6684%" height="15" fill="rgb(246,89,9)"/>
+            <rect x="55.4980%" y="133" width="0.6684%" height="15" fill="rgb(245,58,50)"/>
             <text x="55.7480%" y="143.50"></text>
         </g>
         <g>
             <title>u8::CopyToLowered (2,000 samples, 0.33%)</title>
-            <rect x="55.8322%" y="117" width="0.3342%" height="15" fill="rgb(233,213,13)"/>
+            <rect x="55.8322%" y="117" width="0.3342%" height="15" fill="rgb(244,68,36)"/>
             <text x="56.0822%" y="127.50"></text>
         </g>
         <g>
             <title>bool::master_compress (5,100 samples, 0.85%)</title>
-            <rect x="55.3309%" y="149" width="0.8523%" height="15" fill="rgb(233,141,41)"/>
+            <rect x="55.3309%" y="149" width="0.8523%" height="15" fill="rgb(232,229,15)"/>
             <text x="55.5809%" y="159.50"></text>
         </g>
         <g>
             <title>alloc::vec::Vec&lt;bool&gt;::Boolean_encode_all (9,500 samples, 1.59%)</title>
-            <rect x="55.3309%" y="165" width="1.5876%" height="15" fill="rgb(239,167,4)"/>
+            <rect x="55.3309%" y="165" width="1.5876%" height="15" fill="rgb(254,30,23)"/>
             <text x="55.5809%" y="175.50"></text>
         </g>
         <g>
             <title>Needless_copy_to_u32 (2,000 samples, 0.33%)</title>
-            <rect x="60.1437%" y="117" width="0.3342%" height="15" fill="rgb(209,217,16)"/>
+            <rect x="60.1437%" y="117" width="0.3342%" height="15" fill="rgb(235,160,14)"/>
             <text x="60.3937%" y="127.50"></text>
         </g>
         <g>
             <title>Final (21,100 samples, 3.53%)</title>
-            <rect x="56.9686%" y="149" width="3.5261%" height="15" fill="rgb(219,88,35)"/>
+            <rect x="56.9686%" y="149" width="3.5261%" height="15" fill="rgb(212,155,44)"/>
             <text x="57.2186%" y="159.50">Fin..</text>
         </g>
         <g>
             <title>tree_buf::internal::types::integer::Simple16Compressor::Simple16_compress (21,000 samples, 3.51%)</title>
-            <rect x="56.9853%" y="133" width="3.5094%" height="15" fill="rgb(220,193,23)"/>
+            <rect x="56.9853%" y="133" width="3.5094%" height="15" fill="rgb(226,2,50)"/>
             <text x="57.2353%" y="143.50">tre..</text>
         </g>
         <g>
+            <title>tree_buf::internal::encodings::rle::RLE&lt;(tree_buf::internal::types::integer::Simple16Compressor,_tree_buf::internal::types::integer::BytesCompressor)&gt;::fast_size_for (100 samples, 0.02%)</title>
+            <rect x="60.5615%" y="101" width="0.0167%" height="15" fill="rgb(234,177,6)"/>
+            <text x="60.8115%" y="111.50"></text>
+        </g>
+        <g>
             <title>Needless_copy_to_u32 (700 samples, 0.12%)</title>
-            <rect x="60.7286%" y="85" width="0.1170%" height="15" fill="rgb(230,90,52)"/>
+            <rect x="60.7286%" y="85" width="0.1170%" height="15" fill="rgb(217,24,9)"/>
             <text x="60.9786%" y="95.50"></text>
         </g>
         <g>
             <title>u8::master_fast_size_for (1,900 samples, 0.32%)</title>
-            <rect x="60.5448%" y="117" width="0.3175%" height="15" fill="rgb(252,106,19)"/>
+            <rect x="60.5448%" y="117" width="0.3175%" height="15" fill="rgb(220,13,46)"/>
             <text x="60.7948%" y="127.50"></text>
         </g>
         <g>
             <title>tree_buf::internal::types::integer::Simple16Compressor::Simple16_fast_size_for (1,700 samples, 0.28%)</title>
-            <rect x="60.5782%" y="101" width="0.2841%" height="15" fill="rgb(206,74,20)"/>
+            <rect x="60.5782%" y="101" width="0.2841%" height="15" fill="rgb(239,221,27)"/>
             <text x="60.8282%" y="111.50"></text>
         </g>
         <g>
+            <title>u8::CopyToLowered (300 samples, 0.05%)</title>
+            <rect x="60.8623%" y="117" width="0.0501%" height="15" fill="rgb(222,198,25)"/>
+            <text x="61.1123%" y="127.50"></text>
+        </g>
+        <g>
             <title>tree_buf::internal::types::integer::Simple16Compressor::Simple16_fast_size_for (15,100 samples, 2.52%)</title>
-            <rect x="60.9291%" y="101" width="2.5234%" height="15" fill="rgb(230,138,44)"/>
+            <rect x="60.9291%" y="101" width="2.5234%" height="15" fill="rgb(211,99,13)"/>
             <text x="61.1791%" y="111.50">tr..</text>
         </g>
         <g>
             <title>Needless_copy_to_u32 (14,700 samples, 2.46%)</title>
-            <rect x="60.9960%" y="85" width="2.4566%" height="15" fill="rgb(235,182,43)"/>
+            <rect x="60.9960%" y="85" width="2.4566%" height="15" fill="rgb(232,111,31)"/>
             <text x="61.2460%" y="95.50">Ne..</text>
         </g>
         <g>
             <title>u8::master_fast_size_for (15,300 samples, 2.56%)</title>
-            <rect x="60.9124%" y="117" width="2.5568%" height="15" fill="rgb(242,16,51)"/>
+            <rect x="60.9124%" y="117" width="2.5568%" height="15" fill="rgb(245,82,37)"/>
             <text x="61.1624%" y="127.50">u8..</text>
         </g>
         <g>
             <title>&amp;[u8]::RLE_get_runs (2,600 samples, 0.43%)</title>
-            <rect x="63.4693%" y="117" width="0.4345%" height="15" fill="rgb(248,9,4)"/>
+            <rect x="63.4693%" y="117" width="0.4345%" height="15" fill="rgb(227,149,46)"/>
             <text x="63.7193%" y="127.50"></text>
         </g>
         <g>
             <title>tree_buf::internal::encodings::rle::RLE&lt;(tree_buf::internal::types::integer::Simple16Compressor,_tree_buf::internal::types::integer::BytesCompressor)&gt;::fast_size_for (20,400 samples, 3.41%)</title>
-            <rect x="60.5281%" y="133" width="3.4091%" height="15" fill="rgb(210,31,22)"/>
+            <rect x="60.5281%" y="133" width="3.4091%" height="15" fill="rgb(218,36,50)"/>
             <text x="60.7781%" y="143.50">tre..</text>
         </g>
         <g>
             <title>Needless_copy_to_u32 (1,200 samples, 0.20%)</title>
-            <rect x="64.1377%" y="117" width="0.2005%" height="15" fill="rgb(239,54,39)"/>
+            <rect x="64.1377%" y="117" width="0.2005%" height="15" fill="rgb(226,80,48)"/>
             <text x="64.3877%" y="127.50"></text>
         </g>
         <g>
             <title>Samples (23,100 samples, 3.86%)</title>
-            <rect x="60.4947%" y="149" width="3.8603%" height="15" fill="rgb(230,99,41)"/>
+            <rect x="60.4947%" y="149" width="3.8603%" height="15" fill="rgb(238,224,15)"/>
             <text x="60.7447%" y="159.50">Samp..</text>
         </g>
         <g>
             <title>tree_buf::internal::types::integer::Simple16Compressor::Simple16_fast_size_for (2,500 samples, 0.42%)</title>
-            <rect x="63.9372%" y="133" width="0.4178%" height="15" fill="rgb(253,106,12)"/>
+            <rect x="63.9372%" y="133" width="0.4178%" height="15" fill="rgb(241,136,10)"/>
             <text x="64.1872%" y="143.50"></text>
         </g>
         <g>
             <title>u8::master_compress (44,400 samples, 7.42%)</title>
-            <rect x="56.9519%" y="165" width="7.4198%" height="15" fill="rgb(213,46,41)"/>
+            <rect x="56.9519%" y="165" width="7.4198%" height="15" fill="rgb(208,32,45)"/>
             <text x="57.2019%" y="175.50">u8::master..</text>
         </g>
         <g>
             <title>u8::CopyToLowered (3,200 samples, 0.53%)</title>
-            <rect x="64.3717%" y="165" width="0.5348%" height="15" fill="rgb(215,133,35)"/>
+            <rect x="64.3717%" y="165" width="0.5348%" height="15" fill="rgb(207,135,9)"/>
             <text x="64.6217%" y="175.50"></text>
         </g>
         <g>
             <title>alloc::vec::Vec&lt;u64&gt;::Integer_encode_all (57,600 samples, 9.63%)</title>
-            <rect x="55.2975%" y="181" width="9.6257%" height="15" fill="rgb(213,28,5)"/>
+            <rect x="55.2975%" y="181" width="9.6257%" height="15" fill="rgb(206,86,44)"/>
             <text x="55.5475%" y="191.50">alloc::vec::Ve..</text>
         </g>
         <g>
             <title>tree_buf::internal::types::array::VecArrayEncoder&lt;graphql::schemas::treebuf::BodyShapeTreeBufEncoderArray&gt;::Array_flush (58,400 samples, 9.76%)</title>
-            <rect x="55.2306%" y="197" width="9.7594%" height="15" fill="rgb(215,77,49)"/>
+            <rect x="55.2306%" y="197" width="9.7594%" height="15" fill="rgb(245,177,15)"/>
             <text x="55.4806%" y="207.50">tree_buf::inte..</text>
         </g>
         <g>
             <title>tree_buf::internal::types::integer::PrefixVarIntCompressor::PrefixVarInt_compress (9,800 samples, 1.64%)</title>
-            <rect x="65.0902%" y="149" width="1.6377%" height="15" fill="rgb(248,100,22)"/>
+            <rect x="65.0902%" y="149" width="1.6377%" height="15" fill="rgb(206,64,50)"/>
             <text x="65.3402%" y="159.50"></text>
         </g>
         <g>
             <title>Final (10,000 samples, 1.67%)</title>
-            <rect x="65.0735%" y="165" width="1.6711%" height="15" fill="rgb(208,67,9)"/>
+            <rect x="65.0735%" y="165" width="1.6711%" height="15" fill="rgb(234,36,40)"/>
             <text x="65.3235%" y="175.50"></text>
         </g>
         <g>
+            <title>tree_buf::internal::encodings::rle::RLE&lt;(tree_buf::internal::types::integer::Simple16Compressor,_tree_buf::internal::types::integer::BytesCompressor)&gt;::fast_size_for (200 samples, 0.03%)</title>
+            <rect x="66.8115%" y="117" width="0.0334%" height="15" fill="rgb(213,64,8)"/>
+            <text x="67.0615%" y="127.50"></text>
+        </g>
+        <g>
             <title>tree_buf::internal::types::integer::Simple16Compressor::Simple16_fast_size_for (2,000 samples, 0.33%)</title>
-            <rect x="66.8449%" y="117" width="0.3342%" height="15" fill="rgb(219,133,21)"/>
+            <rect x="66.8449%" y="117" width="0.3342%" height="15" fill="rgb(210,75,36)"/>
             <text x="67.0949%" y="127.50"></text>
         </g>
         <g>
             <title>Needless_copy_to_u32 (1,100 samples, 0.18%)</title>
-            <rect x="66.9953%" y="101" width="0.1838%" height="15" fill="rgb(246,46,29)"/>
+            <rect x="66.9953%" y="101" width="0.1838%" height="15" fill="rgb(229,88,21)"/>
             <text x="67.2453%" y="111.50"></text>
         </g>
         <g>
             <title>u8::master_fast_size_for (2,300 samples, 0.38%)</title>
-            <rect x="66.8115%" y="133" width="0.3844%" height="15" fill="rgb(246,185,52)"/>
+            <rect x="66.8115%" y="133" width="0.3844%" height="15" fill="rgb(252,204,47)"/>
             <text x="67.0615%" y="143.50"></text>
         </g>
         <g>
             <title>u8::CopyToLowered (600 samples, 0.10%)</title>
-            <rect x="67.1959%" y="133" width="0.1003%" height="15" fill="rgb(252,136,11)"/>
+            <rect x="67.1959%" y="133" width="0.1003%" height="15" fill="rgb(208,77,27)"/>
             <text x="67.4459%" y="143.50"></text>
         </g>
         <g>
+            <title>tree_buf::internal::types::integer::PrefixVarIntCompressor::fast_size_for (400 samples, 0.07%)</title>
+            <rect x="67.2961%" y="117" width="0.0668%" height="15" fill="rgb(221,76,26)"/>
+            <text x="67.5461%" y="127.50"></text>
+        </g>
+        <g>
             <title>tree_buf::internal::types::integer::Simple16Compressor::Simple16_fast_size_for (1,200 samples, 0.20%)</title>
-            <rect x="67.3630%" y="117" width="0.2005%" height="15" fill="rgb(219,138,53)"/>
+            <rect x="67.3630%" y="117" width="0.2005%" height="15" fill="rgb(225,139,18)"/>
             <text x="67.6130%" y="127.50"></text>
         </g>
         <g>
             <title>Needless_copy_to_u32 (1,100 samples, 0.18%)</title>
-            <rect x="67.3797%" y="101" width="0.1838%" height="15" fill="rgb(211,51,23)"/>
+            <rect x="67.3797%" y="101" width="0.1838%" height="15" fill="rgb(230,137,11)"/>
             <text x="67.6297%" y="111.50"></text>
         </g>
         <g>
             <title>u32::master_fast_size_for (1,700 samples, 0.28%)</title>
-            <rect x="67.2961%" y="133" width="0.2841%" height="15" fill="rgb(247,221,28)"/>
+            <rect x="67.2961%" y="133" width="0.2841%" height="15" fill="rgb(212,28,1)"/>
             <text x="67.5461%" y="143.50"></text>
         </g>
         <g>
             <title>&amp;[u32]::RLE_get_runs (2,800 samples, 0.47%)</title>
-            <rect x="67.5802%" y="133" width="0.4679%" height="15" fill="rgb(251,222,45)"/>
+            <rect x="67.5802%" y="133" width="0.4679%" height="15" fill="rgb(248,164,17)"/>
             <text x="67.8302%" y="143.50"></text>
         </g>
         <g>
             <title>tree_buf::internal::encodings::rle::RLE&lt;(tree_buf::internal::types::integer::Simple16Compressor,_tree_buf::internal::types::integer::DeltaZigZagCompressor,_tree_buf::internal::types::integer::PrefixVarIntCompressor)&gt;::fast_size_for (7,900 samples, 1.32%)</title>
-            <rect x="66.7614%" y="149" width="1.3202%" height="15" fill="rgb(217,162,53)"/>
+            <rect x="66.7614%" y="149" width="1.3202%" height="15" fill="rgb(222,171,42)"/>
             <text x="67.0114%" y="159.50"></text>
         </g>
         <g>
             <title>tree_buf::internal::types::integer::PrefixVarIntCompressor::fast_size_for (2,700 samples, 0.45%)</title>
-            <rect x="68.0816%" y="149" width="0.4512%" height="15" fill="rgb(229,93,14)"/>
+            <rect x="68.0816%" y="149" width="0.4512%" height="15" fill="rgb(243,84,45)"/>
             <text x="68.3316%" y="159.50"></text>
         </g>
         <g>
             <title>tree_buf::internal::types::integer::Simple16Compressor::Simple16_fast_size_for (1,900 samples, 0.32%)</title>
-            <rect x="68.5328%" y="149" width="0.3175%" height="15" fill="rgb(209,67,49)"/>
+            <rect x="68.5328%" y="149" width="0.3175%" height="15" fill="rgb(252,49,23)"/>
             <text x="68.7828%" y="159.50"></text>
         </g>
         <g>
             <title>Needless_copy_to_u32 (1,700 samples, 0.28%)</title>
-            <rect x="68.5662%" y="133" width="0.2841%" height="15" fill="rgb(213,87,29)"/>
+            <rect x="68.5662%" y="133" width="0.2841%" height="15" fill="rgb(215,19,7)"/>
             <text x="68.8162%" y="143.50"></text>
         </g>
         <g>
             <title>Samples (12,700 samples, 2.12%)</title>
-            <rect x="66.7447%" y="165" width="2.1223%" height="15" fill="rgb(205,151,52)"/>
+            <rect x="66.7447%" y="165" width="2.1223%" height="15" fill="rgb(238,81,41)"/>
             <text x="66.9947%" y="175.50">S..</text>
         </g>
         <g>
             <title>u32::master_compress (22,900 samples, 3.83%)</title>
-            <rect x="65.0568%" y="181" width="3.8269%" height="15" fill="rgb(253,215,39)"/>
+            <rect x="65.0568%" y="181" width="3.8269%" height="15" fill="rgb(210,199,37)"/>
             <text x="65.3068%" y="191.50">u32:..</text>
         </g>
         <g>
             <title>u32::CopyToLowered (25,900 samples, 4.33%)</title>
-            <rect x="68.8837%" y="181" width="4.3282%" height="15" fill="rgb(221,220,41)"/>
+            <rect x="68.8837%" y="181" width="4.3282%" height="15" fill="rgb(244,192,49)"/>
             <text x="69.1337%" y="191.50">u32::..</text>
         </g>
         <g>
             <title>alloc::vec::Vec&lt;u64&gt;::Integer_encode_all (183,900 samples, 30.73%)</title>
-            <rect x="64.9900%" y="197" width="30.7320%" height="15" fill="rgb(218,133,21)"/>
+            <rect x="64.9900%" y="197" width="30.7320%" height="15" fill="rgb(226,211,11)"/>
             <text x="65.2400%" y="207.50">alloc::vec::Vec&lt;u64&gt;::Integer_encode_all</text>
         </g>
         <g>
             <title>alloc::vec::Vec&lt;graphql::schemas::treebuf::Order&gt;::Array_encode_root (597,800 samples, 99.90%)</title>
-            <rect x="0.0501%" y="213" width="99.8997%" height="15" fill="rgb(221,193,43)"/>
+            <rect x="0.0501%" y="213" width="99.8997%" height="15" fill="rgb(236,162,54)"/>
             <text x="0.3001%" y="223.50">alloc::vec::Vec&lt;graphql::schemas::treebuf::Order&gt;::Array_encode_root</text>
         </g>
         <g>
             <title>all (598,400 samples, 100%)</title>
-            <rect x="0.0000%" y="261" width="100.0000%" height="15" fill="rgb(240,128,52)"/>
+            <rect x="0.0000%" y="261" width="100.0000%" height="15" fill="rgb(220,229,9)"/>
             <text x="0.2500%" y="271.50"></text>
         </g>
         <g>
             <title>GraphQL (598,400 samples, 100.00%)</title>
-            <rect x="0.0000%" y="245" width="100.0000%" height="15" fill="rgb(253,114,12)"/>
+            <rect x="0.0000%" y="245" width="100.0000%" height="15" fill="rgb(250,87,22)"/>
             <text x="0.2500%" y="255.50">GraphQL</text>
         </g>
         <g>
             <title>graphql::schemas::treebuf::Response::encode_with_options (598,300 samples, 99.98%)</title>
-            <rect x="0.0167%" y="229" width="99.9833%" height="15" fill="rgb(215,223,47)"/>
+            <rect x="0.0167%" y="229" width="99.9833%" height="15" fill="rgb(239,43,17)"/>
             <text x="0.2667%" y="239.50">graphql::schemas::treebuf::Response::encode_with_options</text>
         </g>
     </svg>
