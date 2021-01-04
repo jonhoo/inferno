@@ -212,6 +212,7 @@ struct Opt {
 }
 
 impl<'a> Opt {
+    #[allow(clippy::field_reassign_with_default)]
     fn into_parts(self) -> (Vec<PathBuf>, Option<PathBuf>, Options<'a>) {
         let mut options = Options::default();
         options.title = self.title.clone();

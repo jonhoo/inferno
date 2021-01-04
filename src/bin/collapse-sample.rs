@@ -43,6 +43,7 @@ struct Opt {
 }
 
 impl Opt {
+    #[allow(clippy::field_reassign_with_default)]
     fn into_parts(self) -> (Option<PathBuf>, Option<PathBuf>, Options) {
         let mut options = Options::default();
         options.no_modules = self.no_modules;

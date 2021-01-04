@@ -22,17 +22,13 @@ pub(super) mod java {
             }
         }
 
-        let java_prefix = if name.starts_with('L') {
-            &name[1..]
-        } else {
-            name
-        };
+        let java_prefix = name.strip_prefix('L').unwrap_or(name);
 
         if name.contains("::") || name.starts_with("-[") || name.starts_with("+[") {
             // C++ or Objective C
             BasicPalette::Yellow
-        } else if java_prefix.contains("/")
-            || (java_prefix.contains(".") && !java_prefix.starts_with("["))
+        } else if java_prefix.contains('/')
+            || (java_prefix.contains('.') && !java_prefix.starts_with('['))
             || match java_prefix.chars().next() {
                 Some(c) => c.is_ascii_uppercase(),
                 _ => false,

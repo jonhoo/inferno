@@ -510,7 +510,7 @@ pub(crate) fn fix_partially_demangled_rust_symbol(symbol: &str) -> Cow<str> {
                 demangled.push_str("::");
                 rest = &rest[2..];
             } else {
-                demangled.push_str(".");
+                demangled.push('.');
                 rest = &rest[1..];
             }
         } else if rest.starts_with('$') {
