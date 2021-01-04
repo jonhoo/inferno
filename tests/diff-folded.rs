@@ -205,4 +205,19 @@ fn diff_folded_cli() {
         .expect("failed to execute process");
     let expected = BufReader::new(File::open(expected_file).unwrap());
     compare_results(Cursor::new(output.stdout), expected, expected_file);
+
+    // Test with output file
+    let outfile = std::env::temp_dir().join(format!("test-outfile-{}.txt", rand::random::<u64>()));
+    assert_cmd::Command::cargo_bin("inferno-diff-folded")
+        .unwrap()
+        .arg("--strip-hex")
+        .arg("--outfile")
+        .arg(&outfile)
+        .arg(infile1)
+        .arg(infile2)
+        .ok()
+        .expect("failed to execute process");
+    let actual = BufReader::new(File::open(&outfile).unwrap());
+    let expected = BufReader::new(File::open(expected_file).unwrap());
+    compare_results(actual, expected, expected_file);
 }

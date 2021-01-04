@@ -1,3 +1,4 @@
+use std::fs::File;
 use std::io;
 use std::path::PathBuf;
 
@@ -46,6 +47,10 @@ struct Opt {
     #[structopt(short = "v", long = "verbose", parse(from_occurrences))]
     verbose: usize,
 
+    /// Output file. STDOUT is used if not set.
+    #[structopt(long = "outfile", parse(from_os_str))]
+    outfile: Option<PathBuf>,
+
     // ************ //
     // *** ARGS *** //
     // ************ //
@@ -59,10 +64,11 @@ struct Opt {
 }
 
 impl Opt {
-    fn into_parts(self) -> (PathBuf, PathBuf, Options) {
+    fn into_parts(self) -> (PathBuf, PathBuf, Option<PathBuf>, Options) {
         (
             self.path1,
             self.path2,
+            self.outfile,
             Options {
                 normalize: self.normalize,
                 strip_hex: self.strip_hex,
@@ -86,6 +92,12 @@ fn main() -> io::Result<()> {
         .init();
     }
 
-    let (folded1, folded2, options) = opt.into_parts();
-    differential::from_files(options, folded1, folded2, io::stdout().lock())
+    let (folded1, folded2, outfile, options) = opt.into_parts();
+
+    if let Some(outfile) = outfile {
+        let outfile = io::BufWriter::new(File::create(&outfile)?);
+        differential::from_files(options, folded1, folded2, outfile)
+    } else {
+        differential::from_files(options, folded1, folded2, io::stdout().lock())
+    }
 }

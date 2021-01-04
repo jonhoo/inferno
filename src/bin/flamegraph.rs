@@ -1,3 +1,4 @@
+use std::fs::File;
 use std::io;
 use std::path::{Path, PathBuf};
 
@@ -190,6 +191,10 @@ struct Opt {
     #[structopt(long = "width", value_name = "UINT")]
     width: Option<usize>,
 
+    /// Output file. STDOUT is used if not set.
+    #[structopt(long = "outfile", parse(from_os_str))]
+    outfile: Option<PathBuf>,
+
     // ************ //
     // *** ARGS *** //
     // ************ //
@@ -207,7 +212,7 @@ struct Opt {
 }
 
 impl<'a> Opt {
-    fn into_parts(self) -> (Vec<PathBuf>, Options<'a>) {
+    fn into_parts(self) -> (Vec<PathBuf>, Option<PathBuf>, Options<'a>) {
         let mut options = Options::default();
         options.title = self.title.clone();
         options.colors = self.colors;
@@ -255,7 +260,7 @@ impl<'a> Opt {
         options.negate_differentials = self.negate;
         options.factor = self.factor;
         options.search_color = self.search_color;
-        (self.infiles, options)
+        (self.infiles, self.outfile, options)
     }
 
     #[cfg(feature = "nameattr")]
@@ -296,10 +301,17 @@ fn main() -> quick_xml::Result<()> {
         Err(e) => panic!("Error reading {}: {:?}", PALETTE_MAP_FILE, e),
     };
 
-    let (infiles, mut options) = opt.into_parts();
+    let (infiles, outfile, mut options) = opt.into_parts();
+
     options.palette_map = palette_map.as_mut();
 
-    flamegraph::from_files(&mut options, &infiles, io::stdout().lock())?;
+    if let Some(outfile) = outfile {
+        let outfile = io::BufWriter::new(File::create(&outfile).map_err(quick_xml::Error::Io)?);
+        flamegraph::from_files(&mut options, &infiles, outfile)?;
+    } else {
+        flamegraph::from_files(&mut options, &infiles, io::stdout().lock())?;
+    }
+
     save_consistent_palette_if_needed(&palette_map, PALETTE_MAP_FILE).map_err(quick_xml::Error::Io)
 }
 
@@ -342,7 +354,7 @@ mod tests {
     fn default_options() {
         let args = vec!["inferno-flamegraph", "test_infile"];
         let opt = Opt::from_iter_safe(args).unwrap();
-        let (_infiles, options) = opt.into_parts();
+        let (_infiles, _outfile, options) = opt.into_parts();
         assert_eq!(options, Options::default());
     }
 
@@ -392,7 +404,7 @@ mod tests {
             "test_infile2",
         ];
         let opt = Opt::from_iter_safe(args).unwrap();
-        let (infiles, options) = opt.into_parts();
+        let (infiles, _outfile, options) = opt.into_parts();
         let mut expected_options = Options::default();
         expected_options.colors = Palette::from_str("purple").unwrap();
         expected_options.search_color = color::SearchColor::from_str("#203040").unwrap();

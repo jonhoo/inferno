@@ -856,6 +856,23 @@ fn flamegraph_cli() {
         .expect("failed to execute process");
     let expected = BufReader::new(File::open(expected_file).unwrap());
     compare_results(Cursor::new(output.stdout), expected, expected_file);
+
+    // Test with output file
+    let outfile = std::env::temp_dir().join(format!("test-outfile-{}.svg", rand::random::<u64>()));
+    assert_cmd::Command::cargo_bin("inferno-flamegraph")
+        .unwrap()
+        .arg("--pretty-xml")
+        .arg("--no-javascript")
+        .arg("--hash")
+        .arg("--outfile")
+        .arg(&outfile)
+        .arg(input_file)
+        .ok()
+        .expect("failed to execute process");
+    let actual = BufReader::new(File::open(&outfile).unwrap());
+    let expected = BufReader::new(File::open(expected_file).unwrap());
+    compare_results(actual, expected, expected_file);
+    fs::remove_file(outfile).unwrap();
 }
 
 #[test]

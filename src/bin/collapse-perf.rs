@@ -74,6 +74,10 @@ struct Opt {
     )]
     nthreads: usize,
 
+    /// Output file. STDOUT is used if not set.
+    #[structopt(long = "outfile", parse(from_os_str))]
+    outfile: Option<PathBuf>,
+
     // ************ //
     // *** ARGS *** //
     // ************ //
@@ -83,7 +87,7 @@ struct Opt {
 }
 
 impl Opt {
-    fn into_parts(self) -> (Option<PathBuf>, Options) {
+    fn into_parts(self) -> (Option<PathBuf>, Option<PathBuf>, Options) {
         let mut options = Options::default();
         options.include_pid = self.pid;
         options.include_tid = self.tid;
@@ -92,7 +96,7 @@ impl Opt {
         options.annotate_kernel = self.kernel || self.all;
         options.event_filter = self.event_filter;
         options.nthreads = self.nthreads;
-        (self.infile, options)
+        (self.infile, self.outfile, options)
     }
 }
 
@@ -111,6 +115,6 @@ fn main() -> io::Result<()> {
         .init();
     }
 
-    let (infile, options) = opt.into_parts();
-    Folder::from(options).collapse_file(infile.as_ref(), io::stdout().lock())
+    let (infile, outfile, options) = opt.into_parts();
+    Folder::from(options).collapse_infile_to_outfile(infile.as_ref(), outfile.as_ref())
 }

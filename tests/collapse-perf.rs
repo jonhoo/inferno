@@ -316,4 +316,18 @@ fn collapse_perf_cli() {
     let output = child.wait_with_output().expect("Failed to read stdout");
     let expected = BufReader::new(File::open(expected_file).unwrap());
     common::compare_results(Cursor::new(output.stdout), expected, expected_file, true);
+
+    // Test with output file
+    let outfile = std::env::temp_dir().join(format!("test-outfile-{}.txt", rand::random::<u64>()));
+    assert_cmd::Command::cargo_bin("inferno-collapse-perf")
+        .unwrap()
+        .arg("--all")
+        .arg("--outfile")
+        .arg(&outfile)
+        .arg(input_file)
+        .ok()
+        .expect("failed to execute process");
+    let actual = BufReader::new(File::open(&outfile).unwrap());
+    let expected = BufReader::new(File::open(expected_file).unwrap());
+    common::compare_results(actual, expected, expected_file, true);
 }
