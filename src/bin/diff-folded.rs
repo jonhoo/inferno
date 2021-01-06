@@ -91,6 +91,11 @@ fn main() -> io::Result<()> {
     if atty::is(atty::Stream::Stdout) {
         differential::from_files(options, folded1, folded2, io::stdout().lock())
     } else {
-        differential::from_files(options, folded1, folded2, io::BufWriter::new(io::stdout().lock()))
+        differential::from_files(
+            options,
+            folded1,
+            folded2,
+            io::BufWriter::new(io::stdout().lock()),
+        )
     }
 }

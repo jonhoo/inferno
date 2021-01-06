@@ -303,7 +303,11 @@ fn main() -> quick_xml::Result<()> {
     if atty::is(atty::Stream::Stdout) {
         flamegraph::from_files(&mut options, &infiles, io::stdout().lock())?;
     } else {
-        flamegraph::from_files(&mut options, &infiles, io::BufWriter::new(io::stdout().lock()))?;
+        flamegraph::from_files(
+            &mut options,
+            &infiles,
+            io::BufWriter::new(io::stdout().lock()),
+        )?;
     }
 
     save_consistent_palette_if_needed(&palette_map, PALETTE_MAP_FILE).map_err(quick_xml::Error::Io)
