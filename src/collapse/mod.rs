@@ -87,6 +87,19 @@ pub trait Collapse {
         }
     }
 
+    /// Collapses the contents of the provided file (or of STDIN if `infile` is `None`) and
+    /// writes folded stack lines to STDOUT.
+    fn collapse_file_to_stdout<P>(&mut self, infile: Option<P>) -> io::Result<()>
+    where
+        P: AsRef<Path>,
+    {
+        if atty::is(atty::Stream::Stdout) {
+            self.collapse_file(infile, io::stdout().lock())
+        } else {
+            self.collapse_file(infile, io::BufWriter::new(io::stdout().lock()))
+        }
+    }
+
     /// Returns whether this implementation is appropriate for the given input.
     ///
     /// - `None` means "not sure -- need more input"

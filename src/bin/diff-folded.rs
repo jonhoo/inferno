@@ -87,5 +87,10 @@ fn main() -> io::Result<()> {
     }
 
     let (folded1, folded2, options) = opt.into_parts();
-    differential::from_files(options, folded1, folded2, io::stdout().lock())
+
+    if atty::is(atty::Stream::Stdout) {
+        differential::from_files(options, folded1, folded2, io::stdout().lock())
+    } else {
+        differential::from_files(options, folded1, folded2, io::BufWriter::new(io::stdout().lock()))
+    }
 }

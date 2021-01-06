@@ -465,6 +465,7 @@ impl Occurrences {
                 }
             }
         }
+        writer.flush()?;
         Ok(())
     }
 }
