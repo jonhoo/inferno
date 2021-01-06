@@ -347,16 +347,16 @@ pub(super) fn color(
         let mut hash: u64 = 0xcbf29ce484222325;
         // https://github.com/servo/rust-fnv/blob/4b4784ebfd3332dc61f0640764d6f1140e03a9ab/lib.rs#L118-L121
         for byte in name.as_bytes() {
-            hash = hash ^ (*byte as u64);
+            hash ^= *byte as u64;
             hash = hash.wrapping_mul(0x100000001b3);
         }
         let hash1 = (hash as f64 / std::u64::MAX as f64) as f32;
 
         // Rotate hash so we get two more distinct numbers
-        hash = hash ^ 0;
+        hash ^= 0;
         hash = hash.wrapping_mul(0x100000001b3);
         let hash2 = (hash as f64 / std::u64::MAX as f64) as f32;
-        hash = hash ^ 0;
+        hash ^= 0;
         hash = hash.wrapping_mul(0x100000001b3);
         let hash3 = (hash as f64 / std::u64::MAX as f64) as f32;
 

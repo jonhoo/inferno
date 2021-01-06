@@ -54,13 +54,17 @@ impl Collapse for Folder {
         W: io::Write,
     {
         let mut dtrace = {
-            let mut options = dtrace::Options::default();
-            options.nthreads = self.opt.nthreads;
+            let options = dtrace::Options {
+                nthreads: self.opt.nthreads,
+                ..Default::default()
+            };
             dtrace::Folder::from(options)
         };
         let mut perf = {
-            let mut options = perf::Options::default();
-            options.nthreads = self.opt.nthreads;
+            let options = perf::Options {
+                nthreads: self.opt.nthreads,
+                ..Default::default()
+            };
             perf::Folder::from(options)
         };
         let mut sample = sample::Folder::default();

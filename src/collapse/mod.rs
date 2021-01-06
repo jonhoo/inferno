@@ -79,9 +79,9 @@ pub trait Collapse {
                 self.collapse(reader, writer)
             }
             None => {
-                let stdio = io::stdin();
-                let stdio_guard = stdio.lock();
-                let reader = io::BufReader::with_capacity(CAPACITY_READER, stdio_guard);
+                let stdin = io::stdin();
+                let stdin_guard = stdin.lock();
+                let reader = io::BufReader::with_capacity(CAPACITY_READER, stdin_guard);
                 self.collapse(reader, writer)
             }
         }
