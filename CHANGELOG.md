@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
  - Decreased default minimum width from 0.1% to 0.01%. [#204](https://github.com/jonhoo/inferno/pull/204)
+ - Detect if STDOUT is a TTY and if it's not, use a `BufWriter` to avoid line buffering. [#206](https://github.com/jonhoo/inferno/pull/206)
 
 ### Removed
 

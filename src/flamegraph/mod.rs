@@ -693,6 +693,7 @@ where
     svg.write_event(Event::End(BytesEnd::borrowed(b"svg")))?;
     svg.write_event(Event::Eof)?;
 
+    svg.into_inner().flush()?;
     Ok(())
 }
 
