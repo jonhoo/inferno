@@ -66,21 +66,21 @@ impl Default for BackgroundColor {
 
 /// A flame graph color palette.
 ///
-/// Defaults to [`BasicPalette::Hot`].
+/// Defaults to [`MultiPalette::Annotated`].
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Palette {
     /// A plain color palette in which the color is not chosen based on function semantics.
     ///
     /// See [`BasicPalette`] for details.
     Basic(BasicPalette),
-    /// A semantic color palette in which different hues are used to signifiy semantic aspects of
+    /// A semantic color palette in which different hues are used to signify semantic aspects of
     /// different function names (kernel functions, JIT functions, etc.).
     Multi(MultiPalette),
 }
 
 impl Default for Palette {
     fn default() -> Self {
-        Palette::Basic(BasicPalette::Hot)
+        Palette::Multi(MultiPalette::Annotated)
     }
 }
 
