@@ -1,16 +1,17 @@
-use crate::flamegraph::color::BasicPalette;
+enum Annotation {
+    Kernel,
+    Inline,
+    Jit,
+}
 
-fn resolve_annotations(name: &str) -> Option<BasicPalette> {
+fn resolve_annotation(name: &str) -> Option<Annotation> {
     if name.ends_with(']') {
         if let Some(ai) = name.rfind("_[") {
             if name[ai..].len() == 4 {
                 match &name[ai + 2..ai + 3] {
-                    // kernel annotation
-                    "k" => return Some(BasicPalette::Orange),
-                    // inline annotation
-                    "i" => return Some(BasicPalette::Aqua),
-                    // jit annotation
-                    "j" => return Some(BasicPalette::Green),
+                    "k" => return Some(Annotation::Kernel),
+                    "i" => return Some(Annotation::Inline),
+                    "j" => return Some(Annotation::Jit),
                     _ => {}
                 }
             }
@@ -21,16 +22,23 @@ fn resolve_annotations(name: &str) -> Option<BasicPalette> {
 }
 
 pub(super) mod annotated {
+    use super::Annotation;
     use crate::flamegraph::color::BasicPalette;
 
     /// Handle annotations (_[j], _[i], ...; which are
     /// accurate) in a generic way.
     pub fn resolve(name: &str) -> BasicPalette {
-        super::resolve_annotations(name).unwrap_or(BasicPalette::Red)
+        match super::resolve_annotation(name) {
+            Some(Annotation::Kernel) => BasicPalette::Gray,
+            Some(Annotation::Inline) => BasicPalette::Aqua,
+            Some(Annotation::Jit) => BasicPalette::Green,
+            None => BasicPalette::Hot,
+        }
     }
 }
 
 pub(super) mod java {
+    use super::Annotation;
     use crate::flamegraph::color::BasicPalette;
 
     /// Handle both annotations (_[j], _[i], ...; which are
@@ -38,8 +46,12 @@ pub(super) mod java {
     /// best as possible. Without annotations, we get a little hacky
     /// and match on java|org|com, etc.
     pub fn resolve(name: &str) -> BasicPalette {
-        if let Some(palette) = super::resolve_annotations(name) {
-            return palette;
+        if let Some(annotation) = super::resolve_annotation(name) {
+            return match annotation {
+                Annotation::Kernel => BasicPalette::Orange,
+                Annotation::Inline => BasicPalette::Aqua,
+                Annotation::Jit => BasicPalette::Green,
+            };
         }
 
         let java_prefix = if name.starts_with('L') {
@@ -71,7 +83,7 @@ pub(super) mod perl {
     use crate::flamegraph::color::BasicPalette;
 
     pub fn resolve(name: &str) -> BasicPalette {
-        if name.ends_with("_[k]") {
+        if let Some(super::Annotation::Kernel) = super::resolve_annotation(name) {
             BasicPalette::Orange
         } else if name.contains("Perl") || name.contains(".pl") {
             BasicPalette::Green
@@ -87,11 +99,13 @@ pub(super) mod js {
     use crate::flamegraph::color::BasicPalette;
 
     pub fn resolve(name: &str) -> BasicPalette {
+        let annotation = super::resolve_annotation(name);
+
         if !name.is_empty() && name.trim().is_empty() {
             return BasicPalette::Green;
-        } else if name.ends_with("_[k]") {
+        } else if let Some(super::Annotation::Kernel) = annotation {
             return BasicPalette::Orange;
-        } else if name.ends_with("_[j]") {
+        } else if let Some(super::Annotation::Jit) = annotation {
             if name.contains('/') {
                 return BasicPalette::Green;
             } else {
