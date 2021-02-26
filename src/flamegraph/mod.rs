@@ -80,7 +80,7 @@ pub mod defaults {
         TITLE: &str = "Flame Graph",
         CHART_TITLE: &str = "Flame Chart",
         FRAME_HEIGHT: usize = 16,
-        MIN_WIDTH: f64 = 0.1,
+        MIN_WIDTH: f64 = 0.01,
         FONT_TYPE: &str = "Verdana",
         FONT_SIZE: usize = 12,
         FONT_WIDTH: f64 = 0.59,
@@ -693,6 +693,7 @@ where
     svg.write_event(Event::End(BytesEnd::borrowed(b"svg")))?;
     svg.write_event(Event::Eof)?;
 
+    svg.into_inner().flush()?;
     Ok(())
 }
 

@@ -11,6 +11,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [0.10.3] - 2021-01-08
+### Added
+ - Support jit annotations in collapse-perf for runtimes using the jitdump format. [#202](https://github.com/jonhoo/inferno/pull/202)
+
+### Changed
+ - Decreased default minimum width from 0.1% to 0.01%. [#204](https://github.com/jonhoo/inferno/pull/204)
+ - Detect if STDOUT is a TTY and if it's not, use a `BufWriter` to avoid line buffering. [#206](https://github.com/jonhoo/inferno/pull/206)
+
 ## [0.10.2] - 2020-11-30
 ### Changed
  - Support for invalid utf8 data in collapse. [#196](https://github.com/jonhoo/inferno/pull/196)
@@ -136,7 +144,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Moved to `IndexMap` and FNV hashing ([#127](https://github.com/jonhoo/inferno/pull/127))
 - Moved CI to Azure DevOps Pipelines
 
-[Unreleased]: https://github.com/jonhoo/inferno/compare/v0.10.2...HEAD
+[Unreleased]: https://github.com/jonhoo/inferno/compare/v0.10.3...HEAD
+[0.10.3]: https://github.com/jonhoo/inferno/compare/v0.10.2...v0.10.3
 [0.10.2]: https://github.com/jonhoo/inferno/compare/v0.10.1...v0.10.2
 [0.10.1]: https://github.com/jonhoo/inferno/compare/v0.10.0...v0.10.1
 [0.10.0]: https://github.com/jonhoo/inferno/compare/v0.9.9...v0.10.0

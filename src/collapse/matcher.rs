@@ -9,13 +9,9 @@
 #[inline]
 pub fn is_vmlinux(s: &str) -> bool {
     if let Some(vm) = s.rfind("vmlinux") {
-        s[vm..].chars().all(|c| {
-            c.is_ascii_alphanumeric()
-                || match c {
-                    '-' | '.' | '_' => true,
-                    _ => false,
-                }
-        })
+        s[vm..]
+            .chars()
+            .all(|c| c.is_ascii_alphanumeric() || matches!(c, '-' | '.' | '_'))
     } else {
         false
     }

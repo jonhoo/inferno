@@ -79,11 +79,24 @@ pub trait Collapse {
                 self.collapse(reader, writer)
             }
             None => {
-                let stdio = io::stdin();
-                let stdio_guard = stdio.lock();
-                let reader = io::BufReader::with_capacity(CAPACITY_READER, stdio_guard);
+                let stdin = io::stdin();
+                let stdin_guard = stdin.lock();
+                let reader = io::BufReader::with_capacity(CAPACITY_READER, stdin_guard);
                 self.collapse(reader, writer)
             }
+        }
+    }
+
+    /// Collapses the contents of the provided file (or of STDIN if `infile` is `None`) and
+    /// writes folded stack lines to STDOUT.
+    fn collapse_file_to_stdout<P>(&mut self, infile: Option<P>) -> io::Result<()>
+    where
+        P: AsRef<Path>,
+    {
+        if atty::is(atty::Stream::Stdout) {
+            self.collapse_file(infile, io::stdout().lock())
+        } else {
+            self.collapse_file(infile, io::BufWriter::new(io::stdout().lock()))
         }
     }
 

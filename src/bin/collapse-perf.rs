@@ -112,5 +112,5 @@ fn main() -> io::Result<()> {
     }
 
     let (infile, options) = opt.into_parts();
-    Folder::from(options).collapse_file(infile.as_ref(), io::stdout().lock())
+    Folder::from(options).collapse_file_to_stdout(infile.as_ref())
 }

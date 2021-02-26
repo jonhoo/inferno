@@ -409,12 +409,12 @@ impl Folder {
             // XXX: re-use existing memory in pname if possible
             self.pname = comm.replace(' ', "_");
             if self.opt.include_tid {
-                self.pname.push_str("-");
+                self.pname.push('-');
                 self.pname.push_str(pid);
-                self.pname.push_str("/");
+                self.pname.push('/');
                 self.pname.push_str(tid);
             } else if self.opt.include_pid {
-                self.pname.push_str("-");
+                self.pname.push('-');
                 self.pname.push_str(pid);
             }
 
@@ -519,8 +519,8 @@ impl Folder {
                 } else if self.opt.annotate_kernel && is_kernel(module) {
                     func.push_str("_[k]"); // kernel
                 } else if self.opt.annotate_jit
-                    && module.starts_with("/tmp/perf-")
-                    && module.ends_with(".map")
+                    && ((module.starts_with("/tmp/perf-") && module.ends_with(".map"))
+                        || (module.contains("/jitted-") && module.ends_with(".so")))
                 {
                     func.push_str("_[j]"); // jitted
                 }
@@ -548,7 +548,7 @@ impl Folder {
             stack_str.push_str(&self.pname);
             // add the other stack entries (if any)
             for e in self.stack.drain(..) {
-                stack_str.push_str(";");
+                stack_str.push(';');
                 stack_str.push_str(&e);
             }
 
@@ -587,15 +587,15 @@ fn with_module_fallback(module: &str, func: &str, pc: &str, include_addrs: bool)
     let mut res = String::with_capacity(func.len() + 12);
 
     if include_addrs {
-        res.push_str("[");
+        res.push('[');
         res.push_str(func);
         res.push_str(" <");
         res.push_str(pc);
         res.push_str(">]");
     } else {
-        res.push_str("[");
+        res.push('[');
         res.push_str(func);
-        res.push_str("]");
+        res.push(']');
     }
 
     res

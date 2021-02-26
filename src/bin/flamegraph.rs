@@ -139,7 +139,7 @@ struct Opt {
     )]
     height: usize,
 
-    /// Omit functions smaller than <FLOAT> pixels
+    /// Omit functions smaller than <FLOAT> percent
     #[structopt(
         long = "minwidth",
         default_value = &defaults::str::MIN_WIDTH,
@@ -297,9 +297,19 @@ fn main() -> quick_xml::Result<()> {
     };
 
     let (infiles, mut options) = opt.into_parts();
+
     options.palette_map = palette_map.as_mut();
 
-    flamegraph::from_files(&mut options, &infiles, io::stdout().lock())?;
+    if atty::is(atty::Stream::Stdout) {
+        flamegraph::from_files(&mut options, &infiles, io::stdout().lock())?;
+    } else {
+        flamegraph::from_files(
+            &mut options,
+            &infiles,
+            io::BufWriter::new(io::stdout().lock()),
+        )?;
+    }
+
     save_consistent_palette_if_needed(&palette_map, PALETTE_MAP_FILE).map_err(quick_xml::Error::Io)
 }
 
