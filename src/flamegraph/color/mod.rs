@@ -332,7 +332,11 @@ fn rgb_components_for_palette(palette: Palette, name: &str, v1: f32, v2: f32, v3
         }
         BasicPalette::Aqua => color!(t!(50, 60_f32, v1), t!(165, 55_f32, v1), t!(165, 55_f32, v1)),
         BasicPalette::Orange => color!(t!(190, 65_f32, v1), t!(90, 65_f32, v1), t!(0, 0_f32, v1)),
-        BasicPalette::Gray => color!(t!(190, 40_f32, v1), t!(190, 40_f32, v1), t!(190, 40_f32, v1)),
+        BasicPalette::Gray => color!(
+            t!(190, 40_f32, v1),
+            t!(190, 40_f32, v1),
+            t!(190, 40_f32, v1)
+        ),
     }
 }
 
