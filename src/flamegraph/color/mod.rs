@@ -66,21 +66,21 @@ impl Default for BackgroundColor {
 
 /// A flame graph color palette.
 ///
-/// Defaults to [`BasicPalette::Hot`].
+/// Defaults to [`MultiPalette::Annotated`].
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Palette {
     /// A plain color palette in which the color is not chosen based on function semantics.
     ///
     /// See [`BasicPalette`] for details.
     Basic(BasicPalette),
-    /// A semantic color palette in which different hues are used to signifiy semantic aspects of
+    /// A semantic color palette in which different hues are used to signify semantic aspects of
     /// different function names (kernel functions, JIT functions, etc.).
     Multi(MultiPalette),
 }
 
 impl Default for Palette {
     fn default() -> Self {
-        Palette::Basic(BasicPalette::Hot)
+        Palette::Multi(MultiPalette::Annotated)
     }
 }
 
@@ -112,12 +112,16 @@ pub enum BasicPalette {
     Purple,
     /// A palette in which colors are chosen from a orange spectrum.
     Orange,
+    /// A palette in which colors are chosen from a gray spectrum.
+    Gray,
 }
 
 /// A semantic color palette in which different hues are used to signifiy semantic aspects of
 /// different function names (kernel functions, JIT functions, etc.).
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum MultiPalette {
+    /// Use function annotations with no specific language heuristics to color frames.
+    Annotated,
     /// Use Java semantics to color frames.
     Java,
     /// Use JavaScript semantics to color frames.
@@ -193,6 +197,7 @@ impl FromStr for Palette {
             "mem" => Ok(Palette::Basic(BasicPalette::Mem)),
             "io" => Ok(Palette::Basic(BasicPalette::Io)),
             "wakeup" => Ok(Palette::Multi(MultiPalette::Wakeup)),
+            "annotated" => Ok(Palette::Multi(MultiPalette::Annotated)),
             "java" => Ok(Palette::Multi(MultiPalette::Java)),
             "js" => Ok(Palette::Multi(MultiPalette::Js)),
             "perl" => Ok(Palette::Multi(MultiPalette::Perl)),
@@ -203,6 +208,7 @@ impl FromStr for Palette {
             "yellow" => Ok(Palette::Basic(BasicPalette::Yellow)),
             "purple" => Ok(Palette::Basic(BasicPalette::Purple)),
             "orange" => Ok(Palette::Basic(BasicPalette::Orange)),
+            "gray" | "grey" => Ok(Palette::Basic(BasicPalette::Gray)),
             unknown => Err(format!("unknown color palette: {}", unknown)),
         }
     }
@@ -304,6 +310,7 @@ macro_rules! color {
 fn rgb_components_for_palette(palette: Palette, name: &str, v1: f32, v2: f32, v3: f32) -> Color {
     let basic_palette = match palette {
         Palette::Basic(basic) => basic,
+        Palette::Multi(MultiPalette::Annotated) => palettes::annotated::resolve(name),
         Palette::Multi(MultiPalette::Java) => palettes::java::resolve(name),
         Palette::Multi(MultiPalette::Perl) => palettes::perl::resolve(name),
         Palette::Multi(MultiPalette::Js) => palettes::js::resolve(name),
@@ -325,6 +332,11 @@ fn rgb_components_for_palette(palette: Palette, name: &str, v1: f32, v2: f32, v3
         }
         BasicPalette::Aqua => color!(t!(50, 60_f32, v1), t!(165, 55_f32, v1), t!(165, 55_f32, v1)),
         BasicPalette::Orange => color!(t!(190, 65_f32, v1), t!(90, 65_f32, v1), t!(0, 0_f32, v1)),
+        BasicPalette::Gray => color!(
+            t!(190, 40_f32, v1),
+            t!(190, 40_f32, v1),
+            t!(190, 40_f32, v1)
+        ),
     }
 }
 

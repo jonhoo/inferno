@@ -75,7 +75,7 @@ pub mod defaults {
     }
 
     define! {
-        COLORS: &str = "hot",
+        COLORS: &str = "annotated",
         SEARCH_COLOR: &str = "#e600e6",
         TITLE: &str = "Flame Graph",
         CHART_TITLE: &str = "Flame Chart",
