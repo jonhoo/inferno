@@ -217,6 +217,17 @@ var truncate_text_right = {};",
         &mut buf,
         TextItem {
             x: Dimension::Pixels(super::XPAD),
+            y: (style_options.imageheight - (opt.ypad2() / 2)) as f64,
+            text: " ".,
+            extra: vec![("id", "dependencies")]
+        }
+    )?;
+
+    write_str(
+        svg,
+        &mut buf,
+        TextItem {
+            x: Dimension::Pixels(super::XPAD),
             y: (opt.font_size * 2) as f64,
             text: "Reset Zoom".into(),
             extra: vec![("id", "unzoom"), ("class", "hide")],

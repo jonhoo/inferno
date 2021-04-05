@@ -1,5 +1,5 @@
 "use strict";
-var details, searchbtn, unzoombtn, matchedtxt, svg, searching, frames;
+var details, dependencies, searchbtn, unzoombtn, matchedtxt, svg, searching, frames;
 function init(evt) {
     details = document.getElementById("details").firstChild;
     searchbtn = document.getElementById("search");
@@ -93,7 +93,10 @@ window.addEventListener("click", function(e) {
 // show
 window.addEventListener("mouseover", function(e) {
     var target = find_group(e.target);
-    if (target) details.nodeValue = nametype + " " + g_to_text(target);
+    if (target) {
+        details.nodeValue = nametype + " " + g_to_text(target);
+        dependencies.nodeValue = find_child(target, "text").getAttribute("dependencies");
+    }
 }, false)
 // clear
 window.addEventListener("mouseout", function(e) {

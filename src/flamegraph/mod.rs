@@ -564,11 +564,13 @@ where
         let _ = samples_txt_buffer.write_formatted(&samples, &Locale::en);
         let samples_txt = samples_txt_buffer.as_str();
 
+        let mut dependencies = Vec::new();
         let info = if frame.location.function.is_empty() && frame.location.depth == 0 {
             write!(buffer, "all ({} {}, 100%)", samples_txt, opt.count_name)
         } else {
             let pct = (100 * samples) as f64 / (timemax as f64 * opt.factor);
             let function = deannotate(&frame.location.function);
+            dependencies = function.split("|||").collect();
             match frame.delta {
                 None => write!(
                     buffer,
@@ -669,6 +671,7 @@ where
             "".into()
         };
 
+        let joined_dependencies = dependencies.join(" ");
         // write the text
         svg::write_str(
             &mut svg,
@@ -677,7 +680,7 @@ where
                 x: Dimension::Percent(rect.x1_pct + 100.0 * 3.0 / image_width),
                 y: 3.0 + (rect.y1 + rect.y2) as f64 / 2.0,
                 text,
-                extra: None,
+                extra: if dependencies.is_empty() { None } else { Some(("dependencies", joined_dependencies.as_str())) },
             },
         )?;
 
