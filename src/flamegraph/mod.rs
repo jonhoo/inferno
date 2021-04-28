@@ -355,8 +355,10 @@ impl Default for TextTruncateDirection {
 }
 
 struct Rectangle {
+    x1_samples: usize,
     x1_pct: f64,
     y1: usize,
+    x2_samples: usize,
     x2_pct: f64,
     y2: usize,
 }
@@ -522,6 +524,7 @@ where
             ("id", "frames"),
             ("x", &container_x),
             ("width", &container_width),
+            ("total_samples", &format!("{}", timemax)),
         ]),
     ))?;
 
@@ -547,8 +550,10 @@ where
 
         let rect = Rectangle {
             x1_pct,
+            x1_samples: frame.start_time,
             y1,
             x2_pct,
+            x2_samples: frame.end_time,
             y2,
         };
 
@@ -857,6 +862,8 @@ fn filled_rectangle<W: Write>(
     let width = write!(buffer, "{:.4}%", rect.width_pct());
     let height = write_usize(buffer, rect.height());
     let color = write!(buffer, "rgb({},{},{})", color.r, color.g, color.b);
+    let x_samples = write_usize(buffer, rect.x1_samples);
+    let width_samples = write_usize(buffer, rect.orig_x2 - rect.x1_samples);
 
     if let Event::Empty(bytes_start) = cache_rect {
         // clear the state
@@ -866,7 +873,9 @@ fn filled_rectangle<W: Write>(
             "y" => &buffer[y],
             "width" => &buffer[width],
             "height" => &buffer[height],
-            "fill" => &buffer[color]
+            "fill" => &buffer[color],
+            "x_samples" => &buffer[x_samples],
+            "width_samples" => &buffer[width_samples]
         ));
     } else {
         unreachable!("cache wrapper was of wrong type: {:?}", cache_rect);

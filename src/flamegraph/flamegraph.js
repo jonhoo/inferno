@@ -7,6 +7,7 @@ function init(evt) {
     matchedtxt = document.getElementById("matched");
     svg = document.getElementsByTagName("svg")[0];
     frames = document.getElementById("frames");
+    total_samples = parseInt(frames.attributes.total_samples.value);
     searching = 0;
 
     // Use GET parameters to restore a flamegraph's state.
@@ -198,41 +199,42 @@ function update_text(e) {
 // zoom
 function zoom_reset(e) {
     if (e.attributes != undefined) {
-        orig_load(e, "x");
-        orig_load(e, "width");
+        if (e.attributes.x_samples != undefined) {
+            e.attributes.x.value = format_percent(100 * parseInt(e.attributes.x_samples.value) / total_samples);
+        }
+        if (e.attributes.width_samples != undefined) {
+            e.attributes.width.value = format_percent(100 * parseInt(e.attributes.width_samples.value) / total_samples);
+        }
     }
     if (e.childNodes == undefined) return;
     for(var i = 0, c = e.childNodes; i < c.length; i++) {
         zoom_reset(c[i]);
     }
 }
-function zoom_child(e, x, ratio) {
+function zoom_child(e, x, zoomed_width_samples) {
     if (e.attributes != undefined) {
         if (e.attributes.x != undefined) {
-            orig_save(e, "x");
-            e.attributes.x.value = format_percent((parseFloat(e.attributes.x.value) - x) * ratio);
             if (e.tagName == "text") {
                 e.attributes.x.value = format_percent(parseFloat(find_child(e.parentNode, "rect[x]").attributes.x.value) + (100 * 3 / frames.attributes.width.value));
+            } else {
+                e.attributes.x.value = format_percent(100 * (parseInt(e.attributes.x_samples.value) - x) / zoomed_width_samples);
             }
         }
         if (e.attributes.width != undefined) {
-            orig_save(e, "width");
-            e.attributes.width.value = format_percent(parseFloat(e.attributes.width.value) * ratio);
+            e.attributes.width.value = format_percent(100 * parseInt(e.attributes.width_samples.value) / zoomed_width_samples);
         }
     }
     if (e.childNodes == undefined) return;
     for(var i = 0, c = e.childNodes; i < c.length; i++) {
-        zoom_child(c[i], x, ratio);
+        zoom_child(c[i], x, zoomed_width_samples);
     }
 }
 function zoom_parent(e) {
     if (e.attributes) {
         if (e.attributes.x != undefined) {
-            orig_save(e, "x");
             e.attributes.x.value = "0.0%";
         }
         if (e.attributes.width != undefined) {
-            orig_save(e, "width");
             e.attributes.width.value = "100.0%";
         }
     }
@@ -243,20 +245,17 @@ function zoom_parent(e) {
 }
 function zoom(node) {
     var attr = find_child(node, "rect").attributes;
-    var width = parseFloat(attr.width.value);
-    var xmin = parseFloat(attr.x.value);
+    var width = parseInt(attr.width_samples.value);
+    var xmin = parseInt(attr.x_samples.value);
     var xmax = xmin + width;
     var ymin = parseFloat(attr.y.value);
-    var ratio = 100 / width;
-    // XXX: Workaround for JavaScript float issues (fix me)
-    var fudge = 0.001;
     unzoombtn.classList.remove("hide");
     var el = frames.children;
     for (var i = 0; i < el.length; i++) {
         var e = el[i];
         var a = find_child(e, "rect").attributes;
-        var ex = parseFloat(a.x.value);
-        var ew = parseFloat(a.width.value);
+        var ex = parseInt(a.x_samples.value);
+        var ew = parseInt(a.width_samples.value);
         // Is it an ancestor
         if (!inverted) {
             var upstack = parseFloat(a.y.value) > ymin;
@@ -265,7 +264,7 @@ function zoom(node) {
         }
         if (upstack) {
             // Direct ancestor
-            if (ex <= xmin && (ex+ew+fudge) >= xmax) {
+            if (ex <= xmin && (ex+ew) >= xmax) {
                 e.classList.add("parent");
                 zoom_parent(e);
                 update_text(e);
@@ -277,11 +276,11 @@ function zoom(node) {
         // Children maybe
         else {
             // no common path
-            if (ex < xmin || ex + fudge >= xmax) {
+            if (ex < xmin || ex >= xmax) {
                 e.classList.add("hide");
             }
             else {
-                zoom_child(e, xmin, ratio);
+                zoom_child(e, xmin, width);
                 update_text(e);
             }
         }
@@ -330,17 +329,20 @@ function search(term) {
     var maxwidth = 0;
     for (var i = 0; i < el.length; i++) {
         var e = el[i];
+        if (e.classList.contains("hide")) {
+            continue;
+        }
         var func = g_to_func(e);
         var rect = find_child(e, "rect");
         if (func == null || rect == null)
             continue;
         // Save max width. Only works as we have a root frame
-        var w = parseFloat(rect.attributes.width.value);
+        var w = parseInt(rect.attributes.width_samples.value);
         if (w > maxwidth)
             maxwidth = w;
         if (func.match(re)) {
             // highlight
-            var x = parseFloat(rect.attributes.x.value);
+            var x = parseInt(rect.attributes.x_samples.value);
             orig_save(rect, "fill");
             rect.attributes.fill.value = searchcolor;
             // remember matches
@@ -380,11 +382,10 @@ function search(term) {
     // Step through frames saving only the biggest bottom-up frames
     // thanks to the sort order. This relies on the tree property
     // where children are always smaller than their parents.
-    var fudge = 0.0001;    // JavaScript floating point
     for (var k in keys) {
-        var x = parseFloat(keys[k]);
+        var x = parseInt(keys[k]);
         var w = matches[keys[k]];
-        if (x >= lastx + lastw - fudge) {
+        if (x > lastx + lastw) {
             count += w;
             lastx = x;
             lastw = w;
