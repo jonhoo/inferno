@@ -863,7 +863,7 @@ fn filled_rectangle<W: Write>(
     let height = write_usize(buffer, rect.height());
     let color = write!(buffer, "rgb({},{},{})", color.r, color.g, color.b);
     let x_samples = write_usize(buffer, rect.x1_samples);
-    let width_samples = write_usize(buffer, rect.orig_x2 - rect.x1_samples);
+    let width_samples = write_usize(buffer, rect.x2_samples - rect.x1_samples);
 
     if let Event::Empty(bytes_start) = cache_rect {
         // clear the state
@@ -874,8 +874,8 @@ fn filled_rectangle<W: Write>(
             "width" => &buffer[width],
             "height" => &buffer[height],
             "fill" => &buffer[color],
-            "x_samples" => &buffer[x_samples],
-            "width_samples" => &buffer[width_samples]
+            "fg:x" => &buffer[x_samples],
+            "fg:w" => &buffer[width_samples]
         ));
     } else {
         unreachable!("cache wrapper was of wrong type: {:?}", cache_rect);

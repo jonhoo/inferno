@@ -142,15 +142,15 @@ function find_group(node) {
     return find_group(parent);
 }
 function orig_save(e, attr, val) {
-    if (e.attributes["_orig_" + attr] != undefined) return;
+    if (e.attributes["fg:orig_" + attr] != undefined) return;
     if (e.attributes[attr] == undefined) return;
     if (val == undefined) val = e.attributes[attr].value;
-    e.setAttribute("_orig_" + attr, val);
+    e.setAttribute("fg:orig_" + attr, val);
 }
 function orig_load(e, attr) {
-    if (e.attributes["_orig_"+attr] == undefined) return;
-    e.attributes[attr].value = e.attributes["_orig_" + attr].value;
-    e.removeAttribute("_orig_" + attr);
+    if (e.attributes["fg:orig_"+attr] == undefined) return;
+    e.attributes[attr].value = e.attributes["fg:orig_" + attr].value;
+    e.removeAttribute("fg:orig_" + attr);
 }
 function g_to_text(e) {
     var text = find_child(e, "title").firstChild.nodeValue;
@@ -198,13 +198,9 @@ function update_text(e) {
 }
 // zoom
 function zoom_reset(e) {
-    if (e.attributes != undefined) {
-        if (e.attributes.x_samples != undefined) {
-            e.attributes.x.value = format_percent(100 * parseInt(e.attributes.x_samples.value) / total_samples);
-        }
-        if (e.attributes.width_samples != undefined) {
-            e.attributes.width.value = format_percent(100 * parseInt(e.attributes.width_samples.value) / total_samples);
-        }
+    if (e.tagName == "rect") {
+        e.attributes.x.value = format_percent(100 * parseInt(e.attributes["fg:x"].value) / total_samples);
+        e.attributes.width.value = format_percent(100 * parseInt(e.attributes["fg:w"].value) / total_samples);
     }
     if (e.childNodes == undefined) return;
     for(var i = 0, c = e.childNodes; i < c.length; i++) {
@@ -212,17 +208,12 @@ function zoom_reset(e) {
     }
 }
 function zoom_child(e, x, zoomed_width_samples) {
-    if (e.attributes != undefined) {
-        if (e.attributes.x != undefined) {
-            if (e.tagName == "text") {
-                e.attributes.x.value = format_percent(parseFloat(find_child(e.parentNode, "rect[x]").attributes.x.value) + (100 * 3 / frames.attributes.width.value));
-            } else {
-                e.attributes.x.value = format_percent(100 * (parseInt(e.attributes.x_samples.value) - x) / zoomed_width_samples);
-            }
-        }
-        if (e.attributes.width != undefined) {
-            e.attributes.width.value = format_percent(100 * parseInt(e.attributes.width_samples.value) / zoomed_width_samples);
-        }
+    if (e.tagName == "text") {
+        var parent_x = parseFloat(find_child(e.parentNode, "rect[x]").attributes.x.value);
+        e.attributes.x.value = format_percent(parent_x + (100 * 3 / frames.attributes.width.value));
+    } else if (e.tagName == "rect") {
+        e.attributes.x.value = format_percent(100 * (parseInt(e.attributes["fg:x"].value) - x) / zoomed_width_samples);
+        e.attributes.width.value = format_percent(100 * parseInt(e.attributes["fg:w"].value) / zoomed_width_samples);
     }
     if (e.childNodes == undefined) return;
     for(var i = 0, c = e.childNodes; i < c.length; i++) {
@@ -245,8 +236,8 @@ function zoom_parent(e) {
 }
 function zoom(node) {
     var attr = find_child(node, "rect").attributes;
-    var width = parseInt(attr.width_samples.value);
-    var xmin = parseInt(attr.x_samples.value);
+    var width = parseInt(attr["fg:w"].value);
+    var xmin = parseInt(attr["fg:x"].value);
     var xmax = xmin + width;
     var ymin = parseFloat(attr.y.value);
     unzoombtn.classList.remove("hide");
@@ -254,8 +245,8 @@ function zoom(node) {
     for (var i = 0; i < el.length; i++) {
         var e = el[i];
         var a = find_child(e, "rect").attributes;
-        var ex = parseInt(a.x_samples.value);
-        var ew = parseInt(a.width_samples.value);
+        var ex = parseInt(a["fg:x"].value);
+        var ew = parseInt(a["fg:w"].value);
         // Is it an ancestor
         if (!inverted) {
             var upstack = parseFloat(a.y.value) > ymin;
@@ -329,7 +320,8 @@ function search(term) {
     var maxwidth = 0;
     for (var i = 0; i < el.length; i++) {
         var e = el[i];
-        if (e.classList.contains("hide")) {
+        // Skip over frames which are either not visible, or below the zoomed-to frame
+        if (e.classList.contains("hide") || e.classList.contains("parent")) {
             continue;
         }
         var func = g_to_func(e);
@@ -337,12 +329,12 @@ function search(term) {
         if (func == null || rect == null)
             continue;
         // Save max width. Only works as we have a root frame
-        var w = parseInt(rect.attributes.width_samples.value);
+        var w = parseInt(rect.attributes["fg:w"].value);
         if (w > maxwidth)
             maxwidth = w;
         if (func.match(re)) {
             // highlight
-            var x = parseInt(rect.attributes.x_samples.value);
+            var x = parseInt(rect.attributes["fg:x"].value);
             orig_save(rect, "fill");
             rect.attributes.fill.value = searchcolor;
             // remember matches
@@ -385,7 +377,7 @@ function search(term) {
     for (var k in keys) {
         var x = parseInt(keys[k]);
         var w = matches[keys[k]];
-        if (x > lastx + lastw) {
+        if (x >= lastx + lastw) {
             count += w;
             lastx = x;
             lastw = w;
