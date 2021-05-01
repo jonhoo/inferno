@@ -99,6 +99,25 @@ pub(super) mod wakeup {
     }
 }
 
+pub(super) mod rust {
+    use crate::flamegraph::color::BasicPalette;
+
+    // Partition into user code and Rust system code
+    pub fn resolve(name: &str) -> BasicPalette {
+        if name.starts_with("core::") || name.starts_with("std::") {
+            return BasicPalette::Orange;
+        } else if name.contains("as core::")
+            || name.contains("as std::")
+            || name.contains("as alloc::")
+        {
+            return BasicPalette::Orange;
+        } else if name.contains("::") {
+            return BasicPalette::Yellow;
+        }
+        BasicPalette::Red
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use crate::flamegraph::color::BasicPalette;
@@ -449,6 +468,46 @@ mod tests {
         ];
         for elem in test_data.iter() {
             let result = js::resolve(&elem.input);
+            assert_eq!(result, elem.output);
+        }
+    }
+
+    #[test]
+    fn rust_returns_correct() {
+        use super::rust;
+
+        let test_names = [
+            TestData {
+                input: String::from("some::mod"),
+                output: BasicPalette::Yellow,
+            },
+            TestData {
+                input: String::from("core::mod"),
+                output: BasicPalette::Orange,
+            },
+            TestData {
+                input: String::from("std::mod"),
+                output: BasicPalette::Orange,
+            },
+            TestData {
+                input: String::from("something"),
+                output: BasicPalette::Red,
+            },
+            TestData {
+                input: String::from("<alloc::boxed::Box<F,A> as core::something"),
+                output: BasicPalette::Orange,
+            },
+            TestData {
+                input: String::from("<alloc::boxed::Box<F,A> as std::something"),
+                output: BasicPalette::Orange,
+            },
+            TestData {
+                input: String::from("<alloc::vec::Vec<T> as alloc::something"),
+                output: BasicPalette::Orange,
+            },
+        ];
+        for elem in test_names.iter() {
+            let result = rust::resolve(&elem.input);
             assert_eq!(result, elem.output);
         }
     }
