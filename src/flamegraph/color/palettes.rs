@@ -102,19 +102,26 @@ pub(super) mod wakeup {
 pub(super) mod rust {
     use crate::flamegraph::color::BasicPalette;
 
-    // Partition into user code and Rust system code
     pub fn resolve(name: &str) -> BasicPalette {
-        if name.starts_with("core::") || name.starts_with("std::") {
-            return BasicPalette::Orange;
-        } else if name.contains("as core::")
-            || name.contains("as std::")
-            || name.contains("as alloc::")
+        if name.starts_with("core::")
+            || name.starts_with("std::")
+            || name.starts_with("alloc::")
+            || name.starts_with("<core::")
+            || name.starts_with("<std::")
+            || name.starts_with("<alloc::")
         {
-            return BasicPalette::Orange;
+            // Palette for Rust system functions
+            BasicPalette::Orange
         } else if name.contains("::") {
-            return BasicPalette::Yellow;
+            // Palette for anything else that looks like a Rust function.
+            // Although this will generate false positives for e.g. C++ code
+            // used with Rust, the intention is to color code from user
+            // crates and dependencies differenly than Rust system code.
+            BasicPalette::Yellow
+        } else {
+            // Non-Rust functions
+            BasicPalette::Blue
         }
-        BasicPalette::Red
     }
 }
 
@@ -478,7 +485,7 @@ mod tests {
 
         let test_names = [
             TestData {
-                input: String::from("some::mod"),
+                input: String::from("some::not_rust_system::mod"),
                 output: BasicPalette::Yellow,
             },
             TestData {
@@ -490,19 +497,23 @@ mod tests {
                 output: BasicPalette::Orange,
             },
             TestData {
-                input: String::from("something"),
-                output: BasicPalette::Red,
-            },
-            TestData {
-                input: String::from("<alloc::boxed::Box<F,A> as core::something"),
+                input: String::from("alloc::mod"),
                 output: BasicPalette::Orange,
             },
             TestData {
-                input: String::from("<alloc::boxed::Box<F,A> as std::something"),
+                input: String::from("something_else"),
+                output: BasicPalette::Blue,
+            },
+            TestData {
+                input: String::from("<alloc::boxed::Box<F,A> as something::else"),
                 output: BasicPalette::Orange,
             },
             TestData {
-                input: String::from("<alloc::vec::Vec<T> as alloc::something"),
+                input: String::from("<core::something as something::else"),
+                output: BasicPalette::Orange,
+            },
+            TestData {
+                input: String::from("<std::something something::else"),
                 output: BasicPalette::Orange,
             },
         ];
