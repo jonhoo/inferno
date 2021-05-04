@@ -14,7 +14,7 @@ function init(evt) {
     var restore_state = function() {
         var params = get_params();
         if (params.x && params.y)
-            zoom(find_group(document.querySelector('[x="' + params.x + '"][y="' + params.y + '"]')));
+            zoom(find_group(document.querySelector('[*|x="' + params.x + '"][y="' + params.y + '"]')));
         if (params.s)
             search(params.s);
     };
