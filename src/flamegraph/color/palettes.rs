@@ -111,16 +111,16 @@ pub(super) mod rust {
             || name.starts_with("<alloc::")
         {
             // Rust system functions
-            BasicPalette::Red
+            BasicPalette::Orange
         } else if name.contains("::") {
-            // Anything else that looks like a Rust function.
+            // Rust user functions.
             // Although this will generate false positives for e.g. C++ code
             // used with Rust, the intention is to color code from user
             // crates and dependencies differenly than Rust system code.
-            BasicPalette::Orange
+            BasicPalette::Aqua
         } else {
             // Non-Rust functions
-            BasicPalette::Green
+            BasicPalette::Yellow
         }
     }
 }
