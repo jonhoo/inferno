@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [0.10.4] - 2021-05-04
+### Changed
+ - Use number of samples instead of fractions for width/x calculations. [#210](https://github.com/jonhoo/inferno/pull/210)
+ - Bumped `pretty_assertions` to 0.7
+ - Bumped `rand` to 0.8
+
 ## [0.10.3] - 2021-01-08
 ### Added
  - Support jit annotations in collapse-perf for runtimes using the jitdump format. [#202](https://github.com/jonhoo/inferno/pull/202)
@@ -144,7 +150,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Moved to `IndexMap` and FNV hashing ([#127](https://github.com/jonhoo/inferno/pull/127))
 - Moved CI to Azure DevOps Pipelines
 
-[Unreleased]: https://github.com/jonhoo/inferno/compare/v0.10.3...HEAD
+[Unreleased]: https://github.com/jonhoo/inferno/compare/v0.10.4...HEAD
+[0.10.4]: https://github.com/jonhoo/inferno/compare/v0.10.3...v0.10.4
 [0.10.3]: https://github.com/jonhoo/inferno/compare/v0.10.2...v0.10.3
 [0.10.2]: https://github.com/jonhoo/inferno/compare/v0.10.1...v0.10.2
 [0.10.1]: https://github.com/jonhoo/inferno/compare/v0.10.0...v0.10.1
