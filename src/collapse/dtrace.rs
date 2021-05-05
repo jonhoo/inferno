@@ -513,10 +513,10 @@ mod tests {
         let inputs = common::testing::read_inputs(&INPUT)?;
 
         loop {
-            let nstacks_per_job = rng.gen_range(1, 500 + 1);
+            let nstacks_per_job = rng.gen_range(1..=500);
             let options = Options {
                 includeoffset: rng.gen(),
-                nthreads: rng.gen_range(2, 32 + 1),
+                nthreads: rng.gen_range(2..=32),
             };
 
             for (path, input) in inputs.iter() {
