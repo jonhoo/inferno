@@ -1,4 +1,4 @@
-<?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg version="1.1" width="1200" height="166" onload="init(evt)" viewBox="0 0 1200 166" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg version="1.1" width="1200" height="166" onload="init(evt)" viewBox="0 0 1200 166" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:fg="http://github.com/jonhoo/inferno">
     <!--Flame graph stack visualization. See https://github.com/brendangregg/FlameGraph for latest version, and http://www.brendangregg.com/flamegraphs.html for examples.-->
     <!--NOTES: -->
     <defs>
@@ -34,65 +34,65 @@ var truncate_text_right = false;]]>
     <text id="unzoom" class="hide" x="10" y="24.00">Reset Zoom</text>
     <text id="search" x="1090" y="24.00">Search</text>
     <text id="matched" x="1090" y="149.00"> </text>
-    <svg id="frames" x="10" width="1180">
+    <svg id="frames" x="10" width="1180" total_samples="386001">
         <g>
             <title>_start (31,000 samples, 8.03%)</title>
-            <rect x="0.0000%" y="85" width="8.0311%" height="15" fill="rgb(239,139,37)"/>
+            <rect x="0.0000%" y="85" width="8.0311%" height="15" fill="rgb(239,139,37)" fg:x="0" fg:w="31000"/>
             <text x="0.2500%" y="95.50">_start</text>
         </g>
         <g>
             <title>__libc_start_main (31,000 samples, 8.03%)</title>
-            <rect x="0.0000%" y="69" width="8.0311%" height="15" fill="rgb(247,154,46)"/>
+            <rect x="0.0000%" y="69" width="8.0311%" height="15" fill="rgb(247,154,46)" fg:x="0" fg:w="31000"/>
             <text x="0.2500%" y="79.50">__libc_star..</text>
         </g>
         <g>
             <title>main (31,000 samples, 8.03%)</title>
-            <rect x="0.0000%" y="53" width="8.0311%" height="15" fill="rgb(247,83,46)"/>
+            <rect x="0.0000%" y="53" width="8.0311%" height="15" fill="rgb(247,83,46)" fg:x="0" fg:w="31000"/>
             <text x="0.2500%" y="63.50">main</text>
         </g>
         <g>
             <title>cksum (31,000 samples, 8.03%)</title>
-            <rect x="0.0000%" y="37" width="8.0311%" height="15" fill="rgb(226,95,23)"/>
+            <rect x="0.0000%" y="37" width="8.0311%" height="15" fill="rgb(226,95,23)" fg:x="0" fg:w="31000"/>
             <text x="0.2500%" y="47.50">cksum</text>
         </g>
         <g>
             <title>cksum (60,001 samples, 15.54%)</title>
-            <rect x="8.0311%" y="85" width="15.5443%" height="15" fill="rgb(226,95,23)"/>
+            <rect x="8.0311%" y="85" width="15.5443%" height="15" fill="rgb(226,95,23)" fg:x="31000" fg:w="60001"/>
             <text x="8.2811%" y="95.50">cksum</text>
         </g>
         <g>
             <title>cksum (110,001 samples, 28.50%)</title>
-            <rect x="0.0000%" y="101" width="28.4976%" height="15" fill="rgb(226,95,23)"/>
+            <rect x="0.0000%" y="101" width="28.4976%" height="15" fill="rgb(226,95,23)" fg:x="0" fg:w="110001"/>
             <text x="0.2500%" y="111.50">cksum</text>
         </g>
         <g>
             <title>main (19,000 samples, 4.92%)</title>
-            <rect x="23.5753%" y="85" width="4.9223%" height="15" fill="rgb(247,83,46)"/>
+            <rect x="23.5753%" y="85" width="4.9223%" height="15" fill="rgb(247,83,46)" fg:x="91001" fg:w="19000"/>
             <text x="23.8253%" y="95.50">main</text>
         </g>
         <g>
             <title>cksum (19,000 samples, 4.92%)</title>
-            <rect x="23.5753%" y="69" width="4.9223%" height="15" fill="rgb(226,95,23)"/>
+            <rect x="23.5753%" y="69" width="4.9223%" height="15" fill="rgb(226,95,23)" fg:x="91001" fg:w="19000"/>
             <text x="23.8253%" y="79.50">cksum</text>
         </g>
         <g>
             <title>[unknown] (2,000 samples, 0.52%)</title>
-            <rect x="28.4976%" y="85" width="0.5181%" height="15" fill="rgb(242,180,40)"/>
+            <rect x="28.4976%" y="85" width="0.5181%" height="15" fill="rgb(242,180,40)" fg:x="110001" fg:w="2000"/>
             <text x="28.7476%" y="95.50"></text>
         </g>
         <g>
             <title>all (386,001 samples, 100%)</title>
-            <rect x="0.0000%" y="117" width="100.0000%" height="15" fill="rgb(255,230,55)"/>
+            <rect x="0.0000%" y="117" width="100.0000%" height="15" fill="rgb(255,230,55)" fg:x="0" fg:w="386001"/>
             <text x="0.2500%" y="127.50"></text>
         </g>
         <g>
             <title>noploop (276,000 samples, 71.50%)</title>
-            <rect x="28.4976%" y="101" width="71.5024%" height="15" fill="rgb(248,212,47)"/>
+            <rect x="28.4976%" y="101" width="71.5024%" height="15" fill="rgb(248,212,47)" fg:x="110001" fg:w="276000"/>
             <text x="28.7476%" y="111.50">noploop</text>
         </g>
         <g>
             <title>main (274,000 samples, 70.98%)</title>
-            <rect x="29.0157%" y="85" width="70.9843%" height="15" fill="rgb(247,83,46)"/>
+            <rect x="29.0157%" y="85" width="70.9843%" height="15" fill="rgb(247,83,46)" fg:x="112001" fg:w="274000"/>
             <text x="29.2657%" y="95.50">main</text>
         </g>
     </svg>
