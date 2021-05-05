@@ -486,7 +486,7 @@ mod tests {
         let test_names = [
             TestData {
                 input: String::from("some::not_rust_system::mod"),
-                output: BasicPalette::Yellow,
+                output: BasicPalette::Aqua,
             },
             TestData {
                 input: String::from("core::mod"),
@@ -502,7 +502,7 @@ mod tests {
             },
             TestData {
                 input: String::from("something_else"),
-                output: BasicPalette::Blue,
+                output: BasicPalette::Yellow,
             },
             TestData {
                 input: String::from("<alloc::boxed::Box<F,A> as something::else"),
