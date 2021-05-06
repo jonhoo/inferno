@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [0.10.5] - 2021-05-05
+### Added
+ - Add Rust language palette. [#211](https://github.com/jonhoo/inferno/pull/211)
+
 ## [0.10.4] - 2021-05-04
 ### Changed
  - Use number of samples instead of fractions for width/x calculations. [#210](https://github.com/jonhoo/inferno/pull/210)
@@ -150,7 +154,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Moved to `IndexMap` and FNV hashing ([#127](https://github.com/jonhoo/inferno/pull/127))
 - Moved CI to Azure DevOps Pipelines
 
-[Unreleased]: https://github.com/jonhoo/inferno/compare/v0.10.4...HEAD
+[Unreleased]: https://github.com/jonhoo/inferno/compare/v0.10.5...HEAD
+[0.10.5]: https://github.com/jonhoo/inferno/compare/v0.10.4...v0.10.5
 [0.10.4]: https://github.com/jonhoo/inferno/compare/v0.10.3...v0.10.4
 [0.10.3]: https://github.com/jonhoo/inferno/compare/v0.10.2...v0.10.3
 [0.10.2]: https://github.com/jonhoo/inferno/compare/v0.10.1...v0.10.2
