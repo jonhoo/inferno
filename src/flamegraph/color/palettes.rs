@@ -99,6 +99,32 @@ pub(super) mod wakeup {
     }
 }
 
+pub(super) mod rust {
+    use crate::flamegraph::color::BasicPalette;
+
+    pub fn resolve(name: &str) -> BasicPalette {
+        if name.starts_with("core::")
+            || name.starts_with("std::")
+            || name.starts_with("alloc::")
+            || name.starts_with("<core::")
+            || name.starts_with("<std::")
+            || name.starts_with("<alloc::")
+        {
+            // Rust system functions
+            BasicPalette::Orange
+        } else if name.contains("::") {
+            // Rust user functions.
+            // Although this will generate false positives for e.g. C++ code
+            // used with Rust, the intention is to color code from user
+            // crates and dependencies differenly than Rust system code.
+            BasicPalette::Aqua
+        } else {
+            // Non-Rust functions
+            BasicPalette::Yellow
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use crate::flamegraph::color::BasicPalette;
@@ -449,6 +475,50 @@ mod tests {
         ];
         for elem in test_data.iter() {
             let result = js::resolve(&elem.input);
+            assert_eq!(result, elem.output);
+        }
+    }
+
+    #[test]
+    fn rust_returns_correct() {
+        use super::rust;
+
+        let test_names = [
+            TestData {
+                input: String::from("some::not_rust_system::mod"),
+                output: BasicPalette::Aqua,
+            },
+            TestData {
+                input: String::from("core::mod"),
+                output: BasicPalette::Orange,
+            },
+            TestData {
+                input: String::from("std::mod"),
+                output: BasicPalette::Orange,
+            },
+            TestData {
+                input: String::from("alloc::mod"),
+                output: BasicPalette::Orange,
+            },
+            TestData {
+                input: String::from("something_else"),
+                output: BasicPalette::Yellow,
+            },
+            TestData {
+                input: String::from("<alloc::boxed::Box<F,A> as something::else"),
+                output: BasicPalette::Orange,
+            },
+            TestData {
+                input: String::from("<core::something as something::else"),
+                output: BasicPalette::Orange,
+            },
+            TestData {
+                input: String::from("<std::something something::else"),
+                output: BasicPalette::Orange,
+            },
+        ];
+        for elem in test_names.iter() {
+            let result = rust::resolve(&elem.input);
             assert_eq!(result, elem.output);
         }
     }
