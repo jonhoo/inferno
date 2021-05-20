@@ -875,7 +875,9 @@ fn filled_rectangle<W: Write>(
             "height" => &buffer[height],
             "fill" => &buffer[color],
             "fg:x" => &buffer[x_samples],
-            "fg:w" => &buffer[width_samples]
+            "fg:w" => &buffer[width_samples],
+            "rx" => "2",
+            "ry" => "2"
         ));
     } else {
         unreachable!("cache wrapper was of wrong type: {:?}", cache_rect);
