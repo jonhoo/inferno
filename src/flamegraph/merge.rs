@@ -16,11 +16,13 @@ pub(super) struct TimedFrame<'a> {
     pub(super) start_time: usize,
     pub(super) end_time: usize,
     pub(super) delta: Option<isize>,
+    pub(super) samples: Option<usize>,
 }
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub(super) struct FrameTime {
     pub(super) start_time: usize,
+    pub(super) samples: Option<usize>,
     pub(super) delta: Option<isize>,
 }
 
@@ -30,6 +32,7 @@ fn flow<'a, LI, TI>(
     last: LI,
     this: TI,
     time: usize,
+    samples: Option<usize>,
     delta: Option<isize>,
 ) where
     LI: IntoIterator<Item = &'a str>,
@@ -70,6 +73,7 @@ fn flow<'a, LI, TI>(
             start_time: frame_time.start_time,
             end_time: time,
             delta: frame_time.delta,
+            samples: frame_time.samples,
         };
         frames.push(frame);
     }
@@ -89,6 +93,7 @@ fn flow<'a, LI, TI>(
         };
         let frame_time = FrameTime {
             start_time: time,
+            samples: if is_last { samples } else { None },
             // For some reason the Perl version does a `+=` for `delta`, but I can't figure out why.
             // See https://github.com/brendangregg/FlameGraph/blob/1b1c6deede9c33c5134c920bdb7a44cc5528e9a7/flamegraph.pl#L588
             delta,
@@ -169,7 +174,15 @@ where
         if last.is_empty() {
             // need to special-case this, because otherwise iter("") + "".split(';') == ["", ""]
             //eprintln!("flow(_, {}, {})", stack, time);
-            flow(&mut tmp, &mut frames, None, this, time, delta);
+            flow(
+                &mut tmp,
+                &mut frames,
+                None,
+                this,
+                time,
+                Some(nsamples),
+                delta,
+            );
         } else {
             //eprintln!("flow({}, {}, {})", last, stack, time);
             flow(
@@ -178,12 +191,13 @@ where
                 iter::once("").chain(last.split(';')),
                 this,
                 time,
+                Some(nsamples),
                 delta,
             );
         }
 
         last = stack;
-        time += nsamples;
+        time += delta.map_or_else(|| nsamples, |d| d.abs() as usize);
         prev_line = Some(line);
     }
 
@@ -195,6 +209,7 @@ where
             iter::once("").chain(last.split(';')),
             None,
             time,
+            None,
             delta,
         );
     }

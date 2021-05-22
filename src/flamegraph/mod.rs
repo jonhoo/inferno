@@ -530,6 +530,7 @@ where
 
     // draw frames
     let mut samples_txt_buffer = num_format::Buffer::default();
+    let mut original_samples_txt_buffer = num_format::Buffer::default();
     for frame in frames {
         let x1_pct = frame.start_time as f64 * widthpertime_pct;
         let x2_pct = frame.end_time as f64 * widthpertime_pct;
@@ -583,18 +584,29 @@ where
                 // Special case delta == 0 so we don't format percentage with a + sign.
                 Some(delta) if delta == 0 => write!(
                     buffer,
-                    "{} ({} {}, {:.2}%; 0.00%)",
+                    "{} ({} {}, 0.00%; {:.2}%)",
                     function, samples_txt, opt.count_name, pct,
                 ),
                 Some(mut delta) => {
+                    let samples = (frame.samples.unwrap() as f64 * opt.factor).round() as usize;
+                    let _ = samples_txt_buffer.write_formatted(&samples, &Locale::en);
+                    let samples_txt = samples_txt_buffer.as_str();
+
+                    let original_samples = (frame.samples.unwrap() as isize - delta) as f64;
+                    let _ = original_samples_txt_buffer.write_formatted(
+                        &((original_samples * opt.factor).round() as usize),
+                        &Locale::en,
+                    );
+                    let original_samples_txt = original_samples_txt_buffer.as_str();
                     if opt.negate_differentials {
                         delta = -delta;
                     }
-                    let delta_pct = (100 * delta) as f64 / (timemax as f64 * opt.factor);
+                    let delta_pct = (100 * delta) as f64 / (original_samples.max(1.0) * opt.factor);
+                    let pct = (100 * delta.abs()) as f64 / (timemax as f64 * opt.factor);
                     write!(
                         buffer,
-                        "{} ({} {}, {:.2}%; {:+.2}%)",
-                        function, samples_txt, opt.count_name, pct, delta_pct
+                        "{} ({} -> {} {}, {:+.2}%; {:.2}%)",
+                        function, original_samples_txt, samples_txt, opt.count_name, delta_pct, pct
                     )
                 }
             }
