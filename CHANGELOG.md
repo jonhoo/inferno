@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [0.10.6] - 2021-05-25
+### Changed
+ - Highlight Rust async/await as user code. [#213](https://github.com/jonhoo/inferno/pull/213)
+
 ## [0.10.5] - 2021-05-05
 ### Added
  - Add Rust language palette. [#211](https://github.com/jonhoo/inferno/pull/211)
@@ -154,7 +158,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Moved to `IndexMap` and FNV hashing ([#127](https://github.com/jonhoo/inferno/pull/127))
 - Moved CI to Azure DevOps Pipelines
 
-[Unreleased]: https://github.com/jonhoo/inferno/compare/v0.10.5...HEAD
+[Unreleased]: https://github.com/jonhoo/inferno/compare/v0.10.6...HEAD
+[0.10.6]: https://github.com/jonhoo/inferno/compare/v0.10.5...v0.10.6
 [0.10.5]: https://github.com/jonhoo/inferno/compare/v0.10.4...v0.10.5
 [0.10.4]: https://github.com/jonhoo/inferno/compare/v0.10.3...v0.10.4
 [0.10.3]: https://github.com/jonhoo/inferno/compare/v0.10.2...v0.10.3
