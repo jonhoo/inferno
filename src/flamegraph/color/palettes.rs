@@ -106,7 +106,11 @@ pub(super) mod rust {
         if name.starts_with("core::")
             || name.starts_with("std::")
             || name.starts_with("alloc::")
-            || name.starts_with("<core::")
+            || (name.starts_with("<core::") 
+                // Rust user-defined async functions are desugared into 
+                // GenFutures so we don't want to include those as Rust 
+                // system functions
+                && !name.starts_with("<core::future::from_generator::GenFuture<T>"))
             || name.starts_with("<std::")
             || name.starts_with("<alloc::")
         {
@@ -511,6 +515,12 @@ mod tests {
             TestData {
                 input: String::from("<core::something as something::else"),
                 output: BasicPalette::Orange,
+            },
+            TestData {
+                input: String::from(
+                    "<core::future::from_generator::GenFuture<T> as something::else",
+                ),
+                output: BasicPalette::Aqua,
             },
             TestData {
                 input: String::from("<std::something something::else"),
