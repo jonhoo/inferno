@@ -2,13 +2,14 @@ use std::fs::File;
 use std::io::{self, Read};
 
 use criterion::*;
-use inferno::collapse::{dtrace, perf, sample, Collapse};
+use inferno::collapse::{dtrace, perf, sample, pmc, Collapse};
 use lazy_static::lazy_static;
 use libflate::gzip::Decoder;
 
 const INFILE_DTRACE: &str = "flamegraph/example-dtrace-stacks.txt";
 const INFILE_PERF: &str = "flamegraph/example-perf-stacks.txt.gz";
 const INFILE_SAMPLE: &str = "tests/data/collapse-sample/large.txt.gz";
+const INFILE_PMC: &str = "tests/data/collapse-pmc/large.txt.gz";
 const SAMPLE_SIZE: usize = 100;
 
 lazy_static! {
@@ -96,7 +97,8 @@ macro_rules! benchmark_multi {
 benchmark_multi!(dtrace, "dtrace", INFILE_DTRACE);
 benchmark_multi!(perf, "perf", INFILE_PERF);
 benchmark_single!(sample, "sample", INFILE_SAMPLE);
+benchmark_multi!(pmc, "pmc", INFILE_PMC);
 
-criterion_group!(benches, dtrace, perf, sample);
+criterion_group!(benches, dtrace, perf, pmc, sample);
 
 criterion_main!(benches);

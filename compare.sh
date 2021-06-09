@@ -28,3 +28,12 @@ zcat < tests/data/collapse-sample/large.txt.gz > "$f"
 echo "==>  sample  <=="
 hyperfine --warmup 20 -m 50 "$BIN/inferno-collapse-sample $f" "./flamegraph/stackcollapse-sample.awk $f"
 rm "$f"
+
+echo
+echo
+cargo build --release --bin inferno-collapse-pmc
+f=tests/data/collapse-pmc/large.txt
+zcat < tests/data/collapse-pmc/large.txt.gz > "$f"
+echo "==>  pmc  <=="
+hyperfine --warmup 20 -m 50 "$BIN/inferno-collapse-pmc $f" "./flamegraph/stackcollapse-pmc.pl $f"
+rm "$f"

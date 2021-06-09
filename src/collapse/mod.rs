@@ -35,6 +35,13 @@ pub mod sample;
 ///   [crate-level documentation]: ../../index.html
 pub mod vtune;
 
+/// Stack collapsing for the output of [`pmcstat`](https://www.freebsd.org/cgi/man.cgi?query=pmcstat&sektion=8) in callchain mode (-G).
+///
+/// See the [crate-level documentation] for details.
+///
+///   [crate-level documentation]: ../../index.html
+pub mod pmc;
+
 // DEFAULT_NTHREADS is public because we use it in the help text of the binaries,
 // but it doesn't need to be exposed to library users, hence #[doc(hidden)].
 #[doc(hidden)]
