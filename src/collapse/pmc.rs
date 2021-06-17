@@ -35,7 +35,6 @@ impl Default for Options {
 /// `pmc::Folder::from(options)`.
 pub struct Folder {
     // State...
-
     /// The number of stacks per job to send to the threadpool.
     nstacks_per_job: usize,
 
@@ -277,9 +276,8 @@ impl Folder {
                 //    100.0%  [1]           0x48c73c8
                 if self.indent.is_some() && indent <= self.indent.unwrap_or(0) {
                     // allocate a string that is long enough to hold the entire stack string
-                    let mut stack_str = String::with_capacity(
-                        self.stack.iter().fold(0, |a, s| a + s.len() + 1),
-                    );
+                    let mut stack_str =
+                        String::with_capacity(self.stack.iter().fold(0, |a, s| a + s.len() + 1));
 
                     // add the stack entries
                     let mut first = true;
@@ -294,10 +292,13 @@ impl Folder {
 
                     // count it!
                     assert!(self.count.is_some());
-                    occurrences.insert_or_add(stack_str, self.count.expect("count not found on previous line"));
+                    occurrences.insert_or_add(
+                        stack_str,
+                        self.count.expect("count not found on previous line"),
+                    );
 
                     // pop as many element as needed to prepare for the next shared stack
-                    self.stack.drain(.. self.stack.len() - indent);
+                    self.stack.drain(..self.stack.len() - indent);
                 }
 
                 self.indent = Some(indent);
@@ -307,10 +308,10 @@ impl Folder {
                 // TODO filter raw addresses
                 // TODO demangle C++ / Rust symbols
                 self.stack.push_front(function.to_string());
-            },
+            }
             None => {
                 logging::weird_stack_line(line);
-            },
+            }
         }
     }
 
@@ -318,9 +319,8 @@ impl Folder {
         // end of stack, so emit stack entry
         if !self.stack.is_empty() {
             // allocate a string that is long enough to hold the entire stack string
-            let mut stack_str = String::with_capacity(
-                self.stack.iter().fold(0, |a, s| a + s.len() + 1),
-            );
+            let mut stack_str =
+                String::with_capacity(self.stack.iter().fold(0, |a, s| a + s.len() + 1));
 
             // add the stack entries (if any)
             let mut first = true;
@@ -335,7 +335,10 @@ impl Folder {
 
             // count it!
             assert!(self.count.is_some());
-            occurrences.insert_or_add(stack_str, self.count.expect("count not found on previous line"));
+            occurrences.insert_or_add(
+                stack_str,
+                self.count.expect("count not found on previous line"),
+            );
         }
 
         // reset for next stack

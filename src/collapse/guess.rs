@@ -3,7 +3,7 @@ use std::io::{self, Cursor};
 
 use log::{error, info};
 
-use crate::collapse::{self, dtrace, perf, sample, vtune, pmc, Collapse};
+use crate::collapse::{self, dtrace, perf, pmc, sample, vtune, Collapse};
 
 const LINES_PER_ITERATION: usize = 10;
 

@@ -2,7 +2,7 @@ use std::fs::File;
 use std::io::{self, Read};
 
 use criterion::*;
-use inferno::collapse::{dtrace, perf, sample, pmc, Collapse};
+use inferno::collapse::{dtrace, perf, pmc, sample, Collapse};
 use lazy_static::lazy_static;
 use libflate::gzip::Decoder;
 
