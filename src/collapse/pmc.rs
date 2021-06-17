@@ -249,7 +249,7 @@ impl Folder {
     //     100.0%  [1318]         sched_idletd
     //      100.0%  [1318]          fork_exit
     fn on_stack_line(&mut self, line: &str, occurrences: &mut Occurrences) {
-        let parts = Self::stack_line_parts(&line);
+        let parts = Self::stack_line_parts(line);
         match parts {
             Some((indent, _, count, function)) => {
                 // detect shared stacks, i.e. stacks that share some elements
@@ -289,7 +289,7 @@ impl Folder {
                         } else {
                             first = false;
                         }
-                        stack_str.push_str(&e);
+                        stack_str.push_str(e);
                     }
 
                     // count it!
