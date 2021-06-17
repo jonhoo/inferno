@@ -1,0 +1,2 @@
+amd64_syscall;sys_read;kern_readv;devfs_read_f;read_random_uio;random_fortuna_read;rijndael_blockEncrypt;aes_ecb_encrypt 1676
+fork_exit;sched_idletd;cpu_idle;cpu_idle_acpi;acpi_cpu_idle;acpi_cpu_c1 260401
