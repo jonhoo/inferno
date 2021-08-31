@@ -134,15 +134,15 @@ text {{ font-family:{}; font-size:{}px; fill:rgb(0,0,0); }}
             .with_attributes(iter::once(("type", "text/ecmascript"))),
     ))?;
     svg.write_event(Event::CData(BytesText::from_escaped_str(&format!(
-        "\
-var nametype = {};
-var fontsize = {};
-var fontwidth = {};
-var xpad = {};
-var inverted = {};
-var searchcolor = '{}';
-var fluiddrawing = {};
-var truncate_text_right = {};",
+        "
+        var nametype = {};
+        var fontsize = {};
+        var fontwidth = {};
+        var xpad = {};
+        var inverted = {};
+        var searchcolor = '{}';
+        var fluiddrawing = {};
+        var truncate_text_right = {};\n    ",
         enquote('\'', &opt.name_type),
         opt.font_size,
         opt.font_width,

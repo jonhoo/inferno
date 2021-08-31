@@ -18,16 +18,16 @@ text { font-family:"Verdana"; font-size:12px; fill:rgb(0,0,0); }
 .hide { display:none; }
 .parent { opacity:0.5; }
 </style>
-    <script type="text/ecmascript">
-        <![CDATA[var nametype = 'Function:';
-var fontsize = 12;
-var fontwidth = 0.59;
-var xpad = 10;
-var inverted = false;
-var searchcolor = 'rgb(125,125,125)';
-var fluiddrawing = true;
-var truncate_text_right = false;]]>
-    </script>
+    <script type="text/ecmascript"><![CDATA[
+        var nametype = 'Function:';
+        var fontsize = 12;
+        var fontwidth = 0.59;
+        var xpad = 10;
+        var inverted = false;
+        var searchcolor = 'rgb(125,125,125)';
+        var fluiddrawing = true;
+        var truncate_text_right = false;
+    ]]></script>
     <rect x="0" y="0" width="100%" height="246" fill="url(#background)"/>
     <text id="title" x="50.0000%" y="24.00">Flame Graph</text>
     <text id="details" x="10" y="229.00"> </text>
