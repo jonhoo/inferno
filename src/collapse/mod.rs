@@ -35,6 +35,13 @@ pub mod sample;
 ///   [crate-level documentation]: ../../index.html
 pub mod vtune;
 
+/// Stack collapsing for the output of the [Visual Studio built in profiler](https://docs.microsoft.com/en-us/visualstudio/profiling/profiling-feature-tour?view=vs-2019).
+///
+/// See the [crate-level documentation] for details.
+///
+///   [crate-level documentation]: ../../index.html
+pub mod vsprof;
+
 // DEFAULT_NTHREADS is public because we use it in the help text of the binaries,
 // but it doesn't need to be exposed to library users, hence #[doc(hidden)].
 #[doc(hidden)]

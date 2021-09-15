@@ -1,0 +1,3 @@
+﻿Level,Function Name,Number of Calls,Elapsed Inclusive Time %,Elapsed Exclusive Time %,Avg Elapsed Inclusive Time,Avg Elapsed Exclusive Time,Module Name,
+0,"Raytracer.exe",0,100.00,0.00,0.00,0.00,"",
+x,"Raytracer.Raytracer.Tracer.<TraceImage>b__5_0(int32)",471,91.25,18.39,401.92,81.02,"Raytracer.exe",
