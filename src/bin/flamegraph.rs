@@ -261,7 +261,7 @@ impl<'a> Opt {
     #[cfg(feature = "nameattr")]
     fn set_func_frameattrs(&self, options: &mut Options) {
         if let Some(file) = &self.nameattr {
-            match FuncFrameAttrsMap::from_file(&file) {
+            match FuncFrameAttrsMap::from_file(file) {
                 Ok(m) => {
                     options.func_frameattrs = m;
                 }

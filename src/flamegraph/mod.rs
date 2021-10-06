@@ -456,7 +456,7 @@ where
         error!("No stack counts found");
         // emit an error message SVG, for tools automating flamegraph use
         let imageheight = opt.font_size * 5;
-        svg::write_header(&mut svg, imageheight, &opt)?;
+        svg::write_header(&mut svg, imageheight, opt)?;
         svg::write_str(
             &mut svg,
             &mut buffer,
@@ -493,7 +493,7 @@ where
 
     // draw canvas, and embed interactive JavaScript program
     let imageheight = ((depthmax + 1) * opt.frame_height) + opt.ypad1() + opt.ypad2();
-    svg::write_header(&mut svg, imageheight, &opt)?;
+    svg::write_header(&mut svg, imageheight, opt)?;
 
     let (bgcolor1, bgcolor2) = color::bgcolor_for(opt.bgcolors, opt.colors);
     let style_options = StyleOptions {
@@ -502,7 +502,7 @@ where
         bgcolor2,
     };
 
-    svg::write_prelude(&mut svg, &style_options, &opt)?;
+    svg::write_prelude(&mut svg, &style_options, opt)?;
 
     // Used when picking color parameters at random, when no option determines how to pick these
     // parameters. We instanciate it here because it may be called once for each iteration in the
@@ -573,7 +573,7 @@ where
             write!(buffer, "all ({} {}, 100%)", samples_txt, opt.count_name)
         } else {
             let pct = (100 * samples) as f64 / (timemax as f64 * opt.factor);
-            let function = deannotate(&frame.location.function);
+            let function = deannotate(frame.location.function);
             match frame.delta {
                 None => write!(
                     buffer,
@@ -634,7 +634,7 @@ where
             let colors = opt.colors;
             let hash = opt.hash;
             let deterministic = opt.deterministic;
-            palette_map.find_color_for(&frame.location.function, |name| {
+            palette_map.find_color_for(frame.location.function, |name| {
                 color::color(colors, hash, deterministic, name, &mut thread_rng)
             })
         } else {
@@ -653,7 +653,7 @@ where
             .trunc() as usize;
         let text: svg::TextArgument<'_> = if fitchars >= 3 {
             // room for one char plus two dots
-            let f = deannotate(&frame.location.function);
+            let f = deannotate(frame.location.function);
 
             // TODO: use Unicode grapheme clusters instead
             if f.len() < fitchars {
@@ -718,11 +718,11 @@ fn write_container_start<'a, W: Write>(
     let mut has_href = false;
     if let Some(frame_attributes) = frame_attributes {
         if frame_attributes.attrs.contains_key("xlink:href") {
-            write_container_attributes(cache_a, &frame_attributes);
+            write_container_attributes(cache_a, frame_attributes);
             svg.write_event(&cache_a)?;
             has_href = true;
         } else {
-            write_container_attributes(cache_g, &frame_attributes);
+            write_container_attributes(cache_g, frame_attributes);
             svg.write_event(&cache_g)?;
         }
         if let Some(ref t) = frame_attributes.title {

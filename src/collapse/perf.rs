@@ -586,15 +586,13 @@ fn with_module_fallback(module: &str, func: &str, pc: &str, include_addrs: bool)
     // output string is a bit longer than rawfunc but not much
     let mut res = String::with_capacity(func.len() + 12);
 
+    res.push('[');
+    res.push_str(func);
     if include_addrs {
-        res.push('[');
-        res.push_str(func);
         res.push_str(" <");
         res.push_str(pc);
         res.push_str(">]");
     } else {
-        res.push('[');
-        res.push_str(func);
         res.push(']');
     }
 
