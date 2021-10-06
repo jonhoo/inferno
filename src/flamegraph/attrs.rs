@@ -1,6 +1,6 @@
 use std::fs::File;
 use std::io::{self, BufRead, BufReader};
-use std::path::PathBuf;
+use std::path::Path;
 
 use ahash::AHashMap;
 use indexmap::map::Entry;
@@ -27,7 +27,7 @@ impl FuncFrameAttrsMap {
     ///
     /// Each line should consist of a function name, a tab (`\t`), and then a sequence of
     /// tab-separated `name=value` pairs.
-    pub fn from_file(path: &PathBuf) -> io::Result<FuncFrameAttrsMap> {
+    pub fn from_file(path: &Path) -> io::Result<FuncFrameAttrsMap> {
         let file = BufReader::new(File::open(path)?);
         FuncFrameAttrsMap::from_reader(file)
     }
@@ -158,8 +158,8 @@ impl<'a> Iterator for AttrIter<'a> {
             warn!("no value after \"=\" for extra attribute {}", name);
         }
 
-        let (value, rest) = if rest.starts_with('"') {
-            if let Some(eq) = rest[1..].find('"') {
+        let (value, rest) = if let Some(stripped_rest) = rest.strip_prefix('"') {
+            if let Some(eq) = stripped_rest.find('"') {
                 (&rest[1..=eq], &rest[eq + 1..])
             } else {
                 warn!("no end quote found for extra attribute {}", name);

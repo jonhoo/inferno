@@ -122,9 +122,9 @@ impl From<Options> for Folder {
 
 impl Folder {
     fn line_parts<'a>(&self, line: &'a str) -> Option<(&'a str, &'a str, &'a str)> {
-        let mut line = if line.starts_with('"') {
+        let mut line = if let Some(line) = line.strip_prefix('"') {
             // The function name will be in quotes if it contains spaces.
-            line[1..].splitn(2, "\",")
+            line.splitn(2, "\",")
         } else {
             // We split on a string because we need to match the type of the other if branch.
             #[allow(clippy::single_char_pattern)]
