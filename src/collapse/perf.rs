@@ -23,6 +23,13 @@ mod logging {
     }
 }
 
+#[derive(PartialEq)]
+enum StackFilter {
+    Keep,
+    Skip,
+    SkipRemaining,
+}
+
 /// `perf` folder configuration options.
 #[derive(Clone, Debug)]
 #[non_exhaustive]
@@ -63,6 +70,12 @@ pub struct Options {
     ///
     /// Default is the number of logical cores on your machine.
     pub nthreads: usize,
+
+    /// If a stack function name is equal to the specified string it will omit all the
+    /// following stackframes for that event.
+    /// In case no function is matched the whole stack is returned.
+    /// Default is `None`.
+    pub skip_after: Option<String>,
 }
 
 impl Default for Options {
@@ -75,6 +88,7 @@ impl Default for Options {
             include_pid: false,
             include_tid: false,
             nthreads: *common::DEFAULT_NTHREADS,
+            skip_after: None,
         }
     }
 }
@@ -110,8 +124,8 @@ pub struct Folder {
     /// Called pname after original stackcollapse-perf source.
     pname: String,
 
-    /// Skip all stack lines in this event.
-    skip_stack: bool,
+    /// Whether to skip stack lines in this event.
+    stack_filter: StackFilter,
 
     /// Function entries on the stack in this entry thus far.
     stack: VecDeque<String>,
@@ -132,7 +146,7 @@ impl From<Options> for Folder {
             in_event: false,
             nstacks_per_job: common::DEFAULT_NSTACKS_PER_JOB,
             pname: String::default(),
-            skip_stack: false,
+            stack_filter: StackFilter::Keep,
             stack: VecDeque::default(),
             opt,
         }
@@ -189,7 +203,7 @@ impl CollapsePrivate for Folder {
 
         // Reset state...
         self.in_event = false;
-        self.skip_stack = false;
+        self.stack_filter = StackFilter::Keep;
         self.stack.clear();
         Ok(())
     }
@@ -246,7 +260,7 @@ impl CollapsePrivate for Folder {
             in_event: false,
             nstacks_per_job: self.nstacks_per_job,
             pname: String::new(),
-            skip_stack: false,
+            stack_filter: StackFilter::Keep,
             stack: VecDeque::default(),
             opt: self.opt.clone(),
         }
@@ -367,7 +381,7 @@ impl Folder {
             if let Some(event) = event {
                 if let Some(ref event_filter) = self.event_filter {
                     if event != event_filter {
-                        self.skip_stack = true;
+                        self.stack_filter = StackFilter::Skip;
                         return;
                     }
                 } else {
@@ -465,7 +479,11 @@ impl Folder {
     //     7f53389994d0 [unknown] ([unknown])
     //                0 [unknown] ([unknown])
     fn on_stack_line(&mut self, line: &str) {
-        if self.skip_stack {
+        let should_omit = matches!(
+            self.stack_filter,
+            StackFilter::Skip | StackFilter::SkipRemaining
+        );
+        if should_omit {
             return;
         }
 
@@ -531,6 +549,12 @@ impl Folder {
             while let Some(func) = self.cache_line.pop() {
                 self.stack.push_front(func);
             }
+
+            if let Some(skip_after) = &self.opt.skip_after {
+                if rawfunc == *skip_after {
+                    self.stack_filter = StackFilter::SkipRemaining;
+                }
+            }
         } else {
             logging::weird_stack_line(line);
         }
@@ -538,7 +562,7 @@ impl Folder {
 
     fn after_event(&mut self, occurrences: &mut Occurrences) {
         // end of stack, so emit stack entry
-        if !self.skip_stack {
+        if !self.stack.is_empty() {
             // allocate a string that is long enough to hold the entire stack string
             let mut stack_str = String::with_capacity(
                 self.pname.len() + self.stack.iter().fold(0, |a, s| a + s.len() + 1),
@@ -558,7 +582,7 @@ impl Folder {
 
         // reset for the next event
         self.in_event = false;
-        self.skip_stack = false;
+        self.stack_filter = StackFilter::Keep;
         self.stack.clear();
     }
 }
@@ -755,6 +779,33 @@ mod tests {
         <Folder as Collapse>::collapse(&mut folder, &bytes[..], io::sink())
     }
 
+    #[test]
+    fn test_skip_after() -> io::Result<()> {
+        let path = "./tests/data/collapse-perf/go-stacks.txt";
+        let mut file = fs::File::open(path)?;
+        let mut bytes = Vec::new();
+        file.read_to_end(&mut bytes)?;
+        let mut folder = {
+            let options = Options {
+                skip_after: Some("main.init".to_string()),
+                ..Default::default()
+            };
+            Folder::from(options)
+        };
+        let mut buf_actual = Vec::new();
+        <Folder as Collapse>::collapse(&mut folder, &bytes[..], &mut buf_actual)?;
+        let lines = std::str::from_utf8(&buf_actual[..]).unwrap().lines();
+
+        // without `skip_after` some collapsed lines would look like:
+        // go;[unknown];x_cgo_notify_runtime_init_done;runtime.main;main.init;...
+        for line in lines {
+            if line.contains("main.init") {
+                assert!(line.contains("go;main.init;")); // we removed the frames above "main.init"
+            }
+        }
+        Ok(())
+    }
+
     /// Varies the nstacks_per_job parameter and outputs the 10 fastests configurations by file.
     ///
     /// Command: `cargo test bench_nstacks_perf --release -- --ignored --nocapture`
@@ -791,6 +842,7 @@ mod tests {
                 include_pid: rng.gen(),
                 include_tid: rng.gen(),
                 nthreads: rng.gen_range(2..=32),
+                skip_after: None,
             };
 
             for (path, input) in inputs.iter() {
