@@ -9,7 +9,7 @@ use crate::collapse::Collapse;
 static HEADER: &str = "Function Stack,CPU Time:Self,Module";
 
 /// `vtune` folder configuration options.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 #[non_exhaustive]
 pub struct Options {
     /// Don't include modules with function names.
@@ -18,31 +18,16 @@ pub struct Options {
     pub no_modules: bool,
 }
 
-impl Default for Options {
-    fn default() -> Self {
-        Self { no_modules: false }
-    }
-}
-
 /// A stack collapser for CSV call graphs created with the VTune `amplxe-cl` tool.
 ///
 /// To construct one, either use `vtune::Folder::default()` or create an [`Options`] and use
 /// `vtune::Folder::from(options)`.
-#[derive(Clone)]
+#[derive(Clone, Default)]
 pub struct Folder {
     /// Function on the stack in this entry thus far.
     stack: Vec<String>,
 
     opt: Options,
-}
-
-impl Default for Folder {
-    fn default() -> Self {
-        Self {
-            stack: Vec::default(),
-            opt: Options::default(),
-        }
-    }
 }
 
 impl Collapse for Folder {

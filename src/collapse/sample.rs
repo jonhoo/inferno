@@ -29,7 +29,7 @@ static START_LINE: &str = "Call graph:";
 static END_LINE: &str = "Total number in stack";
 
 /// `sample` folder configuration options.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 #[non_exhaustive]
 pub struct Options {
     /// Don't include modules with function names.
@@ -38,17 +38,11 @@ pub struct Options {
     pub no_modules: bool,
 }
 
-impl Default for Options {
-    fn default() -> Self {
-        Self { no_modules: false }
-    }
-}
-
 /// A stack collapser for the output of `sample` on macOS.
 ///
 /// To construct one, either use `sample::Folder::default()` or create an [`Options`] and use
 /// `sample::Folder::from(options)`.
-#[derive(Clone)]
+#[derive(Clone, Default)]
 pub struct Folder {
     /// Number of samples for the current stack frame.
     current_samples: usize,
@@ -57,16 +51,6 @@ pub struct Folder {
     stack: Vec<String>,
 
     opt: Options,
-}
-
-impl Default for Folder {
-    fn default() -> Self {
-        Self {
-            current_samples: 0,
-            stack: Vec::default(),
-            opt: Options::default(),
-        }
-    }
 }
 
 impl Collapse for Folder {
