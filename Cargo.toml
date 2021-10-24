@@ -49,7 +49,7 @@ assert_cmd = "2"
 criterion = "0.3"
 libflate = "1"
 maplit = "1.0.1"
-pretty_assertions = "0.7"
+pretty_assertions = "1"
 rand = { version = "0.8", features = ["small_rng"] }
 testing_logger = "0.1.1"
 
