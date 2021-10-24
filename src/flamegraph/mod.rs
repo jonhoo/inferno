@@ -222,8 +222,8 @@ pub struct Options<'a> {
     /// a performance boost. If you have multiple input files, the lines will be merged and sorted
     /// regardless.
     ///
-    /// Note that if you use `from_sorted_lines` directly, the it is always your responsibility to
-    /// make sure the lines are sorted.
+    /// Note that if you use `from_lines` directly, the it is always your responsibility to make
+    /// sure the lines are sorted.
     pub no_sort: bool,
 
     /// Generate stack-reversed flame graph.
@@ -771,7 +771,7 @@ fn write_container_attributes(event: &mut Event<'_>, frame_attributes: &FrameAtt
 
 /// Produce a flame graph from a reader that contains a sequence of folded stack lines.
 ///
-/// See [`from_sorted_lines`] for the expected format of each line.
+/// See [`from_lines`] for the expected format of each line.
 ///
 /// The resulting flame graph will be written out to `writer` in SVG format.
 pub fn from_reader<R, W>(opt: &mut Options<'_>, reader: R, writer: W) -> quick_xml::Result<()>
@@ -784,7 +784,7 @@ where
 
 /// Produce a flame graph from a set of readers that contain folded stack lines.
 ///
-/// See [`from_sorted_lines`] for the expected format of each line.
+/// See [`from_lines`] for the expected format of each line.
 ///
 /// The resulting flame graph will be written out to `writer` in SVG format.
 pub fn from_readers<R, W>(opt: &mut Options<'_>, readers: R, writer: W) -> quick_xml::Result<()>

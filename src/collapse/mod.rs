@@ -50,7 +50,7 @@ use self::common::{CollapsePrivate, CAPACITY_READER};
 ///
 /// Implementors of this trait are providing a way to take the stack traces produced by a
 /// particular profiler's output (like `perf script`) and produce lines in the folded stack format
-/// expected by [`crate::flamegraph::from_sorted_lines`].
+/// expected by [`crate::flamegraph::from_lines`].
 ///
 /// See also the [crate-level documentation] for details.
 ///

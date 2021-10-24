@@ -34,11 +34,11 @@ struct Opt {
     #[structopt(long = "all")]
     all: bool,
 
-    /// Annotate jit functions with a _[j]
+    /// Annotate jit functions with a `_[j]`
     #[structopt(long = "jit")]
     jit: bool,
 
-    /// Annotate kernel functions with a _[k]
+    /// Annotate kernel functions with a `_[k]`
     #[structopt(long = "kernel")]
     kernel: bool,
 
