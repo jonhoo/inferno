@@ -141,8 +141,8 @@
 //!   [sample]: https://gist.github.com/loderunner/36724cc9ee8db66db305#profiling-with-sample
 //!   [VTune]: https://software.intel.com/en-us/vtune-amplifier-help-command-line-interface
 
-#![warn(rustdoc::all)]
-#![allow(rustdoc::missing_doc_code_examples)]
+#![cfg_attr(doc, warn(rustdoc::all))]
+#![cfg_attr(doc, allow(rustdoc::missing_doc_code_examples))]
 #![deny(missing_docs)]
 #![cfg_attr(all(test, feature = "nightly"), feature(test))]
 
