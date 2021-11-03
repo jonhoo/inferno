@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [0.10.8] - 2021-11-02
+### Added
+ - Setting for skipping frames prior to a known frame. [#222](https://github.com/jonhoo/inferno/pull/222)
+
 ## [0.10.7] - 2021-09-01
 ### Changed
  - Upgraded internal dependencies. [#216](https://github.com/jonhoo/inferno/pull/216)
@@ -162,7 +166,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Moved to `IndexMap` and FNV hashing ([#127](https://github.com/jonhoo/inferno/pull/127))
 - Moved CI to Azure DevOps Pipelines
 
-[Unreleased]: https://github.com/jonhoo/inferno/compare/v0.10.7...HEAD
+[Unreleased]: https://github.com/jonhoo/inferno/compare/v0.10.8...HEAD
+[0.10.8]: https://github.com/jonhoo/inferno/compare/v0.10.7...v0.10.8
 [0.10.7]: https://github.com/jonhoo/inferno/compare/v0.10.6...v0.10.7
 [0.10.6]: https://github.com/jonhoo/inferno/compare/v0.10.5...v0.10.6
 [0.10.5]: https://github.com/jonhoo/inferno/compare/v0.10.4...v0.10.5
