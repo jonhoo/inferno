@@ -470,9 +470,14 @@ mod tests {
             input.extend_from_slice(valid_stack.as_bytes());
         }
 
-        let mut folder = Folder::default();
-        folder.nstacks_per_job = 1;
-        folder.opt.nthreads = 12;
+        let mut folder = Folder {
+            nstacks_per_job: 1,
+            opt: Options {
+                nthreads: 12,
+                ..Options::default()
+            },
+            ..Folder::default()
+        };
         <Folder as Collapse>::collapse(&mut folder, &input[..], io::sink()).unwrap();
     }
 

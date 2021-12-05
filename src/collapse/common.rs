@@ -679,7 +679,7 @@ pub(crate) mod testing {
             {
                 let default = folder.nstacks_per_job();
 
-                let (nlines, nstacks) = count_lines_and_stacks(&bytes);
+                let (nlines, nstacks) = count_lines_and_stacks(bytes);
                 if nlines < MIN_LINES {
                     return Ok(None);
                 }
@@ -694,7 +694,7 @@ pub(crate) mod testing {
                     let mut durations = Vec::new();
                     for _ in 0..NSAMPLES {
                         let now = Instant::now();
-                        folder.collapse(&bytes[..], io::sink())?;
+                        folder.collapse(bytes, io::sink())?;
                         durations.push(now.elapsed().as_nanos_compat());
                     }
                     let avg_duration =
