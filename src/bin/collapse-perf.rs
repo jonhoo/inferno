@@ -80,6 +80,11 @@ struct Opt {
     #[structopt(value_name = "PATH")]
     /// Perf script output file, or STDIN if not specified
     infile: Option<PathBuf>,
+
+    #[structopt(long = "skip-after", value_name = "STRING")]
+    /// If set, will omit all the stack frames that follow the frame with matched function name.
+    /// Has not effect on the stack trace if no function is matched.
+    skip_after: Option<String>,
 }
 
 impl Opt {
@@ -92,6 +97,7 @@ impl Opt {
         options.annotate_kernel = self.kernel || self.all;
         options.event_filter = self.event_filter;
         options.nthreads = self.nthreads;
+        options.skip_after = self.skip_after;
         (self.infile, options)
     }
 }
