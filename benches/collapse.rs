@@ -34,20 +34,18 @@ macro_rules! benchmark_single {
 
             let mut collapser = $name::Folder::default();
 
-            c.bench(
-                "collapse",
-                ParameterizedBenchmark::new(
-                    $name_str,
-                    move |b, data| {
-                        b.iter(|| {
-                            let _result = collapser.collapse(data.as_slice(), io::sink());
-                        })
-                    },
-                    vec![bytes],
-                )
-                .throughput(|bytes| Throughput::Bytes(bytes.len() as u64))
-                .sample_size(SAMPLE_SIZE),
-            );
+            let mut group = c.benchmark_group($name_str);
+
+            group
+                .bench_with_input("collapse", &bytes, move |b, data| {
+                    b.iter(|| {
+                        let _result = collapser.collapse(data.as_slice(), io::sink());
+                    })
+                })
+                .throughput(Throughput::Bytes(bytes.len() as u64))
+                .sample_size(SAMPLE_SIZE);
+
+            group.finish();
         }
     };
 }
@@ -70,25 +68,31 @@ macro_rules! benchmark_multi {
                 $name::Folder::from(options)
             };
 
-            c.bench(
-                "collapse",
-                ParameterizedBenchmark::new(
-                    format!("{}/1", $name_str),
-                    move |b, data| {
-                        b.iter(|| {
-                            let _result = collapser1.collapse(data.as_slice(), io::sink());
-                        })
-                    },
-                    vec![bytes],
-                )
-                .with_function(format!("{}/{}", $name_str, *NTHREADS), move |b, data| {
+            let mut group = c.benchmark_group("collapse");
+
+            group
+                .bench_with_input(format!("{}/{}", $name_str, 1), &bytes, move |b, data| {
                     b.iter(|| {
-                        let _result = collapser2.collapse(data.as_slice(), io::sink());
+                        let _result = collapser1.collapse(data.as_slice(), io::sink());
                     })
                 })
-                .throughput(|bytes| Throughput::Bytes(bytes.len() as u64))
-                .sample_size(SAMPLE_SIZE),
-            );
+                .throughput(Throughput::Bytes(bytes.len() as u64))
+                .sample_size(SAMPLE_SIZE);
+
+            group
+                .bench_with_input(
+                    format!("{}/{}", $name_str, *NTHREADS),
+                    &bytes,
+                    move |b, data| {
+                        b.iter(|| {
+                            let _result = collapser2.collapse(data.as_slice(), io::sink());
+                        })
+                    },
+                )
+                .throughput(Throughput::Bytes(bytes.len() as u64))
+                .sample_size(SAMPLE_SIZE);
+
+            group.finish();
         }
     };
 }
