@@ -568,13 +568,19 @@ impl Folder {
                 self.pname.len() + self.stack.iter().fold(0, |a, s| a + s.len() + 1),
             );
 
-            // add the comm name
-            stack_str.push_str(&self.pname);
-            // add the other stack entries (if any)
-            for e in self.stack.drain(..) {
+            // If we skip remaining frames we want to skip pname as well.
+            if self.stack_filter != StackFilter::SkipRemaining {
+                // add the comm name
+                stack_str.push_str(&self.pname);
                 stack_str.push(';');
-                stack_str.push_str(&e);
             }
+            for e in self.stack.drain(..) {
+                stack_str.push_str(&e);
+                stack_str.push(';');
+            }
+
+            // self.stack is not empty, therefore stack_str has at least one frame followed by ';'
+            stack_str.pop();
 
             // count it!
             occurrences.insert_or_add(stack_str, 1);
@@ -800,7 +806,7 @@ mod tests {
         // go;[unknown];x_cgo_notify_runtime_init_done;runtime.main;main.init;...
         for line in lines {
             if line.contains("main.init") {
-                assert!(line.contains("go;main.init;")); // we removed the frames above "main.init"
+                assert!(line.contains("main.init;")); // we removed the frames above "main.init"
             }
         }
         Ok(())
