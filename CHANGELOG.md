@@ -11,6 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [0.10.9] - 2021-12-18
+### Added
+ - `collapse-perf` gained `--skip-after` argument. [#224](https://github.com/jonhoo/inferno/pull/224)
+
+### Changed
+ - Frame skipping will also skip the process frame. [#224](https://github.com/jonhoo/inferno/pull/224)
+
 ## [0.10.8] - 2021-11-02
 ### Added
  - Setting for skipping frames prior to a known frame. [#222](https://github.com/jonhoo/inferno/pull/222)
@@ -166,7 +173,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Moved to `IndexMap` and FNV hashing ([#127](https://github.com/jonhoo/inferno/pull/127))
 - Moved CI to Azure DevOps Pipelines
 
-[Unreleased]: https://github.com/jonhoo/inferno/compare/v0.10.8...HEAD
+[Unreleased]: https://github.com/jonhoo/inferno/compare/v0.10.9...HEAD
+[0.10.9]: https://github.com/jonhoo/inferno/compare/v0.10.8...v0.10.9
 [0.10.8]: https://github.com/jonhoo/inferno/compare/v0.10.7...v0.10.8
 [0.10.7]: https://github.com/jonhoo/inferno/compare/v0.10.6...v0.10.7
 [0.10.6]: https://github.com/jonhoo/inferno/compare/v0.10.5...v0.10.6
