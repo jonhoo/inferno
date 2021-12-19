@@ -82,8 +82,9 @@ struct Opt {
     infile: Option<PathBuf>,
 
     #[structopt(long = "skip-after", value_name = "STRING")]
-    /// If set, will omit all the stack frames that follow the frame with matched function name.
-    /// Has not effect on the stack trace if no function is matched.
+    /// If set, will omit all the parent stack frames of the frame with matched function name.
+    ///
+    /// Has no effect on the stack trace if no function is matched.
     skip_after: Option<String>,
 }
 
