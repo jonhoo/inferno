@@ -8,78 +8,78 @@ use inferno::flamegraph::{self, defaults, Direction, Options, Palette, TextTrunc
 #[cfg(feature = "nameattr")]
 use inferno::flamegraph::FuncFrameAttrsMap;
 
-use structopt::StructOpt;
+use clap::Parser;
 
-#[derive(Debug, StructOpt)]
-#[structopt(name = "inferno-flamegraph", about)]
+#[derive(Debug, Parser)]
+#[clap(name = "inferno-flamegraph", about)]
 struct Opt {
     // ************* //
     // *** FLAGS *** //
     // ************* //
     /// Use consistent palette (palette.map)
-    #[structopt(long = "cp")]
+    #[clap(long = "cp")]
     cp: bool,
 
     /// Colors are selected by hashing the function name, weighting earlier characters more
     /// heavily
-    #[structopt(long = "hash", conflicts_with = "deterministic")]
+    #[clap(long = "hash", conflicts_with = "deterministic")]
     hash: bool,
 
     /// Colors are selected such that the color of a function does not change between runs
-    #[structopt(long = "deterministic", conflicts_with = "hash")]
+    #[clap(long = "deterministic", conflicts_with = "hash")]
     deterministic: bool,
 
     /// Plot the flame graph up-side-down
-    #[structopt(short = "i", long = "inverted")]
+    #[clap(short = 'i', long = "inverted")]
     inverted: bool,
 
     /// If text doesn't fit in frame, truncate right side.
-    #[structopt(long = "truncate-text-right")]
+    #[clap(long = "truncate-text-right")]
     truncate_text_right: bool,
 
     /// Switch differential hues (green<->red)
-    #[structopt(long = "negate")]
+    #[clap(long = "negate")]
     negate: bool,
 
     /// Don't include static JavaScript in flame graph.
     /// This flag is hidden since it's only meant to be used in
     /// tests so we don't have to include the same static
     /// JavaScript in all of the test files
-    #[structopt(hidden = true, long = "no-javascript")]
+    #[clap(hide = true, long = "no-javascript")]
     no_javascript: bool,
 
     /// Don't sort the input lines.
     /// If you set this flag you need to be sure your
     /// input stack lines are already sorted
-    #[structopt(name = "no-sort", long = "no-sort")]
+    #[clap(name = "no-sort", long = "no-sort")]
     no_sort: bool,
 
     /// Pretty print XML with newlines and indentation.
-    #[structopt(long = "pretty-xml")]
+    #[clap(long = "pretty-xml")]
     pretty_xml: bool,
 
     /// Silence all log output
-    #[structopt(short = "q", long = "quiet")]
+    #[clap(short = 'q', long = "quiet")]
     quiet: bool,
 
     /// Generate stack-reversed flame graph
-    #[structopt(long = "reverse", conflicts_with = "no-sort")]
+    #[clap(long = "reverse", conflicts_with = "no-sort")]
     reverse: bool,
 
     /// Verbose logging mode (-v, -vv, -vvv)
-    #[structopt(short = "v", long = "verbose", parse(from_occurrences))]
+    #[clap(short = 'v', long = "verbose", parse(from_occurrences))]
     verbose: usize,
 
     // *************** //
     // *** OPTIONS *** //
     // *************** //
     /// Set background colors. Gradient choices are yellow (default), blue, green, grey; flat colors use "#rrggbb"
-    #[structopt(long = "bgcolors", value_name = "STRING")]
+    #[clap(long = "bgcolors", value_name = "STRING")]
     bgcolors: Option<BackgroundColor>,
 
     /// Set color palette
-    #[structopt(
-        short = "c",
+    #[clap(
+        short = 'c',
         long = "colors",
         default_value = defaults::COLORS,
         possible_values = &["aqua","blue","green","hot","io","java","js","mem","orange","perl","purple","red","rust","wakeup","yellow"],
@@ -88,11 +88,11 @@ struct Opt {
     colors: Palette,
 
     /// Color frames based on their width, highlighting expensive codepaths
-    #[structopt(long = "colordiffusion", conflicts_with = "colors")]
+    #[clap(long = "colordiffusion", conflicts_with = "colors")]
     color_diffusion: bool,
 
     /// Count type label
-    #[structopt(
+    #[clap(
         long = "countname",
         default_value = defaults::COUNT_NAME,
         value_name = "STRING"
@@ -100,7 +100,7 @@ struct Opt {
     countname: String,
 
     /// Factor to scale sample counts by
-    #[structopt(
+    #[clap(
         long = "factor",
         default_value = &defaults::str::FACTOR,
         value_name = "FLOAT"
@@ -108,7 +108,7 @@ struct Opt {
     factor: f64,
 
     /// Font size
-    #[structopt(
+    #[clap(
         long = "fontsize",
         default_value = &defaults::str::FONT_SIZE,
         value_name = "UINT"
@@ -116,7 +116,7 @@ struct Opt {
     fontsize: usize,
 
     /// Font type
-    #[structopt(
+    #[clap(
         long = "fonttype",
         default_value = defaults::FONT_TYPE,
         value_name = "STRING"
@@ -124,7 +124,7 @@ struct Opt {
     fonttype: String,
 
     /// Font width
-    #[structopt(
+    #[clap(
         long = "fontwidth",
         default_value = &defaults::str::FONT_WIDTH,
         value_name = "FLOAT"
@@ -132,7 +132,7 @@ struct Opt {
     fontwidth: f64,
 
     /// Height of each frame
-    #[structopt(
+    #[clap(
         long = "height",
         default_value = &defaults::str::FRAME_HEIGHT,
         value_name = "UINT"
@@ -140,7 +140,7 @@ struct Opt {
     height: usize,
 
     /// Omit functions smaller than <FLOAT> percent
-    #[structopt(
+    #[clap(
         long = "minwidth",
         default_value = &defaults::str::MIN_WIDTH,
         value_name = "FLOAT"
@@ -151,11 +151,11 @@ struct Opt {
     /// Each line in the file should be a function name followed by a tab,
     /// then a sequence of tab separated name=value pairs
     #[cfg(feature = "nameattr")]
-    #[structopt(long = "nameattr", value_name = "PATH")]
+    #[clap(long = "nameattr", value_name = "PATH")]
     nameattr: Option<PathBuf>,
 
     /// Name type label
-    #[structopt(
+    #[clap(
         long = "nametype",
         default_value = defaults::NAME_TYPE,
         value_name = "STRING"
@@ -163,11 +163,11 @@ struct Opt {
     nametype: String,
 
     /// Set embedded notes in SVG
-    #[structopt(long = "notes", value_name = "STRING")]
+    #[clap(long = "notes", value_name = "STRING")]
     notes: Option<String>,
 
     /// Search color
-    #[structopt(
+    #[clap(
         long = "search-color",
         default_value = defaults::SEARCH_COLOR,
         value_name = "STRING"
@@ -175,11 +175,11 @@ struct Opt {
     search_color: SearchColor,
 
     /// Second level title (optional)
-    #[structopt(long = "subtitle", value_name = "STRING")]
+    #[clap(long = "subtitle", value_name = "STRING")]
     subtitle: Option<String>,
 
     /// Change title text
-    #[structopt(
+    #[clap(
         long = "title",
         default_value = defaults::TITLE,
         value_name = "STRING"
@@ -187,18 +187,18 @@ struct Opt {
     title: String,
 
     /// Width of image
-    #[structopt(long = "width", value_name = "UINT")]
+    #[clap(long = "width", value_name = "UINT")]
     width: Option<usize>,
 
     // ************ //
     // *** ARGS *** //
     // ************ //
     /// Collapsed perf output files. With no PATH, or PATH is -, read STDIN.
-    #[structopt(name = "PATH", parse(from_os_str))]
+    #[clap(name = "PATH", parse(from_os_str))]
     infiles: Vec<PathBuf>,
 
     /// Produce a flame chart (sort by time, do not merge stacks)
-    #[structopt(
+    #[clap(
         long = "flamechart",
         conflicts_with = "no-sort",
         conflicts_with = "reverse"
@@ -277,7 +277,7 @@ impl<'a> Opt {
 const PALETTE_MAP_FILE: &str = "palette.map"; // default name for the palette map file
 
 fn main() -> quick_xml::Result<()> {
-    let opt = Opt::from_args();
+    let opt = Opt::parse();
 
     // Initialize logger
     if !opt.quiet {
@@ -342,16 +342,16 @@ fn save_consistent_palette_if_needed(
 #[cfg(test)]
 mod tests {
     use super::Opt;
+    use clap::Parser;
     use inferno::flamegraph::{color, Direction, Options, Palette, TextTruncateDirection};
     use pretty_assertions::assert_eq;
     use std::path::PathBuf;
     use std::str::FromStr;
-    use structopt::StructOpt;
 
     #[test]
     fn default_options() {
         let args = vec!["inferno-flamegraph", "test_infile"];
-        let opt = Opt::from_iter_safe(args).unwrap();
+        let opt = Opt::try_parse_from(args).unwrap();
         let (_infiles, options) = opt.into_parts();
         assert_eq!(options, Options::default());
     }
@@ -401,7 +401,7 @@ mod tests {
             "test_infile1",
             "test_infile2",
         ];
-        let opt = Opt::from_iter_safe(args).unwrap();
+        let opt = Opt::try_parse_from(args).unwrap();
         let (infiles, options) = opt.into_parts();
         let mut expected_options = Options::default();
         expected_options.colors = Palette::from_str("purple").unwrap();

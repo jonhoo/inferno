@@ -22,7 +22,7 @@ codecov = { repository = "jonhoo/inferno", branch = "master", service = "github"
 
 [features]
 default = ["cli", "multithreaded", "nameattr"]
-cli = ["structopt", "env_logger"]
+cli = ["clap", "env_logger"]
 multithreaded = ["dashmap", "crossbeam-utils", "crossbeam-channel", "num_cpus"]
 nameattr = ["indexmap"]
 
@@ -42,7 +42,7 @@ num-format = { version = "0.4", default-features = false }
 quick-xml = { version = "0.22", default-features = false }
 rgb = "0.8.13"
 str_stack = "0.1"
-structopt = { version = "0.3", optional = true }
+clap = { version = "3.0.1", optional = true, features = ["derive"] }
 
 [dev-dependencies]
 assert_cmd = "2"

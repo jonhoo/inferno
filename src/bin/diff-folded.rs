@@ -1,12 +1,12 @@
 use std::io;
 use std::path::PathBuf;
 
+use clap::Parser;
 use env_logger::Env;
 use inferno::differential::{self, Options};
-use structopt::StructOpt;
 
-#[derive(Debug, StructOpt)]
-#[structopt(
+#[derive(Debug, Parser)]
+#[clap(
     name = "inferno-diff-folded",
     about,
     after_help = "\
@@ -31,30 +31,30 @@ struct Opt {
     // *** FLAGS *** //
     // ************* //
     /// Normalize sample counts
-    #[structopt(short = "n", long = "normalize")]
+    #[clap(short = 'n', long = "normalize")]
     normalize: bool,
 
     /// Strip hex numbers (addresses)
-    #[structopt(short = "s", long = "strip-hex")]
+    #[clap(short = 's', long = "strip-hex")]
     strip_hex: bool,
 
     /// Silence all log output
-    #[structopt(short = "q", long = "quiet")]
+    #[clap(short = 'q', long = "quiet")]
     quiet: bool,
 
     /// Verbose logging mode (-v, -vv, -vvv)
-    #[structopt(short = "v", long = "verbose", parse(from_occurrences))]
+    #[clap(short = 'v', long = "verbose", parse(from_occurrences))]
     verbose: usize,
 
     // ************ //
     // *** ARGS *** //
     // ************ //
     /// Path to folded stack profile 1
-    #[structopt(value_name = "PATH1")]
+    #[clap(value_name = "PATH1")]
     path1: PathBuf,
 
     /// Path to folded stack profile 2
-    #[structopt(value_name = "PATH2")]
+    #[clap(value_name = "PATH2")]
     path2: PathBuf,
 }
 
@@ -72,7 +72,7 @@ impl Opt {
 }
 
 fn main() -> io::Result<()> {
-    let opt = Opt::from_args();
+    let opt = Opt::parse();
 
     // Initialize logger
     if !opt.quiet {
