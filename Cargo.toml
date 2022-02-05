@@ -1,6 +1,6 @@
 [package]
 name = "inferno"
-version = "0.10.10"
+version = "0.10.11"
 edition = "2018"
 authors = ["Jon Gjengset <jon@thesquareplanet.com>"]
 
@@ -31,7 +31,7 @@ ahash = "0.7"
 atty = "0.2"
 crossbeam-utils = { version = "0.8", optional = true }
 crossbeam-channel = { version = "0.5", optional = true }
-dashmap = { version = "5", optional = true }
+dashmap = { version = "4", optional = true }
 env_logger = { version = "0.9", default-features = false, optional = true }
 indexmap = { version = "1.0", optional = true }
 itoa = "1"
