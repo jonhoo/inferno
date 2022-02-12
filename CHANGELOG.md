@@ -11,6 +11,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [0.10.12] - 2022-02-12
+### Changed
+ - Re-bump dashmap
+
+## [0.10.11] - 2022-02-05
+### Changed
+ - Undo dashmap bump since 5.0.0 was yanked
+
+## [0.10.10] - 2022-01-10
+### Changed
+ - Bumped various internal dependencies (notably dashmap and clap)
+
 ## [0.10.9] - 2021-12-18
 ### Added
  - `collapse-perf` gained `--skip-after` argument. [#224](https://github.com/jonhoo/inferno/pull/224)
@@ -173,7 +185,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Moved to `IndexMap` and FNV hashing ([#127](https://github.com/jonhoo/inferno/pull/127))
 - Moved CI to Azure DevOps Pipelines
 
-[Unreleased]: https://github.com/jonhoo/inferno/compare/v0.10.9...HEAD
+[Unreleased]: https://github.com/jonhoo/inferno/compare/v0.10.12...HEAD
+[0.10.12]: https://github.com/jonhoo/inferno/compare/v0.10.11...v0.10.12
+[0.10.11]: https://github.com/jonhoo/inferno/compare/v0.10.10...v0.10.11
+[0.10.10]: https://github.com/jonhoo/inferno/compare/v0.10.9...v0.10.10
 [0.10.9]: https://github.com/jonhoo/inferno/compare/v0.10.8...v0.10.9
 [0.10.8]: https://github.com/jonhoo/inferno/compare/v0.10.7...v0.10.8
 [0.10.7]: https://github.com/jonhoo/inferno/compare/v0.10.6...v0.10.7
