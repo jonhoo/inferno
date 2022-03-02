@@ -789,7 +789,7 @@ mod tests {
     }
 
     #[test]
-    fn test_skip_after() -> io::Result<()> {
+    fn test_one_skip_after() -> io::Result<()> {
         let path = "./tests/data/collapse-perf/go-stacks.txt";
         let mut file = fs::File::open(path)?;
         let mut bytes = Vec::new();
@@ -810,6 +810,37 @@ mod tests {
         for line in lines {
             if line.contains("main.init") {
                 assert!(line.contains("main.init;")); // we removed the frames above "main.init"
+            }
+        }
+        Ok(())
+    }
+
+    #[test]
+    fn test_multiple_skip_after() -> io::Result<()> {
+        let path = "./tests/data/collapse-perf/go-stacks.txt";
+        let mut file = fs::File::open(path)?;
+        let mut bytes = Vec::new();
+        file.read_to_end(&mut bytes)?;
+        let mut folder = {
+            let options = Options {
+                skip_after: vec!["main.init".to_string(), "regexp.compile".to_string()],
+                ..Default::default()
+            };
+            Folder::from(options)
+        };
+        let mut buf_actual = Vec::new();
+        <Folder as Collapse>::collapse(&mut folder, &bytes[..], &mut buf_actual)?;
+        let lines = std::str::from_utf8(&buf_actual[..]).unwrap().lines();
+
+        for line in lines {
+            // without `skip_after` some collapsed lines would look like:
+            // go;[unknown];x_cgo_notify_runtime_init_done;runtime.main;main.init;...
+            if line.contains("main.init") {
+                assert!(line.contains("main.init;")); // we removed the frames above "main.init"
+            }
+            // Collapse some other lines too, just to make sure it works.
+            if line.contains("regexp.compile") {
+                assert!(line.contains("regexp.compile;")); // we removed the frames above "regexp.compile"
             }
         }
         Ok(())
