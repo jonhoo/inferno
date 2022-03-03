@@ -809,7 +809,7 @@ mod tests {
         // go;[unknown];x_cgo_notify_runtime_init_done;runtime.main;main.init;...
         for line in lines {
             if line.contains("main.init") {
-                assert!(line.contains("main.init;")); // we removed the frames above "main.init"
+                assert!(line.starts_with("main.init;")); // we removed the frames above "main.init"
             }
         }
         Ok(())
@@ -833,14 +833,13 @@ mod tests {
         let lines = std::str::from_utf8(&buf_actual[..]).unwrap().lines();
 
         for line in lines {
-            // without `skip_after` some collapsed lines would look like:
-            // go;[unknown];x_cgo_notify_runtime_init_done;runtime.main;main.init;...
-            if line.contains("main.init") {
-                assert!(line.contains("main.init;")); // we removed the frames above "main.init"
-            }
-            // Collapse some other lines too, just to make sure it works.
             if line.contains("regexp.compile") {
-                assert!(line.contains("regexp.compile;")); // we removed the frames above "regexp.compile"
+                // Collapse some other lines too, just to make sure it works.
+                assert!(line.starts_with("regexp.compile;")); // we removed the frames above "regexp.compile"
+            } else if line.contains("main.init") {
+                // without `skip_after` some collapsed lines would look like:
+                // go;[unknown];x_cgo_notify_runtime_init_done;runtime.main;main.init;...
+                assert!(line.starts_with("main.init;")); // we removed the frames above "main.init"
             }
         }
         Ok(())
