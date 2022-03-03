@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [0.10.13] - 2022-03-02
+### Changed
+ - Allowed `--skip-after` to appear multiple times. [#231](https://github.com/jonhoo/inferno/pull/231)
+
 ## [0.10.12] - 2022-02-12
 ### Changed
  - Re-bump dashmap
@@ -185,7 +189,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Moved to `IndexMap` and FNV hashing ([#127](https://github.com/jonhoo/inferno/pull/127))
 - Moved CI to Azure DevOps Pipelines
 
-[Unreleased]: https://github.com/jonhoo/inferno/compare/v0.10.12...HEAD
+[Unreleased]: https://github.com/jonhoo/inferno/compare/v0.10.13...HEAD
+[0.10.13]: https://github.com/jonhoo/inferno/compare/v0.10.12...v0.10.13
 [0.10.12]: https://github.com/jonhoo/inferno/compare/v0.10.11...v0.10.12
 [0.10.11]: https://github.com/jonhoo/inferno/compare/v0.10.10...v0.10.11
 [0.10.10]: https://github.com/jonhoo/inferno/compare/v0.10.9...v0.10.10
