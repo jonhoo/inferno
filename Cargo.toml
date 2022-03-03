@@ -15,11 +15,6 @@ license = "CDDL-1.0"
 
 exclude = ["/tests/**", "/flamegraph/**", "/*.perf"]
 
-[badges]
-azure-devops = { project = "jonhoo/jonhoo", pipeline = "inferno", build = "10" }
-cirrus-ci = { repository = "jonhoo/inferno" }
-codecov = { repository = "jonhoo/inferno", branch = "master", service = "github" }
-
 [features]
 default = ["cli", "multithreaded", "nameattr"]
 cli = ["clap", "env_logger"]
