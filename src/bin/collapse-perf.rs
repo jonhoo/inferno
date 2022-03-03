@@ -82,10 +82,10 @@ struct Opt {
     infile: Option<PathBuf>,
 
     #[clap(long = "skip-after", value_name = "STRING")]
-    /// If set, will omit all the parent stack frames of the frame with matched function name.
+    /// If set, will omit all the parent stack frames of any frame with a matched function name.
     ///
-    /// Has no effect on the stack trace if no function is matched.
-    skip_after: Option<String>,
+    /// Has no effect on the stack trace if no functions are matched.
+    skip_after: Vec<String>,
 }
 
 impl Opt {

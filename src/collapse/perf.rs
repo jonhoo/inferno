@@ -71,11 +71,11 @@ pub struct Options {
     /// Default is the number of logical cores on your machine.
     pub nthreads: usize,
 
-    /// If a stack function name is equal to the specified string it will omit all the
+    /// If a stack function name is equal to any of the specified strings it will omit all the
     /// following stackframes for that event.
     /// In case no function is matched the whole stack is returned.
-    /// Default is `None`.
-    pub skip_after: Option<String>,
+    /// Default is not omitting any.
+    pub skip_after: Vec<String>,
 }
 
 impl Default for Options {
@@ -88,7 +88,7 @@ impl Default for Options {
             include_pid: false,
             include_tid: false,
             nthreads: *common::DEFAULT_NTHREADS,
-            skip_after: None,
+            skip_after: Vec::default(),
         }
     }
 }
@@ -550,10 +550,13 @@ impl Folder {
                 self.stack.push_front(func);
             }
 
-            if let Some(skip_after) = &self.opt.skip_after {
-                if rawfunc == *skip_after {
-                    self.stack_filter = StackFilter::SkipRemaining;
-                }
+            if self
+                .opt
+                .skip_after
+                .iter()
+                .any(|skip_after| rawfunc == *skip_after)
+            {
+                self.stack_filter = StackFilter::SkipRemaining;
             }
         } else {
             logging::weird_stack_line(line);
@@ -786,14 +789,14 @@ mod tests {
     }
 
     #[test]
-    fn test_skip_after() -> io::Result<()> {
+    fn test_one_skip_after() -> io::Result<()> {
         let path = "./tests/data/collapse-perf/go-stacks.txt";
         let mut file = fs::File::open(path)?;
         let mut bytes = Vec::new();
         file.read_to_end(&mut bytes)?;
         let mut folder = {
             let options = Options {
-                skip_after: Some("main.init".to_string()),
+                skip_after: vec!["main.init".to_string()],
                 ..Default::default()
             };
             Folder::from(options)
@@ -806,7 +809,37 @@ mod tests {
         // go;[unknown];x_cgo_notify_runtime_init_done;runtime.main;main.init;...
         for line in lines {
             if line.contains("main.init") {
-                assert!(line.contains("main.init;")); // we removed the frames above "main.init"
+                assert!(line.starts_with("main.init;")); // we removed the frames above "main.init"
+            }
+        }
+        Ok(())
+    }
+
+    #[test]
+    fn test_multiple_skip_after() -> io::Result<()> {
+        let path = "./tests/data/collapse-perf/go-stacks.txt";
+        let mut file = fs::File::open(path)?;
+        let mut bytes = Vec::new();
+        file.read_to_end(&mut bytes)?;
+        let mut folder = {
+            let options = Options {
+                skip_after: vec!["main.init".to_string(), "regexp.compile".to_string()],
+                ..Default::default()
+            };
+            Folder::from(options)
+        };
+        let mut buf_actual = Vec::new();
+        <Folder as Collapse>::collapse(&mut folder, &bytes[..], &mut buf_actual)?;
+        let lines = std::str::from_utf8(&buf_actual[..]).unwrap().lines();
+
+        for line in lines {
+            if line.contains("regexp.compile") {
+                // Collapse some other lines too, just to make sure it works.
+                assert!(line.starts_with("regexp.compile;")); // we removed the frames above "regexp.compile"
+            } else if line.contains("main.init") {
+                // without `skip_after` some collapsed lines would look like:
+                // go;[unknown];x_cgo_notify_runtime_init_done;runtime.main;main.init;...
+                assert!(line.starts_with("main.init;")); // we removed the frames above "main.init"
             }
         }
         Ok(())
@@ -848,7 +881,7 @@ mod tests {
                 include_pid: rng.gen(),
                 include_tid: rng.gen(),
                 nthreads: rng.gen_range(2..=32),
-                skip_after: None,
+                skip_after: Vec::default(),
             };
 
             for (path, input) in inputs.iter() {
