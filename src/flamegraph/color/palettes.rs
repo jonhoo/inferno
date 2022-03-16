@@ -78,7 +78,9 @@ pub(super) mod js {
         } else if name.contains(':') {
             return BasicPalette::Aqua;
         } else if let Some(ai) = name.find('/') {
-            if (&name[ai..]).contains(".js") {
+            if (&name[ai..]).contains("node_modules/") {
+                return BasicPalette::Purple;
+            } else if (&name[ai..]).contains(".js") {
                 return BasicPalette::Green;
             }
         }
@@ -467,6 +469,10 @@ mod tests {
             TestData {
                 input: String::from("some/ai.js"),
                 output: BasicPalette::Green,
+            },
+            TestData {
+                input: String::from("project/node_modules/dep/index.js"),
+                output: BasicPalette::Purple,
             },
             TestData {
                 input: String::from("someai.js"),
