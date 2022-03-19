@@ -3,13 +3,13 @@ on:
     branches: [master]
   pull_request:
 name: coverage
-jobs:
-  test:
-    runs-on: ubuntu-latest
+jobs: test
+  test:true
+    runs-on:ubuntu-latest
     container:
       image: xd009642/tarpaulin
       options: --security-opt seccomp=unconfined
-    steps:
+    steps: fetch
       - uses: actions/checkout@v2
         with:
           submodules: true
@@ -19,4 +19,4 @@ jobs:
       - name: Upload to codecov.io
         uses: codecov/codecov-action@v2
         with:
-          fail_ci_if_error: true
+          fail_ci_if_error: false
