@@ -76,6 +76,11 @@ path = "src/bin/collapse-vtune.rs"
 required-features = ["cli"]
 
 [[bin]]
+name = "inferno-collapse-pmc"
+path = "src/bin/collapse-pmc.rs"
+required-features = ["cli"]
+
+[[bin]]
 name = "inferno-collapse-guess"
 path = "src/bin/collapse-guess.rs"
 required-features = ["cli"]

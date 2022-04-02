@@ -1,0 +1,39 @@
+@ CLOCK.HARD [302186 samples]
+
+01.17%  [173]      randomdev_encrypt @ /boot/kernel/kernel
+ 95.95%  [166]       random_fortuna_read
+  100.0%  [166]        read_random_uio
+   100.0%  [166]         devfs_read_f
+    100.0%  [166]          kern_readv
+     100.0%  [166]           sys_read
+      100.0%  [166]            amd64_syscall
+ 04.05%  [7]         read_random_uio
+  100.0%  [7]          devfs_read_f
+   100.0%  [7]           kern_readv
+    100.0%  [7]            sys_read
+     100.0%  [7]             amd64_syscall
+
+00.40%  [59]       acpi_timer_get_timecount @ /boot/kernel/kernel
+ 84.75%  [50]        binuptime
+  54.00%  [27]         kern_clock_nanosleep
+   100.0%  [27]          sys_nanosleep
+    100.0%  [27]           amd64_syscall
+  34.00%  [17]         cpu_idleclock
+   100.0%  [17]          cpu_idle
+    100.0%  [17]           sched_idletd
+     100.0%  [17]            fork_exit
+  10.00%  [5]          kern_poll
+   100.0%  [5]           sys_poll
+    100.0%  [5]            amd64_syscall
+  02.00%  [1]          g_io_deliver
+   100.0%  [1]           md_kthread
+    100.0%  [1]            fork_exit
+ 10.17%  [6]         microtime
+  100.0%  [6]          sys_gettimeofday
+   100.0%  [6]           amd64_syscall
+ 05.08%  [3]         nanouptime
+  100.0%  [3]          kern_clock_gettime
+   100.0%  [3]           do_wait
+    100.0%  [3]            __umtx_op_wait_uint_private
+     100.0%  [3]             amd64_syscall
+

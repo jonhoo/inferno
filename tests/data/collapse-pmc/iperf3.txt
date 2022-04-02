@@ -1,0 +1,192 @@
+@ CLOCK.HARD [118 samples]
+
+50.00%  [59]       copyout_nosmap_std @ /boot/kernel/kernel
+ 100.0%  [59]        uiomove_faultflag
+  100.0%  [59]         soreceive_generic
+   100.0%  [59]          soreceive
+    100.0%  [59]           dofileread
+     100.0%  [59]            sys_read
+      100.0%  [59]             amd64_syscall
+
+11.86%  [14]       soreceive_generic @ /boot/kernel/kernel
+ 100.0%  [14]        soreceive
+  100.0%  [14]         dofileread
+   100.0%  [14]          sys_read
+    100.0%  [14]           amd64_syscall
+
+11.86%  [14]       acpi_timer_get_timecount @ /boot/kernel/kernel
+ 85.71%  [12]        nanouptime
+  100.0%  [12]         kern_clock_gettime
+   100.0%  [12]          sys_clock_gettime
+    100.0%  [12]           amd64_syscall
+ 14.29%  [2]         binuptime
+  100.0%  [2]          cpu_idleclock
+   100.0%  [2]           cpu_idle
+    100.0%  [2]            sched_idletd
+     100.0%  [2]             fork_exit
+
+03.39%  [4]        uma_zfree_arg @ /boot/kernel/kernel
+ 100.0%  [4]         mb_free_ext
+  100.0%  [4]          m_free
+   100.0%  [4]           soreceive_generic
+    100.0%  [4]            soreceive
+     100.0%  [4]             dofileread
+      100.0%  [4]              sys_read
+       100.0%  [4]               amd64_syscall
+
+01.69%  [2]        0xb768a @ /lib/libc.so.7
+ 100.0%  [2]         cJSON_Version @ /usr/local/lib/libiperf.so.0.0.0
+  100.0%  [2]          0x202238 @ /usr/local/bin/iperf3
+   100.0%  [2]           0x20210f
+    100.0%  [2]            0x201ee0
+
+01.69%  [2]        tcp_output @ /boot/kernel/kernel
+ 100.0%  [2]         tcp_usr_rcvd
+  100.0%  [2]          soreceive_generic
+   100.0%  [2]           soreceive
+    100.0%  [2]            dofileread
+     100.0%  [2]             sys_read
+      100.0%  [2]              amd64_syscall
+
+01.69%  [2]        uiomove_faultflag @ /boot/kernel/kernel
+ 100.0%  [2]         soreceive_generic
+  100.0%  [2]          soreceive
+   100.0%  [2]           dofileread
+    100.0%  [2]            sys_read
+     100.0%  [2]             amd64_syscall
+
+01.69%  [2]        Xfast_syscall @ /boot/kernel/kernel
+
+01.69%  [2]        pmap_kextract @ /boot/kernel/kernel
+ 100.0%  [2]         uma_zfree_arg
+  100.0%  [2]          mb_free_ext
+   100.0%  [2]           m_free
+    100.0%  [2]            soreceive_generic
+     100.0%  [2]             soreceive
+      100.0%  [2]              dofileread
+       100.0%  [2]               sys_read
+        100.0%  [2]                amd64_syscall
+
+00.85%  [1]        virtqueue_dequeue @ /boot/kernel/kernel
+ 100.0%  [1]         vtnet_rxq_eof
+  100.0%  [1]          vtnet_rx_vq_process
+   100.0%  [1]           ithread_loop
+    100.0%  [1]            fork_exit
+
+00.85%  [1]        _cv_timedwait_sig_sbt @ /boot/kernel/kernel
+ 100.0%  [1]         seltdwait
+  100.0%  [1]          kern_select
+   100.0%  [1]           sys_select
+    100.0%  [1]            amd64_syscall
+
+00.85%  [1]        vtpci_legacy_notify_vq @ /boot/kernel/kernel
+ 100.0%  [1]         virtqueue_notify
+  100.0%  [1]          vtnet_txq_notify
+   100.0%  [1]           vtnet_txq_mq_start_locked
+    100.0%  [1]            vtnet_txq_mq_start
+     100.0%  [1]             ether_output_frame
+      100.0%  [1]              ether_output
+       100.0%  [1]               ip_output_send
+        100.0%  [1]                ip_output
+         100.0%  [1]                 tcp_output
+          100.0%  [1]                  tcp_do_segment
+           100.0%  [1]                   tcp_input_with_port
+            100.0%  [1]                    tcp_input
+             100.0%  [1]                     ip_input
+              100.0%  [1]                      netisr_dispatch_src
+               100.0%  [1]                       ether_demux
+                100.0%  [1]                        ether_nh_input
+                 100.0%  [1]                         netisr_dispatch_src
+                  100.0%  [1]                          ether_input
+                   100.0%  [1]                           vtnet_rxq_eof
+                    100.0%  [1]                            vtnet_rx_vq_process
+                     100.0%  [1]                             ithread_loop
+                      100.0%  [1]                              fork_exit
+
+00.85%  [1]        acpi_cpu_c1 @ /boot/kernel/kernel
+ 100.0%  [1]         acpi_cpu_idle
+  100.0%  [1]          cpu_idle_acpi
+   100.0%  [1]           cpu_idle
+    100.0%  [1]            sched_idletd
+     100.0%  [1]             fork_exit
+
+00.85%  [1]        kern_select @ /boot/kernel/kernel
+ 100.0%  [1]         sys_select
+  100.0%  [1]          amd64_syscall
+
+00.85%  [1]        sbfree @ /boot/kernel/kernel
+ 100.0%  [1]         soreceive_generic
+  100.0%  [1]          soreceive
+   100.0%  [1]           dofileread
+    100.0%  [1]            sys_read
+     100.0%  [1]             amd64_syscall
+
+00.85%  [1]        fget_only_user @ /boot/kernel/kernel
+ 100.0%  [1]         kern_select
+  100.0%  [1]          sys_select
+   100.0%  [1]           amd64_syscall
+
+00.85%  [1]        selfdfree @ /boot/kernel/kernel
+ 100.0%  [1]         kern_select
+  100.0%  [1]          sys_select
+   100.0%  [1]           amd64_syscall
+
+00.85%  [1]        PHYS_TO_VM_PAGE @ /boot/kernel/kernel
+ 100.0%  [1]         free
+  100.0%  [1]          kern_select
+   100.0%  [1]           sys_select
+    100.0%  [1]            amd64_syscall
+
+00.85%  [1]        m_free @ /boot/kernel/kernel
+ 100.0%  [1]         soreceive_generic
+  100.0%  [1]          soreceive
+   100.0%  [1]           dofileread
+    100.0%  [1]            sys_read
+     100.0%  [1]             amd64_syscall
+
+00.85%  [1]        tcp_usr_rcvd @ /boot/kernel/kernel
+ 100.0%  [1]         soreceive_generic
+  100.0%  [1]          soreceive
+   100.0%  [1]           dofileread
+    100.0%  [1]            sys_read
+     100.0%  [1]             amd64_syscall
+
+00.85%  [1]        0xb44f1 @ /lib/libc.so.7
+ 100.0%  [1]         cJSON_Version @ /usr/local/lib/libiperf.so.0.0.0
+  100.0%  [1]          0x202238 @ /usr/local/bin/iperf3
+   100.0%  [1]           0x20210f
+    100.0%  [1]            0x201ee0
+
+00.85%  [1]        maybe_yield @ /boot/kernel/kernel
+ 100.0%  [1]         uiomove_faultflag
+  100.0%  [1]          soreceive_generic
+   100.0%  [1]           soreceive
+    100.0%  [1]            dofileread
+     100.0%  [1]             sys_read
+      100.0%  [1]              amd64_syscall
+
+00.85%  [1]        spinlock_exit @ /boot/kernel/kernel
+ 100.0%  [1]         cpu_idleclock
+  100.0%  [1]          cpu_idle
+   100.0%  [1]           sched_idletd
+    100.0%  [1]            fork_exit
+
+00.85%  [1]        0xf126 @ /lib/libthr.so.3
+ 100.0%  [1]         cJSON_Version @ /usr/local/lib/libiperf.so.0.0.0
+  100.0%  [1]          0x202238 @ /usr/local/bin/iperf3
+   100.0%  [1]           0x20210f
+    100.0%  [1]            0x201ee0
+
+00.85%  [1]        mb_free_ext @ /boot/kernel/kernel
+ 100.0%  [1]         m_free
+  100.0%  [1]          soreceive_generic
+   100.0%  [1]           soreceive
+    100.0%  [1]            dofileread
+     100.0%  [1]             sys_read
+      100.0%  [1]              amd64_syscall
+
+00.85%  [1]        sopoll_generic @ /boot/kernel/kernel
+ 100.0%  [1]         kern_select
+  100.0%  [1]          sys_select
+   100.0%  [1]           amd64_syscall
+

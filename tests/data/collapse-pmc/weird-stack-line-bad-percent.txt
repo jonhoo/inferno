@@ -1,0 +1,5 @@
+@ CLOCK.HARD [302186 samples]
+
+86.17%  [260401]   acpi_cpu_c1 @ /boot/kernel/kernel
+ %  [260401]    acpi_cpu_idle
+

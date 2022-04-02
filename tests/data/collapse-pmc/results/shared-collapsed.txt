@@ -1,0 +1,8 @@
+amd64_syscall;__umtx_op_wait_uint_private;do_wait;kern_clock_gettime;nanouptime;acpi_timer_get_timecount 3
+amd64_syscall;sys_gettimeofday;microtime;acpi_timer_get_timecount 6
+amd64_syscall;sys_nanosleep;kern_clock_nanosleep;binuptime;acpi_timer_get_timecount 27
+amd64_syscall;sys_poll;kern_poll;binuptime;acpi_timer_get_timecount 5
+amd64_syscall;sys_read;kern_readv;devfs_read_f;read_random_uio;random_fortuna_read;randomdev_encrypt 166
+amd64_syscall;sys_read;kern_readv;devfs_read_f;read_random_uio;randomdev_encrypt 7
+fork_exit;md_kthread;g_io_deliver;binuptime;acpi_timer_get_timecount 1
+fork_exit;sched_idletd;cpu_idle;cpu_idleclock;binuptime;acpi_timer_get_timecount 17

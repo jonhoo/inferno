@@ -1,0 +1,209 @@
+@ CLOCK.HARD [2 samples]
+
+100.0%  [2]        spinlock_exit @ /boot/kernel/kernel
+ 50.00%  [1]         sleepq_timedwait
+  100.0%  [1]          _sleep
+   100.0%  [1]           pmclog_loop @ /boot/kernel/hwpmc.ko
+    100.0%  [1]            fork_exit @ /boot/kernel/kernel
+ 50.00%  [1]         cpu_activeclock
+  100.0%  [1]          cpu_idle
+   100.0%  [1]           sched_idletd
+    100.0%  [1]            fork_exit
+
+@ CLOCK.HARD [1 samples]
+
+100.0%  [1]        spinlock_exit @ /boot/kernel/kernel
+ 100.0%  [1]         cpu_activeclock
+  100.0%  [1]          cpu_idle
+   100.0%  [1]           sched_idletd
+    100.0%  [1]            fork_exit
+
+@ CLOCK.HARD [251 samples]
+
+89.64%  [225]      randomdev_keystream @ /boot/kernel/kernel
+ 100.0%  [225]       random_fortuna_genbytes
+  100.0%  [225]        random_fortuna_read
+   100.0%  [225]         read_random_uio
+    100.0%  [225]          devfs_read_f
+     100.0%  [225]           dofileread
+      100.0%  [225]            sys_read
+       100.0%  [225]             amd64_syscall
+
+02.79%  [7]        copyout_nosmap_std @ /boot/kernel/kernel
+ 100.0%  [7]         uiomove_faultflag
+  100.0%  [7]          read_random_uio
+   100.0%  [7]           devfs_read_f
+    100.0%  [7]            dofileread
+     100.0%  [7]             sys_read
+      100.0%  [7]              amd64_syscall
+
+02.39%  [6]        memset_std @ /boot/kernel/kernel
+ 100.0%  [6]         explicit_bzero
+  100.0%  [6]          zfree
+   100.0%  [6]           read_random_uio
+    100.0%  [6]            devfs_read_f
+     100.0%  [6]             dofileread
+      100.0%  [6]              sys_read
+       100.0%  [6]               amd64_syscall
+
+01.59%  [4]        spinlock_exit @ /boot/kernel/kernel
+ 100.0%  [4]         pmap_update_pde
+  50.00%  [2]          pmap_promote_pde
+   100.0%  [2]           pmap_enter
+    100.0%  [2]            kmem_back_domain
+     100.0%  [2]             kmem_malloc_domainset
+      100.0%  [2]              malloc_large
+       100.0%  [2]               malloc
+        100.0%  [2]                read_random_uio
+         100.0%  [2]                 devfs_read_f
+          100.0%  [2]                  dofileread
+           100.0%  [2]                   sys_read
+            100.0%  [2]                    amd64_syscall
+  50.00%  [2]          pmap_demote_pde_locked
+   100.0%  [2]           pmap_remove
+    100.0%  [2]            _kmem_unback
+     100.0%  [2]             kmem_free
+      100.0%  [2]              zfree
+       100.0%  [2]               read_random_uio
+        100.0%  [2]                devfs_read_f
+         100.0%  [2]                 dofileread
+          100.0%  [2]                  sys_read
+           100.0%  [2]                   amd64_syscall
+
+01.20%  [3]        vm_radix_insert @ /boot/kernel/kernel
+ 100.0%  [3]         vm_page_alloc_domain_after
+  100.0%  [3]          kmem_back_domain
+   100.0%  [3]           kmem_malloc_domainset
+    100.0%  [3]            malloc_large
+     100.0%  [3]             malloc
+      100.0%  [3]              read_random_uio
+       100.0%  [3]               devfs_read_f
+        100.0%  [3]                dofileread
+         100.0%  [3]                 sys_read
+          100.0%  [3]                  amd64_syscall
+
+00.80%  [2]        0xb768a @ /lib/libc.so.7
+ 100.0%  [2]         0x2042e0 @ /bin/dd
+
+00.40%  [1]        vm_reserv_free_page @ /boot/kernel/kernel
+ 100.0%  [1]         vm_page_free_prep
+  100.0%  [1]          vm_page_free_toq
+   100.0%  [1]           _kmem_unback
+    100.0%  [1]            kmem_free
+     100.0%  [1]             zfree
+      100.0%  [1]              read_random_uio
+       100.0%  [1]               devfs_read_f
+        100.0%  [1]                dofileread
+         100.0%  [1]                 sys_read
+          100.0%  [1]                  amd64_syscall
+
+00.40%  [1]        zfree @ /boot/kernel/kernel
+ 100.0%  [1]         read_random_uio
+  100.0%  [1]          devfs_read_f
+   100.0%  [1]           dofileread
+    100.0%  [1]            sys_read
+     100.0%  [1]             amd64_syscall
+
+00.40%  [1]        vm_page_free_prep @ /boot/kernel/kernel
+ 100.0%  [1]         vm_page_free_toq
+  100.0%  [1]          _kmem_unback
+   100.0%  [1]           kmem_free
+    100.0%  [1]            zfree
+     100.0%  [1]             read_random_uio
+      100.0%  [1]              devfs_read_f
+       100.0%  [1]               dofileread
+        100.0%  [1]                sys_read
+         100.0%  [1]                 amd64_syscall
+
+00.40%  [1]        vm_domain_allocate @ /boot/kernel/kernel
+ 100.0%  [1]         vm_reserv_alloc_page
+  100.0%  [1]          vm_page_alloc_domain_after
+   100.0%  [1]           kmem_back_domain
+    100.0%  [1]            kmem_malloc_domainset
+     100.0%  [1]             malloc_large
+      100.0%  [1]              malloc
+       100.0%  [1]               read_random_uio
+        100.0%  [1]                devfs_read_f
+         100.0%  [1]                 dofileread
+          100.0%  [1]                  sys_read
+           100.0%  [1]                   amd64_syscall
+
+@ è [66 samples]
+
+87.88%  [58]       randomdev_keystream @ /boot/kernel/kernel
+ 100.0%  [58]        random_fortuna_genbytes
+  100.0%  [58]         random_fortuna_read
+   100.0%  [58]          read_random_uio
+    100.0%  [58]           devfs_read_f
+     100.0%  [58]            dofileread
+      100.0%  [58]             sys_read
+       100.0%  [58]              amd64_syscall
+
+06.06%  [4]        spinlock_exit @ /boot/kernel/kernel
+ 75.00%  [3]         pmap_update_pde
+  66.67%  [2]          pmap_promote_pde
+   100.0%  [2]           pmap_enter
+    100.0%  [2]            kmem_back_domain
+     100.0%  [2]             kmem_malloc_domainset
+      100.0%  [2]              malloc_large
+       100.0%  [2]               malloc
+        100.0%  [2]                read_random_uio
+         100.0%  [2]                 devfs_read_f
+          100.0%  [2]                  dofileread
+           100.0%  [2]                   sys_read
+            100.0%  [2]                    amd64_syscall
+  33.33%  [1]          pmap_demote_pde_locked
+   100.0%  [1]           pmap_remove
+    100.0%  [1]            _kmem_unback
+     100.0%  [1]             kmem_free
+      100.0%  [1]              zfree
+       100.0%  [1]               read_random_uio
+        100.0%  [1]                devfs_read_f
+         100.0%  [1]                 dofileread
+          100.0%  [1]                  sys_read
+           100.0%  [1]                   amd64_syscall
+ 25.00%  [1]         cpu_activeclock
+  100.0%  [1]          cpu_idle
+   100.0%  [1]           sched_idletd
+    100.0%  [1]            fork_exit
+
+01.52%  [1]        copyout_nosmap_std @ /boot/kernel/kernel
+ 100.0%  [1]         uiomove_faultflag
+  100.0%  [1]          read_random_uio
+   100.0%  [1]           devfs_read_f
+    100.0%  [1]            dofileread
+     100.0%  [1]             sys_read
+      100.0%  [1]              amd64_syscall
+
+01.52%  [1]        vm_reserv_free_page @ /boot/kernel/kernel
+ 100.0%  [1]         vm_page_free_prep
+  100.0%  [1]          vm_page_free_toq
+   100.0%  [1]           _kmem_unback
+    100.0%  [1]            kmem_free
+     100.0%  [1]             zfree
+      100.0%  [1]              read_random_uio
+       100.0%  [1]               devfs_read_f
+        100.0%  [1]                dofileread
+         100.0%  [1]                 sys_read
+          100.0%  [1]                  amd64_syscall
+
+01.52%  [1]        memset_std @ /boot/kernel/kernel
+ 100.0%  [1]         explicit_bzero
+  100.0%  [1]          zfree
+   100.0%  [1]           read_random_uio
+    100.0%  [1]            devfs_read_f
+     100.0%  [1]             dofileread
+      100.0%  [1]              sys_read
+       100.0%  [1]               amd64_syscall
+
+01.52%  [1]        vm_page_free_prep @ /boot/kernel/kernel
+ 100.0%  [1]         vm_page_free_toq
+  100.0%  [1]          _kmem_unback
+   100.0%  [1]           kmem_free
+    100.0%  [1]            zfree
+     100.0%  [1]             read_random_uio
+      100.0%  [1]              devfs_read_f
+       100.0%  [1]               dofileread
+        100.0%  [1]                sys_read
+         100.0%  [1]                 amd64_syscall
+

@@ -1,0 +1,18 @@
+@ CLOCK.HARD [302186 samples]
+
+86.17%  [260401]   acpi_cpu_c1 @ /boot/kernel/kernel
+ 100.0%  [260401]    acpi_cpu_idle
+  100.0%  [260401]     cpu_idle_acpi
+   100.0%  [260401]      cpu_idle
+    100.0%  [260401]       sched_idletd
+     100.0%  [260401]        fork_exit
+
+00.55%  [1676]     aes_ecb_encrypt @ /boot/kernel/kernel
+ 100.0%  [1676]      rijndael_blockEncrypt
+  100.0%  [1676]       random_fortuna_read
+   100.0%  [1676]        read_random_uio
+    100.0%  [1676]         devfs_read_f
+     100.0%  [1676]          kern_readv
+      100.0%  [1676]           sys_read
+       100.0%  [1676]            amd64_syscall
+
