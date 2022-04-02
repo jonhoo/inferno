@@ -57,7 +57,9 @@ fn collapse_vsprof_should_return_error_for_incorrect_header() {
     let test_file = "./tests/data/collapse-vsprof/incorrect-header.csv";
     let error = test_collapse_vsprof_error(test_file);
     assert_eq!(error.kind(), io::ErrorKind::InvalidData);
-    assert!(error.to_string().starts_with("Incorrect header:"));
+    assert!(error
+        .to_string()
+        .starts_with("Expected first line to be header line"));
 }
 
 #[test]
@@ -83,7 +85,7 @@ fn collapse_vsprof_should_return_error_for_invalid_depth() {
     let test_file = "./tests/data/collapse-vsprof/invalid-depth.csv";
     let error = test_collapse_vsprof_error(test_file);
     assert_eq!(error.kind(), io::ErrorKind::InvalidData);
-    assert!(error.to_string().starts_with("Invalid number in line:"));
+    assert!(error.to_string().starts_with("Unable to parse number"));
 }
 
 #[test]
@@ -91,7 +93,9 @@ fn collapse_vsprof_should_return_error_for_invalid_number_of_calls() {
     let test_file = "./tests/data/collapse-vsprof/invalid-number-of-calls.csv";
     let error = test_collapse_vsprof_error(test_file);
     assert_eq!(error.kind(), io::ErrorKind::InvalidData);
-    assert!(error.to_string().starts_with("Invalid number in line:"));
+    assert!(error
+        .to_string()
+        .starts_with("Floating point numbers are not valid here"));
 }
 
 #[test]

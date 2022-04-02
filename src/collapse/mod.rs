@@ -35,7 +35,7 @@ pub mod sample;
 ///   [crate-level documentation]: ../../index.html
 pub mod vtune;
 
-/// Stack collapsing for the output of the [Visual Studio built in profiler](https://docs.microsoft.com/en-us/visualstudio/profiling/profiling-feature-tour?view=vs-2019).
+/// Stack collapsing for the output of the [Visual Studio built-in profiler](https://docs.microsoft.com/en-us/visualstudio/profiling/profiling-feature-tour?view=vs-2019).
 ///
 /// See the [crate-level documentation] for details.
 ///

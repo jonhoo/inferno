@@ -1,7 +1,4 @@
-use std::{
-    cmp::Ordering,
-    io::{self, BufRead},
-};
+use std::{cmp::Ordering, io};
 
 use log::warn;
 
@@ -30,8 +27,12 @@ impl Collapse for Folder {
         };
 
         let header = String::from_utf8_lossy(&line).to_string();
-        if !line_matches_start_line(header.clone()) {
-            return invalid_data_error!("Incorrect header:\n{}", header);
+        if !line_matches_start_line(&header) {
+            return invalid_data_error!(
+                "Expected first line to be header line\n    {}\nbut instead got\n    {}",
+                START_LINE,
+                header
+            );
         }
 
         // Process the data
@@ -61,28 +62,23 @@ impl Collapse for Folder {
     }
 
     fn is_applicable(&mut self, input: &str) -> Option<bool> {
-        let mut input = input.as_bytes();
-        let mut line = String::new();
-        if let Ok(n) = input.read_line(&mut line) {
-            if n == 0 {
-                return Some(false);
-            }
-        } else {
-            return Some(false);
-        }
+        let line = input
+            .lines()
+            .next()
+            .expect("there is always at least one line (even if empty)");
 
         Some(line_matches_start_line(line))
     }
 }
 
 impl Folder {
-    // Parse lines like:
+    // Parse lines with values in the order as specified by `START_LINE`, comma delimited.
     // Level,Function Name,Number of Calls,...
     // 6,"System.String.IsNullOrEmpty(string)",4,0.00,0.00,0.00,0.00,"mscorlib.dll",
     fn on_line(&mut self, line: &str, occurences: &mut Occurrences) -> io::Result<()> {
         let (depth, remainder) = get_next_number(line)?;
 
-        // Function names are always wrapped in spaces. By trimming the leading double quote, we
+        // Function names are always wrapped in quotes. By trimming the leading double quote, we
         // know that the next double quote is the double quote closing the function name. Splitting
         // on this double quote, we get the function name and the remainder of the line.
         let split = if let Some(remainder) = remainder.strip_prefix('"') {
@@ -108,6 +104,7 @@ impl Folder {
             match prev_depth.cmp(&depth) {
                 // Case 1
                 Ordering::Less => {
+                    assert_eq!(prev_depth + 1, depth);
                     self.stack
                         .push((function_name.to_string(), number_of_calls));
                 }
@@ -166,11 +163,9 @@ impl Folder {
 
     // Store the current stack in `occurences`
     fn write_stack(&self, occurrences: &mut Occurrences) {
-        if let Some(nsamples) = self.stack.last().map(|(_, n)| *n) {
-            if nsamples > 0 {
-                let functions: Vec<_> = self.stack.iter().cloned().map(|(f, _)| f).collect();
-                occurrences.insert(functions.join(";"), nsamples);
-            }
+        if let Some(nsamples) = self.stack.last().map(|(_, n)| *n).filter(|n| *n > 0) {
+            let functions: Vec<_> = self.stack.iter().map(|(f, _)| &f[..]).collect();
+            occurrences.insert(functions.join(";"), nsamples);
         }
     }
 }
@@ -179,36 +174,62 @@ impl Folder {
 /// line doesn't contain double quotes, or the number can be >1000, in which case the line does
 /// contain double quotes. In both cases `line` may start with a leading comma, which will be
 /// ignored.
+///
+/// ### Example inputs
+/// - Number <1000: `471,91.25,18.39,401.92,81.02,"Raytracer.exe",`
+/// - Number >1000: `"2,893,824",54.37,4.21,0.04,0.00,"Raytracer.exe",`
 fn get_next_number(line: &str) -> io::Result<(usize, &str)> {
     // Trim the leading comma, if any
     let line = line.strip_prefix(',').unwrap_or(line);
 
     let mut remove_leading_comma = false;
-    let split = if let Some(line) = line.strip_prefix('"') {
+    let field = if let Some(line) = line.strip_prefix('"') {
         remove_leading_comma = true;
         line.split_once('"')
     } else {
         line.split_once(',')
     };
 
-    if let Some((num, remainder)) = split {
-        // Remove any thousands separators which may be present
-        // TODO: If Visual Studio were to output numbers with a `.` as thousands separators, this
-        //       would fail
-        let num = num.replace(',', "");
-
-        if let Ok(num) = num.parse::<usize>() {
-            if remove_leading_comma {
-                // `remainder` still has a leading comma, because the number is >1000. We need to
-                // remove it so we are consistent regardless of whether the number was wrapped in
-                // double quotes or not.
-                if let Some(remainder) = remainder.strip_prefix(',') {
-                    return Ok((num, remainder));
+    if let Some((num, remainder)) = field {
+        // Parse the number
+        let thousands = num.split(|c: char| !c.is_ascii_digit());
+        let mut n = 0;
+        for thousand in thousands {
+            if n == 0 {
+                if thousand.len() > 3 {
+                    return invalid_data_error!(
+                        "Expected thousands separators for number bigger than 1000, found '{}'",
+                        num
+                    );
                 }
+            } else if thousand.len() != 3 {
+                return invalid_data_error!(
+                    "Floating point numbers are not valid here, expected an integer, found '{}'",
+                    num
+                );
             }
 
-            return Ok((num, remainder));
+            n *= 1000;
+            if let Ok(num) = thousand.parse::<usize>() {
+                n += num;
+            } else {
+                return invalid_data_error!(
+                    "Unable to parse number '{}', expected an integer",
+                    num
+                );
+            }
         }
+
+        if remove_leading_comma {
+            // `remainder` still has a leading comma, because the number is >1000. We need to
+            // remove it so we are consistent regardless of whether the number was wrapped in
+            // double quotes or not.
+            if let Some(remainder) = remainder.strip_prefix(',') {
+                return Ok((n, remainder));
+            }
+        }
+
+        return Ok((n, remainder));
     }
 
     invalid_data_error!("Invalid number in line:\n{}", line)
@@ -217,6 +238,8 @@ fn get_next_number(line: &str) -> io::Result<(usize, &str)> {
 /// Some files may start with the <U+FEFF> character (zero width no-break space). This
 /// causes the call to `starts_with` to return false, which in this case isn't what we want.
 /// As this character has no influence on the rest of the file, we can safely ignore it.
-fn line_matches_start_line(line: String) -> bool {
-    line.trim().trim_start_matches('\u{feff}') == START_LINE
+fn line_matches_start_line(line: &str) -> bool {
+    line.trim()
+        .trim_start_matches('\u{feff}')
+        .starts_with(START_LINE)
 }
