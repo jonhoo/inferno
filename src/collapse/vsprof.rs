@@ -243,3 +243,45 @@ fn line_matches_start_line(line: &str) -> bool {
         .trim_start_matches('\u{feff}')
         .starts_with(START_LINE)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::get_next_number;
+
+    #[test]
+    fn get_next_number_default() {
+        let result = get_next_number(r#"471,91.25,18.39,401.92,81.02,"Raytracer.exe","#);
+        assert!(result.is_ok());
+
+        let (result, _) = result.unwrap();
+        assert_eq!(result, 471);
+    }
+
+    #[test]
+    fn get_next_number_with_leading_comma() {
+        let result = get_next_number(r#",471,91.25,18.39,401.92,81.02,"Raytracer.exe","#);
+        assert!(result.is_ok());
+
+        let (result, _) = result.unwrap();
+        assert_eq!(result, 471);
+    }
+
+    #[test]
+    fn get_next_number_with_thousands_sep() {
+        let result = get_next_number(r#""2,893,824",54.37,4.21,0.04,0.00,"Raytracer.exe","#);
+        assert!(result.is_ok());
+
+        let (result, _) = result.unwrap();
+        assert_eq!(result, 2_893_824);
+    }
+
+    #[test]
+    fn get_next_number_missing_thousands_sep() {
+        assert!(get_next_number(r#""2893824",54.37,4.21,0.04,0.00,"Raytracer.exe","#).is_err());
+    }
+
+    #[test]
+    fn get_next_number_with_float() {
+        assert!(get_next_number(r#""2,893.82",54.37,4.21,0.04,0.00,"Raytracer.exe","#).is_err());
+    }
+}
