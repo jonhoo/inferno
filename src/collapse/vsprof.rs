@@ -129,9 +129,10 @@ impl Folder {
                     // the previous node (in this case `B()`) from the current node (in this case
                     // `A()`. This leaves `A()` with the correct number of 500 samples.
                     //
-                    // If the previous number of calls is equal to the current number of calls, we
-                    // don't want to write the current top node, because that would duplicate the
-                    // number of samples for the current node.
+                    // The top node is always written, but while walking down the stack, if the
+                    // previous number of calls is equal to the current number of calls, we don't
+                    // want to write the current top node, because that would duplicate the number
+                    // of samples for the current node.
                     let mut prev_number_of_calls = 0;
                     for _ in 0..(prev_depth - depth + 1) {
                         if prev_number_of_calls != self.stack.last().unwrap().1 {
