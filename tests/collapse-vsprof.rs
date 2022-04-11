@@ -67,7 +67,9 @@ fn collapse_vsprof_should_return_error_for_missing_function_name() {
     let test_file = "./tests/data/collapse-vsprof/missing-function-name.csv";
     let error = test_collapse_vsprof_error(test_file);
     assert_eq!(error.kind(), io::ErrorKind::InvalidData);
-    assert!(error.to_string().starts_with("Invalid number in line:"));
+    assert!(error
+        .to_string()
+        .starts_with("Missing function name in line:"));
 }
 
 #[test]

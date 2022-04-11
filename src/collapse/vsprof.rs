@@ -78,6 +78,10 @@ impl Folder {
     fn on_line(&mut self, line: &str, occurences: &mut Occurrences) -> io::Result<()> {
         let (depth, remainder) = get_next_number(line)?;
 
+        if remainder.is_empty() {
+            return invalid_data_error!("Missing function name in line:\n{}", line);
+        }
+
         // Function names are always wrapped in quotes. By trimming the leading double quote, we
         // know that the next double quote is the double quote closing the function name. Splitting
         // on this double quote, we get the function name and the remainder of the line.
@@ -188,12 +192,12 @@ fn get_next_number(line: &str) -> io::Result<(usize, &str)> {
         remove_leading_comma = true;
         line.split_once('"')
     } else {
-        line.split_once(',')
+        line.split_once(',').or(Some((line, "")))
     };
 
-    if let Some((num, remainder)) = field {
+    if let Some((num, mut remainder)) = field {
         // Parse the number
-        let thousands = num.split(|c: char| !c.is_ascii_digit());
+        let thousands = num.split(|c: char| c == ',' || c == '.');
         let mut n = 0;
         for thousand in thousands {
             if n == 0 {
@@ -225,9 +229,7 @@ fn get_next_number(line: &str) -> io::Result<(usize, &str)> {
             // `remainder` still has a leading comma, because the number is >1000. We need to
             // remove it so we are consistent regardless of whether the number was wrapped in
             // double quotes or not.
-            if let Some(remainder) = remainder.strip_prefix(',') {
-                return Ok((n, remainder));
-            }
+            remainder = remainder.strip_prefix(',').unwrap_or(remainder);
         }
 
         return Ok((n, remainder));
