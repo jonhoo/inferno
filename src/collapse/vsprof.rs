@@ -187,6 +187,11 @@ fn get_next_number(line: &str) -> io::Result<(usize, &str)> {
     // Trim the leading comma, if any
     let line = line.strip_prefix(',').unwrap_or(line);
 
+    // If the number is >1000, it is wrapped in quotes, so we need to remove those, and make sure
+    // that we also remove the leading comma from the remainder after we are done parsing the
+    // number.
+    // If the number is <1000, we remove the leading comma from the remainder here and we don't
+    // have to do anything after parsing the number.
     let mut remove_leading_comma = false;
     let field = if let Some(line) = line.strip_prefix('"') {
         remove_leading_comma = true;
@@ -195,34 +200,47 @@ fn get_next_number(line: &str) -> io::Result<(usize, &str)> {
         line.split_once(',').or(Some((line, "")))
     };
 
+    // Parse the number
     if let Some((num, mut remainder)) = field {
-        // Parse the number
-        let thousands = num.split(|c: char| c == ',' || c == '.');
+        let mut initial = true;
+        let mut current_group_count = 0;
         let mut n = 0;
-        for thousand in thousands {
-            if n == 0 {
-                if thousand.len() > 3 {
-                    return invalid_data_error!(
-                        "Expected thousands separators for number bigger than 1000, found '{}'",
-                        num
-                    );
+        let mut separator = None;
+        for c in num.chars() {
+            if c.is_ascii_digit() {
+                if current_group_count > 2 {
+                    return invalid_data_error!("Missing thousands separator in number '{}'", num);
                 }
-            } else if thousand.len() != 3 {
-                return invalid_data_error!(
-                    "Floating point numbers are not valid here, expected an integer, found '{}'",
-                    num
-                );
+
+                n *= 10;
+                n += c as u32 - '0' as u32;
+
+                current_group_count += 1;
+                continue;
             }
 
-            n *= 1000;
-            if let Ok(num) = thousand.parse::<usize>() {
-                n += num;
-            } else {
-                return invalid_data_error!(
-                    "Unable to parse number '{}', expected an integer",
-                    num
-                );
+            if c == ',' || c == '.' || c == ' ' {
+                if !initial && current_group_count < 3 {
+                    return invalid_data_error!("Missing thousands separator in number '{}'", num);
+                }
+
+                match separator {
+                    Some(sep) if sep != c => {
+                        // Ensure that we always use the same separator, this takes care of
+                        // handling floating point numbers (which aren't valid here), because those
+                        // would use at least 2 different separators.
+                        return invalid_data_error!("Unable to parse integer from '{}'", num);
+                    }
+                    Some(_) => {}
+                    None => separator = Some(c),
+                }
+
+                initial = false;
+                current_group_count = 0;
+                continue;
             }
+
+            return invalid_data_error!("Unable to parse integer from '{}'", num);
         }
 
         if remove_leading_comma {
@@ -232,7 +250,7 @@ fn get_next_number(line: &str) -> io::Result<(usize, &str)> {
             remainder = remainder.strip_prefix(',').unwrap_or(remainder);
         }
 
-        return Ok((n, remainder));
+        return Ok((n as usize, remainder));
     }
 
     invalid_data_error!("Invalid number in line:\n{}", line)
@@ -279,12 +297,22 @@ mod tests {
     }
 
     #[test]
-    fn get_next_number_missing_thousands_sep() {
+    fn get_next_number_missing_thousands_seps() {
         assert!(get_next_number(r#""2893824",54.37,4.21,0.04,0.00,"Raytracer.exe","#).is_err());
+    }
+
+    #[test]
+    fn get_next_number_missing_thousands_sep() {
+        assert!(get_next_number(r#""28,93824",54.37,4.21,0.04,0.00,"Raytracer.exe","#).is_err());
     }
 
     #[test]
     fn get_next_number_with_float() {
         assert!(get_next_number(r#""2,893.82",54.37,4.21,0.04,0.00,"Raytracer.exe","#).is_err());
+    }
+
+    #[test]
+    fn get_next_number_with_text_input() {
+        assert!(get_next_number(r#""text",54.37,4.21,0.04,0.00,"Raytracer.exe","#).is_err());
     }
 }

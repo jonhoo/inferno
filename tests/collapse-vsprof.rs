@@ -87,7 +87,9 @@ fn collapse_vsprof_should_return_error_for_invalid_depth() {
     let test_file = "./tests/data/collapse-vsprof/invalid-depth.csv";
     let error = test_collapse_vsprof_error(test_file);
     assert_eq!(error.kind(), io::ErrorKind::InvalidData);
-    assert!(error.to_string().starts_with("Unable to parse number"));
+    assert!(error
+        .to_string()
+        .starts_with("Unable to parse integer from"));
 }
 
 #[test]
@@ -97,7 +99,7 @@ fn collapse_vsprof_should_return_error_for_invalid_number_of_calls() {
     assert_eq!(error.kind(), io::ErrorKind::InvalidData);
     assert!(error
         .to_string()
-        .starts_with("Floating point numbers are not valid here"));
+        .starts_with("Unable to parse integer from"));
 }
 
 #[test]
