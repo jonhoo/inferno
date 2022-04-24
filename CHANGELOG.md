@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [0.11.2] - 2022-04-24
+### Added
+ - Add collapser for Visual Studio profiler. [#218](https://github.com/jonhoo/inferno/pull/218)
+
 ## [0.11.1] - 2022-03-18
 ### Added
  - Highlight external NodeJS dependencies. [#234](https://github.com/jonhoo/inferno/pull/234)
@@ -194,7 +198,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Moved to `IndexMap` and FNV hashing ([#127](https://github.com/jonhoo/inferno/pull/127))
 - Moved CI to Azure DevOps Pipelines
 
-[Unreleased]: https://github.com/jonhoo/inferno/compare/v0.11.1...HEAD
+[Unreleased]: https://github.com/jonhoo/inferno/compare/v0.11.2...HEAD
+[0.11.2]: https://github.com/jonhoo/inferno/compare/v0.11.1...v0.11.2
 [0.11.1]: https://github.com/jonhoo/inferno/compare/v0.11.0...v0.11.1
 [0.11.0]: https://github.com/jonhoo/inferno/compare/v0.10.12...v0.11.0
 [0.10.12]: https://github.com/jonhoo/inferno/compare/v0.10.11...v0.10.12
