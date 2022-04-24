@@ -86,6 +86,13 @@ fn collapse_guess_vtune() {
 }
 
 #[test]
+fn collapse_guess_vsprof() {
+    let test_file = "./tests/data/collapse-vsprof/CallTreeSummary.csv";
+    let result_file = "./tests/data/collapse-vsprof/results/vsprof-default.txt";
+    test_collapse_guess(test_file, result_file, false).unwrap()
+}
+
+#[test]
 fn collapse_guess_unknown_format_should_log_error() {
     test_collapse_guess_logs(
         "./tests/data/collapse-guess/unknown-format.txt",
