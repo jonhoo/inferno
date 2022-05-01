@@ -124,9 +124,6 @@ where
     let mut prev_line = None;
     for line in lines {
         let mut line = line.trim();
-        if line.is_empty() {
-            continue;
-        }
 
         if !suppress_sort_check {
             if let Some(prev_line) = prev_line {
