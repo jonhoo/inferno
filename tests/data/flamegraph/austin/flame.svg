@@ -1,0 +1,114 @@
+<?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg version="1.1" width="1200" height="294" onload="init(evt)" viewBox="0 0 1200 294" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:fg="http://github.com/jonhoo/inferno">
+    <!--Flame graph stack visualization. See https://github.com/brendangregg/FlameGraph for latest version, and http://www.brendangregg.com/flamegraphs.html for examples.-->
+    <!--NOTES: -->
+    <defs>
+        <linearGradient id="background" y1="0" y2="1" x1="0" x2="0">
+            <stop stop-color="#eeeeee" offset="5%"/>
+            <stop stop-color="#eeeeb0" offset="95%"/>
+        </linearGradient>
+    </defs>
+    <style type="text/css">
+text { font-family:"Verdana"; font-size:12px; fill:rgb(0,0,0); }
+#title { text-anchor:middle; font-size:17px; }
+#search { opacity:0.1; cursor:pointer; }
+#search:hover, #search.show { opacity:1; }
+#subtitle { text-anchor:middle; font-color:rgb(160,160,160); }
+#unzoom { cursor:pointer; }
+#frames > *:hover { stroke:black; stroke-width:0.5; cursor:pointer; }
+.hide { display:none; }
+.parent { opacity:0.5; }
+</style>
+    <script type="text/ecmascript"><![CDATA[
+        var nametype = 'Function:';
+        var fontsize = 12;
+        var fontwidth = 0.59;
+        var xpad = 10;
+        var inverted = false;
+        var searchcolor = 'rgb(230,0,230)';
+        var fluiddrawing = true;
+        var truncate_text_right = false;
+    ]]></script>
+    <rect x="0" y="0" width="100%" height="294" fill="url(#background)"/>
+    <text id="title" x="50.0000%" y="24.00">Flame Graph</text>
+    <text id="details" x="10" y="277.00"> </text>
+    <text id="unzoom" class="hide" x="10" y="24.00">Reset Zoom</text>
+    <text id="search" x="1090" y="24.00">Search</text>
+    <text id="matched" x="1090" y="277.00"> </text>
+    <svg id="frames" x="10" width="1180" total_samples="291">
+        <g>
+            <title>&lt;frozen importlib._bootstrap_external&gt;:&lt;module&gt;:35 (105 samples, 36.08%)</title>
+            <rect x="0.0000%" y="117" width="36.0825%" height="15" fill="rgb(227,0,7)" fg:x="0" fg:w="105"/>
+            <text x="0.2500%" y="127.50">&lt;frozen importlib._bootstrap_external&gt;:&lt;module&gt;:35</text>
+        </g>
+        <g>
+            <title>&lt;frozen importlib._bootstrap&gt;:_find_and_load:1007 (105 samples, 36.08%)</title>
+            <rect x="0.0000%" y="101" width="36.0825%" height="15" fill="rgb(217,0,24)" fg:x="0" fg:w="105"/>
+            <text x="0.2500%" y="111.50">&lt;frozen importlib._bootstrap&gt;:_find_and_load:1007</text>
+        </g>
+        <g>
+            <title>&lt;frozen importlib._bootstrap&gt;:_find_and_load_unlocked:986 (105 samples, 36.08%)</title>
+            <rect x="0.0000%" y="85" width="36.0825%" height="15" fill="rgb(221,193,54)" fg:x="0" fg:w="105"/>
+            <text x="0.2500%" y="95.50">&lt;frozen importlib._bootstrap&gt;:_find_and_load_unlocked:986</text>
+        </g>
+        <g>
+            <title>&lt;frozen importlib._bootstrap&gt;:_load_unlocked:680 (105 samples, 36.08%)</title>
+            <rect x="0.0000%" y="69" width="36.0825%" height="15" fill="rgb(248,212,6)" fg:x="0" fg:w="105"/>
+            <text x="0.2500%" y="79.50">&lt;frozen importlib._bootstrap&gt;:_load_unlocked:680</text>
+        </g>
+        <g>
+            <title>&lt;frozen importlib._bootstrap&gt;:exec_module:768 (105 samples, 36.08%)</title>
+            <rect x="0.0000%" y="53" width="36.0825%" height="15" fill="rgb(208,68,35)" fg:x="0" fg:w="105"/>
+            <text x="0.2500%" y="63.50">&lt;frozen importlib._bootstrap&gt;:exec_module:768</text>
+        </g>
+        <g>
+            <title>&lt;frozen importlib._bootstrap&gt;:_call_with_frames_removed:228 (105 samples, 36.08%)</title>
+            <rect x="0.0000%" y="37" width="36.0825%" height="15" fill="rgb(232,128,0)" fg:x="0" fg:w="105"/>
+            <text x="0.2500%" y="47.50">&lt;frozen importlib._bootstrap&gt;:_call_with_frames_removed:228</text>
+        </g>
+        <g>
+            <title>all (291 samples, 100%)</title>
+            <rect x="0.0000%" y="245" width="100.0000%" height="15" fill="rgb(207,160,47)" fg:x="0" fg:w="291"/>
+            <text x="0.2500%" y="255.50"></text>
+        </g>
+        <g>
+            <title>P6360 (291 samples, 100.00%)</title>
+            <rect x="0.0000%" y="229" width="100.0000%" height="15" fill="rgb(228,23,34)" fg:x="0" fg:w="291"/>
+            <text x="0.2500%" y="239.50">P6360</text>
+        </g>
+        <g>
+            <title>T6360 (291 samples, 100.00%)</title>
+            <rect x="0.0000%" y="213" width="100.0000%" height="15" fill="rgb(218,30,26)" fg:x="0" fg:w="291"/>
+            <text x="0.2500%" y="223.50">T6360</text>
+        </g>
+        <g>
+            <title>&lt;frozen importlib._bootstrap&gt;:_install_external_importers:1187 (291 samples, 100.00%)</title>
+            <rect x="0.0000%" y="197" width="100.0000%" height="15" fill="rgb(220,122,19)" fg:x="0" fg:w="291"/>
+            <text x="0.2500%" y="207.50">&lt;frozen importlib._bootstrap&gt;:_install_external_importers:1187</text>
+        </g>
+        <g>
+            <title>&lt;frozen importlib._bootstrap&gt;:_find_and_load:1007 (291 samples, 100.00%)</title>
+            <rect x="0.0000%" y="181" width="100.0000%" height="15" fill="rgb(250,228,42)" fg:x="0" fg:w="291"/>
+            <text x="0.2500%" y="191.50">&lt;frozen importlib._bootstrap&gt;:_find_and_load:1007</text>
+        </g>
+        <g>
+            <title>&lt;frozen importlib._bootstrap&gt;:_find_and_load_unlocked:986 (291 samples, 100.00%)</title>
+            <rect x="0.0000%" y="165" width="100.0000%" height="15" fill="rgb(240,193,28)" fg:x="0" fg:w="291"/>
+            <text x="0.2500%" y="175.50">&lt;frozen importlib._bootstrap&gt;:_find_and_load_unlocked:986</text>
+        </g>
+        <g>
+            <title>&lt;frozen importlib._bootstrap&gt;:_load_unlocked:680 (291 samples, 100.00%)</title>
+            <rect x="0.0000%" y="149" width="100.0000%" height="15" fill="rgb(216,20,37)" fg:x="0" fg:w="291"/>
+            <text x="0.2500%" y="159.50">&lt;frozen importlib._bootstrap&gt;:_load_unlocked:680</text>
+        </g>
+        <g>
+            <title>&lt;frozen importlib._bootstrap&gt;:exec_module:838 (291 samples, 100.00%)</title>
+            <rect x="0.0000%" y="133" width="100.0000%" height="15" fill="rgb(206,188,39)" fg:x="0" fg:w="291"/>
+            <text x="0.2500%" y="143.50">&lt;frozen importlib._bootstrap&gt;:exec_module:838</text>
+        </g>
+        <g>
+            <title>&lt;frozen importlib._bootstrap_external&gt;:&lt;module&gt;:828 (186 samples, 63.92%)</title>
+            <rect x="36.0825%" y="117" width="63.9175%" height="15" fill="rgb(217,207,13)" fg:x="105" fg:w="186"/>
+            <text x="36.3325%" y="127.50">&lt;frozen importlib._bootstrap_external&gt;:&lt;module&gt;:828</text>
+        </g>
+    </svg>
+</svg>

@@ -883,3 +883,11 @@ fn flamegraph_flamechart() {
 
     test_flamegraph(input_file, expected_result_file, opts).unwrap();
 }
+
+#[test]
+fn flamegraph_austin() {
+    let input_file = "./tests/data/flamegraph/austin/flames.txt";
+    let expected_result_file = "./tests/data/flamegraph/austin/flame.svg";
+    let opts = flamegraph::Options::default();
+    test_flamegraph(input_file, expected_result_file, opts).unwrap();
+}
