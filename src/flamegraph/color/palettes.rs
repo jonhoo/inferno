@@ -59,6 +59,21 @@ pub(super) mod perl {
     }
 }
 
+pub(super) mod python {
+    use crate::flamegraph::color::BasicPalette;
+
+    pub fn resolve(name: &str) -> BasicPalette {
+        if name.starts_with("native@") { // austin-specific format for native calls
+            return BasicPalette::Aqua;
+        } else if name.contains("site-packages/") {
+            return BasicPalette::Yellow;
+        } else if name.contains("/python") || name.starts_with("<frozen importlib") { // stdlib
+            return BasicPalette::Green;
+        }
+        BasicPalette::Red
+    }
+}
+
 pub(super) mod js {
     use crate::flamegraph::color::BasicPalette;
 
@@ -428,6 +443,39 @@ mod tests {
             TestData {
                 input: String::from("somethingPerl"),
                 output: BasicPalette::Green,
+            },
+        ];
+
+        for item in test_names.iter() {
+            let resolved_color = resolve(&item.input);
+            assert_eq!(resolved_color, item.output)
+        }
+    }
+
+    #[test]
+    fn python_returns_correct() {
+        use super::python::resolve;
+
+        let test_names = [
+            TestData {
+                input: String::from("<frozen importlib._bootstrap>:_load_unlocked:680"),
+                output: BasicPalette::Green,
+            },
+            TestData {
+                input: String::from(".venv/lib/python3.9/time.py:12"),
+                output: BasicPalette::Green,
+            },
+            TestData {
+                input: String::from("my_file.py:55"),
+                output: BasicPalette::Red,
+            },
+            TestData {
+                input: String::from(".venv/lib/python3.9/site-packages/package/file.py:12"),
+                output: BasicPalette::Yellow,
+            },
+            TestData {
+                input: String::from("native@511863:_PyFunction_Vectorcall:339"),
+                output: BasicPalette::Aqua,
             },
         ];
 

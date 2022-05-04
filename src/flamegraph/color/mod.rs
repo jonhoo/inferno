@@ -124,6 +124,8 @@ pub enum MultiPalette {
     Js,
     /// Use Perl semantics to color frames.
     Perl,
+    /// Use Python semantics to color frames.
+    Python,
     /// Use Rust semantics to color frames.
     Rust,
     /// Equivalent to [`BasicPalette::Aqua`] with [`BackgroundColor::Blue`].
@@ -220,6 +222,7 @@ impl FromStr for Palette {
             "java" => Ok(Palette::Multi(MultiPalette::Java)),
             "js" => Ok(Palette::Multi(MultiPalette::Js)),
             "perl" => Ok(Palette::Multi(MultiPalette::Perl)),
+            "python" => Ok(Palette::Multi(MultiPalette::Python)),
             "rust" => Ok(Palette::Multi(MultiPalette::Rust)),
             "red" => Ok(Palette::Basic(BasicPalette::Red)),
             "green" => Ok(Palette::Basic(BasicPalette::Green)),
@@ -331,6 +334,7 @@ fn rgb_components_for_palette(palette: Palette, name: &str, v1: f32, v2: f32, v3
         Palette::Basic(basic) => basic,
         Palette::Multi(MultiPalette::Java) => palettes::java::resolve(name),
         Palette::Multi(MultiPalette::Perl) => palettes::perl::resolve(name),
+        Palette::Multi(MultiPalette::Python) => palettes::python::resolve(name),
         Palette::Multi(MultiPalette::Js) => palettes::js::resolve(name),
         Palette::Multi(MultiPalette::Wakeup) => palettes::wakeup::resolve(name),
         Palette::Multi(MultiPalette::Rust) => palettes::rust::resolve(name),
