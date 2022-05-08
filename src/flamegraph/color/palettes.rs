@@ -61,19 +61,20 @@ pub(super) mod perl {
 
 pub(super) mod python {
     use crate::flamegraph::color::BasicPalette;
-    use std::path::Path;
+
+    fn split_any_path(path: &str) -> impl Iterator<Item = &str> {
+        path.split(|c| c == '/' || c == '\\')
+    }
 
     pub fn resolve(name: &str) -> BasicPalette {
         if name.starts_with("native@") {
             // austin-specific format for native calls
             return BasicPalette::Aqua;
-        } else if Path::new(name).iter().any(|c| c == "site-packages") {
+        } else if split_any_path(name).any(|part| part == "site-packages") {
             return BasicPalette::Yellow;
-        } else if Path::new(name).iter().any(|c| {
-            c.to_str()
-                .unwrap_or("")
-                .to_ascii_lowercase()
-                .strip_prefix("python")
+        } else if split_any_path(name).any(|part| {
+            part.strip_prefix("python")
+                .or_else(|| part.strip_prefix("Python"))
                 .map_or(false, |version| {
                     version.chars().all(|c| c.is_digit(10) || c == '.')
                 })
@@ -479,6 +480,10 @@ mod tests {
             },
             TestData {
                 input: String::from("C:/Users/User/AppData/Local/Programs/Python/Python39/lib/concurrent/futures/thread.py"),
+                output: BasicPalette::Green,
+            },
+            TestData {
+                input: String::from("C:\\Users\\User\\AppData\\Local\\Programs\\Python\\Python39\\lib\\concurrent\\futures\\thread.py"),
                 output: BasicPalette::Green,
             },
             TestData {
