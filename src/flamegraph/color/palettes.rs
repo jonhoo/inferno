@@ -65,7 +65,7 @@ pub(super) mod python {
     pub fn resolve(name: &str) -> BasicPalette {
         if name.starts_with("native@") { // austin-specific format for native calls
             return BasicPalette::Aqua;
-        } else if name.contains("site-packages/") {
+        } else if name.contains("/site-packages/") {
             return BasicPalette::Yellow;
         } else if name.contains("/python") || name.starts_with("<frozen importlib") { // stdlib
             return BasicPalette::Green;
