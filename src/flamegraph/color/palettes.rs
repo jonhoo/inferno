@@ -61,16 +61,23 @@ pub(super) mod perl {
 
 pub(super) mod python {
     use crate::flamegraph::color::BasicPalette;
+    use std::path::Path;
 
     pub fn resolve(name: &str) -> BasicPalette {
         if name.starts_with("native@") {
             // austin-specific format for native calls
             return BasicPalette::Aqua;
-        } else if name.contains("/site-packages/") || name.contains("\\site-packages\\") {
+        } else if Path::new(name).iter().any(|c| c == "site-packages") {
             return BasicPalette::Yellow;
-        } else if (name.contains("/python") && name.contains("/lib/"))
-            || (name.contains("\\Python") && name.contains("\\lib\\"))
-            || name.starts_with("<frozen importlib")
+        } else if Path::new(name).iter().any(|c| {
+            c.to_str()
+                .unwrap_or("")
+                .to_ascii_lowercase()
+                .strip_prefix("python")
+                .map_or(false, |version| {
+                    version.chars().all(|c| c.is_digit(10) || c == '.')
+                })
+        }) || name.starts_with("<frozen importlib")
         {
             // stdlib
             return BasicPalette::Green;
@@ -471,7 +478,7 @@ mod tests {
                 output: BasicPalette::Green,
             },
             TestData {
-                input: String::from("C:\\Users\\User\\AppData\\Local\\Programs\\Python\\Python39\\lib\\concurrent\\futures\\thread.py"),
+                input: String::from("C:/Users/User/AppData/Local/Programs/Python/Python39/lib/concurrent/futures/thread.py"),
                 output: BasicPalette::Green,
             },
             TestData {
