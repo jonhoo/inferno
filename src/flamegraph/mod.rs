@@ -394,6 +394,11 @@ where
     W: Write,
 {
     let mut reversed = StrStack::new();
+    let lines = lines
+        .into_iter()
+        .map(|line| line.trim())
+        .filter(|line| !(line.is_empty() || line.starts_with("# ")));
+
     let (mut frames, time, ignored, delta_max) = if opt.reverse_stack_order {
         if opt.no_sort {
             warn!(

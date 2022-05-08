@@ -1,0 +1,8 @@
+# austin: 3.3.0
+# interval: 100
+# mode: wall
+
+P6360;T6360;<frozen importlib._bootstrap>:_install_external_importers:1187;<frozen importlib._bootstrap>:_find_and_load:1007;<frozen importlib._bootstrap>:_find_and_load_unlocked:986;<frozen importlib._bootstrap>:_load_unlocked:680;<frozen importlib._bootstrap>:exec_module:838;<frozen importlib._bootstrap_external>:<module>:35;<frozen importlib._bootstrap>:_find_and_load:1007;<frozen importlib._bootstrap>:_find_and_load_unlocked:986;<frozen importlib._bootstrap>:_load_unlocked:680;<frozen importlib._bootstrap>:exec_module:768;<frozen importlib._bootstrap>:_call_with_frames_removed:228 105
+P6360;T6360;<frozen importlib._bootstrap>:_install_external_importers:1187;<frozen importlib._bootstrap>:_find_and_load:1007;<frozen importlib._bootstrap>:_find_and_load_unlocked:986;<frozen importlib._bootstrap>:_load_unlocked:680;<frozen importlib._bootstrap>:exec_module:838;<frozen importlib._bootstrap_external>:<module>:828 186
+
+# duration: 23873
