@@ -112,6 +112,8 @@ pub enum BasicPalette {
     Purple,
     /// A palette in which colors are chosen from a orange spectrum.
     Orange,
+    /// A palette in which colors are chosen from a gray spectrum.
+    Gray,
 }
 
 /// A semantic color palette in which different hues are used to signifiy semantic aspects of
@@ -231,6 +233,7 @@ impl FromStr for Palette {
             "yellow" => Ok(Palette::Basic(BasicPalette::Yellow)),
             "purple" => Ok(Palette::Basic(BasicPalette::Purple)),
             "orange" => Ok(Palette::Basic(BasicPalette::Orange)),
+            "gray" => Ok(Palette::Basic(BasicPalette::Gray)),
             unknown => Err(format!("unknown color palette: {}", unknown)),
         }
     }
@@ -355,6 +358,7 @@ fn rgb_components_for_palette(palette: Palette, name: &str, v1: f32, v2: f32, v3
         }
         BasicPalette::Aqua => color!(t!(50, 60_f32, v1), t!(165, 55_f32, v1), t!(165, 55_f32, v1)),
         BasicPalette::Orange => color!(t!(190, 65_f32, v1), t!(90, 65_f32, v1), t!(0, 0_f32, v1)),
+        BasicPalette::Gray => color!(t!(110, 100_f32, v1), t!(110, 100_f32, v1), t!(110, 100_f32, v1)),
     }
 }
 

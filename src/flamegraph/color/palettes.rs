@@ -495,6 +495,18 @@ mod tests {
                 input: String::from("native@511863:_PyFunction_Vectorcall:339"),
                 output: BasicPalette::Aqua,
             },
+            TestData {
+                input: String::from("L339"),
+                output: BasicPalette::Gray,
+            },
+            TestData {
+                input: String::from("T339"),
+                output: BasicPalette::Gray,
+            },
+            TestData {
+                input: String::from("P339"),
+                output: BasicPalette::Gray,
+            },
         ];
 
         for item in test_names.iter() {
