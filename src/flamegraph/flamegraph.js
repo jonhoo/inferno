@@ -24,9 +24,6 @@ function init(evt) {
         svg.removeAttribute("width");
         // Edge requires us to have a viewBox that gets updated with size changes.
         var isEdge = /Edge\/\d./i.test(navigator.userAgent);
-        if (!isEdge) {
-          svg.removeAttribute("viewBox");
-        }
         var update_for_width_change = function() {
             if (isEdge) {
                 svg.attributes.viewBox.value = "0 0 " + svg.width.baseVal.value + " " + svg.height.baseVal.value;
@@ -45,6 +42,10 @@ function init(evt) {
             var svgWidth = svg.width.baseVal.value;
             searchbtn.attributes.x.value = svgWidth - xpad - 100;
             matchedtxt.attributes.x.value = svgWidth - xpad - 100;
+
+            if (!isEdge) {
+                svg.removeAttribute("viewBox");
+            }
         };
         window.addEventListener('resize', function() {
             update_for_width_change();
