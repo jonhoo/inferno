@@ -42,10 +42,6 @@ function init(evt) {
             var svgWidth = svg.width.baseVal.value;
             searchbtn.attributes.x.value = svgWidth - xpad - 100;
             matchedtxt.attributes.x.value = svgWidth - xpad - 100;
-
-            if (!isEdge) {
-                svg.removeAttribute("viewBox");
-            }
         };
         window.addEventListener('resize', function() {
             update_for_width_change();
@@ -55,6 +51,9 @@ function init(evt) {
             unzoom();
             update_for_width_change();
             restore_state();
+            if (!isEdge) {
+                svg.removeAttribute("viewBox");
+            }
         }, 0);
     } else {
         restore_state();
