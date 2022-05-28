@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 ### Changed
+ - Fix for Firefox canvas heigh unpredictability. [#242](https://github.com/jonhoo/inferno/pull/242)
 
 ### Removed
 
