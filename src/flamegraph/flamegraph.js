@@ -24,9 +24,6 @@ function init(evt) {
         svg.removeAttribute("width");
         // Edge requires us to have a viewBox that gets updated with size changes.
         var isEdge = /Edge\/\d./i.test(navigator.userAgent);
-        if (!isEdge) {
-          svg.removeAttribute("viewBox");
-        }
         var update_for_width_change = function() {
             if (isEdge) {
                 svg.attributes.viewBox.value = "0 0 " + svg.width.baseVal.value + " " + svg.height.baseVal.value;
@@ -54,6 +51,9 @@ function init(evt) {
             unzoom();
             update_for_width_change();
             restore_state();
+            if (!isEdge) {
+                svg.removeAttribute("viewBox");
+            }
         }, 0);
     } else {
         restore_state();
