@@ -8,10 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 ### Changed
- - Fix for Firefox canvas heigh unpredictability. [#242](https://github.com/jonhoo/inferno/pull/242)
- - Update `quick-xml` to 0.23.
 
 ### Removed
+
+## [0.11.4] - 2022-05-28
+### Changed
+ - Fix for Firefox canvas heigh unpredictability. [#242](https://github.com/jonhoo/inferno/pull/242)
+ - Update `quick-xml` to 0.23.
 
 ## [0.11.3] - 2022-05-08
 ### Changed
@@ -204,7 +207,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Moved to `IndexMap` and FNV hashing ([#127](https://github.com/jonhoo/inferno/pull/127))
 - Moved CI to Azure DevOps Pipelines
 
-[Unreleased]: https://github.com/jonhoo/inferno/compare/v0.11.3...HEAD
+[Unreleased]: https://github.com/jonhoo/inferno/compare/v0.11.4...HEAD
+[0.11.4]: https://github.com/jonhoo/inferno/compare/v0.11.3...v0.11.4
 [0.11.3]: https://github.com/jonhoo/inferno/compare/v0.11.2...v0.11.3
 [0.11.2]: https://github.com/jonhoo/inferno/compare/v0.11.1...v0.11.2
 [0.11.1]: https://github.com/jonhoo/inferno/compare/v0.11.0...v0.11.1
