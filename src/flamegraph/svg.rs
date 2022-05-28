@@ -3,7 +3,7 @@ use std::cell::RefCell;
 use std::io::prelude::*;
 use std::iter;
 
-use quick_xml::events::{BytesEnd, BytesStart, BytesText, Event};
+use quick_xml::events::{BytesCData, BytesEnd, BytesStart, BytesText, Event};
 use quick_xml::Writer;
 use str_stack::StrStack;
 
@@ -133,7 +133,7 @@ text {{ font-family:{}; font-size:{}px; fill:rgb(0,0,0); }}
         BytesStart::borrowed_name(b"script")
             .with_attributes(iter::once(("type", "text/ecmascript"))),
     ))?;
-    svg.write_event(Event::CData(BytesText::from_escaped_str(&format!(
+    svg.write_event(Event::CData(BytesCData::from_str(&format!(
         "
         var nametype = {};
         var fontsize = {};
@@ -153,7 +153,7 @@ text {{ font-family:{}; font-size:{}px; fill:rgb(0,0,0); }}
         opt.text_truncate_direction == TextTruncateDirection::Right
     ))))?;
     if !opt.no_javascript {
-        svg.write_event(Event::CData(BytesText::from_escaped_str(include_str!(
+        svg.write_event(Event::CData(BytesCData::from_str(include_str!(
             "flamegraph.js"
         ))))?;
     }
