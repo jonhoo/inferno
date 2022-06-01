@@ -322,7 +322,7 @@ impl Folder {
         Cow::Borrowed(frame)
     }
 
-    // we have a stack line that shows one stack entry from the preceeding event, like:
+    // we have a stack line that shows one stack entry from the preceding event, like:
     //
     //     unix`tsc_gethrtimeunscaled+0x21
     //     genunix`gethrtime_unscaled+0xa

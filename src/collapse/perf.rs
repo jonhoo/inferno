@@ -459,7 +459,7 @@ impl Folder {
         module = &module[1..(module.len() - 1)];
 
         let rawfunc = match line.next()?.trim() {
-            // Sometimes there are two spaces betwen the pc and the (, like:
+            // Sometimes there are two spaces between the pc and the (, like:
             //     7f1e2215d058  (/lib/x86_64-linux-gnu/libc-2.15.so)
             // In order to match the perl version, the rawfunc should be " ", and not "".
             "" => " ",
@@ -468,7 +468,7 @@ impl Folder {
         Some((pc, rawfunc, module))
     }
 
-    // we have a stack line that shows one stack entry from the preceeding event, like:
+    // we have a stack line that shows one stack entry from the preceding event, like:
     //
     //     ffffffff8103ce3b native_safe_halt ([kernel.kallsyms])
     //     ffffffff8101c6a3 default_idle ([kernel.kallsyms])

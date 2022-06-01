@@ -84,7 +84,7 @@ pub trait CollapsePrivate: Send + Sized {
     ///
     /// This method receives a reader whose header has already been consumed (see above),
     /// as well as a mutable reference to an `Occurences` instance (just a hashamp that
-    /// works across multiple threads). Implementators should parse the stack data
+    /// works across multiple threads). Implementers should parse the stack data
     /// contained in the reader and write output to the provided `Occurrences` map.
     ///
     /// This method may be called multiple times to process batches of incoming samples.
@@ -109,7 +109,7 @@ pub trait CollapsePrivate: Send + Sized {
     /// `false` otherwise.
     ///
     /// If your format requires more information than merely a line of the input data in order
-    /// to determine whether or not you are at the end of a stack, you can retreive/store
+    /// to determine whether or not you are at the end of a stack, you can retrieve/store
     /// information on the `self` instance, which is also available to you in this method. This
     /// method will be called for every line of input data (excluding those consumed by the
     /// `pre_process` method).

@@ -400,7 +400,7 @@ fn flamegraph_palette_map_should_warn_about_invalid_lines() {
             .count();
         assert_eq!(
             nwarnings, 1,
-            "invalide palette map line warning logged {} times, but should be logged exactly once",
+            "invalid palette map line warning logged {} times, but should be logged exactly once",
             nwarnings
         );
     });
