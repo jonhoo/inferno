@@ -510,11 +510,11 @@ where
     svg::write_prelude(&mut svg, &style_options, opt)?;
 
     // Used when picking color parameters at random, when no option determines how to pick these
-    // parameters. We instanciate it here because it may be called once for each iteration in the
+    // parameters. We instantiate it here because it may be called once for each iteration in the
     // frames loop.
     let mut thread_rng = rand::thread_rng();
 
-    // structs to reuse accross loops to avoid allocations
+    // structs to reuse across loops to avoid allocations
     let mut cache_g = Event::Start(BytesStart::owned_name("g"));
     let mut cache_a = Event::Start(BytesStart::owned_name("a"));
     let mut cache_rect = Event::Empty(BytesStart::owned_name("rect"));
@@ -758,7 +758,7 @@ fn write_container_start<'a, W: Write>(
     Ok((false, title))
 }
 
-/// Writes atributes to the container, container could be g or a
+/// Writes attributes to the container, container could be g or a
 #[cfg(feature = "nameattr")]
 fn write_container_attributes(event: &mut Event<'_>, frame_attributes: &FrameAttrs) {
     if let Event::Start(ref mut c) = event {

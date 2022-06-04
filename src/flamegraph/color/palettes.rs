@@ -118,7 +118,7 @@ pub(super) mod rust {
             // Rust user functions.
             // Although this will generate false positives for e.g. C++ code
             // used with Rust, the intention is to color code from user
-            // crates and dependencies differenly than Rust system code.
+            // crates and dependencies differently than Rust system code.
             BasicPalette::Aqua
         } else {
             // Non-Rust functions
