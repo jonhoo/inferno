@@ -3,17 +3,15 @@ use std::io::{self, Read};
 
 use criterion::*;
 use inferno::collapse::{dtrace, perf, sample, Collapse};
-use lazy_static::lazy_static;
 use libflate::gzip::Decoder;
+use once_cell::sync::Lazy;
 
 const INFILE_DTRACE: &str = "flamegraph/example-dtrace-stacks.txt";
 const INFILE_PERF: &str = "flamegraph/example-perf-stacks.txt.gz";
 const INFILE_SAMPLE: &str = "tests/data/collapse-sample/large.txt.gz";
 const SAMPLE_SIZE: usize = 100;
 
-lazy_static! {
-    static ref NTHREADS: usize = num_cpus::get();
-}
+static NTHREADS: Lazy<usize> = Lazy::new(num_cpus::get);
 
 fn read_infile(infile: &str, buf: &mut Vec<u8>) -> io::Result<()> {
     let mut f = File::open(infile)?;

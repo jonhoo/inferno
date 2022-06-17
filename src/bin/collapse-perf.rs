@@ -5,11 +5,9 @@ use clap::Parser;
 use env_logger::Env;
 use inferno::collapse::perf::{Folder, Options};
 use inferno::collapse::{Collapse, DEFAULT_NTHREADS};
-use lazy_static::lazy_static;
+use once_cell::sync::Lazy;
 
-lazy_static! {
-    static ref NTHREADS: String = format!("{}", *DEFAULT_NTHREADS);
-}
+static NTHREADS: Lazy<String> = Lazy::new(|| format!("{}", *DEFAULT_NTHREADS));
 
 #[derive(Debug, Parser)]
 #[clap(

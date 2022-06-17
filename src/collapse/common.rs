@@ -8,7 +8,7 @@ use std::sync::Arc;
 use ahash::AHashMap;
 #[cfg(feature = "multithreaded")]
 use dashmap::DashMap;
-use lazy_static::lazy_static;
+use once_cell::sync::Lazy;
 
 macro_rules! invalid_data_error {
     ($($arg:tt)*) => {{
@@ -39,16 +39,11 @@ const NBYTES_PER_STACK_GUESS: usize = 1024;
 const RUST_HASH_LENGTH: usize = 17;
 
 #[cfg(feature = "multithreaded")]
-lazy_static! {
-    #[doc(hidden)]
-    pub static ref DEFAULT_NTHREADS: usize = num_cpus::get();
-}
-
+#[doc(hidden)]
+pub static DEFAULT_NTHREADS: Lazy<usize> = Lazy::new(|| num_cpus::get());
 #[cfg(not(feature = "multithreaded"))]
-lazy_static! {
-    #[doc(hidden)]
-    pub static ref DEFAULT_NTHREADS: usize = 1;
-}
+#[doc(hidden)]
+pub static DEFAULT_NTHREADS: Lazy<usize> = Lazy::new(|| 1);
 
 /// Private trait for internal library authors.
 ///

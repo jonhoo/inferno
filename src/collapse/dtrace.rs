@@ -406,7 +406,7 @@ mod tests {
     use std::fs;
     use std::path::PathBuf;
 
-    use lazy_static::lazy_static;
+    use once_cell::sync::Lazy;
     use pretty_assertions::assert_eq;
     use rand::prelude::*;
 
@@ -414,21 +414,19 @@ mod tests {
     use crate::collapse::common;
     use crate::collapse::Collapse;
 
-    lazy_static! {
-        static ref INPUT: Vec<PathBuf> = {
-            [
-                "./flamegraph/example-dtrace-stacks.txt",
-                "./tests/data/collapse-dtrace/flamegraph-bug.txt",
-                "./tests/data/collapse-dtrace/hex-addresses.txt",
-                "./tests/data/collapse-dtrace/java.txt",
-                "./tests/data/collapse-dtrace/only-header-lines.txt",
-                "./tests/data/collapse-dtrace/scope_with_no_argument_list.txt",
-            ]
-            .iter()
-            .map(PathBuf::from)
-            .collect::<Vec<_>>()
-        };
-    }
+    static INPUT: Lazy<Vec<PathBuf>> = Lazy::new(|| {
+        [
+            "./flamegraph/example-dtrace-stacks.txt",
+            "./tests/data/collapse-dtrace/flamegraph-bug.txt",
+            "./tests/data/collapse-dtrace/hex-addresses.txt",
+            "./tests/data/collapse-dtrace/java.txt",
+            "./tests/data/collapse-dtrace/only-header-lines.txt",
+            "./tests/data/collapse-dtrace/scope_with_no_argument_list.txt",
+        ]
+        .iter()
+        .map(PathBuf::from)
+        .collect::<Vec<_>>()
+    });
 
     #[test]
     fn cpp_test() {
