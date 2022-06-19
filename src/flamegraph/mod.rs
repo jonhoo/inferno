@@ -62,13 +62,12 @@ pub mod defaults {
                 );
             )*
 
+
             #[doc(hidden)]
             pub mod str {
-                use lazy_static::lazy_static;
+            use once_cell::sync::Lazy;
             $(
-                lazy_static! {
-                    pub static ref $name: String = ($val).to_string();
-                }
+                    pub static $name: Lazy<String> = Lazy::new(|| ($val).to_string());
             )*
             }
         }

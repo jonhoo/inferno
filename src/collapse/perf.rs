@@ -703,7 +703,7 @@ mod tests {
     use std::io::Read;
     use std::path::PathBuf;
 
-    use lazy_static::lazy_static;
+    use once_cell::sync::Lazy;
     use pretty_assertions::assert_eq;
     use rand::prelude::*;
 
@@ -743,34 +743,32 @@ mod tests {
         }
     }
 
-    lazy_static! {
-        static ref INPUT: Vec<PathBuf> = {
-            [
-                "./flamegraph/example-perf-stacks.txt.gz",
-                "./flamegraph/test/perf-cycles-instructions-01.txt",
-                "./flamegraph/test/perf-dd-stacks-01.txt",
-                "./flamegraph/test/perf-funcab-cmd-01.txt",
-                "./flamegraph/test/perf-funcab-pid-01.txt",
-                "./flamegraph/test/perf-iperf-stacks-pidtid-01.txt",
-                "./flamegraph/test/perf-java-faults-01.txt",
-                "./flamegraph/test/perf-java-stacks-01.txt",
-                "./flamegraph/test/perf-java-stacks-02.txt",
-                "./flamegraph/test/perf-js-stacks-01.txt",
-                "./flamegraph/test/perf-mirageos-stacks-01.txt",
-                "./flamegraph/test/perf-numa-stacks-01.txt",
-                "./flamegraph/test/perf-rust-Yamakaky-dcpu.txt",
-                "./flamegraph/test/perf-vertx-stacks-01.txt",
-                "./tests/data/collapse-perf/empty-line.txt",
-                "./tests/data/collapse-perf/go-stacks.txt",
-                "./tests/data/collapse-perf/java-inline.txt",
-                "./tests/data/collapse-perf/weird-stack-line.txt",
-                "./tests/data/collapse-perf/cpp-stacks-std-function.txt",
-            ]
-            .iter()
-            .map(PathBuf::from)
-            .collect::<Vec<_>>()
-        };
-    }
+    static INPUT: Lazy<Vec<PathBuf>> = Lazy::new(|| {
+        [
+            "./flamegraph/example-perf-stacks.txt.gz",
+            "./flamegraph/test/perf-cycles-instructions-01.txt",
+            "./flamegraph/test/perf-dd-stacks-01.txt",
+            "./flamegraph/test/perf-funcab-cmd-01.txt",
+            "./flamegraph/test/perf-funcab-pid-01.txt",
+            "./flamegraph/test/perf-iperf-stacks-pidtid-01.txt",
+            "./flamegraph/test/perf-java-faults-01.txt",
+            "./flamegraph/test/perf-java-stacks-01.txt",
+            "./flamegraph/test/perf-java-stacks-02.txt",
+            "./flamegraph/test/perf-js-stacks-01.txt",
+            "./flamegraph/test/perf-mirageos-stacks-01.txt",
+            "./flamegraph/test/perf-numa-stacks-01.txt",
+            "./flamegraph/test/perf-rust-Yamakaky-dcpu.txt",
+            "./flamegraph/test/perf-vertx-stacks-01.txt",
+            "./tests/data/collapse-perf/empty-line.txt",
+            "./tests/data/collapse-perf/go-stacks.txt",
+            "./tests/data/collapse-perf/java-inline.txt",
+            "./tests/data/collapse-perf/weird-stack-line.txt",
+            "./tests/data/collapse-perf/cpp-stacks-std-function.txt",
+        ]
+        .iter()
+        .map(PathBuf::from)
+        .collect::<Vec<_>>()
+    });
 
     #[test]
     fn test_collapse_multi_perf() -> io::Result<()> {
