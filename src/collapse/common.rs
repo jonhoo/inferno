@@ -40,7 +40,7 @@ const RUST_HASH_LENGTH: usize = 17;
 
 #[cfg(feature = "multithreaded")]
 #[doc(hidden)]
-pub static DEFAULT_NTHREADS: Lazy<usize> = Lazy::new(|| num_cpus::get());
+pub static DEFAULT_NTHREADS: Lazy<usize> = Lazy::new(num_cpus::get);
 #[cfg(not(feature = "multithreaded"))]
 #[doc(hidden)]
 pub static DEFAULT_NTHREADS: Lazy<usize> = Lazy::new(|| 1);
@@ -128,6 +128,7 @@ pub trait CollapsePrivate: Send + Sized {
     /// - `None` means "not sure -- need more input"
     /// - `Some(true)` means "yes, this implementation should work with this string"
     /// - `Some(false)` means "no, this implementation definitely won't work"
+    #[allow(clippy::wrong_self_convention)]
     fn is_applicable(&mut self, input: &str) -> Option<bool>;
 
     /// Returns the number of stacks per job to send to the threadpool.
@@ -216,8 +217,6 @@ pub trait CollapsePrivate: Send + Sized {
                 let mut occurrences = occurrences.clone();
 
                 // Launch the worker thread...
-                // TODO: https://github.com/crossbeam-rs/crossbeam/issues/404
-                #[allow(clippy::drop_copy, clippy::zero_ptr)]
                 let handle = scope.spawn(move |_| loop {
                     crossbeam_channel::select! {
                         recv(rx_input) -> input => {
@@ -479,7 +478,8 @@ impl Occurrences {
 #[allow(clippy::cognitive_complexity)]
 pub(crate) fn fix_partially_demangled_rust_symbol(symbol: &str) -> Cow<str> {
     // Rust hashes are hex digits with an `h` prepended.
-    let is_rust_hash = |s: &str| s.starts_with('h') && s[1..].chars().all(|c| c.is_digit(16));
+    let is_rust_hash =
+        |s: &str| s.starts_with('h') && s[1..].chars().all(|c| c.is_ascii_hexdigit());
 
     // If there's no trailing Rust hash just return the symbol as is.
     if symbol.len() < RUST_HASH_LENGTH || !is_rust_hash(&symbol[symbol.len() - RUST_HASH_LENGTH..])
@@ -567,23 +567,12 @@ pub(crate) mod testing {
     use std::io::Write;
     use std::io::{self, BufRead, Read};
     use std::path::{Path, PathBuf};
-    use std::time::{Duration, Instant};
+    use std::time::Instant;
 
     use libflate::gzip::Decoder;
 
     use super::*;
     use crate::collapse::Collapse;
-
-    // TODO: Eventually replace with `as_nanos`, which became part of the standard library in Rust 1.33.0.
-    pub(crate) trait DurationExt {
-        fn as_nanos_compat(&self) -> u128;
-    }
-
-    impl DurationExt for Duration {
-        fn as_nanos_compat(&self) -> u128 {
-            self.as_secs() as u128 * 1_000_000_000 + self.subsec_nanos() as u128
-        }
-    }
 
     pub(crate) fn read_inputs<P>(inputs: &[P]) -> io::Result<HashMap<PathBuf, Vec<u8>>>
     where
@@ -690,7 +679,7 @@ pub(crate) mod testing {
                     for _ in 0..NSAMPLES {
                         let now = Instant::now();
                         folder.collapse(bytes, io::sink())?;
-                        durations.push(now.elapsed().as_nanos_compat());
+                        durations.push(now.elapsed().as_nanos());
                     }
                     let avg_duration =
                         (durations.iter().sum::<u128>() as f64 / durations.len() as f64) as u64;

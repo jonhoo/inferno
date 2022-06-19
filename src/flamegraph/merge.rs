@@ -147,7 +147,7 @@ where
                     parse_nsamples(&mut line, &mut stripped_fractional_samples)
                 {
                     delta = Some(samples as isize - original_samples as isize);
-                    delta_max = std::cmp::max(delta.unwrap().abs() as usize, delta_max);
+                    delta_max = std::cmp::max(delta.unwrap().unsigned_abs(), delta_max);
                 }
                 samples
             } else {
@@ -248,13 +248,13 @@ pub(super) fn rfind_samples(line: &str) -> Option<(usize, usize)> {
         if samples[..doti]
             .chars()
             .chain(samples[doti + 1..].chars())
-            .all(|c| c.is_digit(10))
+            .all(|c| c.is_ascii_digit())
         {
             Some((samplesi, doti))
         } else {
             None
         }
-    } else if !samples.chars().all(|c| c.is_digit(10)) {
+    } else if !samples.chars().all(|c| c.is_ascii_digit()) {
         None
     } else {
         Some((samplesi, line.len() - samplesi))

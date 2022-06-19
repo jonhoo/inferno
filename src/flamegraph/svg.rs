@@ -285,7 +285,7 @@ where
         svg.write_event(&*start_event.borrow())
     })?;
     let s = match text {
-        TextArgument::String(ref s) => &*s,
+        TextArgument::String(ref s) => s,
         TextArgument::FromBuffer(i) => &buf[i],
     };
     svg.write_event(Event::Text(BytesText::from_plain_str(s)))?;

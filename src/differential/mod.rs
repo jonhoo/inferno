@@ -148,7 +148,7 @@ fn parse_line(
         if !samples[..doti]
             .chars()
             .chain(samples[doti + 1..].chars())
-            .all(|c| c.is_digit(10))
+            .all(|c| c.is_ascii_digit())
         {
             return None;
         }
@@ -176,7 +176,7 @@ fn strip_hex_address(mut stack: &str) -> String {
         stripped.push_str(&stack[..idx + 2]);
         let ndigits = stack[idx + 2..]
             .chars()
-            .take_while(|c| c.is_digit(16))
+            .take_while(|c| c.is_ascii_hexdigit())
             .count();
         if ndigits > 0 {
             stripped.push_str("...");

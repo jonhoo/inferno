@@ -42,7 +42,7 @@ const GRAY_GRADIENT: (&str, &str) = ("#f8f8f8", "#e8e8e8");
 ///  - All other [`MultiPalette`] variants default to [`BackgroundColor::Yellow`].
 ///
 /// `BackgroundColor::default()` is `Yellow`.
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum BackgroundColor {
     /// A yellow gradient from `#EEEEEE` to `#EEEEB0`.
     Yellow,
@@ -67,7 +67,7 @@ impl Default for BackgroundColor {
 /// A flame graph color palette.
 ///
 /// Defaults to [`BasicPalette::Hot`].
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Palette {
     /// A plain color palette in which the color is not chosen based on function semantics.
     ///
@@ -90,7 +90,7 @@ impl Default for Palette {
 /// [`super::Options.consistent_palette`] and [`super::Options.hash`]. In the absence of options
 /// like that, these palettes all choose colors randomly from the indicated spectrum, and does not
 /// consider the name of the frame's function when doing so.
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum BasicPalette {
     /// A palette in which colors are chosen from a red-yellow spectrum.
     Hot,
@@ -116,7 +116,7 @@ pub enum BasicPalette {
 
 /// A semantic color palette in which different hues are used to signifiy semantic aspects of
 /// different function names (kernel functions, JIT functions, etc.).
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum MultiPalette {
     /// Use Java semantics to color frames.
     Java,
@@ -167,7 +167,7 @@ fn parse_flat_bgcolor(s: &str) -> Option<Color> {
 }
 
 /// `SearchColor::default()` is `rgb(230,0,230)`.
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct SearchColor(Color);
 
 impl FromStr for SearchColor {

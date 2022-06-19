@@ -112,6 +112,7 @@ pub trait Collapse {
     /// - `None` means "not sure -- need more input"
     /// - `Some(true)` means "yes, this implementation should work with this string"
     /// - `Some(false)` means "no, this implementation definitely won't work"
+    #[allow(clippy::wrong_self_convention)]
     fn is_applicable(&mut self, input: &str) -> Option<bool>;
 }
 
