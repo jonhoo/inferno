@@ -7,7 +7,7 @@ use inferno::collapse::guess::{Folder, Options};
 use inferno::collapse::{Collapse, DEFAULT_NTHREADS};
 use once_cell::sync::Lazy;
 
-static NTHREADS: Lazy<String> = Lazy::new(|| format!("{}", *DEFAULT_NTHREADS));
+static NTHREADS: Lazy<String> = Lazy::new(|| DEFAULT_NTHREADS.to_string());
 
 #[derive(Debug, Parser)]
 #[clap(
