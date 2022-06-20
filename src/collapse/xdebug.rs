@@ -10,6 +10,8 @@ use std::io::{self, Write};
 use std::rc::Rc;
 // Ideas: str_stack and colosseum to keep allocations closer together or something.
 
+// Xdebug uses nanoseconds, whereas flamegraph expects seconds, hence a scale
+// factor of one million.
 const SCALE_FACTOR: f32 = 1_000_000.0;
 static CALLS: &[&str] = &["require", "require_once", "include", "include_once"];
 
