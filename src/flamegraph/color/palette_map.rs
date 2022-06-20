@@ -61,7 +61,10 @@ impl PaletteMap {
     }
 
     /// Writes the palette map using the given writer.
-    /// The output content will follow the same format described in [from_stream()]
+    ///
+    /// The output content will follow the same format described in
+    /// [`from_reader`](Self::from_reader).
+    ///
     /// The name/color pairs will be sorted by name in lexicographic order.
     pub fn to_writer(&self, writer: &mut dyn io::Write) -> io::Result<()> {
         let mut entries = self.0.iter().collect::<Vec<_>>();
@@ -79,7 +82,7 @@ impl PaletteMap {
 
     /// Utility function to load a palette map from a file.
     ///
-    /// The file content should follow the format described in [from_stream()].
+    /// The file content should follow the format described in [`from_reader`](Self::from_reader).
     ///
     /// If the file does not exist, an empty palette map is returned.
     pub fn load_from_file_or_empty(path: &dyn AsRef<Path>) -> io::Result<Self> {
@@ -96,7 +99,7 @@ impl PaletteMap {
 
     /// Utility function to save a palette map to a file.
     ///
-    /// The file content will follow the format described in [from_stream()].
+    /// The file content will follow the format described in [`from_reader`](Self::from_reader).
     pub fn save_to_file(&self, path: &dyn AsRef<Path>) -> io::Result<()> {
         let mut file = OpenOptions::new().write(true).create(true).open(path)?;
         self.to_writer(&mut file)

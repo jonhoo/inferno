@@ -8,12 +8,8 @@ use crate::collapse::common::{self, CollapsePrivate, Occurrences};
 
 /// `dtrace` folder configuration options.
 #[derive(Clone, Debug)]
+#[non_exhaustive]
 pub struct Options {
-    /// Demangle function names.
-    ///
-    /// Default is `false`.
-    pub demangle: bool,
-
     /// Include function offset (except leafs).
     ///
     /// Default is `false`.
@@ -28,7 +24,6 @@ pub struct Options {
 impl Default for Options {
     fn default() -> Self {
         Self {
-            demangle: false,
             includeoffset: false,
             nthreads: *common::DEFAULT_NTHREADS,
         }
@@ -82,15 +77,15 @@ impl CollapsePrivate for Folder {
         R: io::BufRead,
     {
         // Consumer the header...
-        let mut line = String::new();
+        let mut line = Vec::new();
         loop {
             line.clear();
-            if reader.read_line(&mut line)? == 0 {
+            if reader.read_until(0x0A, &mut line)? == 0 {
                 // We reached the end :( this should not happen.
                 warn!("File ended while skipping headers");
                 return Ok(());
             };
-            if line.trim().is_empty() {
+            if String::from_utf8_lossy(&line).trim().is_empty() {
                 return Ok(());
             }
         }
@@ -104,13 +99,14 @@ impl CollapsePrivate for Folder {
     where
         R: io::BufRead,
     {
-        let mut line = String::new();
+        let mut line = Vec::new();
         loop {
             line.clear();
-            if reader.read_line(&mut line)? == 0 {
+            if reader.read_until(0x0A, &mut line)? == 0 {
                 break;
             }
-            let line = line.trim();
+            let s = String::from_utf8_lossy(&line);
+            let line = s.trim();
             if line.is_empty() {
                 continue;
             } else if let Ok(count) = line.parse::<usize>() {
@@ -301,17 +297,16 @@ impl Folder {
         )
     }
 
-    // Transforms the function part of a frame with the given function.
-    fn transform_function_name<'a, F>(&self, frame: &'a str, transform: F) -> Cow<'a, str>
-    where
-        F: Fn(&'a str) -> Cow<'a, str>,
-    {
+    // DTrace doesn't properly demangle Rust function names, so fix those.
+    fn fix_rust_symbol<'a>(&self, frame: &'a str) -> Cow<'a, str> {
         let mut parts = frame.splitn(2, '`');
         if let (Some(pname), Some(func)) = (parts.next(), parts.next()) {
             if self.opt.includeoffset {
                 let mut parts = func.rsplitn(2, '+');
                 if let (Some(offset), Some(func)) = (parts.next(), parts.next()) {
-                    if let Cow::Owned(func) = transform(func.trim_end()) {
+                    if let Cow::Owned(func) =
+                        common::fix_partially_demangled_rust_symbol(func.trim_end())
+                    {
                         return Cow::Owned(format!("{}`{}+{}", pname, func, offset));
                     } else {
                         return Cow::Borrowed(frame);
@@ -319,7 +314,7 @@ impl Folder {
                 }
             }
 
-            if let Cow::Owned(func) = transform(func.trim_end()) {
+            if let Cow::Owned(func) = common::fix_partially_demangled_rust_symbol(func.trim_end()) {
                 return Cow::Owned(format!("{}`{}", pname, func));
             }
         }
@@ -327,17 +322,7 @@ impl Folder {
         Cow::Borrowed(frame)
     }
 
-    // Demangle the function name if it's mangled.
-    fn demangle<'a>(&self, frame: &'a str) -> Cow<'a, str> {
-        self.transform_function_name(frame, symbolic_demangle::demangle)
-    }
-
-    // DTrace doesn't properly demangle Rust function names, so fix those.
-    fn fix_rust_symbol<'a>(&self, frame: &'a str) -> Cow<'a, str> {
-        self.transform_function_name(frame, common::fix_partially_demangled_rust_symbol)
-    }
-
-    // we have a stack line that shows one stack entry from the preceeding event, like:
+    // we have a stack line that shows one stack entry from the preceding event, like:
     //
     //     unix`tsc_gethrtimeunscaled+0x21
     //     genunix`gethrtime_unscaled+0xa
@@ -357,8 +342,6 @@ impl Folder {
 
         let frame = if frame.is_empty() {
             Cow::Borrowed("-")
-        } else if self.opt.demangle {
-            self.demangle(frame)
         } else {
             self.fix_rust_symbol(frame)
         };
@@ -423,7 +406,7 @@ mod tests {
     use std::fs;
     use std::path::PathBuf;
 
-    use lazy_static::lazy_static;
+    use once_cell::sync::Lazy;
     use pretty_assertions::assert_eq;
     use rand::prelude::*;
 
@@ -431,21 +414,19 @@ mod tests {
     use crate::collapse::common;
     use crate::collapse::Collapse;
 
-    lazy_static! {
-        static ref INPUT: Vec<PathBuf> = {
-            [
-                "./flamegraph/example-dtrace-stacks.txt",
-                "./tests/data/collapse-dtrace/flamegraph-bug.txt",
-                "./tests/data/collapse-dtrace/hex-addresses.txt",
-                "./tests/data/collapse-dtrace/java.txt",
-                "./tests/data/collapse-dtrace/only-header-lines.txt",
-                "./tests/data/collapse-dtrace/scope_with_no_argument_list.txt",
-            ]
-            .into_iter()
-            .map(PathBuf::from)
-            .collect::<Vec<_>>()
-        };
-    }
+    static INPUT: Lazy<Vec<PathBuf>> = Lazy::new(|| {
+        [
+            "./flamegraph/example-dtrace-stacks.txt",
+            "./tests/data/collapse-dtrace/flamegraph-bug.txt",
+            "./tests/data/collapse-dtrace/hex-addresses.txt",
+            "./tests/data/collapse-dtrace/java.txt",
+            "./tests/data/collapse-dtrace/only-header-lines.txt",
+            "./tests/data/collapse-dtrace/scope_with_no_argument_list.txt",
+        ]
+        .iter()
+        .map(PathBuf::from)
+        .collect::<Vec<_>>()
+    });
 
     #[test]
     fn cpp_test() {
@@ -473,7 +454,7 @@ mod tests {
     }
 
     #[test]
-    fn test_collapse_multi_dtrace_stop_early() {
+    fn test_collapse_multi_dtrace_non_utf8() {
         let invalid_utf8 = unsafe { std::str::from_utf8_unchecked(&[0xf0, 0x28, 0x8c, 0xbc]) };
         let invalid_stack = format!("genunix`cv_broadcast+0x1{}\n1\n\n", invalid_utf8);
         let valid_stack = "genunix`cv_broadcast+0x1\n1\n\n";
@@ -483,31 +464,22 @@ mod tests {
             input.extend_from_slice(valid_stack.as_bytes());
         }
         input.extend_from_slice(invalid_stack.as_bytes());
-        for _ in 0..(1024 * 1024 * 10) {
+        for _ in 0..100 {
             input.extend_from_slice(valid_stack.as_bytes());
         }
 
-        let mut folder = Folder::default();
-        folder.nstacks_per_job = 1;
-        folder.opt.nthreads = 12;
-        match <Folder as Collapse>::collapse(&mut folder, &input[..], io::sink()) {
-            Ok(_) => panic!("collapse should have return error, but instead returned Ok."),
-            Err(e) => match e.kind() {
-                io::ErrorKind::InvalidData => assert_eq!(
-                    &format!("{}", e),
-                    "stream did not contain valid UTF-8",
-                    "error message is incorrect.",
-                ),
-                k => panic!(
-                    "collapse should have returned `InvalidData` error but instead returned {:?}",
-                    k
-                ),
+        let mut folder = Folder {
+            nstacks_per_job: 1,
+            opt: Options {
+                nthreads: 12,
+                ..Options::default()
             },
-        }
+            ..Folder::default()
+        };
+        <Folder as Collapse>::collapse(&mut folder, &input[..], io::sink()).unwrap();
     }
 
     #[test]
-    #[ignore]
     fn test_collapse_multi_dtrace_simple() -> io::Result<()> {
         let path = "./flamegraph/example-dtrace-stacks.txt";
         let mut file = fs::File::open(path)?;
@@ -544,11 +516,10 @@ mod tests {
         let inputs = common::testing::read_inputs(&INPUT)?;
 
         loop {
-            let nstacks_per_job = rng.gen_range(1, 500 + 1);
+            let nstacks_per_job = rng.gen_range(1..=500);
             let options = Options {
-                demangle: rng.gen(),
                 includeoffset: rng.gen(),
-                nthreads: rng.gen_range(2, 32 + 1),
+                nthreads: rng.gen_range(2..=32),
             };
 
             for (path, input) in inputs.iter() {

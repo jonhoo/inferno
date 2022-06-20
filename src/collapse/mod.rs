@@ -1,3 +1,6 @@
+#[macro_use]
+pub(crate) mod common;
+
 /// Stack collapsing for the output of [`dtrace`](https://www.joyent.com/dtrace).
 ///
 /// See the [crate-level documentation] for details.
@@ -15,12 +18,8 @@ pub mod guess;
 ///   [crate-level documentation]: ../../index.html
 pub mod perf;
 
-/// Stack collapsing for the output of [`Xdebug`](https://xdebug.org/docs/execution_trace).
-///
-/// See the [crate-level documentation] for details.
-///
-///   [crate-level documentation]: ../../index.html
-pub mod xdebug;
+/// Internal string match helper functions for perf
+pub(crate) mod matcher;
 
 /// Stack collapsing for the output of [`sample`](https://gist.github.com/loderunner/36724cc9ee8db66db305#profiling-with-sample) on macOS.
 ///
@@ -30,8 +29,26 @@ pub mod xdebug;
 
 pub mod sample;
 
+/// Stack collapsing for the output of [`VTune`](https://software.intel.com/en-us/vtune-amplifier-help-command-line-interface).
+///
+/// See the [crate-level documentation] for details.
+///
+///   [crate-level documentation]: ../../index.html
+pub mod vtune;
 
-pub(crate) mod common;
+/// Stack collapsing for the output of the [Visual Studio built-in profiler](https://docs.microsoft.com/en-us/visualstudio/profiling/profiling-feature-tour?view=vs-2019).
+///
+/// See the [crate-level documentation] for details.
+///
+///   [crate-level documentation]: ../../index.html
+pub mod vsprof;
+
+/// Stack collapsing for the output of [`Xdebug`](https://xdebug.org/docs/execution_trace).
+///
+/// See the [crate-level documentation] for details.
+///
+///   [crate-level documentation]: ../../index.html
+pub mod xdebug;
 
 // DEFAULT_NTHREADS is public because we use it in the help text of the binaries,
 // but it doesn't need to be exposed to library users, hence #[doc(hidden)].
@@ -48,7 +65,7 @@ use self::common::{CollapsePrivate, CAPACITY_READER};
 ///
 /// Implementors of this trait are providing a way to take the stack traces produced by a
 /// particular profiler's output (like `perf script`) and produce lines in the folded stack format
-/// expected by [`crate::flamegraph::from_sorted_lines`].
+/// expected by [`crate::flamegraph::from_lines`].
 ///
 /// See also the [crate-level documentation] for details.
 ///
@@ -77,11 +94,24 @@ pub trait Collapse {
                 self.collapse(reader, writer)
             }
             None => {
-                let stdio = io::stdin();
-                let stdio_guard = stdio.lock();
-                let reader = io::BufReader::with_capacity(CAPACITY_READER, stdio_guard);
+                let stdin = io::stdin();
+                let stdin_guard = stdin.lock();
+                let reader = io::BufReader::with_capacity(CAPACITY_READER, stdin_guard);
                 self.collapse(reader, writer)
             }
+        }
+    }
+
+    /// Collapses the contents of the provided file (or of STDIN if `infile` is `None`) and
+    /// writes folded stack lines to STDOUT.
+    fn collapse_file_to_stdout<P>(&mut self, infile: Option<P>) -> io::Result<()>
+    where
+        P: AsRef<Path>,
+    {
+        if atty::is(atty::Stream::Stdout) {
+            self.collapse_file(infile, io::stdout().lock())
+        } else {
+            self.collapse_file(infile, io::BufWriter::new(io::stdout().lock()))
         }
     }
 
@@ -90,6 +120,7 @@ pub trait Collapse {
     /// - `None` means "not sure -- need more input"
     /// - `Some(true)` means "yes, this implementation should work with this string"
     /// - `Some(false)` means "no, this implementation definitely won't work"
+    #[allow(clippy::wrong_self_convention)]
     fn is_applicable(&mut self, input: &str) -> Option<bool>;
 }
 

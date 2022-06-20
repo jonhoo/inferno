@@ -4,8 +4,7 @@ use std::io::{self, BufRead, BufReader, Cursor};
 use inferno::collapse::Collapse;
 use libflate::gzip::Decoder;
 use pretty_assertions::assert_eq;
-
-use super::test_logger::{self, CapturedLog};
+use testing_logger::CapturedLog;
 
 pub fn compare_results<R, E>(result: R, mut expected: E, expected_file: &str, strip_quotes: bool)
 where
@@ -50,7 +49,7 @@ where
 {
     if let Err(e) = fs::metadata(test_filename) {
         eprintln!("Failed to open input file '{}'", test_filename);
-        return Err(e.into());
+        return Err(e);
     }
 
     let mut collapse = move |out: &mut dyn io::Write| {
@@ -73,14 +72,14 @@ where
                 fs::metadata(expected_filename).unwrap()
             } else {
                 eprintln!("Tried to open {}.", expected_filename);
-                return Err(e.into());
+                return Err(e);
             }
         }
     };
 
     let expected_len = metadata.len() as usize;
     let mut result = Cursor::new(Vec::with_capacity(expected_len));
-    let return_value = collapse(&mut result)?;
+    collapse(&mut result)?;
     let expected = BufReader::new(File::open(expected_filename)?);
     // write out the expected result to /tmp for easy restoration
     result.set_position(0);
@@ -91,7 +90,7 @@ where
     }
     // and then compare
     compare_results(result, expected, expected_filename, strip_quotes);
-    Ok(return_value)
+    Ok(())
 }
 
 pub fn test_collapse_logs<C, F>(mut collapser: C, input_file: &str, asserter: F)
@@ -99,8 +98,29 @@ where
     C: Collapse,
     F: Fn(&Vec<CapturedLog>),
 {
-    test_logger::init();
+    testing_logger::setup();
     let r = BufReader::new(File::open(input_file).unwrap());
     collapser.collapse(r, std::io::sink()).unwrap();
-    test_logger::validate(asserter);
+    testing_logger::validate(asserter);
+}
+
+pub fn test_collapse_error<C>(mut collapser: C, test_filename: &str) -> io::Error
+where
+    C: Collapse,
+{
+    if fs::metadata(test_filename).is_err() {
+        panic!("Failed to open input file '{}'", test_filename);
+    }
+
+    let mut collapse = move |out: &mut dyn io::Write| {
+        if test_filename.ends_with(".gz") {
+            let test_file = File::open(test_filename)?;
+            let r = BufReader::new(Decoder::new(test_file).unwrap());
+            collapser.collapse(r, out)
+        } else {
+            collapser.collapse_file(Some(test_filename), out)
+        }
+    };
+
+    collapse(&mut io::sink()).expect_err("Expected an error")
 }

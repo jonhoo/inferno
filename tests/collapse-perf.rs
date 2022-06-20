@@ -9,8 +9,7 @@ use assert_cmd::cargo::CommandCargoExt;
 use inferno::collapse::perf::{Folder, Options};
 use log::Level;
 use pretty_assertions::assert_eq;
-
-use common::test_logger::CapturedLog;
+use testing_logger::CapturedLog;
 
 fn test_collapse_perf(
     test_file: &str,
@@ -35,7 +34,8 @@ fn test_collapse_perf_logs_with_options<F>(input_file: &str, asserter: F, mut op
 where
     F: Fn(&Vec<CapturedLog>),
 {
-    options.nthreads = 2;
+    // We must run log tests in a single thread to play nicely with `testing_logger`.
+    options.nthreads = 1;
     common::test_collapse_logs(Folder::from(options), input_file, asserter);
 }
 
@@ -228,8 +228,13 @@ macro_rules! collapse_perf_tests {
 }
 
 collapse_perf_tests! {
+    collapse_perf_no_events,
+    collapse_perf_single_line_stacks,
+    collapse_perf_single_event,
     collapse_perf_go_stacks,
-    collapse_perf_java_inline
+    collapse_perf_java_inline,
+    collapse_perf_versioned_vmlinux__kernel,
+    collapse_perf_sourcepawn_jitdump__jit
 }
 
 #[test]
@@ -249,7 +254,7 @@ fn collapse_perf_should_warn_about_empty_input_lines() {
         "./tests/data/collapse-perf/empty-line.txt",
         |captured_logs| {
             let nwarnings = captured_logs
-                .into_iter()
+                .iter()
                 .filter(|log| {
                     log.body.starts_with("Weird event line: ") && log.level == Level::Warn
                 })
@@ -269,7 +274,7 @@ fn collapse_perf_should_warn_about_weird_input_lines() {
         "./tests/data/collapse-perf/weird-stack-line.txt",
         |captured_logs| {
             let nwarnings = captured_logs
-                .into_iter()
+                .iter()
                 .filter(|log| {
                     log.body.starts_with("Weird stack line: ") && log.level == Level::Warn
                 })
@@ -281,22 +286,6 @@ fn collapse_perf_should_warn_about_weird_input_lines() {
             );
         },
     );
-}
-
-#[test]
-fn collapse_perf_demangle() {
-    let test_file = "./tests/data/collapse-perf/mangled.txt";
-    let result_file = "./tests/data/collapse-perf/results/demangled.txt";
-    test_collapse_perf(
-        test_file,
-        result_file,
-        Options {
-            demangle: true,
-            ..Default::default()
-        },
-        false,
-    )
-    .unwrap()
 }
 
 #[test]

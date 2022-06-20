@@ -1,20 +1,18 @@
 use std::io;
 use std::path::PathBuf;
 
+use clap::Parser;
 use env_logger::Env;
 use inferno::collapse::guess::{Folder, Options};
 use inferno::collapse::{Collapse, DEFAULT_NTHREADS};
-use lazy_static::lazy_static;
-use structopt::StructOpt;
+use once_cell::sync::Lazy;
 
-lazy_static! {
-    static ref NTHREADS: String = format!("{}", *DEFAULT_NTHREADS);
-}
+static NTHREADS: Lazy<String> = Lazy::new(|| DEFAULT_NTHREADS.to_string());
 
-#[derive(Debug, StructOpt)]
-#[structopt(
+#[derive(Debug, Parser)]
+#[clap(
     name = "inferno-collapse-guess",
-    author = "",
+    about,
     after_help = "\
 [1] Attempts to find an appropriate collapser to use based on the input.
                   "
@@ -24,21 +22,21 @@ struct Opt {
     // *** FLAGS *** //
     // ************* //
     /// Silence all log output
-    #[structopt(short = "q", long = "quiet")]
+    #[clap(short = 'q', long = "quiet")]
     quiet: bool,
 
     /// Verbose logging mode (-v, -vv, -vvv)
-    #[structopt(short = "v", long = "verbose", parse(from_occurrences))]
+    #[clap(short = 'v', long = "verbose", parse(from_occurrences))]
     verbose: usize,
 
     // *************** //
     // *** OPTIONS *** //
     // *************** //
     /// Number of threads to use
-    #[structopt(
-        short = "n",
+    #[clap(
+        short = 'n',
         long = "nthreads",
-        raw(default_value = "&NTHREADS"),
+        default_value = &NTHREADS,
         value_name = "UINT"
     )]
     nthreads: usize,
@@ -47,23 +45,20 @@ struct Opt {
     // *** ARGS *** //
     // ************ //
     /// Input file, or STDIN if not specified
-    #[structopt(value_name = "PATH")]
+    #[clap(value_name = "PATH")]
     infile: Option<PathBuf>,
 }
 
 impl Opt {
     fn into_parts(self) -> (Option<PathBuf>, Options) {
-        (
-            self.infile,
-            Options {
-                nthreads: self.nthreads,
-            },
-        )
+        let mut options = Options::default();
+        options.nthreads = self.nthreads;
+        (self.infile, options)
     }
 }
 
 fn main() -> io::Result<()> {
-    let opt = Opt::from_args();
+    let opt = Opt::parse();
 
     // Initialize logger
     if !opt.quiet {
@@ -73,10 +68,10 @@ fn main() -> io::Result<()> {
             2 => "debug",
             _ => "trace",
         }))
-        .default_format_timestamp(false)
+        .format_timestamp(None)
         .init();
     }
 
     let (infile, options) = opt.into_parts();
-    Folder::from(options).collapse_file(infile.as_ref(), io::stdout().lock())
+    Folder::from(options).collapse_file_to_stdout(infile.as_ref())
 }

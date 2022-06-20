@@ -1,20 +1,18 @@
 use std::io;
 use std::path::PathBuf;
 
+use clap::Parser;
 use env_logger::Env;
 use inferno::collapse::perf::{Folder, Options};
 use inferno::collapse::{Collapse, DEFAULT_NTHREADS};
-use lazy_static::lazy_static;
-use structopt::StructOpt;
+use once_cell::sync::Lazy;
 
-lazy_static! {
-    static ref NTHREADS: String = format!("{}", *DEFAULT_NTHREADS);
-}
+static NTHREADS: Lazy<String> = Lazy::new(|| DEFAULT_NTHREADS.to_string());
 
-#[derive(Debug, StructOpt)]
-#[structopt(
+#[derive(Debug, Parser)]
+#[clap(
     name = "inferno-collapse-perf",
-    author = "",
+    about,
     after_help = "\
 [1] perf script must emit both PID and TIDs for these to work; eg, Linux < 4.1:
         perf script -f comm,pid,tid,cpu,time,event,ip,sym,dso,trace
@@ -27,53 +25,49 @@ struct Opt {
     // *** FLAGS *** //
     // ************* //
     /// Include raw addresses where symbols can't be found
-    #[structopt(long = "addrs")]
+    #[clap(long = "addrs")]
     addrs: bool,
 
     /// All annotations (--kernel --jit)
-    #[structopt(long = "all")]
+    #[clap(long = "all")]
     all: bool,
 
-    /// Demangle function names
-    #[structopt(long = "demangle")]
-    demangle: bool,
-
-    /// Annotate jit functions with a _[j]
-    #[structopt(long = "jit")]
+    /// Annotate jit functions with a `_[j]`
+    #[clap(long = "jit")]
     jit: bool,
 
-    /// Annotate kernel functions with a _[k]
-    #[structopt(long = "kernel")]
+    /// Annotate kernel functions with a `_[k]`
+    #[clap(long = "kernel")]
     kernel: bool,
 
     /// Include PID with process names
-    #[structopt(long = "pid")]
+    #[clap(long = "pid")]
     pid: bool,
 
     /// Include TID and PID with process names
-    #[structopt(long = "tid")]
+    #[clap(long = "tid")]
     tid: bool,
 
     /// Silence all log output
-    #[structopt(short = "q", long = "quiet")]
+    #[clap(short = 'q', long = "quiet")]
     quiet: bool,
 
     /// Verbose logging mode (-v, -vv, -vvv)
-    #[structopt(short = "v", long = "verbose", parse(from_occurrences))]
+    #[clap(short = 'v', long = "verbose", parse(from_occurrences))]
     verbose: usize,
 
     // *************** //
     // *** OPTIONS *** //
     // *************** //
     /// Event filter [default: first encountered event]
-    #[structopt(long = "event-filter", value_name = "STRING")]
+    #[clap(long = "event-filter", value_name = "STRING")]
     event_filter: Option<String>,
 
     /// Number of threads to use
-    #[structopt(
-        short = "n",
+    #[clap(
+        short = 'n',
         long = "nthreads",
-        raw(default_value = "&NTHREADS"),
+        default_value = &NTHREADS,
         value_name = "UINT"
     )]
     nthreads: usize,
@@ -81,31 +75,34 @@ struct Opt {
     // ************ //
     // *** ARGS *** //
     // ************ //
-    #[structopt(value_name = "PATH")]
+    #[clap(value_name = "PATH")]
     /// Perf script output file, or STDIN if not specified
     infile: Option<PathBuf>,
+
+    #[clap(long = "skip-after", value_name = "STRING")]
+    /// If set, will omit all the parent stack frames of any frame with a matched function name.
+    ///
+    /// Has no effect on the stack trace if no functions are matched.
+    skip_after: Vec<String>,
 }
 
 impl Opt {
     fn into_parts(self) -> (Option<PathBuf>, Options) {
-        (
-            self.infile,
-            Options {
-                include_pid: self.pid,
-                include_tid: self.tid,
-                include_addrs: self.addrs,
-                annotate_jit: self.jit || self.all,
-                annotate_kernel: self.kernel || self.all,
-                demangle: self.demangle,
-                event_filter: self.event_filter,
-                nthreads: self.nthreads,
-            },
-        )
+        let mut options = Options::default();
+        options.include_pid = self.pid;
+        options.include_tid = self.tid;
+        options.include_addrs = self.addrs;
+        options.annotate_jit = self.jit || self.all;
+        options.annotate_kernel = self.kernel || self.all;
+        options.event_filter = self.event_filter;
+        options.nthreads = self.nthreads;
+        options.skip_after = self.skip_after;
+        (self.infile, options)
     }
 }
 
 fn main() -> io::Result<()> {
-    let opt = Opt::from_args();
+    let opt = Opt::parse();
 
     // Initialize logger
     if !opt.quiet {
@@ -115,10 +112,10 @@ fn main() -> io::Result<()> {
             2 => "debug",
             _ => "trace",
         }))
-        .default_format_timestamp(false)
+        .format_timestamp(None)
         .init();
     }
 
     let (infile, options) = opt.into_parts();
-    Folder::from(options).collapse_file(infile.as_ref(), io::stdout().lock())
+    Folder::from(options).collapse_file_to_stdout(infile.as_ref())
 }

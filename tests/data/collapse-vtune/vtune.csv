@@ -1,0 +1,64 @@
+Function Stack,CPU Time:Self,Module
+Total,0.0,[Unknown]
+ RtlUserThreadStart,0.0,ntdll.dll
+  BaseThreadInitThunk,0.0,KERNEL32.DLL
+   _scrt_common_main_seh,0.0,inferno-collapse-dtrace.exe
+    main,0.0,inferno-collapse-dtrace.exe
+     "std::rt::lang_start<core::result::Result<(), std::io::error::Error>>",0.0,inferno-collapse-dtrace.exe
+      std::rt::lang_start_internal,0.0,inferno-collapse-dtrace.exe
+       rust_maybe_catch_panic,0.0,inferno-collapse-dtrace.exe
+        "std::panicking::try::do_call<closure,i32>",0.0,inferno-collapse-dtrace.exe
+         "std::rt::lang_start::{{closure}}<core::result::Result<(), std::io::error::Error>>",0.0,inferno-collapse-dtrace.exe
+          inferno_collapse_dtrace::main,0.0,inferno-collapse-dtrace.exe
+           "inferno::collapse::Collapse::collapse_file<inferno::collapse::dtrace::Folder,std::path::PathBuf*,std::io::stdio::StdoutLock>",0.0,inferno-collapse-dtrace.exe
+            "inferno::collapse::dtrace::{{impl}}::collapse<std::io::buffered::BufReader<std::fs::File>,std::io::stdio::StdoutLock>",0.0,inferno-collapse-dtrace.exe
+             inferno::collapse::dtrace::Folder::on_stack_line,0.0,inferno-collapse-dtrace.exe
+              alloc::string::{{impl}}::to_string,0.0,inferno-collapse-dtrace.exe
+               alloc::str::{{impl}}::to_owned,0.0,inferno-collapse-dtrace.exe
+                alloc::slice::{{impl}}::to_owned<u8>,0.0,inferno-collapse-dtrace.exe
+                 alloc::slice::{{impl}}::to_vec<u8>,0.0,inferno-collapse-dtrace.exe
+                  alloc::slice::hack::to_vec<u8>,0.0,inferno-collapse-dtrace.exe
+                   alloc::vec::Vec<u8>::extend_from_slice<u8>,0.0,inferno-collapse-dtrace.exe
+                    core::slice::{{impl}}::iter<u8>,0.0,inferno-collapse-dtrace.exe
+                     core::ptr::{{impl}}::is_null<u8>,0.016612,inferno-collapse-dtrace.exe
+                   alloc::vec::Vec<u8>::with_capacity<u8>,0.0,inferno-collapse-dtrace.exe
+                    "alloc::raw_vec::RawVec<u8, alloc::alloc::Global>::with_capacity<u8>",0.0,inferno-collapse-dtrace.exe
+                     "alloc::raw_vec::RawVec<u8, alloc::alloc::Global>::allocate_in<u8,alloc::alloc::Global>",0.0,inferno-collapse-dtrace.exe
+                      alloc::alloc::{{impl}}::alloc,0.0,inferno-collapse-dtrace.exe
+                       alloc::alloc::alloc,0.0,inferno-collapse-dtrace.exe
+                        func@0x180019140,0.014938,ntdll.dll
+              inferno::collapse::dtrace::Folder::remove_offset,0.0,inferno-collapse-dtrace.exe
+               core::iter::range::{{impl}}::next<usize>,0.014942,inferno-collapse-dtrace.exe
+                core::iter::range::{{impl}}::add_usize,0.0,inferno-collapse-dtrace.exe
+                 core::num::{{impl}}::checked_add,0.0,inferno-collapse-dtrace.exe
+                  core::num::{{impl}}::overflowing_add,0.015414,inferno-collapse-dtrace.exe
+             alloc::string::String::clear,0.0,inferno-collapse-dtrace.exe
+              alloc::vec::Vec<u8>::clear<u8>,0.0,inferno-collapse-dtrace.exe
+               alloc::vec::Vec<u8>::truncate<u8>,0.030580,inferno-collapse-dtrace.exe
+                core::iter::range::{{impl}}::next<usize>,0.0,inferno-collapse-dtrace.exe
+                 core::iter::range::{{impl}}::add_usize,0.0,inferno-collapse-dtrace.exe
+                  "core::convert::{{impl}}::try_from<usize,usize>",0.0,inferno-collapse-dtrace.exe
+                   "core::convert::{{impl}}::into<usize,usize>",0.015309,inferno-collapse-dtrace.exe
+             inferno::collapse::dtrace::Folder::on_stack_end,0.0,inferno-collapse-dtrace.exe
+              alloc::collections::vec_deque::VecDeque<alloc::string::String>::clear<alloc::string::String>,0.0,inferno-collapse-dtrace.exe
+               core::ptr::real_drop_in_place<alloc::collections::vec_deque::Drain<alloc::string::String>>,0.0,inferno-collapse-dtrace.exe
+                alloc::collections::vec_deque::{{impl}}::drop<alloc::string::String>,0.0,inferno-collapse-dtrace.exe
+                 "core::iter::traits::iterator::Iterator::for_each<mut alloc::collections::vec_deque::Drain<alloc::string::String>*,fn(alloc::string::String)>",0.016777,inferno-collapse-dtrace.exe
+              alloc::string::{{impl}}::deref,0.0,inferno-collapse-dtrace.exe
+               alloc::vec::{{impl}}::deref<u8>,0.0,inferno-collapse-dtrace.exe
+                core::ptr::{{impl}}::is_null<u8>,0.015252,inferno-collapse-dtrace.exe
+             inferno::collapse::dtrace::Folder::finish<std::io::stdio::StdoutLock>,0.0,inferno-collapse-dtrace.exe
+              std::io::Write::write_fmt<std::io::stdio::StdoutLock>,0.0,inferno-collapse-dtrace.exe
+               core::fmt::write,0.0,inferno-collapse-dtrace.exe
+                std::io::Write::write_fmt::{{impl}}::write_str<std::io::stdio::StdoutLock>,0.0,inferno-collapse-dtrace.exe
+                 std::io::Write::write_all<std::io::stdio::StdoutLock>,0.0,inferno-collapse-dtrace.exe
+                  std::io::stdio::{{impl}}::write,0.0,inferno-collapse-dtrace.exe
+                   std::io::buffered::{{impl}}::write<std::io::stdio::Maybe<std::io::stdio::StdoutRaw>>,0.0,inferno-collapse-dtrace.exe
+                    std::io::buffered::BufWriter<std::io::stdio::Maybe<std::io::stdio::StdoutRaw>>::flush_buf<std::io::stdio::Maybe<std::io::stdio::StdoutRaw>>,0.0,inferno-collapse-dtrace.exe
+                     std::sys::windows::stdio::write,0.0,inferno-collapse-dtrace.exe
+                      GetConsoleMode,0.0,KERNELBASE.dll
+                       NtDeviceIoControlFile,0.023113,ntdll.dll
+                      WriteConsoleW,0.0,KERNELBASE.dll
+                       func@0x180008ce8,0.0,KERNELBASE.dll
+                        NtDeviceIoControlFile,0.004207,ntdll.dll
+                      memset,0.001428,VCRUNTIME140.dll

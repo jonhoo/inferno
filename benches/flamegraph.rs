@@ -10,20 +10,18 @@ fn flamegraph_benchmark(c: &mut Criterion, id: &str, infile: &str, mut opt: Opti
     let mut bytes = Vec::new();
     f.read_to_end(&mut bytes).expect("Could not read file");
 
-    c.bench(
-        "flamegraph",
-        ParameterizedBenchmark::new(
-            id,
-            move |b, data| {
-                b.iter(|| {
-                    let reader = BufReader::new(data.as_slice());
-                    let _folder = flamegraph::from_reader(&mut opt, reader, io::sink());
-                })
-            },
-            vec![bytes],
-        )
-        .throughput(|bytes| Throughput::Bytes(bytes.len() as u32)),
-    );
+    let mut group = c.benchmark_group(id);
+
+    group
+        .bench_with_input("flamegraph", &bytes, move |b, data| {
+            b.iter(|| {
+                let reader = BufReader::new(data.as_slice());
+                let _folder = flamegraph::from_reader(&mut opt, reader, io::sink());
+            })
+        })
+        .throughput(Throughput::Bytes(bytes.len() as u64));
+
+    group.finish();
 }
 
 macro_rules! flamegraph_benchmarks {
@@ -42,5 +40,5 @@ macro_rules! flamegraph_benchmarks {
 
 flamegraph_benchmarks! {
     flamegraph: ("tests/data/collapse-perf/results/example-perf-stacks-collapsed.txt",
-                     Options { reverse_stack_order: true, ..Default::default() })
+                 { let mut opt = Options::default(); opt.reverse_stack_order = true; opt })
 }

@@ -8,8 +8,7 @@ use assert_cmd::cargo::CommandCargoExt;
 use inferno::collapse::guess::Folder;
 use log::Level;
 use pretty_assertions::assert_eq;
-
-use common::test_logger::CapturedLog;
+use testing_logger::CapturedLog;
 
 fn test_collapse_guess(test_file: &str, expected_file: &str, strip_quotes: bool) -> io::Result<()> {
     common::test_collapse(Folder::default(), test_file, expected_file, strip_quotes)
@@ -37,6 +36,7 @@ fn collapse_guess_dtrace_java() {
 }
 
 #[test]
+#[cfg_attr(windows, ignore)]
 fn collapse_guess_dtrace_hex_addresses() {
     let test_file = "./tests/data/collapse-dtrace/hex-addresses.txt";
     let result_file = "./tests/data/collapse-dtrace/results/hex-addresses.txt";
@@ -58,6 +58,13 @@ fn collapse_guess_perf_go_stacks() {
 }
 
 #[test]
+fn collapse_guess_perf_cpp_stacks() {
+    let test_file = "./tests/data/collapse-perf/cpp-stacks-std-function.txt";
+    let result_file = "./tests/data/collapse-perf/results/cpp-stacks-std-function-collapsed.txt";
+    test_collapse_guess(test_file, result_file, true).unwrap()
+}
+
+#[test]
 fn collapse_guess_perf_java_inline() {
     let test_file = "./tests/data/collapse-perf/java-inline.txt";
     let result_file = "./tests/data/collapse-perf/results/java-inline-collapsed.txt";
@@ -72,12 +79,26 @@ fn collapse_guess_sample() {
 }
 
 #[test]
+fn collapse_guess_vtune() {
+    let test_file = "./tests/data/collapse-vtune/vtune.csv";
+    let result_file = "./tests/data/collapse-vtune/results/vtune-default.txt";
+    test_collapse_guess(test_file, result_file, false).unwrap()
+}
+
+#[test]
+fn collapse_guess_vsprof() {
+    let test_file = "./tests/data/collapse-vsprof/CallTreeSummary.csv";
+    let result_file = "./tests/data/collapse-vsprof/results/vsprof-default.txt";
+    test_collapse_guess(test_file, result_file, false).unwrap()
+}
+
+#[test]
 fn collapse_guess_unknown_format_should_log_error() {
     test_collapse_guess_logs(
         "./tests/data/collapse-guess/unknown-format.txt",
         |captured_logs| {
             let nerrors = captured_logs
-                .into_iter()
+                .iter()
                 .filter(|log| {
                     log.level == Level::Error
                         && log.body == "No applicable collapse implementation found for input"
@@ -98,7 +119,7 @@ fn collapse_guess_invalid_perf_should_log_error() {
         "./tests/data/collapse-guess/invalid-perf-with-empty-line-after-event-line.txt",
         |captured_logs| {
             let nerrors = captured_logs
-                .into_iter()
+                .iter()
                 .filter(|log| {
                     log.level == Level::Error
                         && log.body == "No applicable collapse implementation found for input"

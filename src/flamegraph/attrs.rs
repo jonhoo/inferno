@@ -1,12 +1,12 @@
 use std::fs::File;
 use std::io::{self, BufRead, BufReader};
-use std::path::PathBuf;
+use std::path::Path;
 
-use fnv::FnvHashMap;
+use ahash::AHashMap;
 use indexmap::map::Entry;
 use log::warn;
 
-type AttrMap<K, V> = indexmap::IndexMap<K, V, fnv::FnvBuildHasher>;
+type AttrMap<K, V> = indexmap::IndexMap<K, V, ahash::RandomState>;
 
 macro_rules! unwrap_or_continue {
     ($e:expr) => {{
@@ -20,14 +20,14 @@ macro_rules! unwrap_or_continue {
 
 /// Provides a way to customize the attributes on the SVG elements for a frame.
 #[derive(PartialEq, Eq, Debug, Default)]
-pub struct FuncFrameAttrsMap(FnvHashMap<String, FrameAttrs>);
+pub struct FuncFrameAttrsMap(AHashMap<String, FrameAttrs>);
 
 impl FuncFrameAttrsMap {
     /// Parse frame attributes from a file.
     ///
     /// Each line should consist of a function name, a tab (`\t`), and then a sequence of
     /// tab-separated `name=value` pairs.
-    pub fn from_file(path: &PathBuf) -> io::Result<FuncFrameAttrsMap> {
+    pub fn from_file(path: &Path) -> io::Result<FuncFrameAttrsMap> {
         let file = BufReader::new(File::open(path)?);
         FuncFrameAttrsMap::from_reader(file)
     }
@@ -38,15 +38,16 @@ impl FuncFrameAttrsMap {
     /// tab-separated `name=value` pairs.
     pub fn from_reader<R: BufRead>(mut reader: R) -> io::Result<FuncFrameAttrsMap> {
         let mut funcattr_map = FuncFrameAttrsMap::default();
-        let mut line = String::new();
+        let mut line = Vec::new();
         loop {
             line.clear();
 
-            if reader.read_line(&mut line)? == 0 {
+            if reader.read_until(0x0A, &mut line)? == 0 {
                 break;
             }
 
-            let mut line = line.trim().splitn(2, '\t');
+            let l = String::from_utf8_lossy(&line);
+            let mut line = l.trim().splitn(2, '\t');
             let func = unwrap_or_continue!(line.next());
             if func.is_empty() {
                 continue;
@@ -157,8 +158,8 @@ impl<'a> Iterator for AttrIter<'a> {
             warn!("no value after \"=\" for extra attribute {}", name);
         }
 
-        let (value, rest) = if rest.starts_with('"') {
-            if let Some(eq) = rest[1..].find('"') {
+        let (value, rest) = if let Some(stripped_rest) = rest.strip_prefix('"') {
+            if let Some(eq) = stripped_rest.find('"') {
                 (&rest[1..=eq], &rest[eq + 1..])
             } else {
                 warn!("no end quote found for extra attribute {}", name);
@@ -179,7 +180,7 @@ impl<'a> Iterator for AttrIter<'a> {
 #[cfg(test)]
 mod test {
     use super::*;
-    use fnv::FnvHashMap;
+    use ahash::AHashMap;
     use maplit::{convert_args, hashmap};
     use pretty_assertions::assert_eq;
 
@@ -213,7 +214,7 @@ mod test {
         let s = vec![foo, bar].join("\n");
         let r = s.as_bytes();
 
-        let mut expected_inner = FnvHashMap::default();
+        let mut expected_inner = AHashMap::default();
         let foo_attrs: AttrMap<String, String> = convert_args!(hashmap!(
             "class" => "foo class",
             "xlink:href" => "foo href",

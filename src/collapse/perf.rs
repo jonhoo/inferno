@@ -1,9 +1,8 @@
 use std::collections::VecDeque;
 use std::io::{self, BufRead};
 
-use symbolic_demangle::demangle;
-
 use crate::collapse::common::{self, CollapsePrivate, Occurrences};
+use crate::collapse::matcher::is_kernel;
 
 const TIDY_GENERIC: bool = true;
 const TIDY_JAVA: bool = true;
@@ -24,8 +23,16 @@ mod logging {
     }
 }
 
+#[derive(PartialEq)]
+enum StackFilter {
+    Keep,
+    Skip,
+    SkipRemaining,
+}
+
 /// `perf` folder configuration options.
 #[derive(Clone, Debug)]
+#[non_exhaustive]
 pub struct Options {
     /// Annotate JIT functions with a `_[j]` suffix.
     ///
@@ -36,11 +43,6 @@ pub struct Options {
     ///
     /// Default is `false`.
     pub annotate_kernel: bool,
-
-    /// Demangle function names.
-    ///
-    /// Default is `false`.
-    pub demangle: bool,
 
     /// Only consider samples of the given event type (see `perf list`). If this option is
     /// set to `None`, it will be set to the first encountered event type.
@@ -68,6 +70,12 @@ pub struct Options {
     ///
     /// Default is the number of logical cores on your machine.
     pub nthreads: usize,
+
+    /// If a stack function name is equal to any of the specified strings it will omit all the
+    /// following stackframes for that event.
+    /// In case no function is matched the whole stack is returned.
+    /// Default is not omitting any.
+    pub skip_after: Vec<String>,
 }
 
 impl Default for Options {
@@ -75,12 +83,12 @@ impl Default for Options {
         Self {
             annotate_jit: false,
             annotate_kernel: false,
-            demangle: false,
             event_filter: None,
             include_addrs: false,
             include_pid: false,
             include_tid: false,
             nthreads: *common::DEFAULT_NTHREADS,
+            skip_after: Vec::default(),
         }
     }
 }
@@ -116,8 +124,8 @@ pub struct Folder {
     /// Called pname after original stackcollapse-perf source.
     pname: String,
 
-    /// Skip all stack lines in this event.
-    skip_stack: bool,
+    /// Whether to skip stack lines in this event.
+    stack_filter: StackFilter,
 
     /// Function entries on the stack in this entry thus far.
     stack: VecDeque<String>,
@@ -138,7 +146,7 @@ impl From<Options> for Folder {
             in_event: false,
             nstacks_per_job: common::DEFAULT_NSTACKS_PER_JOB,
             pname: String::default(),
-            skip_stack: false,
+            stack_filter: StackFilter::Keep,
             stack: VecDeque::default(),
             opt,
         }
@@ -165,8 +173,14 @@ impl CollapsePrivate for Folder {
         // the first stack to figure it out (the worker threads need this
         // information to get started). Only read one stack, however, as we would
         // like the remaining stacks to be processed on the worker threads.
-        let mut line_buffer = String::new();
-        self.process_single_stack(&mut line_buffer, reader, occurrences)?;
+        let mut line_buffer = Vec::new();
+        let eof = self.process_single_stack(&mut line_buffer, reader, occurrences)?;
+
+        if eof {
+            // If we hit EOF, it may be that the input was completely empty.
+            // In that case, we don't do the event_filter assertion below.
+            return Ok(());
+        }
 
         // If we didn't find an event filter, there is something wrong with
         // our processing code.
@@ -184,12 +198,12 @@ impl CollapsePrivate for Folder {
         R: io::BufRead,
     {
         // While there are still stacks left to process, process them...
-        let mut line_buffer = String::new();
+        let mut line_buffer = Vec::new();
         while !self.process_single_stack(&mut line_buffer, &mut reader, occurrences)? {}
 
         // Reset state...
         self.in_event = false;
-        self.skip_stack = false;
+        self.stack_filter = StackFilter::Keep;
         self.stack.clear();
         Ok(())
     }
@@ -246,7 +260,7 @@ impl CollapsePrivate for Folder {
             in_event: false,
             nstacks_per_job: self.nstacks_per_job,
             pname: String::new(),
-            skip_stack: false,
+            stack_filter: StackFilter::Keep,
             stack: VecDeque::default(),
             opt: self.opt.clone(),
         }
@@ -273,7 +287,7 @@ impl Folder {
     /// Processes a stack. On success, returns `true` if at end of data; `false` otherwise.
     fn process_single_stack<R>(
         &mut self,
-        line_buffer: &mut String,
+        line_buffer: &mut Vec<u8>,
         reader: &mut R,
         occurrences: &mut Occurrences,
     ) -> io::Result<bool>
@@ -282,25 +296,34 @@ impl Folder {
     {
         loop {
             line_buffer.clear();
-            if reader.read_line(line_buffer)? == 0 {
+            if reader.read_until(0x0A, line_buffer)? == 0 {
+                if !self.stack.is_empty() {
+                    self.after_event(occurrences);
+                }
                 return Ok(true);
             }
-            if line_buffer.starts_with('#') {
+            let line = String::from_utf8_lossy(line_buffer);
+            if line.starts_with('#') {
                 continue;
             }
-            let line = line_buffer.trim_end();
+            let line = line.trim_end();
             if line.is_empty() {
                 self.after_event(occurrences);
                 return Ok(false);
             } else if self.in_event {
                 self.on_stack_line(line);
             } else {
+                assert!(self.stack.is_empty());
                 self.on_event_line(line);
+                if !self.stack.is_empty() {
+                    // we must have hit a combined event/stack line
+                    self.after_event(occurrences);
+                }
             }
         }
     }
 
-    fn event_line_parts(line: &str) -> Option<(&str, &str, &str)> {
+    fn event_line_parts(line: &str) -> Option<(&str, &str, &str, usize)> {
         let mut word_start = 0;
         let mut all_digits = false;
         let mut last_was_space = false;
@@ -318,7 +341,7 @@ impl Folder {
                     };
                     // also trim comm in case multiple spaces were used to separate
                     let comm = line[..(word_start - 1)].trim();
-                    return Some((comm, pid, tid));
+                    return Some((comm, pid, tid, idx + 1));
                 }
                 word_start = idx + 1;
                 all_digits = true;
@@ -346,39 +369,72 @@ impl Folder {
     //     java 12688/12764 6544038.708352: cpu-clock:
     //     V8 WorkerThread 24636/25607 [000] 94564.109216: cycles:
     //     vote   913    72.176760:     257597 cycles:uppp:
+    //     false 64414 20110.539270:      34467 cycles:u:  ffffffff9aa3c8de [unknown] ([unknown])
     fn on_event_line(&mut self, line: &str) {
         self.in_event = true;
 
-        if let Some((comm, pid, tid)) = Self::event_line_parts(line) {
-            if let Some(event) = line.rsplitn(2, ' ').next() {
-                if event.ends_with(':') {
-                    let event = &event[..(event.len() - 1)];
-
-                    if let Some(ref event_filter) = self.event_filter {
-                        if event != event_filter {
-                            self.skip_stack = true;
-                            return;
-                        }
-                    } else {
-                        // By default only show events of the first encountered event type.
-                        // Merging together different types, such as instructions and cycles,
-                        // produces misleading results.
-                        logging::filtering_for_events_of_type(event);
-                        self.event_filter = Some(event.to_string());
+        if let Some((comm, pid, tid, end)) = Self::event_line_parts(line) {
+            let mut by_colons = line[end..].splitn(3, ':').skip(1);
+            let event = by_colons
+                .next()
+                .and_then(|has_event| has_event.rsplit(' ').next());
+            if let Some(event) = event {
+                if let Some(ref event_filter) = self.event_filter {
+                    if event != event_filter {
+                        self.stack_filter = StackFilter::Skip;
+                        return;
                     }
+                } else {
+                    // By default only show events of the first encountered event type.
+                    // Merging together different types, such as instructions and cycles,
+                    // produces misleading results.
+                    logging::filtering_for_events_of_type(event);
+                    self.event_filter = Some(event.to_string());
                 }
             }
+
+            // some event lines _include_ a stack line if the stack only has one frame.
+            // in that case, the event will be followed by the stack.
+            let single_stack = if let Some(post_event) = by_colons.next() {
+                // we need to deal with a couple of cases here:
+                //
+                //     vote   913    72.176760:     257597 cycles:uppp:
+                //     false 64414 20110.539270:      34467 cycles:u:  ffffffff9aa3c8de [unknown] ([unknown])
+                //     false 64414 20110.539270:      34467 cycles:  ffffffff9aa3c8de [unknown] ([unknown])
+                //
+                // the first should not be handled as a stack, whereas the latter two both should
+                // the trick is going to be to trim until we encounter a space or a :, whichever
+                // comes first, and then evaluate from there.
+                let post_event_start = post_event
+                    .find(|c| c == ':' || c == ' ')
+                    .map(|i| i + 1)
+                    .unwrap_or(0);
+                let post_event = post_event[post_event_start..].trim();
+                if !post_event.is_empty() {
+                    // we have a stack!
+                    Some(post_event)
+                } else {
+                    None
+                }
+            } else {
+                None
+            };
 
             // XXX: re-use existing memory in pname if possible
             self.pname = comm.replace(' ', "_");
             if self.opt.include_tid {
-                self.pname.push_str("-");
+                self.pname.push('-');
                 self.pname.push_str(pid);
-                self.pname.push_str("/");
+                self.pname.push('/');
                 self.pname.push_str(tid);
             } else if self.opt.include_pid {
-                self.pname.push_str("-");
+                self.pname.push('-');
                 self.pname.push_str(pid);
+            }
+
+            if let Some(stack_line) = single_stack {
+                self.on_stack_line(stack_line);
+                self.in_event = false;
             }
         } else {
             logging::weird_event_line(line);
@@ -403,7 +459,7 @@ impl Folder {
         module = &module[1..(module.len() - 1)];
 
         let rawfunc = match line.next()?.trim() {
-            // Sometimes there are two spaces betwen the pc and the (, like:
+            // Sometimes there are two spaces between the pc and the (, like:
             //     7f1e2215d058  (/lib/x86_64-linux-gnu/libc-2.15.so)
             // In order to match the perl version, the rawfunc should be " ", and not "".
             "" => " ",
@@ -412,7 +468,7 @@ impl Folder {
         Some((pc, rawfunc, module))
     }
 
-    // we have a stack line that shows one stack entry from the preceeding event, like:
+    // we have a stack line that shows one stack entry from the preceding event, like:
     //
     //     ffffffff8103ce3b native_safe_halt ([kernel.kallsyms])
     //     ffffffff8101c6a3 default_idle ([kernel.kallsyms])
@@ -423,7 +479,11 @@ impl Folder {
     //     7f53389994d0 [unknown] ([unknown])
     //                0 [unknown] ([unknown])
     fn on_stack_line(&mut self, line: &str) {
-        if self.skip_stack {
+        let should_omit = matches!(
+            self.stack_filter,
+            StackFilter::Skip | StackFilter::SkipRemaining
+        );
+        if should_omit {
             return;
         }
 
@@ -443,13 +503,9 @@ impl Folder {
                 return;
             }
 
-            let rawfunc = if self.opt.demangle {
-                demangle(rawfunc)
-            } else {
-                // perf mostly demangles Rust symbols,
-                // but this will fix the things it gets wrong
-                common::fix_partially_demangled_rust_symbol(rawfunc)
-            };
+            // perf mostly demangles Rust symbols,
+            // but this will fix the things it gets wrong
+            let rawfunc = common::fix_partially_demangled_rust_symbol(rawfunc);
 
             // Support Java inlining by splitting on "->". After the first func, the
             // rest are annotated with "_[i]" to mark them as inlined.
@@ -478,14 +534,11 @@ impl Folder {
                 //     7f722d142778 Ljava/io/PrintStream;::print (/tmp/perf-19982.map)
                 if !self.cache_line.is_empty() {
                     func.push_str("_[i]"); // inlined
-                } else if self.opt.annotate_kernel
-                    && (module.starts_with('[') || module.ends_with("vmlinux"))
-                    && module != "[unknown]"
-                {
+                } else if self.opt.annotate_kernel && is_kernel(module) {
                     func.push_str("_[k]"); // kernel
                 } else if self.opt.annotate_jit
-                    && module.starts_with("/tmp/perf-")
-                    && module.ends_with(".map")
+                    && ((module.starts_with("/tmp/perf-") && module.ends_with(".map"))
+                        || (module.contains("/jitted-") && module.ends_with(".so")))
                 {
                     func.push_str("_[j]"); // jitted
                 }
@@ -496,6 +549,15 @@ impl Folder {
             while let Some(func) = self.cache_line.pop() {
                 self.stack.push_front(func);
             }
+
+            if self
+                .opt
+                .skip_after
+                .iter()
+                .any(|skip_after| rawfunc == *skip_after)
+            {
+                self.stack_filter = StackFilter::SkipRemaining;
+            }
         } else {
             logging::weird_stack_line(line);
         }
@@ -503,19 +565,25 @@ impl Folder {
 
     fn after_event(&mut self, occurrences: &mut Occurrences) {
         // end of stack, so emit stack entry
-        if !self.skip_stack {
+        if !self.stack.is_empty() {
             // allocate a string that is long enough to hold the entire stack string
             let mut stack_str = String::with_capacity(
                 self.pname.len() + self.stack.iter().fold(0, |a, s| a + s.len() + 1),
             );
 
-            // add the comm name
-            stack_str.push_str(&self.pname);
-            // add the other stack entries (if any)
-            for e in self.stack.drain(..) {
-                stack_str.push_str(";");
-                stack_str.push_str(&e);
+            // If we skip remaining frames we want to skip pname as well.
+            if self.stack_filter != StackFilter::SkipRemaining {
+                // add the comm name
+                stack_str.push_str(&self.pname);
+                stack_str.push(';');
             }
+            for e in self.stack.drain(..) {
+                stack_str.push_str(&e);
+                stack_str.push(';');
+            }
+
+            // self.stack is not empty, therefore stack_str has at least one frame followed by ';'
+            stack_str.pop();
 
             // count it!
             occurrences.insert_or_add(stack_str, 1);
@@ -523,7 +591,7 @@ impl Folder {
 
         // reset for the next event
         self.in_event = false;
-        self.skip_stack = false;
+        self.stack_filter = StackFilter::Keep;
         self.stack.clear();
     }
 }
@@ -551,16 +619,14 @@ fn with_module_fallback(module: &str, func: &str, pc: &str, include_addrs: bool)
     // output string is a bit longer than rawfunc but not much
     let mut res = String::with_capacity(func.len() + 12);
 
+    res.push('[');
+    res.push_str(func);
     if include_addrs {
-        res.push_str("[");
-        res.push_str(func);
         res.push_str(" <");
         res.push_str(pc);
         res.push_str(">]");
     } else {
-        res.push_str("[");
-        res.push_str(func);
-        res.push_str("]");
+        res.push(']');
     }
 
     res
@@ -574,25 +640,41 @@ fn tidy_generic(mut func: String) -> String {
     //    see https://github.com/brendangregg/FlameGraph/pull/72
     //  - C++ anonymous namespace annotations.
     //    see https://github.com/brendangregg/FlameGraph/pull/93
-    if let Some(first_paren) = func.find('(') {
-        if func[first_paren..].starts_with("anonymous namespace)") {
-            // C++ anonymous namespace
-        } else {
-            let mut is_go = false;
-            if let Some(c) = func.get((first_paren - 1)..first_paren) {
-                // if .get(-1) is None, can't be a dot
-                if c == "." {
-                    // assume it's a Go method name, so do nothing
-                    is_go = true;
+    let mut bracket_depth = 0;
+    let mut last_dot_index = Option::<usize>::None;
+    let mut length_without_parameters = func.len();
+    for (idx, c) in func.char_indices() {
+        match c {
+            '<' | '{' | '[' => {
+                bracket_depth += 1;
+            }
+            '>' | '}' | ']' | ')' => {
+                bracket_depth -= 1;
+            }
+            '(' => {
+                // ignore parentheses inside Rust/C++ templates, or C++ lambda stacks {lambda(...)#1}
+                // by only considering top-level parentheses
+                if bracket_depth == 0 {
+                    // Don't remove go functions starting with .(
+                    let is_go_function = last_dot_index == Some(idx);
+                    // Don't remove C++ anonymous namespaces
+                    let is_anonymous_namespace = func[idx..].starts_with("(anonymous namespace)");
+                    if !is_go_function && !is_anonymous_namespace {
+                        // found start of parameter list
+                        length_without_parameters = idx;
+                        break;
+                    }
                 }
+                bracket_depth += 1;
             }
-
-            if !is_go {
-                // kill it with fire!
-                func.truncate(first_paren);
+            '.' => {
+                // insert index + 1 so we can associate it with the opening parentheses for Golang
+                last_dot_index = Some(idx + 1);
             }
-        }
+            _ => (),
+        };
     }
+    func.truncate(length_without_parameters);
 
     // The perl version here strips ' and "; we don't do that.
     // see https://github.com/brendangregg/FlameGraph/commit/817c6ea3b92417349605e5715fe6a7cb8cbc9776
@@ -621,7 +703,7 @@ mod tests {
     use std::io::Read;
     use std::path::PathBuf;
 
-    use lazy_static::lazy_static;
+    use once_cell::sync::Lazy;
     use pretty_assertions::assert_eq;
     use rand::prelude::*;
 
@@ -629,33 +711,64 @@ mod tests {
     use crate::collapse::common;
     use crate::collapse::Collapse;
 
-    lazy_static! {
-        static ref INPUT: Vec<PathBuf> = {
-            [
-                "./flamegraph/example-perf-stacks.txt.gz",
-                "./flamegraph/test/perf-cycles-instructions-01.txt",
-                "./flamegraph/test/perf-dd-stacks-01.txt",
-                "./flamegraph/test/perf-funcab-cmd-01.txt",
-                "./flamegraph/test/perf-funcab-pid-01.txt",
-                "./flamegraph/test/perf-iperf-stacks-pidtid-01.txt",
-                "./flamegraph/test/perf-java-faults-01.txt",
-                "./flamegraph/test/perf-java-stacks-01.txt",
-                "./flamegraph/test/perf-java-stacks-02.txt",
-                "./flamegraph/test/perf-js-stacks-01.txt",
-                "./flamegraph/test/perf-mirageos-stacks-01.txt",
-                "./flamegraph/test/perf-numa-stacks-01.txt",
-                "./flamegraph/test/perf-rust-Yamakaky-dcpu.txt",
-                "./flamegraph/test/perf-vertx-stacks-01.txt",
-                "./tests/data/collapse-perf/empty-line.txt",
-                "./tests/data/collapse-perf/go-stacks.txt",
-                "./tests/data/collapse-perf/java-inline.txt",
-                "./tests/data/collapse-perf/weird-stack-line.txt",
-            ]
-            .into_iter()
-            .map(PathBuf::from)
-            .collect::<Vec<_>>()
-        };
+    // Test some interesting edge cased for tidy_generic
+    #[test]
+    fn test_tidy_generic() {
+        let test_expectations = [
+            (
+                "go/build.(*importReader).readByte",
+                "go/build.(*importReader).readByte",
+            ),
+            ("foo<Vec::<usize>>(Vec<usize>)", "foo<Vec::<usize>>"),
+            (".run()V", ".run"),
+            ("base(BasicType) const", "base"),
+            (
+                "std::function<void (int, int)>::operator(int, int)",
+                "std::function<void (int, int)>::operator",
+            ),
+            (
+                "{lambda(int, int)#2}::operator()",
+                "{lambda(int, int)#2}::operator",
+            ),
+            (
+                "(anonymous namespace)::myBar()",
+                "(anonymous namespace)::myBar",
+            ),
+            // Didn't see this anywhere, but it seems like some language may have [] brackets containing parentheses
+            ("[(foo)]::bar()", "[(foo)]::bar"),
+        ];
+
+        for (input, expected) in test_expectations.iter() {
+            assert_eq!(&tidy_generic(input.to_string()), expected);
+        }
     }
+
+    static INPUT: Lazy<Vec<PathBuf>> = Lazy::new(|| {
+        [
+            "./flamegraph/example-perf-stacks.txt.gz",
+            "./flamegraph/test/perf-cycles-instructions-01.txt",
+            "./flamegraph/test/perf-dd-stacks-01.txt",
+            "./flamegraph/test/perf-funcab-cmd-01.txt",
+            "./flamegraph/test/perf-funcab-pid-01.txt",
+            "./flamegraph/test/perf-iperf-stacks-pidtid-01.txt",
+            "./flamegraph/test/perf-java-faults-01.txt",
+            "./flamegraph/test/perf-java-stacks-01.txt",
+            "./flamegraph/test/perf-java-stacks-02.txt",
+            "./flamegraph/test/perf-js-stacks-01.txt",
+            "./flamegraph/test/perf-mirageos-stacks-01.txt",
+            "./flamegraph/test/perf-numa-stacks-01.txt",
+            "./flamegraph/test/perf-rust-Yamakaky-dcpu.txt",
+            "./flamegraph/test/perf-vertx-stacks-01.txt",
+            "./tests/data/collapse-perf/empty-line.txt",
+            "./tests/data/collapse-perf/go-stacks.txt",
+            "./tests/data/collapse-perf/java-inline.txt",
+            "./tests/data/collapse-perf/weird-stack-line.txt",
+            "./tests/data/collapse-perf/cpp-stacks-std-function.txt",
+        ]
+        .iter()
+        .map(PathBuf::from)
+        .collect::<Vec<_>>()
+    });
 
     #[test]
     fn test_collapse_multi_perf() -> io::Result<()> {
@@ -664,7 +777,6 @@ mod tests {
     }
 
     #[test]
-    #[ignore]
     fn test_collapse_multi_perf_simple() -> io::Result<()> {
         let path = "./flamegraph/test/perf-cycles-instructions-01.txt";
         let mut file = fs::File::open(path)?;
@@ -672,6 +784,63 @@ mod tests {
         file.read_to_end(&mut bytes)?;
         let mut folder = Folder::default();
         <Folder as Collapse>::collapse(&mut folder, &bytes[..], io::sink())
+    }
+
+    #[test]
+    fn test_one_skip_after() -> io::Result<()> {
+        let path = "./tests/data/collapse-perf/go-stacks.txt";
+        let mut file = fs::File::open(path)?;
+        let mut bytes = Vec::new();
+        file.read_to_end(&mut bytes)?;
+        let mut folder = {
+            let options = Options {
+                skip_after: vec!["main.init".to_string()],
+                ..Default::default()
+            };
+            Folder::from(options)
+        };
+        let mut buf_actual = Vec::new();
+        <Folder as Collapse>::collapse(&mut folder, &bytes[..], &mut buf_actual)?;
+        let lines = std::str::from_utf8(&buf_actual[..]).unwrap().lines();
+
+        // without `skip_after` some collapsed lines would look like:
+        // go;[unknown];x_cgo_notify_runtime_init_done;runtime.main;main.init;...
+        for line in lines {
+            if line.contains("main.init") {
+                assert!(line.starts_with("main.init;")); // we removed the frames above "main.init"
+            }
+        }
+        Ok(())
+    }
+
+    #[test]
+    fn test_multiple_skip_after() -> io::Result<()> {
+        let path = "./tests/data/collapse-perf/go-stacks.txt";
+        let mut file = fs::File::open(path)?;
+        let mut bytes = Vec::new();
+        file.read_to_end(&mut bytes)?;
+        let mut folder = {
+            let options = Options {
+                skip_after: vec!["main.init".to_string(), "regexp.compile".to_string()],
+                ..Default::default()
+            };
+            Folder::from(options)
+        };
+        let mut buf_actual = Vec::new();
+        <Folder as Collapse>::collapse(&mut folder, &bytes[..], &mut buf_actual)?;
+        let lines = std::str::from_utf8(&buf_actual[..]).unwrap().lines();
+
+        for line in lines {
+            if line.contains("regexp.compile") {
+                // Collapse some other lines too, just to make sure it works.
+                assert!(line.starts_with("regexp.compile;")); // we removed the frames above "regexp.compile"
+            } else if line.contains("main.init") {
+                // without `skip_after` some collapsed lines would look like:
+                // go;[unknown];x_cgo_notify_runtime_init_done;runtime.main;main.init;...
+                assert!(line.starts_with("main.init;")); // we removed the frames above "main.init"
+            }
+        }
+        Ok(())
     }
 
     /// Varies the nstacks_per_job parameter and outputs the 10 fastests configurations by file.
@@ -701,16 +870,16 @@ mod tests {
         let inputs = common::testing::read_inputs(&INPUT)?;
 
         loop {
-            let nstacks_per_job = rng.gen_range(1, 500 + 1);
+            let nstacks_per_job = rng.gen_range(1..=500);
             let options = Options {
                 annotate_jit: rng.gen(),
                 annotate_kernel: rng.gen(),
-                demangle: rng.gen(),
                 event_filter: None,
                 include_addrs: rng.gen(),
                 include_pid: rng.gen(),
                 include_tid: rng.gen(),
-                nthreads: rng.gen_range(2, 32 + 1),
+                nthreads: rng.gen_range(2..=32),
+                skip_after: Vec::default(),
             };
 
             for (path, input) in inputs.iter() {

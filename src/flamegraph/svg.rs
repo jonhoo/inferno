@@ -3,11 +3,11 @@ use std::cell::RefCell;
 use std::io::prelude::*;
 use std::iter;
 
-use quick_xml::events::{BytesEnd, BytesStart, BytesText, Event};
+use quick_xml::events::{BytesCData, BytesEnd, BytesStart, BytesText, Event};
 use quick_xml::Writer;
 use str_stack::StrStack;
 
-use super::{Direction, Options};
+use super::{Direction, Options, TextTruncateDirection};
 
 pub(super) enum TextArgument<'a> {
     String(Cow<'a, str>),
@@ -70,6 +70,7 @@ where
             ("viewBox", &*format!("0 0 {} {}", imagewidth, imageheight)),
             ("xmlns", "http://www.w3.org/2000/svg"),
             ("xmlns:xlink", "http://www.w3.org/1999/xlink"),
+            ("xmlns:fg", "http://github.com/jonhoo/inferno"),
         ]),
     ))?;
     svg.write_event(Event::Comment(BytesText::from_plain_str(
@@ -132,25 +133,27 @@ text {{ font-family:{}; font-size:{}px; fill:rgb(0,0,0); }}
         BytesStart::borrowed_name(b"script")
             .with_attributes(iter::once(("type", "text/ecmascript"))),
     ))?;
-    svg.write_event(Event::CData(BytesText::from_escaped_str(&format!(
-        "\
-var nametype = {};
-var fontsize = {};
-var fontwidth = {};
-var xpad = {};
-var inverted = {};
-var searchcolor = '{}';
-var fluiddrawing = {};",
+    svg.write_event(Event::CData(BytesCData::from_str(&format!(
+        "
+        var nametype = {};
+        var fontsize = {};
+        var fontwidth = {};
+        var xpad = {};
+        var inverted = {};
+        var searchcolor = '{}';
+        var fluiddrawing = {};
+        var truncate_text_right = {};\n    ",
         enquote('\'', &opt.name_type),
         opt.font_size,
         opt.font_width,
         super::XPAD,
         opt.direction == Direction::Inverted,
         opt.search_color,
-        opt.image_width.is_none()
+        opt.image_width.is_none(),
+        opt.text_truncate_direction == TextTruncateDirection::Right
     ))))?;
     if !opt.no_javascript {
-        svg.write_event(Event::CData(BytesText::from_escaped_str(include_str!(
+        svg.write_event(Event::CData(BytesCData::from_str(include_str!(
             "flamegraph.js"
         ))))?;
     }
@@ -199,7 +202,12 @@ var fluiddrawing = {};",
         &mut buf,
         TextItem {
             x: Dimension::Pixels(super::XPAD),
-            y: (style_options.imageheight - (opt.ypad2() / 2)) as f64,
+            y: if opt.direction == Direction::Straight {
+                style_options.imageheight - (opt.ypad2() / 2)
+            } else {
+                // Inverted (icicle) mode, put the details on top:
+                opt.ypad1() - opt.font_size
+            } as f64,
             text: " ".into(),
             extra: iter::once(("id", "details")),
         },
@@ -245,7 +253,7 @@ pub(super) fn write_str<'a, W, I>(
     svg: &mut Writer<W>,
     buf: &mut StrStack,
     item: TextItem<'a, I>,
-) -> quick_xml::Result<usize>
+) -> quick_xml::Result<()>
 where
     W: Write,
     I: IntoIterator<Item = (&'a str, &'a str)>,
@@ -277,7 +285,7 @@ where
         svg.write_event(&*start_event.borrow())
     })?;
     let s = match text {
-        TextArgument::String(ref s) => &*s,
+        TextArgument::String(ref s) => s,
         TextArgument::FromBuffer(i) => &buf[i],
     };
     svg.write_event(Event::Text(BytesText::from_plain_str(s)))?;

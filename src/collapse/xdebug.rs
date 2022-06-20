@@ -1,13 +1,13 @@
 use super::Collapse;
-use hashbrown::HashMap;
+use crate::collapse::common;
 use hashbrown::hash_map::RawEntryMut;
+use hashbrown::HashMap;
 use log::warn;
 use std::fmt;
 use std::hash::{BuildHasher, Hash, Hasher};
 use std::io::prelude::*;
 use std::io::{self, Write};
 use std::rc::Rc;
-use crate::collapse::common;
 // Ideas: str_stack and colosseum to keep allocations closer together or something.
 
 const SCALE_FACTOR: f32 = 1_000_000.0;
@@ -142,11 +142,12 @@ impl Collapse for Folder {
             // Break the line into tab separated tokens.
             let mut parts = Fields::new(&line).skip(2);
 
-            let (is_exit, time) = if let (Some(is_exit), Some(time)) = (parts.next(), parts.next()) {
+            let (is_exit, time) = if let (Some(is_exit), Some(time)) = (parts.next(), parts.next())
+            {
                 let is_exit = match is_exit {
                     "1" => true,
                     "0" => false,
-                    a => panic!(format!("uh oh: {}", a)),
+                    a => panic!("uh oh: {}", a),
                 };
 
                 let time = time.parse::<f32>().unwrap();

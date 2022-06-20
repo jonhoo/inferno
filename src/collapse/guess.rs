@@ -3,12 +3,13 @@ use std::io::{self, Cursor};
 
 use log::{error, info};
 
-use crate::collapse::{self, dtrace, perf, sample, Collapse};
+use crate::collapse::{self, dtrace, perf, sample, vsprof, vtune, Collapse};
 
 const LINES_PER_ITERATION: usize = 10;
 
 /// Folder configuration options.
 #[derive(Clone, Debug)]
+#[non_exhaustive]
 pub struct Options {
     /// The number of threads to use.
     ///
@@ -53,20 +54,26 @@ impl Collapse for Folder {
         W: io::Write,
     {
         let mut dtrace = {
-            let mut options = dtrace::Options::default();
-            options.nthreads = self.opt.nthreads;
+            let options = dtrace::Options {
+                nthreads: self.opt.nthreads,
+                ..Default::default()
+            };
             dtrace::Folder::from(options)
         };
         let mut perf = {
-            let mut options = perf::Options::default();
-            options.nthreads = self.opt.nthreads;
+            let options = perf::Options {
+                nthreads: self.opt.nthreads,
+                ..Default::default()
+            };
             perf::Folder::from(options)
         };
         let mut sample = sample::Folder::default();
+        let mut vtune = vtune::Folder::default();
+        let mut vsprof = vsprof::Folder::default();
 
         // Each Collapse impl gets its own flag in this array.
         // It gets set to true when the impl has been ruled out.
-        let mut not_applicable = [false; 3];
+        let mut not_applicable = [false; 5];
 
         let mut buffer = String::new();
         loop {
@@ -99,6 +106,8 @@ impl Collapse for Folder {
             try_collapse_impl!(perf, 0);
             try_collapse_impl!(dtrace, 1);
             try_collapse_impl!(sample, 2);
+            try_collapse_impl!(vtune, 3);
+            try_collapse_impl!(vsprof, 4);
 
             if eof {
                 break;

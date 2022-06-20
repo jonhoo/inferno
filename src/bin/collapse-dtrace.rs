@@ -1,20 +1,18 @@
 use std::io;
 use std::path::PathBuf;
 
+use clap::Parser;
 use env_logger::Env;
 use inferno::collapse::dtrace::{Folder, Options};
 use inferno::collapse::{Collapse, DEFAULT_NTHREADS};
-use lazy_static::lazy_static;
-use structopt::StructOpt;
+use once_cell::sync::Lazy;
 
-lazy_static! {
-    static ref NTHREADS: String = format!("{}", *DEFAULT_NTHREADS);
-}
+static NTHREADS: Lazy<String> = Lazy::new(|| DEFAULT_NTHREADS.to_string());
 
-#[derive(Debug, StructOpt)]
-#[structopt(
+#[derive(Debug, Parser)]
+#[clap(
     name = "inferno-collapse-dtrace",
-    author = "",
+    about,
     after_help = "\
 [1] This processes the result of the dtrace ustack() as run with:
         dtrace -x ustackframes=100 -n 'profile-97 /pid == 12345 && arg1/ { @[ustack()] = count(); } tick-60s { exit(0); }'
@@ -26,30 +24,26 @@ struct Opt {
     // ************* //
     // *** FLAGS *** //
     // ************* //
-    /// Demangle function names
-    #[structopt(long = "demangle")]
-    demangle: bool,
-
     /// Include offsets
-    #[structopt(long = "includeoffset")]
+    #[clap(long = "includeoffset")]
     includeoffset: bool,
 
     /// Silence all log output
-    #[structopt(short = "q", long = "quiet")]
+    #[clap(short = 'q', long = "quiet")]
     quiet: bool,
 
     /// Verbose logging mode (-v, -vv, -vvv)
-    #[structopt(short = "v", long = "verbose", parse(from_occurrences))]
+    #[clap(short = 'v', long = "verbose", parse(from_occurrences))]
     verbose: usize,
 
     // *************** //
     // *** OPTIONS *** //
     // *************** //
     /// Number of threads to use.
-    #[structopt(
-        short = "n",
+    #[clap(
+        short = 'n',
         long = "nthreads",
-        raw(default_value = "&NTHREADS"),
+        default_value = &NTHREADS,
         value_name = "UINT"
     )]
     nthreads: usize,
@@ -57,26 +51,22 @@ struct Opt {
     // ************ //
     // *** ARGS *** //
     // ************ //
-    #[structopt(value_name = "PATH")]
+    #[clap(value_name = "PATH")]
     /// Dtrace script output file, or STDIN if not specified
     infile: Option<PathBuf>,
 }
 
 impl Opt {
     fn into_parts(self) -> (Option<PathBuf>, Options) {
-        (
-            self.infile,
-            Options {
-                demangle: self.demangle,
-                includeoffset: self.includeoffset,
-                nthreads: self.nthreads,
-            },
-        )
+        let mut options = Options::default();
+        options.includeoffset = self.includeoffset;
+        options.nthreads = self.nthreads;
+        (self.infile, options)
     }
 }
 
 fn main() -> io::Result<()> {
-    let opt = Opt::from_args();
+    let opt = Opt::parse();
 
     // Initialize logger
     if !opt.quiet {
@@ -86,10 +76,10 @@ fn main() -> io::Result<()> {
             2 => "debug",
             _ => "trace",
         }))
-        .default_format_timestamp(false)
+        .format_timestamp(None)
         .init();
     }
 
     let (infile, options) = opt.into_parts();
-    Folder::from(options).collapse_file(infile.as_ref(), io::stdout().lock())
+    Folder::from(options).collapse_file_to_stdout(infile.as_ref())
 }

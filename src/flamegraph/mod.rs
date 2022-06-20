@@ -1,12 +1,15 @@
 macro_rules! args {
     ($($key:expr => $value:expr),*) => {{
-        [$(($key, $value),)*].into_iter().map(|(k, v): &(&str, &str)| (*k, *v))
+        [$(($key, $value),)*].iter().map(|(k, v): &(&str, &str)| (*k, *v))
     }};
 }
 
+#[cfg(feature = "nameattr")]
 mod attrs;
+
 pub mod color;
 mod merge;
+mod rand;
 mod svg;
 
 use std::fs::File;
@@ -22,8 +25,12 @@ use quick_xml::events::{BytesEnd, BytesStart, BytesText, Event};
 use quick_xml::Writer;
 use str_stack::StrStack;
 
+#[cfg(feature = "nameattr")]
 use self::attrs::FrameAttrs;
+
+#[cfg(feature = "nameattr")]
 pub use self::attrs::FuncFrameAttrsMap;
+
 pub use self::color::Palette;
 use self::color::{Color, SearchColor};
 use self::svg::{Dimension, StyleOptions};
@@ -55,13 +62,12 @@ pub mod defaults {
                 );
             )*
 
+
             #[doc(hidden)]
             pub mod str {
-                use lazy_static::lazy_static;
+            use once_cell::sync::Lazy;
             $(
-                lazy_static! {
-                    pub static ref $name: String = ($val).to_string();
-                }
+                    pub static $name: Lazy<String> = Lazy::new(|| ($val).to_string());
             )*
             }
         }
@@ -71,8 +77,9 @@ pub mod defaults {
         COLORS: &str = "hot",
         SEARCH_COLOR: &str = "#e600e6",
         TITLE: &str = "Flame Graph",
+        CHART_TITLE: &str = "Flame Chart",
         FRAME_HEIGHT: usize = 16,
-        MIN_WIDTH: f64 = 0.1,
+        MIN_WIDTH: f64 = 0.01,
         FONT_TYPE: &str = "Verdana",
         FONT_SIZE: usize = 12,
         FONT_WIDTH: f64 = 0.59,
@@ -84,6 +91,7 @@ pub mod defaults {
 
 /// Configure the flame graph.
 #[derive(Debug, PartialEq)]
+#[non_exhaustive]
 pub struct Options<'a> {
     /// The color palette to use when plotting.
     pub colors: color::Palette,
@@ -97,6 +105,10 @@ pub struct Options<'a> {
     ///
     /// This will cause similar functions to be colored similarly.
     pub hash: bool,
+
+    /// Choose names based on the hashes of function names, without the weighting scheme that
+    /// `hash` uses.
+    pub deterministic: bool,
 
     /// Store the choice of color for each function so that later invocations use the same colors.
     ///
@@ -114,6 +126,7 @@ pub struct Options<'a> {
     ///
     /// In particular, if a function appears in the given map, it will have extra attributes set in
     /// the resulting SVG based on its value in the map.
+    #[cfg(feature = "nameattr")]
     pub func_frameattrs: FuncFrameAttrsMap,
 
     /// Whether to plot a plot that grows top-to-bottom or bottom-up (the default).
@@ -164,6 +177,9 @@ pub struct Options<'a> {
     /// [Default value](defaults::FONT_WIDTH).
     pub font_width: f64,
 
+    /// When text doesn't fit in a frame, should we cut off left side (the default) or right side?
+    pub text_truncate_direction: TextTruncateDirection,
+
     /// Count type label for the flame graph.
     ///
     /// [Default value](defaults::COUNT_NAME).
@@ -205,8 +221,8 @@ pub struct Options<'a> {
     /// a performance boost. If you have multiple input files, the lines will be merged and sorted
     /// regardless.
     ///
-    /// Note that if you use `from_sorted_lines` directly, the it is always your responsibility to
-    /// make sure the lines are sorted.
+    /// Note that if you use `from_lines` directly, the it is always your responsibility to make
+    /// sure the lines are sorted.
     pub no_sort: bool,
 
     /// Generate stack-reversed flame graph.
@@ -219,17 +235,48 @@ pub struct Options<'a> {
     /// This is only meant to be used in tests.
     #[doc(hidden)]
     pub no_javascript: bool,
+
+    /// Diffusion-based color: the wider the frame, the more red it is. This
+    /// helps visually draw the eye towards frames that are wider, and therefore
+    /// more likely to need to be optimized. This is redundant information,
+    /// insofar as it's the same as the width of frames, but it still provides a
+    /// useful visual cue of what to focus on, especially if you are showing
+    /// flamegraphs to someone for the first time.
+    pub color_diffusion: bool,
+
+    /// Produce a flame chart (sort by time, do not merge stacks)
+    ///
+    /// Note that stack is not sorted and will be reversed
+    pub flame_chart: bool,
 }
 
 impl<'a> Options<'a> {
-    /// Calculate pad top, including title
+    /// Calculate pad top, including title and subtitle
     pub(super) fn ypad1(&self) -> usize {
-        self.font_size * 3
+        let subtitle_height = if self.subtitle.is_some() {
+            self.font_size * 2
+        } else {
+            0
+        };
+        if self.direction == Direction::Straight {
+            self.font_size * 3 + subtitle_height
+        } else {
+            // Inverted (icicle) mode, put the details on top. The +4 is to add
+            // a little bit more space between the title (or subtitle if there
+            // is one) and the details.
+            self.font_size * 4 + subtitle_height + 4
+        }
     }
 
     /// Calculate pad bottom, including labels
     pub(super) fn ypad2(&self) -> usize {
-        self.font_size * 2 + 10
+        if self.direction == Direction::Straight {
+            self.font_size * 2 + 10
+        } else {
+            // Inverted (icicle) mode, put the details on top, so don't need
+            // room at the bottom.
+            self.font_size + 10
+        }
     }
 }
 
@@ -244,6 +291,7 @@ impl<'a> Default for Options<'a> {
             font_type: defaults::FONT_TYPE.to_string(),
             font_size: defaults::FONT_SIZE,
             font_width: defaults::FONT_WIDTH,
+            text_truncate_direction: Default::default(),
             count_name: defaults::COUNT_NAME.to_string(),
             name_type: defaults::NAME_TYPE.to_string(),
             factor: defaults::FACTOR,
@@ -252,14 +300,19 @@ impl<'a> Default for Options<'a> {
             subtitle: Default::default(),
             bgcolors: Default::default(),
             hash: Default::default(),
+            deterministic: Default::default(),
             palette_map: Default::default(),
-            func_frameattrs: Default::default(),
             direction: Default::default(),
             negate_differentials: Default::default(),
             pretty_xml: Default::default(),
             no_sort: Default::default(),
             reverse_stack_order: Default::default(),
             no_javascript: Default::default(),
+            color_diffusion: Default::default(),
+            flame_chart: Default::default(),
+
+            #[cfg(feature = "nameattr")]
+            func_frameattrs: Default::default(),
         }
     }
 }
@@ -284,9 +337,27 @@ impl Default for Direction {
     }
 }
 
+/// The direction text is truncated when it's too long.
+#[derive(Debug, Clone, Copy, Eq, PartialEq)]
+pub enum TextTruncateDirection {
+    /// Truncate text on the left.
+    Left,
+
+    /// Truncate text on the right.
+    Right,
+}
+
+impl Default for TextTruncateDirection {
+    fn default() -> Self {
+        TextTruncateDirection::Left
+    }
+}
+
 struct Rectangle {
+    x1_samples: usize,
     x1_pct: f64,
     y1: usize,
+    x2_samples: usize,
     x2_pct: f64,
     y2: usize,
 }
@@ -322,6 +393,11 @@ where
     W: Write,
 {
     let mut reversed = StrStack::new();
+    let lines = lines
+        .into_iter()
+        .map(|line| line.trim())
+        .filter(|line| !(line.is_empty() || line.starts_with("# ")));
+
     let (mut frames, time, ignored, delta_max) = if opt.reverse_stack_order {
         if opt.no_sort {
             warn!(
@@ -351,15 +427,20 @@ where
         }
         let mut reversed: Vec<&str> = reversed.iter().collect();
         reversed.sort_unstable();
-        merge::frames(reversed)?
+        merge::frames(reversed, false)?
+    } else if opt.flame_chart {
+        // In flame chart mode, just reverse the data so time moves from left to right.
+        let mut lines: Vec<&str> = lines.into_iter().collect();
+        lines.reverse();
+        merge::frames(lines, true)?
     } else if opt.no_sort {
         // Lines don't need sorting.
-        merge::frames(lines)?
+        merge::frames(lines, false)?
     } else {
         // Sort lines by default.
         let mut lines: Vec<&str> = lines.into_iter().collect();
         lines.sort_unstable();
-        merge::frames(lines)?
+        merge::frames(lines, false)?
     };
 
     if ignored != 0 {
@@ -379,7 +460,7 @@ where
         error!("No stack counts found");
         // emit an error message SVG, for tools automating flamegraph use
         let imageheight = opt.font_size * 5;
-        svg::write_header(&mut svg, imageheight, &opt)?;
+        svg::write_header(&mut svg, imageheight, opt)?;
         svg::write_str(
             &mut svg,
             &mut buffer,
@@ -416,7 +497,7 @@ where
 
     // draw canvas, and embed interactive JavaScript program
     let imageheight = ((depthmax + 1) * opt.frame_height) + opt.ypad1() + opt.ypad2();
-    svg::write_header(&mut svg, imageheight, &opt)?;
+    svg::write_header(&mut svg, imageheight, opt)?;
 
     let (bgcolor1, bgcolor2) = color::bgcolor_for(opt.bgcolors, opt.colors);
     let style_options = StyleOptions {
@@ -425,16 +506,16 @@ where
         bgcolor2,
     };
 
-    svg::write_prelude(&mut svg, &style_options, &opt)?;
+    svg::write_prelude(&mut svg, &style_options, opt)?;
 
     // Used when picking color parameters at random, when no option determines how to pick these
-    // parameters. We instanciate it here because it may be called once for each iteration in the
+    // parameters. We instantiate it here because it may be called once for each iteration in the
     // frames loop.
     let mut thread_rng = rand::thread_rng();
 
-    // structs to reuse accross loops to avoid allocations
-    let mut cache_g = Event::Start({ BytesStart::owned_name("g") });
-    let mut cache_a = Event::Start({ BytesStart::owned_name("a") });
+    // structs to reuse across loops to avoid allocations
+    let mut cache_g = Event::Start(BytesStart::owned_name("g"));
+    let mut cache_a = Event::Start(BytesStart::owned_name("a"));
     let mut cache_rect = Event::Empty(BytesStart::owned_name("rect"));
     let cache_g_end = Event::End(BytesEnd::borrowed(b"g"));
     let cache_a_end = Event::End(BytesEnd::borrowed(b"a"));
@@ -447,6 +528,7 @@ where
             ("id", "frames"),
             ("x", &container_x),
             ("width", &container_width),
+            ("total_samples", &format!("{}", timemax)),
         ]),
     ))?;
 
@@ -472,8 +554,10 @@ where
 
         let rect = Rectangle {
             x1_pct,
+            x1_samples: frame.start_time,
             y1,
             x2_pct,
+            x2_samples: frame.end_time,
             y2,
         };
 
@@ -493,7 +577,7 @@ where
             write!(buffer, "all ({} {}, 100%)", samples_txt, opt.count_name)
         } else {
             let pct = (100 * samples) as f64 / (timemax as f64 * opt.factor);
-            let function = deannotate(&frame.location.function);
+            let function = deannotate(frame.location.function);
             match frame.delta {
                 None => write!(
                     buffer,
@@ -520,28 +604,14 @@ where
             }
         };
 
-        let frame_attributes = opt
-            .func_frameattrs
-            .frameattrs_for_func(frame.location.function);
-
-        let mut has_href = false;
-        let mut title = &buffer[info];
-        if let Some(frame_attributes) = frame_attributes {
-            if frame_attributes.attrs.contains_key("xlink:href") {
-                write_container_attributes(&mut cache_a, &frame_attributes);
-                svg.write_event(&cache_a)?;
-                has_href = true;
-            } else {
-                write_container_attributes(&mut cache_g, &frame_attributes);
-                svg.write_event(&cache_g)?;
-            }
-            if let Some(ref t) = frame_attributes.title {
-                title = t.as_str();
-            }
-        } else if let Event::Start(ref mut c) = cache_g {
-            c.clear_attributes();
-            svg.write_event(&cache_g)?;
-        }
+        let (has_href, title) = write_container_start(
+            opt,
+            &mut svg,
+            &mut cache_a,
+            &mut cache_g,
+            &frame,
+            &buffer[info],
+        )?;
 
         svg.write_event(Event::Start(BytesStart::borrowed_name(b"title")))?;
         svg.write_event(Event::Text(BytesText::from_plain_str(title)))?;
@@ -552,6 +622,13 @@ where
             color::VDGREY
         } else if frame.location.function == "-" {
             color::DGREY
+        } else if opt.color_diffusion {
+            // We want to visually highlight high priority regions for
+            // optimization: wider frames are redder. Typically when optimizing,
+            // a frame that is 50% of width is high priority, so it seems wrong
+            // to give it half the saturation of 100%. So we use sqrt to make
+            // the red dropoff less linear.
+            color::color_scale((((x2_pct - x1_pct) / 100.0).sqrt() * 2000.0) as isize, 2000)
         } else if let Some(mut delta) = frame.delta {
             if opt.negate_differentials {
                 delta = -delta;
@@ -560,13 +637,15 @@ where
         } else if let Some(ref mut palette_map) = opt.palette_map {
             let colors = opt.colors;
             let hash = opt.hash;
-            palette_map.find_color_for(&frame.location.function, |name| {
-                color::color(colors, hash, name, &mut thread_rng)
+            let deterministic = opt.deterministic;
+            palette_map.find_color_for(frame.location.function, |name| {
+                color::color(colors, hash, deterministic, name, &mut thread_rng)
             })
         } else {
             color::color(
                 opt.colors,
                 opt.hash,
+                opt.deterministic,
                 frame.location.function,
                 &mut thread_rng,
             )
@@ -578,7 +657,7 @@ where
             .trunc() as usize;
         let text: svg::TextArgument<'_> = if fitchars >= 3 {
             // room for one char plus two dots
-            let f = deannotate(&frame.location.function);
+            let f = deannotate(frame.location.function);
 
             // TODO: use Unicode grapheme clusters instead
             if f.len() < fitchars {
@@ -623,10 +702,63 @@ where
     svg.write_event(Event::End(BytesEnd::borrowed(b"svg")))?;
     svg.write_event(Event::Eof)?;
 
+    svg.into_inner().flush()?;
     Ok(())
 }
 
-/// Writes atributes to the container, container could be g or a
+#[cfg(feature = "nameattr")]
+fn write_container_start<'a, W: Write>(
+    opt: &'a Options<'a>,
+    svg: &mut Writer<W>,
+    cache_a: &mut Event<'_>,
+    cache_g: &mut Event<'_>,
+    frame: &merge::TimedFrame<'_>,
+    mut title: &'a str,
+) -> quick_xml::Result<(bool, &'a str)> {
+    let frame_attributes = opt
+        .func_frameattrs
+        .frameattrs_for_func(frame.location.function);
+
+    let mut has_href = false;
+    if let Some(frame_attributes) = frame_attributes {
+        if frame_attributes.attrs.contains_key("xlink:href") {
+            write_container_attributes(cache_a, frame_attributes);
+            svg.write_event(&cache_a)?;
+            has_href = true;
+        } else {
+            write_container_attributes(cache_g, frame_attributes);
+            svg.write_event(&cache_g)?;
+        }
+        if let Some(ref t) = frame_attributes.title {
+            title = t.as_str();
+        }
+    } else if let Event::Start(ref mut c) = cache_g {
+        c.clear_attributes();
+        svg.write_event(&cache_g)?;
+    }
+
+    Ok((has_href, title))
+}
+
+#[cfg(not(feature = "nameattr"))]
+fn write_container_start<'a, W: Write>(
+    _opt: &Options<'_>,
+    svg: &mut Writer<W>,
+    _cache_a: &mut Event<'_>,
+    cache_g: &mut Event<'_>,
+    _frame: &merge::TimedFrame<'_>,
+    title: &'a str,
+) -> quick_xml::Result<(bool, &'a str)> {
+    if let Event::Start(ref mut c) = cache_g {
+        c.clear_attributes();
+        svg.write_event(&cache_g)?;
+    }
+
+    Ok((false, title))
+}
+
+/// Writes attributes to the container, container could be g or a
+#[cfg(feature = "nameattr")]
 fn write_container_attributes(event: &mut Event<'_>, frame_attributes: &FrameAttrs) {
     if let Event::Start(ref mut c) = event {
         c.clear_attributes();
@@ -643,7 +775,7 @@ fn write_container_attributes(event: &mut Event<'_>, frame_attributes: &FrameAtt
 
 /// Produce a flame graph from a reader that contains a sequence of folded stack lines.
 ///
-/// See [`from_sorted_lines`] for the expected format of each line.
+/// See [`from_lines`] for the expected format of each line.
 ///
 /// The resulting flame graph will be written out to `writer` in SVG format.
 pub fn from_reader<R, W>(opt: &mut Options<'_>, reader: R, writer: W) -> quick_xml::Result<()>
@@ -656,7 +788,7 @@ where
 
 /// Produce a flame graph from a set of readers that contain folded stack lines.
 ///
-/// See [`from_sorted_lines`] for the expected format of each line.
+/// See [`from_lines`] for the expected format of each line.
 ///
 /// The resulting flame graph will be written out to `writer` in SVG format.
 pub fn from_readers<R, W>(opt: &mut Options<'_>, readers: R, writer: W) -> quick_xml::Result<()>
@@ -728,12 +860,14 @@ fn filled_rectangle<W: Write>(
     rect: &Rectangle,
     color: Color,
     cache_rect: &mut Event<'_>,
-) -> quick_xml::Result<usize> {
+) -> quick_xml::Result<()> {
     let x = write!(buffer, "{:.4}%", rect.x1_pct);
     let y = write_usize(buffer, rect.y1);
     let width = write!(buffer, "{:.4}%", rect.width_pct());
     let height = write_usize(buffer, rect.height());
     let color = write!(buffer, "rgb({},{},{})", color.r, color.g, color.b);
+    let x_samples = write_usize(buffer, rect.x1_samples);
+    let width_samples = write_usize(buffer, rect.x2_samples - rect.x1_samples);
 
     if let Event::Empty(bytes_start) = cache_rect {
         // clear the state
@@ -743,7 +877,9 @@ fn filled_rectangle<W: Write>(
             "y" => &buffer[y],
             "width" => &buffer[width],
             "height" => &buffer[height],
-            "fill" => &buffer[color]
+            "fill" => &buffer[color],
+            "fg:x" => &buffer[x_samples],
+            "fg:w" => &buffer[width_samples]
         ));
     } else {
         unreachable!("cache wrapper was of wrong type: {:?}", cache_rect);
@@ -752,8 +888,40 @@ fn filled_rectangle<W: Write>(
 }
 
 fn write_usize(buffer: &mut StrStack, value: usize) -> usize {
-    let mut writer = buffer.writer();
-    // OK to unwrap here because this `fmt::Write` implementation never returns an error.
-    itoa::fmt(&mut writer, value).unwrap();
-    writer.finish()
+    buffer.push(itoa::Buffer::new().format(value))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{Direction, Options};
+
+    // If there's a subtitle, we need to adjust the top height:
+    #[test]
+    fn top_ypadding_adjusts_for_subtitle() {
+        let height_without_subtitle = Options {
+            ..Default::default()
+        }
+        .ypad1();
+        let height_with_subtitle = Options {
+            subtitle: Some(String::from("hello!")),
+            ..Default::default()
+        }
+        .ypad1();
+        assert!(height_with_subtitle > height_without_subtitle);
+    }
+
+    // In inverted (icicle) mode, the details move from bottom to top, so
+    // ypadding shifts accordingly.
+    #[test]
+    fn ypadding_adjust_for_inverted_mode() {
+        let regular = Options {
+            ..Default::default()
+        };
+        let inverted = Options {
+            direction: Direction::Inverted,
+            ..Default::default()
+        };
+        assert!(inverted.ypad1() > regular.ypad1());
+        assert!(inverted.ypad2() < regular.ypad2());
+    }
 }

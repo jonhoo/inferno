@@ -1,0 +1,1859 @@
+<?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg version="1.1" width="1200" height="1190" onload="init(evt)" viewBox="0 0 1200 1190" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:fg="http://github.com/jonhoo/inferno">
+    <!--Flame graph stack visualization. See https://github.com/brendangregg/FlameGraph for latest version, and http://www.brendangregg.com/flamegraphs.html for examples.-->
+    <!--NOTES: -->
+    <defs>
+        <linearGradient id="background" y1="0" y2="1" x1="0" x2="0">
+            <stop stop-color="#eeeeee" offset="5%"/>
+            <stop stop-color="#eeeeb0" offset="95%"/>
+        </linearGradient>
+    </defs>
+    <style type="text/css">
+text { font-family:"Verdana"; font-size:12px; fill:rgb(0,0,0); }
+#title { text-anchor:middle; font-size:17px; }
+#search { opacity:0.1; cursor:pointer; }
+#search:hover, #search.show { opacity:1; }
+#subtitle { text-anchor:middle; font-color:rgb(160,160,160); }
+#unzoom { cursor:pointer; }
+#frames > *:hover { stroke:black; stroke-width:0.5; cursor:pointer; }
+.hide { display:none; }
+.parent { opacity:0.5; }
+</style>
+    <script type="text/ecmascript"><![CDATA[
+        var nametype = 'Function:';
+        var fontsize = 12;
+        var fontwidth = 0.59;
+        var xpad = 10;
+        var inverted = false;
+        var searchcolor = 'rgb(230,0,230)';
+        var fluiddrawing = true;
+        var truncate_text_right = false;
+    ]]></script>
+    <rect x="0" y="0" width="100%" height="1190" fill="url(#background)"/>
+    <text id="title" x="50.0000%" y="24.00">Flame Graph</text>
+    <text id="details" x="10" y="1173.00"> </text>
+    <text id="unzoom" class="hide" x="10" y="24.00">Reset Zoom</text>
+    <text id="search" x="1090" y="24.00">Search</text>
+    <text id="matched" x="1090" y="1173.00"> </text>
+    <svg id="frames" x="10" width="1180" total_samples="286">
+        <g>
+            <title>read (1 samples, 0.35%)</title>
+            <rect x="0.0000%" y="1109" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="0" fg:w="1"/>
+            <text x="0.2500%" y="1119.50"></text>
+        </g>
+        <g>
+            <title>check_events (1 samples, 0.35%)</title>
+            <rect x="0.0000%" y="1093" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="0" fg:w="1"/>
+            <text x="0.2500%" y="1103.50"></text>
+        </g>
+        <g>
+            <title>hypercall_page (1 samples, 0.35%)</title>
+            <rect x="0.0000%" y="1077" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="0" fg:w="1"/>
+            <text x="0.2500%" y="1087.50"></text>
+        </g>
+        <g>
+            <title>ScavengeRootsTask::do_it (1 samples, 0.35%)</title>
+            <rect x="0.3497%" y="1061" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="1" fg:w="1"/>
+            <text x="0.5997%" y="1071.50"></text>
+        </g>
+        <g>
+            <title>ClassLoaderDataGraph::oops_do (1 samples, 0.35%)</title>
+            <rect x="0.3497%" y="1045" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="1" fg:w="1"/>
+            <text x="0.5997%" y="1055.50"></text>
+        </g>
+        <g>
+            <title>ClassLoaderData::oops_do (1 samples, 0.35%)</title>
+            <rect x="0.3497%" y="1029" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="1" fg:w="1"/>
+            <text x="0.5997%" y="1039.50"></text>
+        </g>
+        <g>
+            <title>PSScavengeKlassClosure::do_klass (1 samples, 0.35%)</title>
+            <rect x="0.3497%" y="1013" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="1" fg:w="1"/>
+            <text x="0.5997%" y="1023.50"></text>
+        </g>
+        <g>
+            <title>PSPromotionManager::drain_stacks_depth (1 samples, 0.35%)</title>
+            <rect x="0.6993%" y="1045" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="2" fg:w="1"/>
+            <text x="0.9493%" y="1055.50"></text>
+        </g>
+        <g>
+            <title>oopDesc* PSPromotionManager::copy_to_survivor_space&lt;false&gt; (1 samples, 0.35%)</title>
+            <rect x="0.6993%" y="1029" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="2" fg:w="1"/>
+            <text x="0.9493%" y="1039.50"></text>
+        </g>
+        <g>
+            <title>InstanceKlass::oop_push_contents (1 samples, 0.35%)</title>
+            <rect x="0.6993%" y="1013" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="2" fg:w="1"/>
+            <text x="0.9493%" y="1023.50"></text>
+        </g>
+        <g>
+            <title>ParallelTaskTerminator::offer_termination (5 samples, 1.75%)</title>
+            <rect x="1.0490%" y="1045" width="1.7483%" height="15" fill="rgb(255,230,230)" fg:x="3" fg:w="5"/>
+            <text x="1.2990%" y="1055.50"></text>
+        </g>
+        <g>
+            <title>GCTaskThread::run (14 samples, 4.90%)</title>
+            <rect x="0.3497%" y="1077" width="4.8951%" height="15" fill="rgb(255,216,216)" fg:x="1" fg:w="14"/>
+            <text x="0.5997%" y="1087.50">GCTask..</text>
+        </g>
+        <g>
+            <title>StealTask::do_it (13 samples, 4.55%)</title>
+            <rect x="0.6993%" y="1061" width="4.5455%" height="15" fill="rgb(255,218,218)" fg:x="2" fg:w="13"/>
+            <text x="0.9493%" y="1071.50">Steal..</text>
+        </g>
+        <g>
+            <title>SpinPause (7 samples, 2.45%)</title>
+            <rect x="2.7972%" y="1045" width="2.4476%" height="15" fill="rgb(255,226,226)" fg:x="8" fg:w="7"/>
+            <text x="3.0472%" y="1055.50">Sp..</text>
+        </g>
+        <g>
+            <title>io/netty/buffer/AbstractByteBufAllocator:.directBuffer (1 samples, 0.35%)</title>
+            <rect x="6.2937%" y="853" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="18" fg:w="1"/>
+            <text x="6.5437%" y="863.50"></text>
+        </g>
+        <g>
+            <title>io/netty/buffer/AbstractReferenceCountedByteBuf:.release (1 samples, 0.35%)</title>
+            <rect x="7.3427%" y="661" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="21" fg:w="1"/>
+            <text x="7.5927%" y="671.50"></text>
+        </g>
+        <g>
+            <title>io/netty/buffer/PooledByteBuf:.internalNioBuffer (1 samples, 0.35%)</title>
+            <rect x="7.6923%" y="645" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="22" fg:w="1"/>
+            <text x="7.9423%" y="655.50"></text>
+        </g>
+        <g>
+            <title>sun/nio/ch/NativeThread:.current (1 samples, 0.35%)</title>
+            <rect x="8.0420%" y="645" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="23" fg:w="1"/>
+            <text x="8.2920%" y="655.50"></text>
+        </g>
+        <g>
+            <title> (3 samples, 1.05%)</title>
+            <rect x="8.7413%" y="613" width="1.0490%" height="15" fill="rgb(255,234,234)" fg:x="25" fg:w="3"/>
+            <text x="8.9913%" y="623.50"></text>
+        </g>
+        <g>
+            <title>Java_sun_nio_ch_FileDispatcherImpl_write0 (1 samples, 0.35%)</title>
+            <rect x="9.7902%" y="613" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="28" fg:w="1"/>
+            <text x="10.0402%" y="623.50"></text>
+        </g>
+        <g>
+            <title>sys_write (1 samples, 0.35%)</title>
+            <rect x="10.4895%" y="597" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="30" fg:w="1"/>
+            <text x="10.7395%" y="607.50"></text>
+        </g>
+        <g>
+            <title>fget_light (1 samples, 0.35%)</title>
+            <rect x="10.8392%" y="565" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="31" fg:w="1"/>
+            <text x="11.0892%" y="575.50"></text>
+        </g>
+        <g>
+            <title>__srcu_read_lock (1 samples, 0.35%)</title>
+            <rect x="11.1888%" y="549" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="32" fg:w="1"/>
+            <text x="11.4388%" y="559.50"></text>
+        </g>
+        <g>
+            <title>__tcp_push_pending_frames (1 samples, 0.35%)</title>
+            <rect x="11.5385%" y="485" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="33" fg:w="1"/>
+            <text x="11.7885%" y="495.50"></text>
+        </g>
+        <g>
+            <title>ktime_get_real (1 samples, 0.35%)</title>
+            <rect x="12.5874%" y="437" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="36" fg:w="1"/>
+            <text x="12.8374%" y="447.50"></text>
+        </g>
+        <g>
+            <title>skb_clone (1 samples, 0.35%)</title>
+            <rect x="12.9371%" y="437" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="37" fg:w="1"/>
+            <text x="13.1871%" y="447.50"></text>
+        </g>
+        <g>
+            <title>tcp_set_skb_tso_segs (1 samples, 0.35%)</title>
+            <rect x="13.2867%" y="437" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="38" fg:w="1"/>
+            <text x="13.5367%" y="447.50"></text>
+        </g>
+        <g>
+            <title>dev_hard_start_xmit (1 samples, 0.35%)</title>
+            <rect x="14.3357%" y="357" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="41" fg:w="1"/>
+            <text x="14.5857%" y="367.50"></text>
+        </g>
+        <g>
+            <title>dev_pick_tx (1 samples, 0.35%)</title>
+            <rect x="14.6853%" y="357" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="42" fg:w="1"/>
+            <text x="14.9353%" y="367.50"></text>
+        </g>
+        <g>
+            <title>dev_queue_xmit_nit (1 samples, 0.35%)</title>
+            <rect x="15.0350%" y="325" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="43" fg:w="1"/>
+            <text x="15.2850%" y="335.50"></text>
+        </g>
+        <g>
+            <title>xen_restore_fl_direct (1 samples, 0.35%)</title>
+            <rect x="15.7343%" y="277" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="45" fg:w="1"/>
+            <text x="15.9843%" y="287.50"></text>
+        </g>
+        <g>
+            <title>dev_hard_start_xmit (4 samples, 1.40%)</title>
+            <rect x="15.0350%" y="341" width="1.3986%" height="15" fill="rgb(255,232,232)" fg:x="43" fg:w="4"/>
+            <text x="15.2850%" y="351.50"></text>
+        </g>
+        <g>
+            <title>loopback_xmit (3 samples, 1.05%)</title>
+            <rect x="15.3846%" y="325" width="1.0490%" height="15" fill="rgb(255,234,234)" fg:x="44" fg:w="3"/>
+            <text x="15.6346%" y="335.50"></text>
+        </g>
+        <g>
+            <title>netif_rx (2 samples, 0.70%)</title>
+            <rect x="15.7343%" y="309" width="0.6993%" height="15" fill="rgb(255,237,237)" fg:x="45" fg:w="2"/>
+            <text x="15.9843%" y="319.50"></text>
+        </g>
+        <g>
+            <title>netif_rx.part.82 (2 samples, 0.70%)</title>
+            <rect x="15.7343%" y="293" width="0.6993%" height="15" fill="rgb(255,237,237)" fg:x="45" fg:w="2"/>
+            <text x="15.9843%" y="303.50"></text>
+        </g>
+        <g>
+            <title>xen_restore_fl_direct_end (1 samples, 0.35%)</title>
+            <rect x="16.0839%" y="277" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="46" fg:w="1"/>
+            <text x="16.3339%" y="287.50"></text>
+        </g>
+        <g>
+            <title>dma_issue_pending_all (1 samples, 0.35%)</title>
+            <rect x="16.4336%" y="261" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="47" fg:w="1"/>
+            <text x="16.6836%" y="271.50"></text>
+        </g>
+        <g>
+            <title>__inet_lookup_established (3 samples, 1.05%)</title>
+            <rect x="17.8322%" y="149" width="1.0490%" height="15" fill="rgb(255,234,234)" fg:x="51" fg:w="3"/>
+            <text x="18.0822%" y="159.50"></text>
+        </g>
+        <g>
+            <title>tcp_event_data_recv (1 samples, 0.35%)</title>
+            <rect x="18.8811%" y="133" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="54" fg:w="1"/>
+            <text x="19.1311%" y="143.50"></text>
+        </g>
+        <g>
+            <title>sock_def_readable (19 samples, 6.64%)</title>
+            <rect x="19.2308%" y="117" width="6.6434%" height="15" fill="rgb(255,211,211)" fg:x="55" fg:w="19"/>
+            <text x="19.4808%" y="127.50">sock_def_..</text>
+        </g>
+        <g>
+            <title>__wake_up_sync_key (19 samples, 6.64%)</title>
+            <rect x="19.2308%" y="101" width="6.6434%" height="15" fill="rgb(255,211,211)" fg:x="55" fg:w="19"/>
+            <text x="19.4808%" y="111.50">__wake_up..</text>
+        </g>
+        <g>
+            <title>check_events (19 samples, 6.64%)</title>
+            <rect x="19.2308%" y="85" width="6.6434%" height="15" fill="rgb(255,211,211)" fg:x="55" fg:w="19"/>
+            <text x="19.4808%" y="95.50">check_eve..</text>
+        </g>
+        <g>
+            <title>hypercall_page (19 samples, 6.64%)</title>
+            <rect x="19.2308%" y="69" width="6.6434%" height="15" fill="rgb(255,211,211)" fg:x="55" fg:w="19"/>
+            <text x="19.4808%" y="79.50">hypercall..</text>
+        </g>
+        <g>
+            <title>__kfree_skb (1 samples, 0.35%)</title>
+            <rect x="27.2727%" y="85" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="78" fg:w="1"/>
+            <text x="27.5227%" y="95.50"></text>
+        </g>
+        <g>
+            <title>skb_release_data (1 samples, 0.35%)</title>
+            <rect x="27.2727%" y="69" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="78" fg:w="1"/>
+            <text x="27.5227%" y="79.50"></text>
+        </g>
+        <g>
+            <title>skb_release_data.part.45 (1 samples, 0.35%)</title>
+            <rect x="27.2727%" y="53" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="78" fg:w="1"/>
+            <text x="27.5227%" y="63.50"></text>
+        </g>
+        <g>
+            <title>bictcp_acked (1 samples, 0.35%)</title>
+            <rect x="27.6224%" y="85" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="79" fg:w="1"/>
+            <text x="27.8724%" y="95.50"></text>
+        </g>
+        <g>
+            <title>ktime_get_real (2 samples, 0.70%)</title>
+            <rect x="27.9720%" y="85" width="0.6993%" height="15" fill="rgb(255,237,237)" fg:x="80" fg:w="2"/>
+            <text x="28.2220%" y="95.50"></text>
+        </g>
+        <g>
+            <title>getnstimeofday (2 samples, 0.70%)</title>
+            <rect x="27.9720%" y="69" width="0.6993%" height="15" fill="rgb(255,237,237)" fg:x="80" fg:w="2"/>
+            <text x="28.2220%" y="79.50"></text>
+        </g>
+        <g>
+            <title>xen_clocksource_get_cycles (1 samples, 0.35%)</title>
+            <rect x="28.3217%" y="53" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="81" fg:w="1"/>
+            <text x="28.5717%" y="63.50"></text>
+        </g>
+        <g>
+            <title>xen_clocksource_read (1 samples, 0.35%)</title>
+            <rect x="28.3217%" y="37" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="81" fg:w="1"/>
+            <text x="28.5717%" y="47.50"></text>
+        </g>
+        <g>
+            <title>tcp_rtt_estimator (1 samples, 0.35%)</title>
+            <rect x="28.6713%" y="85" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="82" fg:w="1"/>
+            <text x="28.9213%" y="95.50"></text>
+        </g>
+        <g>
+            <title>ip_local_deliver (35 samples, 12.24%)</title>
+            <rect x="17.1329%" y="197" width="12.2378%" height="15" fill="rgb(255,197,197)" fg:x="49" fg:w="35"/>
+            <text x="17.3829%" y="207.50">ip_local_deliver</text>
+        </g>
+        <g>
+            <title>ip_local_deliver_finish (35 samples, 12.24%)</title>
+            <rect x="17.1329%" y="181" width="12.2378%" height="15" fill="rgb(255,197,197)" fg:x="49" fg:w="35"/>
+            <text x="17.3829%" y="191.50">ip_local_deliver_f..</text>
+        </g>
+        <g>
+            <title>tcp_v4_rcv (34 samples, 11.89%)</title>
+            <rect x="17.4825%" y="165" width="11.8881%" height="15" fill="rgb(255,198,198)" fg:x="50" fg:w="34"/>
+            <text x="17.7325%" y="175.50">tcp_v4_rcv</text>
+        </g>
+        <g>
+            <title>tcp_v4_do_rcv (30 samples, 10.49%)</title>
+            <rect x="18.8811%" y="149" width="10.4895%" height="15" fill="rgb(255,201,201)" fg:x="54" fg:w="30"/>
+            <text x="19.1311%" y="159.50">tcp_v4_do_rcv</text>
+        </g>
+        <g>
+            <title>tcp_rcv_established (29 samples, 10.14%)</title>
+            <rect x="19.2308%" y="133" width="10.1399%" height="15" fill="rgb(255,202,202)" fg:x="55" fg:w="29"/>
+            <text x="19.4808%" y="143.50">tcp_rcv_establi..</text>
+        </g>
+        <g>
+            <title>tcp_ack (10 samples, 3.50%)</title>
+            <rect x="25.8741%" y="117" width="3.4965%" height="15" fill="rgb(255,222,222)" fg:x="74" fg:w="10"/>
+            <text x="26.1241%" y="127.50">tcp..</text>
+        </g>
+        <g>
+            <title>tcp_clean_rtx_queue (7 samples, 2.45%)</title>
+            <rect x="26.9231%" y="101" width="2.4476%" height="15" fill="rgb(255,226,226)" fg:x="77" fg:w="7"/>
+            <text x="27.1731%" y="111.50">tc..</text>
+        </g>
+        <g>
+            <title>tcp_valid_rtt_meas (1 samples, 0.35%)</title>
+            <rect x="29.0210%" y="85" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="83" fg:w="1"/>
+            <text x="29.2710%" y="95.50"></text>
+        </g>
+        <g>
+            <title>tcp_rtt_estimator (1 samples, 0.35%)</title>
+            <rect x="29.0210%" y="69" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="83" fg:w="1"/>
+            <text x="29.2710%" y="79.50"></text>
+        </g>
+        <g>
+            <title>__do_softirq (38 samples, 13.29%)</title>
+            <rect x="16.4336%" y="293" width="13.2867%" height="15" fill="rgb(255,195,195)" fg:x="47" fg:w="38"/>
+            <text x="16.6836%" y="303.50">__do_softirq</text>
+        </g>
+        <g>
+            <title>net_rx_action (38 samples, 13.29%)</title>
+            <rect x="16.4336%" y="277" width="13.2867%" height="15" fill="rgb(255,195,195)" fg:x="47" fg:w="38"/>
+            <text x="16.6836%" y="287.50">net_rx_action</text>
+        </g>
+        <g>
+            <title>process_backlog (37 samples, 12.94%)</title>
+            <rect x="16.7832%" y="261" width="12.9371%" height="15" fill="rgb(255,196,196)" fg:x="48" fg:w="37"/>
+            <text x="17.0332%" y="271.50">process_backlog</text>
+        </g>
+        <g>
+            <title>__netif_receive_skb (37 samples, 12.94%)</title>
+            <rect x="16.7832%" y="245" width="12.9371%" height="15" fill="rgb(255,196,196)" fg:x="48" fg:w="37"/>
+            <text x="17.0332%" y="255.50">__netif_receive_skb</text>
+        </g>
+        <g>
+            <title>ip_rcv (36 samples, 12.59%)</title>
+            <rect x="17.1329%" y="229" width="12.5874%" height="15" fill="rgb(255,196,196)" fg:x="49" fg:w="36"/>
+            <text x="17.3829%" y="239.50">ip_rcv</text>
+        </g>
+        <g>
+            <title>ip_rcv_finish (36 samples, 12.59%)</title>
+            <rect x="17.1329%" y="213" width="12.5874%" height="15" fill="rgb(255,196,196)" fg:x="49" fg:w="36"/>
+            <text x="17.3829%" y="223.50">ip_rcv_finish</text>
+        </g>
+        <g>
+            <title>ip_local_deliver_finish (1 samples, 0.35%)</title>
+            <rect x="29.3706%" y="197" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="84" fg:w="1"/>
+            <text x="29.6206%" y="207.50"></text>
+        </g>
+        <g>
+            <title>local_bh_enable (39 samples, 13.64%)</title>
+            <rect x="16.4336%" y="341" width="13.6364%" height="15" fill="rgb(255,194,194)" fg:x="47" fg:w="39"/>
+            <text x="16.6836%" y="351.50">local_bh_enable</text>
+        </g>
+        <g>
+            <title>do_softirq (39 samples, 13.64%)</title>
+            <rect x="16.4336%" y="325" width="13.6364%" height="15" fill="rgb(255,194,194)" fg:x="47" fg:w="39"/>
+            <text x="16.6836%" y="335.50">do_softirq</text>
+        </g>
+        <g>
+            <title>call_softirq (39 samples, 13.64%)</title>
+            <rect x="16.4336%" y="309" width="13.6364%" height="15" fill="rgb(255,194,194)" fg:x="47" fg:w="39"/>
+            <text x="16.6836%" y="319.50">call_softirq</text>
+        </g>
+        <g>
+            <title>rcu_bh_qs (1 samples, 0.35%)</title>
+            <rect x="29.7203%" y="293" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="85" fg:w="1"/>
+            <text x="29.9703%" y="303.50"></text>
+        </g>
+        <g>
+            <title>ip_local_out (46 samples, 16.08%)</title>
+            <rect x="14.3357%" y="405" width="16.0839%" height="15" fill="rgb(255,189,189)" fg:x="41" fg:w="46"/>
+            <text x="14.5857%" y="415.50">ip_local_out</text>
+        </g>
+        <g>
+            <title>ip_output (46 samples, 16.08%)</title>
+            <rect x="14.3357%" y="389" width="16.0839%" height="15" fill="rgb(255,189,189)" fg:x="41" fg:w="46"/>
+            <text x="14.5857%" y="399.50">ip_output</text>
+        </g>
+        <g>
+            <title>ip_finish_output (46 samples, 16.08%)</title>
+            <rect x="14.3357%" y="373" width="16.0839%" height="15" fill="rgb(255,189,189)" fg:x="41" fg:w="46"/>
+            <text x="14.5857%" y="383.50">ip_finish_output</text>
+        </g>
+        <g>
+            <title>dev_queue_xmit (44 samples, 15.38%)</title>
+            <rect x="15.0350%" y="357" width="15.3846%" height="15" fill="rgb(255,191,191)" fg:x="43" fg:w="44"/>
+            <text x="15.2850%" y="367.50">dev_queue_xmit</text>
+        </g>
+        <g>
+            <title>netif_skb_features (1 samples, 0.35%)</title>
+            <rect x="30.0699%" y="341" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="86" fg:w="1"/>
+            <text x="30.3199%" y="351.50"></text>
+        </g>
+        <g>
+            <title>ip_queue_xmit (48 samples, 16.78%)</title>
+            <rect x="14.3357%" y="421" width="16.7832%" height="15" fill="rgb(255,188,188)" fg:x="41" fg:w="48"/>
+            <text x="14.5857%" y="431.50">ip_queue_xmit</text>
+        </g>
+        <g>
+            <title>ip_output (2 samples, 0.70%)</title>
+            <rect x="30.4196%" y="405" width="0.6993%" height="15" fill="rgb(255,237,237)" fg:x="87" fg:w="2"/>
+            <text x="30.6696%" y="415.50"></text>
+        </g>
+        <g>
+            <title>pvclock_clocksource_read (1 samples, 0.35%)</title>
+            <rect x="31.1189%" y="373" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="89" fg:w="1"/>
+            <text x="31.3689%" y="383.50"></text>
+        </g>
+        <g>
+            <title>getnstimeofday (2 samples, 0.70%)</title>
+            <rect x="31.1189%" y="405" width="0.6993%" height="15" fill="rgb(255,237,237)" fg:x="89" fg:w="2"/>
+            <text x="31.3689%" y="415.50"></text>
+        </g>
+        <g>
+            <title>xen_clocksource_get_cycles (2 samples, 0.70%)</title>
+            <rect x="31.1189%" y="389" width="0.6993%" height="15" fill="rgb(255,237,237)" fg:x="89" fg:w="2"/>
+            <text x="31.3689%" y="399.50"></text>
+        </g>
+        <g>
+            <title>xen_clocksource_read (1 samples, 0.35%)</title>
+            <rect x="31.4685%" y="373" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="90" fg:w="1"/>
+            <text x="31.7185%" y="383.50"></text>
+        </g>
+        <g>
+            <title>pvclock_clocksource_read (1 samples, 0.35%)</title>
+            <rect x="31.4685%" y="357" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="90" fg:w="1"/>
+            <text x="31.7185%" y="367.50"></text>
+        </g>
+        <g>
+            <title>ktime_get_real (3 samples, 1.05%)</title>
+            <rect x="31.1189%" y="421" width="1.0490%" height="15" fill="rgb(255,234,234)" fg:x="89" fg:w="3"/>
+            <text x="31.3689%" y="431.50"></text>
+        </g>
+        <g>
+            <title>xen_clocksource_get_cycles (1 samples, 0.35%)</title>
+            <rect x="31.8182%" y="405" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="91" fg:w="1"/>
+            <text x="32.0682%" y="415.50"></text>
+        </g>
+        <g>
+            <title>__tcp_push_pending_frames (57 samples, 19.93%)</title>
+            <rect x="12.5874%" y="469" width="19.9301%" height="15" fill="rgb(255,183,183)" fg:x="36" fg:w="57"/>
+            <text x="12.8374%" y="479.50">__tcp_push_pending_frames</text>
+        </g>
+        <g>
+            <title>tcp_write_xmit (57 samples, 19.93%)</title>
+            <rect x="12.5874%" y="453" width="19.9301%" height="15" fill="rgb(255,183,183)" fg:x="36" fg:w="57"/>
+            <text x="12.8374%" y="463.50">tcp_write_xmit</text>
+        </g>
+        <g>
+            <title>tcp_transmit_skb (54 samples, 18.88%)</title>
+            <rect x="13.6364%" y="437" width="18.8811%" height="15" fill="rgb(255,184,184)" fg:x="39" fg:w="54"/>
+            <text x="13.8864%" y="447.50">tcp_transmit_skb</text>
+        </g>
+        <g>
+            <title>skb_dst_set_noref (1 samples, 0.35%)</title>
+            <rect x="32.1678%" y="421" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="92" fg:w="1"/>
+            <text x="32.4178%" y="431.50"></text>
+        </g>
+        <g>
+            <title>lock_sock_nested (1 samples, 0.35%)</title>
+            <rect x="32.5175%" y="469" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="93" fg:w="1"/>
+            <text x="32.7675%" y="479.50"></text>
+        </g>
+        <g>
+            <title>_raw_spin_lock_bh (1 samples, 0.35%)</title>
+            <rect x="32.5175%" y="453" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="93" fg:w="1"/>
+            <text x="32.7675%" y="463.50"></text>
+        </g>
+        <g>
+            <title>local_bh_disable (1 samples, 0.35%)</title>
+            <rect x="32.5175%" y="437" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="93" fg:w="1"/>
+            <text x="32.7675%" y="447.50"></text>
+        </g>
+        <g>
+            <title>__kmalloc_node_track_caller (2 samples, 0.70%)</title>
+            <rect x="33.2168%" y="437" width="0.6993%" height="15" fill="rgb(255,237,237)" fg:x="95" fg:w="2"/>
+            <text x="33.4668%" y="447.50"></text>
+        </g>
+        <g>
+            <title>arch_local_irq_save (1 samples, 0.35%)</title>
+            <rect x="33.5664%" y="421" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="96" fg:w="1"/>
+            <text x="33.8164%" y="431.50"></text>
+        </g>
+        <g>
+            <title>__phys_addr (1 samples, 0.35%)</title>
+            <rect x="33.9161%" y="437" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="97" fg:w="1"/>
+            <text x="34.1661%" y="447.50"></text>
+        </g>
+        <g>
+            <title>get_slab (2 samples, 0.70%)</title>
+            <rect x="34.2657%" y="437" width="0.6993%" height="15" fill="rgb(255,237,237)" fg:x="98" fg:w="2"/>
+            <text x="34.5157%" y="447.50"></text>
+        </g>
+        <g>
+            <title>__alloc_skb (7 samples, 2.45%)</title>
+            <rect x="32.8671%" y="453" width="2.4476%" height="15" fill="rgb(255,226,226)" fg:x="94" fg:w="7"/>
+            <text x="33.1171%" y="463.50">__..</text>
+        </g>
+        <g>
+            <title>kmem_cache_alloc_node (1 samples, 0.35%)</title>
+            <rect x="34.9650%" y="437" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="100" fg:w="1"/>
+            <text x="35.2150%" y="447.50"></text>
+        </g>
+        <g>
+            <title>sk_stream_alloc_skb (8 samples, 2.80%)</title>
+            <rect x="32.8671%" y="469" width="2.7972%" height="15" fill="rgb(255,224,224)" fg:x="94" fg:w="8"/>
+            <text x="33.1171%" y="479.50">sk..</text>
+        </g>
+        <g>
+            <title>ksize (1 samples, 0.35%)</title>
+            <rect x="35.3147%" y="453" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="101" fg:w="1"/>
+            <text x="35.5647%" y="463.50"></text>
+        </g>
+        <g>
+            <title>ipv4_mtu (1 samples, 0.35%)</title>
+            <rect x="35.6643%" y="437" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="102" fg:w="1"/>
+            <text x="35.9143%" y="447.50"></text>
+        </g>
+        <g>
+            <title>tcp_current_mss (2 samples, 0.70%)</title>
+            <rect x="35.6643%" y="453" width="0.6993%" height="15" fill="rgb(255,237,237)" fg:x="102" fg:w="2"/>
+            <text x="35.9143%" y="463.50"></text>
+        </g>
+        <g>
+            <title>tcp_established_options (1 samples, 0.35%)</title>
+            <rect x="36.0140%" y="437" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="103" fg:w="1"/>
+            <text x="36.2640%" y="447.50"></text>
+        </g>
+        <g>
+            <title>tcp_send_mss (3 samples, 1.05%)</title>
+            <rect x="35.6643%" y="469" width="1.0490%" height="15" fill="rgb(255,234,234)" fg:x="102" fg:w="3"/>
+            <text x="35.9143%" y="479.50"></text>
+        </g>
+        <g>
+            <title>tcp_xmit_size_goal (1 samples, 0.35%)</title>
+            <rect x="36.3636%" y="453" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="104" fg:w="1"/>
+            <text x="36.6136%" y="463.50"></text>
+        </g>
+        <g>
+            <title>do_sync_write (73 samples, 25.52%)</title>
+            <rect x="11.5385%" y="549" width="25.5245%" height="15" fill="rgb(255,174,174)" fg:x="33" fg:w="73"/>
+            <text x="11.7885%" y="559.50">do_sync_write</text>
+        </g>
+        <g>
+            <title>sock_aio_write (73 samples, 25.52%)</title>
+            <rect x="11.5385%" y="533" width="25.5245%" height="15" fill="rgb(255,174,174)" fg:x="33" fg:w="73"/>
+            <text x="11.7885%" y="543.50">sock_aio_write</text>
+        </g>
+        <g>
+            <title>do_sock_write.isra.10 (73 samples, 25.52%)</title>
+            <rect x="11.5385%" y="517" width="25.5245%" height="15" fill="rgb(255,174,174)" fg:x="33" fg:w="73"/>
+            <text x="11.7885%" y="527.50">do_sock_write.isra.10</text>
+        </g>
+        <g>
+            <title>inet_sendmsg (73 samples, 25.52%)</title>
+            <rect x="11.5385%" y="501" width="25.5245%" height="15" fill="rgb(255,174,174)" fg:x="33" fg:w="73"/>
+            <text x="11.7885%" y="511.50">inet_sendmsg</text>
+        </g>
+        <g>
+            <title>tcp_sendmsg (72 samples, 25.17%)</title>
+            <rect x="11.8881%" y="485" width="25.1748%" height="15" fill="rgb(255,174,174)" fg:x="34" fg:w="72"/>
+            <text x="12.1381%" y="495.50">tcp_sendmsg</text>
+        </g>
+        <g>
+            <title>tcp_xmit_size_goal (1 samples, 0.35%)</title>
+            <rect x="36.7133%" y="469" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="105" fg:w="1"/>
+            <text x="36.9633%" y="479.50"></text>
+        </g>
+        <g>
+            <title>fsnotify (2 samples, 0.70%)</title>
+            <rect x="37.0629%" y="549" width="0.6993%" height="15" fill="rgb(255,237,237)" fg:x="106" fg:w="2"/>
+            <text x="37.3129%" y="559.50"></text>
+        </g>
+        <g>
+            <title>__srcu_read_lock (1 samples, 0.35%)</title>
+            <rect x="37.4126%" y="533" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="107" fg:w="1"/>
+            <text x="37.6626%" y="543.50"></text>
+        </g>
+        <g>
+            <title>apparmor_file_permission (1 samples, 0.35%)</title>
+            <rect x="38.1119%" y="533" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="109" fg:w="1"/>
+            <text x="38.3619%" y="543.50"></text>
+        </g>
+        <g>
+            <title>rw_verify_area (3 samples, 1.05%)</title>
+            <rect x="37.7622%" y="549" width="1.0490%" height="15" fill="rgb(255,234,234)" fg:x="108" fg:w="3"/>
+            <text x="38.0122%" y="559.50"></text>
+        </g>
+        <g>
+            <title>security_file_permission (1 samples, 0.35%)</title>
+            <rect x="38.4615%" y="533" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="110" fg:w="1"/>
+            <text x="38.7115%" y="543.50"></text>
+        </g>
+        <g>
+            <title>apparmor_file_permission (1 samples, 0.35%)</title>
+            <rect x="38.4615%" y="517" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="110" fg:w="1"/>
+            <text x="38.7115%" y="527.50"></text>
+        </g>
+        <g>
+            <title>common_file_perm (1 samples, 0.35%)</title>
+            <rect x="38.4615%" y="501" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="110" fg:w="1"/>
+            <text x="38.7115%" y="511.50"></text>
+        </g>
+        <g>
+            <title>sun/nio/ch/FileDispatcherImpl:.write0 (88 samples, 30.77%)</title>
+            <rect x="8.3916%" y="629" width="30.7692%" height="15" fill="rgb(255,166,166)" fg:x="24" fg:w="88"/>
+            <text x="8.6416%" y="639.50">sun/nio/ch/FileDispatcherImpl:.write0</text>
+        </g>
+        <g>
+            <title>write (83 samples, 29.02%)</title>
+            <rect x="10.1399%" y="613" width="29.0210%" height="15" fill="rgb(255,169,169)" fg:x="29" fg:w="83"/>
+            <text x="10.3899%" y="623.50">write</text>
+        </g>
+        <g>
+            <title>system_call_fastpath (81 samples, 28.32%)</title>
+            <rect x="10.8392%" y="597" width="28.3217%" height="15" fill="rgb(255,170,170)" fg:x="31" fg:w="81"/>
+            <text x="11.0892%" y="607.50">system_call_fastpath</text>
+        </g>
+        <g>
+            <title>sys_write (81 samples, 28.32%)</title>
+            <rect x="10.8392%" y="581" width="28.3217%" height="15" fill="rgb(255,170,170)" fg:x="31" fg:w="81"/>
+            <text x="11.0892%" y="591.50">sys_write</text>
+        </g>
+        <g>
+            <title>vfs_write (80 samples, 27.97%)</title>
+            <rect x="11.1888%" y="565" width="27.9720%" height="15" fill="rgb(255,170,170)" fg:x="32" fg:w="80"/>
+            <text x="11.4388%" y="575.50">vfs_write</text>
+        </g>
+        <g>
+            <title>sock_aio_write (1 samples, 0.35%)</title>
+            <rect x="38.8112%" y="549" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="111" fg:w="1"/>
+            <text x="39.0612%" y="559.50"></text>
+        </g>
+        <g>
+            <title>sun/nio/ch/SocketChannelImpl:.write (89 samples, 31.12%)</title>
+            <rect x="8.3916%" y="645" width="31.1189%" height="15" fill="rgb(255,166,166)" fg:x="24" fg:w="89"/>
+            <text x="8.6416%" y="655.50">sun/nio/ch/SocketChannelImpl:.write</text>
+        </g>
+        <g>
+            <title>sun/nio/ch/SocketChannelImpl:.writerCleanup (1 samples, 0.35%)</title>
+            <rect x="39.1608%" y="629" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="112" fg:w="1"/>
+            <text x="39.4108%" y="639.50"></text>
+        </g>
+        <g>
+            <title>io/netty/buffer/PooledUnsafeDirectByteBuf:.readBytes (92 samples, 32.17%)</title>
+            <rect x="7.6923%" y="661" width="32.1678%" height="15" fill="rgb(255,164,164)" fg:x="22" fg:w="92"/>
+            <text x="7.9423%" y="671.50">io/netty/buffer/PooledUnsafeDirectByteBuf:.readBytes</text>
+        </g>
+        <g>
+            <title>sun/nio/ch/SocketChannelImpl:.writerCleanup (1 samples, 0.35%)</title>
+            <rect x="39.5105%" y="645" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="113" fg:w="1"/>
+            <text x="39.7605%" y="655.50"></text>
+        </g>
+        <g>
+            <title>io/netty/channel/AbstractChannelHandlerContext:.flush (96 samples, 33.57%)</title>
+            <rect x="6.6434%" y="789" width="33.5664%" height="15" fill="rgb(255,163,163)" fg:x="19" fg:w="96"/>
+            <text x="6.8934%" y="799.50">io/netty/channel/AbstractChannelHandlerContext:.flush</text>
+        </g>
+        <g>
+            <title>io/netty/channel/ChannelDuplexHandler:.flush (96 samples, 33.57%)</title>
+            <rect x="6.6434%" y="773" width="33.5664%" height="15" fill="rgb(255,163,163)" fg:x="19" fg:w="96"/>
+            <text x="6.8934%" y="783.50">io/netty/channel/ChannelDuplexHandler:.flush</text>
+        </g>
+        <g>
+            <title>io/netty/channel/AbstractChannelHandlerContext:.flush (96 samples, 33.57%)</title>
+            <rect x="6.6434%" y="757" width="33.5664%" height="15" fill="rgb(255,163,163)" fg:x="19" fg:w="96"/>
+            <text x="6.8934%" y="767.50">io/netty/channel/AbstractChannelHandlerContext:.flush</text>
+        </g>
+        <g>
+            <title>io/netty/channel/ChannelOutboundHandlerAdapter:.flush (96 samples, 33.57%)</title>
+            <rect x="6.6434%" y="741" width="33.5664%" height="15" fill="rgb(255,163,163)" fg:x="19" fg:w="96"/>
+            <text x="6.8934%" y="751.50">io/netty/channel/ChannelOutboundHandlerAdapter:.flush</text>
+        </g>
+        <g>
+            <title>io/netty/channel/AbstractChannelHandlerContext:.flush (96 samples, 33.57%)</title>
+            <rect x="6.6434%" y="725" width="33.5664%" height="15" fill="rgb(255,163,163)" fg:x="19" fg:w="96"/>
+            <text x="6.8934%" y="735.50">io/netty/channel/AbstractChannelHandlerContext:.flush</text>
+        </g>
+        <g>
+            <title>io/netty/channel/DefaultChannelPipeline$HeadContext:.flush (96 samples, 33.57%)</title>
+            <rect x="6.6434%" y="709" width="33.5664%" height="15" fill="rgb(255,163,163)" fg:x="19" fg:w="96"/>
+            <text x="6.8934%" y="719.50">io/netty/channel/DefaultChannelPipeline$HeadContext:.f..</text>
+        </g>
+        <g>
+            <title>io/netty/channel/AbstractChannel$AbstractUnsafe:.flush0 (96 samples, 33.57%)</title>
+            <rect x="6.6434%" y="693" width="33.5664%" height="15" fill="rgb(255,163,163)" fg:x="19" fg:w="96"/>
+            <text x="6.8934%" y="703.50">io/netty/channel/AbstractChannel$AbstractUnsafe:.flush0</text>
+        </g>
+        <g>
+            <title>io/netty/channel/nio/AbstractNioByteChannel:.doWrite (96 samples, 33.57%)</title>
+            <rect x="6.6434%" y="677" width="33.5664%" height="15" fill="rgb(255,163,163)" fg:x="19" fg:w="96"/>
+            <text x="6.8934%" y="687.50">io/netty/channel/nio/AbstractNioByteChannel:.doWrite</text>
+        </g>
+        <g>
+            <title>io/netty/util/Recycler:.recycle (1 samples, 0.35%)</title>
+            <rect x="39.8601%" y="661" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="114" fg:w="1"/>
+            <text x="40.1101%" y="671.50"></text>
+        </g>
+        <g>
+            <title>io/netty/channel/AbstractChannelHandlerContext:.fireChannelReadComplete (98 samples, 34.27%)</title>
+            <rect x="6.6434%" y="821" width="34.2657%" height="15" fill="rgb(255,162,162)" fg:x="19" fg:w="98"/>
+            <text x="6.8934%" y="831.50">io/netty/channel/AbstractChannelHandlerContext:.fireChan..</text>
+        </g>
+        <g>
+            <title>org/vertx/java/core/net/impl/VertxHandler:.channelReadComplete (98 samples, 34.27%)</title>
+            <rect x="6.6434%" y="805" width="34.2657%" height="15" fill="rgb(255,162,162)" fg:x="19" fg:w="98"/>
+            <text x="6.8934%" y="815.50">org/vertx/java/core/net/impl/VertxHandler:.channelReadCo..</text>
+        </g>
+        <g>
+            <title>io/netty/channel/ChannelDuplexHandler:.flush (2 samples, 0.70%)</title>
+            <rect x="40.2098%" y="789" width="0.6993%" height="15" fill="rgb(255,237,237)" fg:x="115" fg:w="2"/>
+            <text x="40.4598%" y="799.50"></text>
+        </g>
+        <g>
+            <title>io/netty/channel/AbstractChannelHandlerContext:.fireChannelReadComplete (99 samples, 34.62%)</title>
+            <rect x="6.6434%" y="853" width="34.6154%" height="15" fill="rgb(255,161,161)" fg:x="19" fg:w="99"/>
+            <text x="6.8934%" y="863.50">io/netty/channel/AbstractChannelHandlerContext:.fireChan..</text>
+        </g>
+        <g>
+            <title>io/netty/handler/codec/ByteToMessageDecoder:.channelReadComplete (99 samples, 34.62%)</title>
+            <rect x="6.6434%" y="837" width="34.6154%" height="15" fill="rgb(255,161,161)" fg:x="19" fg:w="99"/>
+            <text x="6.8934%" y="847.50">io/netty/handler/codec/ByteToMessageDecoder:.channelRead..</text>
+        </g>
+        <g>
+            <title>org/vertx/java/core/net/impl/VertxHandler:.channelReadComplete (1 samples, 0.35%)</title>
+            <rect x="40.9091%" y="821" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="117" fg:w="1"/>
+            <text x="41.1591%" y="831.50"></text>
+        </g>
+        <g>
+            <title>io/netty/buffer/AbstractReferenceCountedByteBuf:.release (1 samples, 0.35%)</title>
+            <rect x="41.6084%" y="821" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="119" fg:w="1"/>
+            <text x="41.8584%" y="831.50"></text>
+        </g>
+        <g>
+            <title>java/util/concurrent/ConcurrentHashMap:.get (1 samples, 0.35%)</title>
+            <rect x="42.3077%" y="789" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="121" fg:w="1"/>
+            <text x="42.5577%" y="799.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/Context:.getWrapFactory (2 samples, 0.70%)</title>
+            <rect x="42.6573%" y="789" width="0.6993%" height="15" fill="rgb(255,237,237)" fg:x="122" fg:w="2"/>
+            <text x="42.9073%" y="799.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptableObject:.getParentScope (1 samples, 0.35%)</title>
+            <rect x="44.4056%" y="773" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="127" fg:w="1"/>
+            <text x="44.6556%" y="783.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/WrapFactory:.wrapAsJavaObject (2 samples, 0.70%)</title>
+            <rect x="44.7552%" y="773" width="0.6993%" height="15" fill="rgb(255,237,237)" fg:x="128" fg:w="2"/>
+            <text x="45.0052%" y="783.50"></text>
+        </g>
+        <g>
+            <title>java/util/HashMap:.get (1 samples, 0.35%)</title>
+            <rect x="45.1049%" y="757" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="129" fg:w="1"/>
+            <text x="45.3549%" y="767.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/WrapFactory:.wrap (1 samples, 0.35%)</title>
+            <rect x="45.4545%" y="773" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="130" fg:w="1"/>
+            <text x="45.7045%" y="783.50"></text>
+        </g>
+        <g>
+            <title>java/util/HashMap:.get (1 samples, 0.35%)</title>
+            <rect x="45.4545%" y="757" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="130" fg:w="1"/>
+            <text x="45.7045%" y="767.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptableObject$RelinkedSlot:.getValue (1 samples, 0.35%)</title>
+            <rect x="47.2028%" y="725" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="135" fg:w="1"/>
+            <text x="47.4528%" y="735.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptRuntime:.getObjectProp (4 samples, 1.40%)</title>
+            <rect x="46.5035%" y="741" width="1.3986%" height="15" fill="rgb(255,232,232)" fg:x="133" fg:w="4"/>
+            <text x="46.7535%" y="751.50"></text>
+        </g>
+        <g>
+            <title>vtable chunks (1 samples, 0.35%)</title>
+            <rect x="47.5524%" y="725" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="136" fg:w="1"/>
+            <text x="47.8024%" y="735.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptRuntime:.nameOrFunction (1 samples, 0.35%)</title>
+            <rect x="47.9021%" y="741" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="137" fg:w="1"/>
+            <text x="48.1521%" y="751.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptableObject$Slot:.getValue (1 samples, 0.35%)</title>
+            <rect x="47.9021%" y="725" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="137" fg:w="1"/>
+            <text x="48.1521%" y="735.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptRuntime:.name (1 samples, 0.35%)</title>
+            <rect x="48.2517%" y="741" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="138" fg:w="1"/>
+            <text x="48.5017%" y="751.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/IdScriptableObject:.get (1 samples, 0.35%)</title>
+            <rect x="48.2517%" y="725" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="138" fg:w="1"/>
+            <text x="48.5017%" y="735.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptRuntime:.getPropFunctionAndThis (1 samples, 0.35%)</title>
+            <rect x="48.6014%" y="725" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="139" fg:w="1"/>
+            <text x="48.8514%" y="735.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/IdScriptableObject:.findInstanceIdInfo (1 samples, 0.35%)</title>
+            <rect x="48.9510%" y="709" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="140" fg:w="1"/>
+            <text x="49.2010%" y="719.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/IdScriptableObject:.has (3 samples, 1.05%)</title>
+            <rect x="49.3007%" y="709" width="1.0490%" height="15" fill="rgb(255,234,234)" fg:x="141" fg:w="3"/>
+            <text x="49.5507%" y="719.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptableObject:.getSlot (2 samples, 0.70%)</title>
+            <rect x="49.6503%" y="693" width="0.6993%" height="15" fill="rgb(255,237,237)" fg:x="142" fg:w="2"/>
+            <text x="49.9003%" y="703.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/IdScriptableObject:.put (1 samples, 0.35%)</title>
+            <rect x="50.3497%" y="709" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="144" fg:w="1"/>
+            <text x="50.5997%" y="719.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptableObject:.getSlot (1 samples, 0.35%)</title>
+            <rect x="50.3497%" y="693" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="144" fg:w="1"/>
+            <text x="50.5997%" y="703.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/IdScriptableObject:.setAttributes (1 samples, 0.35%)</title>
+            <rect x="50.6993%" y="709" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="145" fg:w="1"/>
+            <text x="50.9493%" y="719.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/MemberBox:.invoke (1 samples, 0.35%)</title>
+            <rect x="51.0490%" y="709" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="146" fg:w="1"/>
+            <text x="51.2990%" y="719.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/NativeJavaMethod:.call (2 samples, 0.70%)</title>
+            <rect x="51.3986%" y="709" width="0.6993%" height="15" fill="rgb(255,237,237)" fg:x="147" fg:w="2"/>
+            <text x="51.6486%" y="719.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/WrapFactory:.wrap (1 samples, 0.35%)</title>
+            <rect x="51.7483%" y="693" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="148" fg:w="1"/>
+            <text x="51.9983%" y="703.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/NativeJavaMethod:.findFunction (1 samples, 0.35%)</title>
+            <rect x="52.0979%" y="709" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="149" fg:w="1"/>
+            <text x="52.3479%" y="719.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/NativeJavaObject:.get (2 samples, 0.70%)</title>
+            <rect x="52.4476%" y="709" width="0.6993%" height="15" fill="rgb(255,237,237)" fg:x="150" fg:w="2"/>
+            <text x="52.6976%" y="719.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/IdScriptableObject:.get (1 samples, 0.35%)</title>
+            <rect x="53.1469%" y="693" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="152" fg:w="1"/>
+            <text x="53.3969%" y="703.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptableObject:.getSlot (1 samples, 0.35%)</title>
+            <rect x="53.1469%" y="677" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="152" fg:w="1"/>
+            <text x="53.3969%" y="687.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/IdScriptableObject:.put (2 samples, 0.70%)</title>
+            <rect x="53.4965%" y="693" width="0.6993%" height="15" fill="rgb(255,237,237)" fg:x="153" fg:w="2"/>
+            <text x="53.7465%" y="703.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptableObject:.getSlot (2 samples, 0.70%)</title>
+            <rect x="53.4965%" y="677" width="0.6993%" height="15" fill="rgb(255,237,237)" fg:x="153" fg:w="2"/>
+            <text x="53.7465%" y="687.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptableObject:.createSlot (2 samples, 0.70%)</title>
+            <rect x="53.4965%" y="661" width="0.6993%" height="15" fill="rgb(255,237,237)" fg:x="153" fg:w="2"/>
+            <text x="53.7465%" y="671.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/IdScriptableObject:.setAttributes (1 samples, 0.35%)</title>
+            <rect x="54.1958%" y="693" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="155" fg:w="1"/>
+            <text x="54.4458%" y="703.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptRuntime:.createFunctionActivation (5 samples, 1.75%)</title>
+            <rect x="53.1469%" y="709" width="1.7483%" height="15" fill="rgb(255,230,230)" fg:x="152" fg:w="5"/>
+            <text x="53.3969%" y="719.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/gen/file__home_bgregg_testtest_vert_x_2_1_4_sys_mods_io_vertx_lang_js_1_1_0 (1 samples, 0.35%)</title>
+            <rect x="54.5455%" y="693" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="156" fg:w="1"/>
+            <text x="54.7955%" y="703.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptRuntime:.getObjectProp (1 samples, 0.35%)</title>
+            <rect x="54.8951%" y="709" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="157" fg:w="1"/>
+            <text x="55.1451%" y="719.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptableObject$Slot:.getValue (1 samples, 0.35%)</title>
+            <rect x="54.8951%" y="693" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="157" fg:w="1"/>
+            <text x="55.1451%" y="703.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptRuntime:.getPropFunctionAndThis (1 samples, 0.35%)</title>
+            <rect x="55.2448%" y="709" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="158" fg:w="1"/>
+            <text x="55.4948%" y="719.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/NativeJavaObject:.get (1 samples, 0.35%)</title>
+            <rect x="55.2448%" y="693" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="158" fg:w="1"/>
+            <text x="55.4948%" y="703.50"></text>
+        </g>
+        <g>
+            <title>java/util/HashMap:.get (1 samples, 0.35%)</title>
+            <rect x="55.2448%" y="677" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="158" fg:w="1"/>
+            <text x="55.4948%" y="687.50"></text>
+        </g>
+        <g>
+            <title>jint_disjoint_arraycopy (1 samples, 0.35%)</title>
+            <rect x="55.9441%" y="661" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="160" fg:w="1"/>
+            <text x="56.1941%" y="671.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/IdScriptableObject:.get (2 samples, 0.70%)</title>
+            <rect x="56.2937%" y="661" width="0.6993%" height="15" fill="rgb(255,237,237)" fg:x="161" fg:w="2"/>
+            <text x="56.5437%" y="671.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/IdScriptableObject:.has (1 samples, 0.35%)</title>
+            <rect x="56.9930%" y="661" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="163" fg:w="1"/>
+            <text x="57.2430%" y="671.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/IdScriptableObject:.put (2 samples, 0.70%)</title>
+            <rect x="57.6923%" y="645" width="0.6993%" height="15" fill="rgb(255,237,237)" fg:x="165" fg:w="2"/>
+            <text x="57.9423%" y="655.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptableObject:.getSlot (2 samples, 0.70%)</title>
+            <rect x="57.6923%" y="629" width="0.6993%" height="15" fill="rgb(255,237,237)" fg:x="165" fg:w="2"/>
+            <text x="57.9423%" y="639.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptableObject:.createSlot (2 samples, 0.70%)</title>
+            <rect x="57.6923%" y="613" width="0.6993%" height="15" fill="rgb(255,237,237)" fg:x="165" fg:w="2"/>
+            <text x="57.9423%" y="623.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptRuntime:.createFunctionActivation (5 samples, 1.75%)</title>
+            <rect x="57.3427%" y="661" width="1.7483%" height="15" fill="rgb(255,230,230)" fg:x="164" fg:w="5"/>
+            <text x="57.5927%" y="671.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/IdScriptableObject:.setAttributes (2 samples, 0.70%)</title>
+            <rect x="58.3916%" y="645" width="0.6993%" height="15" fill="rgb(255,237,237)" fg:x="167" fg:w="2"/>
+            <text x="58.6416%" y="655.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptRuntime:.getObjectProp (1 samples, 0.35%)</title>
+            <rect x="59.0909%" y="661" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="169" fg:w="1"/>
+            <text x="59.3409%" y="671.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/IdScriptableObject:.get (1 samples, 0.35%)</title>
+            <rect x="59.0909%" y="645" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="169" fg:w="1"/>
+            <text x="59.3409%" y="655.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptableObject:.getSlot (1 samples, 0.35%)</title>
+            <rect x="59.0909%" y="629" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="169" fg:w="1"/>
+            <text x="59.3409%" y="639.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptRuntime:.nameOrFunction (1 samples, 0.35%)</title>
+            <rect x="59.4406%" y="661" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="170" fg:w="1"/>
+            <text x="59.6906%" y="671.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/IdScriptableObject:.get (1 samples, 0.35%)</title>
+            <rect x="59.4406%" y="645" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="170" fg:w="1"/>
+            <text x="59.6906%" y="655.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptableObject$RelinkedSlot:.getValue (1 samples, 0.35%)</title>
+            <rect x="59.4406%" y="629" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="170" fg:w="1"/>
+            <text x="59.6906%" y="639.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/IdScriptableObject:.findInstanceIdInfo (1 samples, 0.35%)</title>
+            <rect x="59.7902%" y="645" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="171" fg:w="1"/>
+            <text x="60.0402%" y="655.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/IdScriptableObject:.put (4 samples, 1.40%)</title>
+            <rect x="60.1399%" y="645" width="1.3986%" height="15" fill="rgb(255,232,232)" fg:x="172" fg:w="4"/>
+            <text x="60.3899%" y="655.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptableObject:.getSlot (3 samples, 1.05%)</title>
+            <rect x="60.4895%" y="629" width="1.0490%" height="15" fill="rgb(255,234,234)" fg:x="173" fg:w="3"/>
+            <text x="60.7395%" y="639.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptableObject:.createSlot (3 samples, 1.05%)</title>
+            <rect x="60.4895%" y="613" width="1.0490%" height="15" fill="rgb(255,234,234)" fg:x="173" fg:w="3"/>
+            <text x="60.7395%" y="623.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptableObject:.getSlot (1 samples, 0.35%)</title>
+            <rect x="61.5385%" y="645" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="176" fg:w="1"/>
+            <text x="61.7885%" y="655.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptRuntime:.setObjectProp (7 samples, 2.45%)</title>
+            <rect x="59.7902%" y="661" width="2.4476%" height="15" fill="rgb(255,226,226)" fg:x="171" fg:w="7"/>
+            <text x="60.0402%" y="671.50">or..</text>
+        </g>
+        <g>
+            <title>vtable chunks (1 samples, 0.35%)</title>
+            <rect x="61.8881%" y="645" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="177" fg:w="1"/>
+            <text x="62.1381%" y="655.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/NativeFunction:.initScriptFunction (1 samples, 0.35%)</title>
+            <rect x="62.2378%" y="645" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="178" fg:w="1"/>
+            <text x="62.4878%" y="655.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptRuntime:.createFunctionActivation (1 samples, 0.35%)</title>
+            <rect x="62.5874%" y="645" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="179" fg:w="1"/>
+            <text x="62.8374%" y="655.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptRuntime:.createFunctionActivation (2 samples, 0.70%)</title>
+            <rect x="62.9371%" y="629" width="0.6993%" height="15" fill="rgb(255,237,237)" fg:x="180" fg:w="2"/>
+            <text x="63.1871%" y="639.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/IdScriptableObject:.get (1 samples, 0.35%)</title>
+            <rect x="63.2867%" y="613" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="181" fg:w="1"/>
+            <text x="63.5367%" y="623.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/IdScriptableObject:.has (1 samples, 0.35%)</title>
+            <rect x="63.6364%" y="613" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="182" fg:w="1"/>
+            <text x="63.8864%" y="623.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptRuntime:.setObjectProp (8 samples, 2.80%)</title>
+            <rect x="63.6364%" y="629" width="2.7972%" height="15" fill="rgb(255,224,224)" fg:x="182" fg:w="8"/>
+            <text x="63.8864%" y="639.50">or..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/IdScriptableObject:.put (7 samples, 2.45%)</title>
+            <rect x="63.9860%" y="613" width="2.4476%" height="15" fill="rgb(255,226,226)" fg:x="183" fg:w="7"/>
+            <text x="64.2360%" y="623.50">or..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptableObject:.getSlot (6 samples, 2.10%)</title>
+            <rect x="64.3357%" y="597" width="2.0979%" height="15" fill="rgb(255,228,228)" fg:x="184" fg:w="6"/>
+            <text x="64.5857%" y="607.50">o..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptableObject:.createSlot (6 samples, 2.10%)</title>
+            <rect x="64.3357%" y="581" width="2.0979%" height="15" fill="rgb(255,228,228)" fg:x="184" fg:w="6"/>
+            <text x="64.5857%" y="591.50">o..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptRuntime:.newObject (32 samples, 11.19%)</title>
+            <rect x="55.5944%" y="709" width="11.1888%" height="15" fill="rgb(255,199,199)" fg:x="159" fg:w="32"/>
+            <text x="55.8444%" y="719.50">org/mozilla/java..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/gen/file__home_bgregg_testtest_vert_x_2_1_4_sys_mods_io_vertx_lang_js_1_1_0 (32 samples, 11.19%)</title>
+            <rect x="55.5944%" y="693" width="11.1888%" height="15" fill="rgb(255,199,199)" fg:x="159" fg:w="32"/>
+            <text x="55.8444%" y="703.50">org/mozilla/java..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/gen/file__home_bgregg_testtest_vert_x_2_1_4_sys_mods_io_vertx_lang_js_1_1_0 (32 samples, 11.19%)</title>
+            <rect x="55.5944%" y="677" width="11.1888%" height="15" fill="rgb(255,199,199)" fg:x="159" fg:w="32"/>
+            <text x="55.8444%" y="687.50">org/mozilla/java..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/optimizer/OptRuntime:.call2 (13 samples, 4.55%)</title>
+            <rect x="62.2378%" y="661" width="4.5455%" height="15" fill="rgb(255,218,218)" fg:x="178" fg:w="13"/>
+            <text x="62.4878%" y="671.50">org/m..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/gen/file__home_bgregg_testtest_vert_x_2_1_4_sys_mods_io_vertx_lang_js_1_1_0 (11 samples, 3.85%)</title>
+            <rect x="62.9371%" y="645" width="3.8462%" height="15" fill="rgb(255,220,220)" fg:x="180" fg:w="11"/>
+            <text x="63.1871%" y="655.50">org/..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptableObject:.getParentScope (1 samples, 0.35%)</title>
+            <rect x="66.4336%" y="629" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="190" fg:w="1"/>
+            <text x="66.6836%" y="639.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/IdScriptableObject:.has (9 samples, 3.15%)</title>
+            <rect x="66.7832%" y="693" width="3.1469%" height="15" fill="rgb(255,223,223)" fg:x="191" fg:w="9"/>
+            <text x="67.0332%" y="703.50">org..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptableObject:.getSlot (5 samples, 1.75%)</title>
+            <rect x="68.1818%" y="677" width="1.7483%" height="15" fill="rgb(255,230,230)" fg:x="195" fg:w="5"/>
+            <text x="68.4318%" y="687.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptRuntime:.setObjectProp (17 samples, 5.94%)</title>
+            <rect x="66.7832%" y="709" width="5.9441%" height="15" fill="rgb(255,213,213)" fg:x="191" fg:w="17"/>
+            <text x="67.0332%" y="719.50">org/mozi..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/IdScriptableObject:.put (8 samples, 2.80%)</title>
+            <rect x="69.9301%" y="693" width="2.7972%" height="15" fill="rgb(255,224,224)" fg:x="200" fg:w="8"/>
+            <text x="70.1801%" y="703.50">or..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptableObject:.getSlot (7 samples, 2.45%)</title>
+            <rect x="70.2797%" y="677" width="2.4476%" height="15" fill="rgb(255,226,226)" fg:x="201" fg:w="7"/>
+            <text x="70.5297%" y="687.50">or..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptableObject:.createSlot (6 samples, 2.10%)</title>
+            <rect x="70.6294%" y="661" width="2.0979%" height="15" fill="rgb(255,228,228)" fg:x="202" fg:w="6"/>
+            <text x="70.8794%" y="671.50">o..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptableObject:.getPrototype (1 samples, 0.35%)</title>
+            <rect x="72.7273%" y="709" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="208" fg:w="1"/>
+            <text x="72.9773%" y="719.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptableObject:.getParentScope (1 samples, 0.35%)</title>
+            <rect x="73.0769%" y="677" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="209" fg:w="1"/>
+            <text x="73.3269%" y="687.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/gen/file__home_bgregg_testtest_vert_x_2_1_4_sys_mods_io_vertx_lang_js_1_1_0 (3 samples, 1.05%)</title>
+            <rect x="73.0769%" y="709" width="1.0490%" height="15" fill="rgb(255,234,234)" fg:x="209" fg:w="3"/>
+            <text x="73.3269%" y="719.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/gen/file__home_bgregg_testtest_vert_x_2_1_4_sys_mods_io_vertx_lang_js_1_1_0 (3 samples, 1.05%)</title>
+            <rect x="73.0769%" y="693" width="1.0490%" height="15" fill="rgb(255,234,234)" fg:x="209" fg:w="3"/>
+            <text x="73.3269%" y="703.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/TopLevel:.getBuiltinPrototype (2 samples, 0.70%)</title>
+            <rect x="73.4266%" y="677" width="0.6993%" height="15" fill="rgb(255,237,237)" fg:x="210" fg:w="2"/>
+            <text x="73.6766%" y="687.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptRuntime:.name (1 samples, 0.35%)</title>
+            <rect x="74.4755%" y="693" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="213" fg:w="1"/>
+            <text x="74.7255%" y="703.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptRuntime:.nameOrFunction (1 samples, 0.35%)</title>
+            <rect x="74.4755%" y="677" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="213" fg:w="1"/>
+            <text x="74.7255%" y="687.50"></text>
+        </g>
+        <g>
+            <title>vtable chunks (1 samples, 0.35%)</title>
+            <rect x="74.4755%" y="661" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="213" fg:w="1"/>
+            <text x="74.7255%" y="671.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptRuntime:.setObjectProp (1 samples, 0.35%)</title>
+            <rect x="74.8252%" y="693" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="214" fg:w="1"/>
+            <text x="75.0752%" y="703.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/IdScriptableObject:.has (1 samples, 0.35%)</title>
+            <rect x="74.8252%" y="677" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="214" fg:w="1"/>
+            <text x="75.0752%" y="687.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptableObject:.getSlot (1 samples, 0.35%)</title>
+            <rect x="74.8252%" y="661" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="214" fg:w="1"/>
+            <text x="75.0752%" y="671.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/IdScriptableObject:.setAttributes (2 samples, 0.70%)</title>
+            <rect x="75.5245%" y="661" width="0.6993%" height="15" fill="rgb(255,237,237)" fg:x="216" fg:w="2"/>
+            <text x="75.7745%" y="671.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptRuntime:.createFunctionActivation (5 samples, 1.75%)</title>
+            <rect x="75.1748%" y="677" width="1.7483%" height="15" fill="rgb(255,230,230)" fg:x="215" fg:w="5"/>
+            <text x="75.4248%" y="687.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/TopLevel:.getBuiltinPrototype (2 samples, 0.70%)</title>
+            <rect x="76.2238%" y="661" width="0.6993%" height="15" fill="rgb(255,237,237)" fg:x="218" fg:w="2"/>
+            <text x="76.4738%" y="671.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/gen/file__home_bgregg_testtest_vert_x_2_1_4_sys_mods_io_vertx_lang_js_1_1_0 (82 samples, 28.67%)</title>
+            <rect x="48.6014%" y="741" width="28.6713%" height="15" fill="rgb(255,169,169)" fg:x="139" fg:w="82"/>
+            <text x="48.8514%" y="751.50">org/mozilla/javascript/gen/file__home_bgregg_t..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/gen/file__home_bgregg_testtest_vert_x_2_1_4_sys_mods_io_vertx_lang_js_1_1_0 (81 samples, 28.32%)</title>
+            <rect x="48.9510%" y="725" width="28.3217%" height="15" fill="rgb(255,170,170)" fg:x="140" fg:w="81"/>
+            <text x="49.2010%" y="735.50">org/mozilla/javascript/gen/file__home_bgregg_t..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/optimizer/OptRuntime:.call2 (9 samples, 3.15%)</title>
+            <rect x="74.1259%" y="709" width="3.1469%" height="15" fill="rgb(255,223,223)" fg:x="212" fg:w="9"/>
+            <text x="74.3759%" y="719.50">org..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/gen/file__home_bgregg_testtest_vert_x_2_1_4_sys_mods_io_vertx_lang_js_1_1_0 (6 samples, 2.10%)</title>
+            <rect x="75.1748%" y="693" width="2.0979%" height="15" fill="rgb(255,228,228)" fg:x="215" fg:w="6"/>
+            <text x="75.4248%" y="703.50">o..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptRuntime:.setObjectProp (1 samples, 0.35%)</title>
+            <rect x="76.9231%" y="677" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="220" fg:w="1"/>
+            <text x="77.1731%" y="687.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/IdScriptableObject:.put (1 samples, 0.35%)</title>
+            <rect x="76.9231%" y="661" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="220" fg:w="1"/>
+            <text x="77.1731%" y="671.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptableObject:.getSlot (1 samples, 0.35%)</title>
+            <rect x="76.9231%" y="645" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="220" fg:w="1"/>
+            <text x="77.1731%" y="655.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptableObject:.createSlot (1 samples, 0.35%)</title>
+            <rect x="76.9231%" y="629" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="220" fg:w="1"/>
+            <text x="77.1731%" y="639.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptRuntime:.indexFromString (1 samples, 0.35%)</title>
+            <rect x="77.2727%" y="725" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="221" fg:w="1"/>
+            <text x="77.5227%" y="735.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptRuntime:.setObjectElem (2 samples, 0.70%)</title>
+            <rect x="77.6224%" y="725" width="0.6993%" height="15" fill="rgb(255,237,237)" fg:x="222" fg:w="2"/>
+            <text x="77.8724%" y="735.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptRuntime:.indexFromString (2 samples, 0.70%)</title>
+            <rect x="77.6224%" y="709" width="0.6993%" height="15" fill="rgb(255,237,237)" fg:x="222" fg:w="2"/>
+            <text x="77.8724%" y="719.50"></text>
+        </g>
+        <g>
+            <title>io/netty/handler/codec/http/DefaultHttpHeaders:.set (1 samples, 0.35%)</title>
+            <rect x="79.3706%" y="677" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="227" fg:w="1"/>
+            <text x="79.6206%" y="687.50"></text>
+        </g>
+        <g>
+            <title>io/netty/buffer/AbstractByteBuf:.writeBytes (1 samples, 0.35%)</title>
+            <rect x="81.8182%" y="581" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="234" fg:w="1"/>
+            <text x="82.0682%" y="591.50"></text>
+        </g>
+        <g>
+            <title>io/netty/buffer/AbstractByteBuf:.writeBytes (1 samples, 0.35%)</title>
+            <rect x="82.1678%" y="565" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="235" fg:w="1"/>
+            <text x="82.4178%" y="575.50"></text>
+        </g>
+        <g>
+            <title>io/netty/buffer/AbstractByteBufAllocator:.directBuffer (3 samples, 1.05%)</title>
+            <rect x="82.5175%" y="565" width="1.0490%" height="15" fill="rgb(255,234,234)" fg:x="236" fg:w="3"/>
+            <text x="82.7675%" y="575.50"></text>
+        </g>
+        <g>
+            <title>io/netty/util/concurrent/FastThreadLocal:.get (1 samples, 0.35%)</title>
+            <rect x="83.2168%" y="549" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="238" fg:w="1"/>
+            <text x="83.4668%" y="559.50"></text>
+        </g>
+        <g>
+            <title>io/netty/handler/codec/http/HttpObjectEncoder:.encode (5 samples, 1.75%)</title>
+            <rect x="82.1678%" y="581" width="1.7483%" height="15" fill="rgb(255,230,230)" fg:x="235" fg:w="5"/>
+            <text x="82.4178%" y="591.50"></text>
+        </g>
+        <g>
+            <title>java/util/ArrayList:.add (1 samples, 0.35%)</title>
+            <rect x="83.5664%" y="565" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="239" fg:w="1"/>
+            <text x="83.8164%" y="575.50"></text>
+        </g>
+        <g>
+            <title>io/netty/util/internal/RecyclableArrayList:.newInstance (1 samples, 0.35%)</title>
+            <rect x="83.9161%" y="581" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="240" fg:w="1"/>
+            <text x="84.1661%" y="591.50"></text>
+        </g>
+        <g>
+            <title>io/netty/util/concurrent/FastThreadLocal:.get (1 samples, 0.35%)</title>
+            <rect x="83.9161%" y="565" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="240" fg:w="1"/>
+            <text x="84.1661%" y="575.50"></text>
+        </g>
+        <g>
+            <title>java/util/ArrayList:.ensureExplicitCapacity (1 samples, 0.35%)</title>
+            <rect x="84.2657%" y="581" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="241" fg:w="1"/>
+            <text x="84.5157%" y="591.50"></text>
+        </g>
+        <g>
+            <title>io/netty/channel/AbstractChannelHandlerContext:.write (12 samples, 4.20%)</title>
+            <rect x="80.7692%" y="645" width="4.1958%" height="15" fill="rgb(255,219,219)" fg:x="231" fg:w="12"/>
+            <text x="81.0192%" y="655.50">io/ne..</text>
+        </g>
+        <g>
+            <title>org/vertx/java/core/http/impl/VertxHttpHandler:.write (11 samples, 3.85%)</title>
+            <rect x="81.1189%" y="629" width="3.8462%" height="15" fill="rgb(255,220,220)" fg:x="232" fg:w="11"/>
+            <text x="81.3689%" y="639.50">org/..</text>
+        </g>
+        <g>
+            <title>io/netty/channel/AbstractChannelHandlerContext:.write (10 samples, 3.50%)</title>
+            <rect x="81.4685%" y="613" width="3.4965%" height="15" fill="rgb(255,222,222)" fg:x="233" fg:w="10"/>
+            <text x="81.7185%" y="623.50">io/..</text>
+        </g>
+        <g>
+            <title>io/netty/handler/codec/MessageToMessageEncoder:.write (10 samples, 3.50%)</title>
+            <rect x="81.4685%" y="597" width="3.4965%" height="15" fill="rgb(255,222,222)" fg:x="233" fg:w="10"/>
+            <text x="81.7185%" y="607.50">io/..</text>
+        </g>
+        <g>
+            <title>vtable chunks (1 samples, 0.35%)</title>
+            <rect x="84.6154%" y="581" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="242" fg:w="1"/>
+            <text x="84.8654%" y="591.50"></text>
+        </g>
+        <g>
+            <title>io/netty/channel/AbstractChannelHandlerContext:.write (13 samples, 4.55%)</title>
+            <rect x="80.7692%" y="661" width="4.5455%" height="15" fill="rgb(255,218,218)" fg:x="231" fg:w="13"/>
+            <text x="81.0192%" y="671.50">io/ne..</text>
+        </g>
+        <g>
+            <title>org/vertx/java/core/http/impl/VertxHttpHandler:.write (1 samples, 0.35%)</title>
+            <rect x="84.9650%" y="645" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="243" fg:w="1"/>
+            <text x="85.2150%" y="655.50"></text>
+        </g>
+        <g>
+            <title>io/netty/handler/codec/http/DefaultHttpHeaders:.add0 (1 samples, 0.35%)</title>
+            <rect x="85.3147%" y="661" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="244" fg:w="1"/>
+            <text x="85.5647%" y="671.50"></text>
+        </g>
+        <g>
+            <title>io/netty/handler/codec/http/DefaultHttpHeaders:.set (1 samples, 0.35%)</title>
+            <rect x="85.6643%" y="661" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="245" fg:w="1"/>
+            <text x="85.9143%" y="671.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/NativeJavaMethod:.call (21 samples, 7.34%)</title>
+            <rect x="79.0210%" y="709" width="7.3427%" height="15" fill="rgb(255,209,209)" fg:x="226" fg:w="21"/>
+            <text x="79.2710%" y="719.50">org/mozill..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/MemberBox:.invoke (21 samples, 7.34%)</title>
+            <rect x="79.0210%" y="693" width="7.3427%" height="15" fill="rgb(255,209,209)" fg:x="226" fg:w="21"/>
+            <text x="79.2710%" y="703.50">org/mozill..</text>
+        </g>
+        <g>
+            <title>sun/reflect/DelegatingMethodAccessorImpl:.invoke (19 samples, 6.64%)</title>
+            <rect x="79.7203%" y="677" width="6.6434%" height="15" fill="rgb(255,211,211)" fg:x="228" fg:w="19"/>
+            <text x="79.9703%" y="687.50">sun/refle..</text>
+        </g>
+        <g>
+            <title>sun/nio/cs/UTF_8$Encoder:.&lt;init&gt; (1 samples, 0.35%)</title>
+            <rect x="86.0140%" y="661" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="246" fg:w="1"/>
+            <text x="86.2640%" y="671.50"></text>
+        </g>
+        <g>
+            <title>jbyte_disjoint_arraycopy (1 samples, 0.35%)</title>
+            <rect x="86.0140%" y="645" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="246" fg:w="1"/>
+            <text x="86.2640%" y="655.50"></text>
+        </g>
+        <g>
+            <title>io/netty/channel/AbstractChannelHandlerContext:.fireChannelRead (128 samples, 44.76%)</title>
+            <rect x="41.9580%" y="821" width="44.7552%" height="15" fill="rgb(255,149,149)" fg:x="120" fg:w="128"/>
+            <text x="42.2080%" y="831.50">io/netty/channel/AbstractChannelHandlerContext:.fireChannelRead</text>
+        </g>
+        <g>
+            <title>org/vertx/java/core/net/impl/VertxHandler:.channelRead (128 samples, 44.76%)</title>
+            <rect x="41.9580%" y="805" width="44.7552%" height="15" fill="rgb(255,149,149)" fg:x="120" fg:w="128"/>
+            <text x="42.2080%" y="815.50">org/vertx/java/core/net/impl/VertxHandler:.channelRead</text>
+        </g>
+        <g>
+            <title>org/vertx/java/core/http/impl/DefaultHttpServer$ServerHandler:.doMessageReceived (124 samples, 43.36%)</title>
+            <rect x="43.3566%" y="789" width="43.3566%" height="15" fill="rgb(255,151,151)" fg:x="124" fg:w="124"/>
+            <text x="43.6066%" y="799.50">org/vertx/java/core/http/impl/DefaultHttpServer$ServerHandler:.doMessag..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/gen/file__home_bgregg_testtest_vert_x_2_1_4_sys_mods_io_vertx_lang_js_1_1_0 (117 samples, 40.91%)</title>
+            <rect x="45.8042%" y="773" width="40.9091%" height="15" fill="rgb(255,154,154)" fg:x="131" fg:w="117"/>
+            <text x="46.0542%" y="783.50">org/mozilla/javascript/gen/file__home_bgregg_testtest_vert_x_2_1_4_..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/gen/file__home_bgregg_testtest_vert_x_2_1_4_sys_mods_io_vertx_lang_js_1_1_0 (116 samples, 40.56%)</title>
+            <rect x="46.1538%" y="757" width="40.5594%" height="15" fill="rgb(255,154,154)" fg:x="132" fg:w="116"/>
+            <text x="46.4038%" y="767.50">org/mozilla/javascript/gen/file__home_bgregg_testtest_vert_x_2_1_4..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/gen/file__home_bgregg_testtest_vhello_js_1:.call (27 samples, 9.44%)</title>
+            <rect x="77.2727%" y="741" width="9.4406%" height="15" fill="rgb(255,203,203)" fg:x="221" fg:w="27"/>
+            <text x="77.5227%" y="751.50">org/mozilla/ja..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/gen/file__home_bgregg_testtest_vert_x_2_1_4_sys_mods_io_vertx_lang_js_1_1_0 (24 samples, 8.39%)</title>
+            <rect x="78.3217%" y="725" width="8.3916%" height="15" fill="rgb(255,206,206)" fg:x="224" fg:w="24"/>
+            <text x="78.5717%" y="735.50">org/mozilla/..</text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptRuntime:.name (1 samples, 0.35%)</title>
+            <rect x="86.3636%" y="709" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="247" fg:w="1"/>
+            <text x="86.6136%" y="719.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptRuntime:.nameOrFunction (1 samples, 0.35%)</title>
+            <rect x="86.3636%" y="693" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="247" fg:w="1"/>
+            <text x="86.6136%" y="703.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/IdScriptableObject:.get (1 samples, 0.35%)</title>
+            <rect x="86.3636%" y="677" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="247" fg:w="1"/>
+            <text x="86.6136%" y="687.50"></text>
+        </g>
+        <g>
+            <title>org/mozilla/javascript/ScriptableObject$RelinkedSlot:.getValue (1 samples, 0.35%)</title>
+            <rect x="86.3636%" y="661" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="247" fg:w="1"/>
+            <text x="86.6136%" y="671.50"></text>
+        </g>
+        <g>
+            <title>io/netty/buffer/AbstractByteBuf:.forEachByteAsc0 (1 samples, 0.35%)</title>
+            <rect x="86.7133%" y="805" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="248" fg:w="1"/>
+            <text x="86.9633%" y="815.50"></text>
+        </g>
+        <g>
+            <title>io/netty/util/internal/AppendableCharSequence:.append (1 samples, 0.35%)</title>
+            <rect x="86.7133%" y="789" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="248" fg:w="1"/>
+            <text x="86.9633%" y="799.50"></text>
+        </g>
+        <g>
+            <title>io/netty/handler/codec/http/HttpHeaders:.isTransferEncodingChunked (1 samples, 0.35%)</title>
+            <rect x="87.0629%" y="805" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="249" fg:w="1"/>
+            <text x="87.3129%" y="815.50"></text>
+        </g>
+        <g>
+            <title>io/netty/handler/codec/http/HttpObjectDecoder:.findWhitespace (1 samples, 0.35%)</title>
+            <rect x="87.4126%" y="805" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="250" fg:w="1"/>
+            <text x="87.6626%" y="815.50"></text>
+        </g>
+        <g>
+            <title>io/netty/buffer/AbstractByteBuf:.forEachByteAsc0 (2 samples, 0.70%)</title>
+            <rect x="88.1119%" y="789" width="0.6993%" height="15" fill="rgb(255,237,237)" fg:x="252" fg:w="2"/>
+            <text x="88.3619%" y="799.50"></text>
+        </g>
+        <g>
+            <title>io/netty/handler/codec/http/HttpHeaders:.hash (1 samples, 0.35%)</title>
+            <rect x="88.8112%" y="789" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="254" fg:w="1"/>
+            <text x="89.0612%" y="799.50"></text>
+        </g>
+        <g>
+            <title>io/netty/handler/codec/http/HttpObjectDecoder:.splitHeader (5 samples, 1.75%)</title>
+            <rect x="89.1608%" y="789" width="1.7483%" height="15" fill="rgb(255,230,230)" fg:x="255" fg:w="5"/>
+            <text x="89.4108%" y="799.50"></text>
+        </g>
+        <g>
+            <title>io/netty/channel/AbstractChannelHandlerContext:.fireChannelRead (143 samples, 50.00%)</title>
+            <rect x="41.2587%" y="853" width="50.0000%" height="15" fill="rgb(255,143,143)" fg:x="118" fg:w="143"/>
+            <text x="41.5087%" y="863.50">io/netty/channel/AbstractChannelHandlerContext:.fireChannelRead</text>
+        </g>
+        <g>
+            <title>io/netty/handler/codec/ByteToMessageDecoder:.channelRead (143 samples, 50.00%)</title>
+            <rect x="41.2587%" y="837" width="50.0000%" height="15" fill="rgb(255,143,143)" fg:x="118" fg:w="143"/>
+            <text x="41.5087%" y="847.50">io/netty/handler/codec/ByteToMessageDecoder:.channelRead</text>
+        </g>
+        <g>
+            <title>io/netty/handler/codec/http/HttpObjectDecoder:.decode (13 samples, 4.55%)</title>
+            <rect x="86.7133%" y="821" width="4.5455%" height="15" fill="rgb(255,218,218)" fg:x="248" fg:w="13"/>
+            <text x="86.9633%" y="831.50">io/ne..</text>
+        </g>
+        <g>
+            <title>io/netty/handler/codec/http/HttpObjectDecoder:.readHeaders (10 samples, 3.50%)</title>
+            <rect x="87.7622%" y="805" width="3.4965%" height="15" fill="rgb(255,222,222)" fg:x="251" fg:w="10"/>
+            <text x="88.0122%" y="815.50">io/..</text>
+        </g>
+        <g>
+            <title>java/util/Arrays:.fill (1 samples, 0.35%)</title>
+            <rect x="90.9091%" y="789" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="260" fg:w="1"/>
+            <text x="91.1591%" y="799.50"></text>
+        </g>
+        <g>
+            <title>java/nio/channels/spi/AbstractInterruptibleChannel:.end (1 samples, 0.35%)</title>
+            <rect x="91.2587%" y="821" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="261" fg:w="1"/>
+            <text x="91.5087%" y="831.50"></text>
+        </g>
+        <g>
+            <title>sys_read (1 samples, 0.35%)</title>
+            <rect x="92.3077%" y="789" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="264" fg:w="1"/>
+            <text x="92.5577%" y="799.50"></text>
+        </g>
+        <g>
+            <title>do_sync_read (1 samples, 0.35%)</title>
+            <rect x="93.0070%" y="757" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="266" fg:w="1"/>
+            <text x="93.2570%" y="767.50"></text>
+        </g>
+        <g>
+            <title>__kfree_skb (1 samples, 0.35%)</title>
+            <rect x="93.3566%" y="661" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="267" fg:w="1"/>
+            <text x="93.6066%" y="671.50"></text>
+        </g>
+        <g>
+            <title>tcp_rcv_space_adjust (1 samples, 0.35%)</title>
+            <rect x="93.7063%" y="661" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="268" fg:w="1"/>
+            <text x="93.9563%" y="671.50"></text>
+        </g>
+        <g>
+            <title>skb_release_data (1 samples, 0.35%)</title>
+            <rect x="94.0559%" y="629" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="269" fg:w="1"/>
+            <text x="94.3059%" y="639.50"></text>
+        </g>
+        <g>
+            <title>__kfree_skb (2 samples, 0.70%)</title>
+            <rect x="94.0559%" y="645" width="0.6993%" height="15" fill="rgb(255,237,237)" fg:x="269" fg:w="2"/>
+            <text x="94.3059%" y="655.50"></text>
+        </g>
+        <g>
+            <title>skb_release_head_state (1 samples, 0.35%)</title>
+            <rect x="94.4056%" y="629" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="270" fg:w="1"/>
+            <text x="94.6556%" y="639.50"></text>
+        </g>
+        <g>
+            <title>dst_release (1 samples, 0.35%)</title>
+            <rect x="94.4056%" y="613" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="270" fg:w="1"/>
+            <text x="94.6556%" y="623.50"></text>
+        </g>
+        <g>
+            <title>_raw_spin_lock_bh (1 samples, 0.35%)</title>
+            <rect x="94.7552%" y="645" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="271" fg:w="1"/>
+            <text x="95.0052%" y="655.50"></text>
+        </g>
+        <g>
+            <title>skb_copy_datagram_iovec (2 samples, 0.70%)</title>
+            <rect x="95.1049%" y="645" width="0.6993%" height="15" fill="rgb(255,237,237)" fg:x="272" fg:w="2"/>
+            <text x="95.3549%" y="655.50"></text>
+        </g>
+        <g>
+            <title>copy_user_enhanced_fast_string (1 samples, 0.35%)</title>
+            <rect x="95.4545%" y="629" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="273" fg:w="1"/>
+            <text x="95.7045%" y="639.50"></text>
+        </g>
+        <g>
+            <title>do_sync_read (9 samples, 3.15%)</title>
+            <rect x="93.3566%" y="741" width="3.1469%" height="15" fill="rgb(255,223,223)" fg:x="267" fg:w="9"/>
+            <text x="93.6066%" y="751.50">do_..</text>
+        </g>
+        <g>
+            <title>sock_aio_read (9 samples, 3.15%)</title>
+            <rect x="93.3566%" y="725" width="3.1469%" height="15" fill="rgb(255,223,223)" fg:x="267" fg:w="9"/>
+            <text x="93.6066%" y="735.50">soc..</text>
+        </g>
+        <g>
+            <title>sock_aio_read.part.13 (9 samples, 3.15%)</title>
+            <rect x="93.3566%" y="709" width="3.1469%" height="15" fill="rgb(255,223,223)" fg:x="267" fg:w="9"/>
+            <text x="93.6066%" y="719.50">soc..</text>
+        </g>
+        <g>
+            <title>do_sock_read.isra.12 (9 samples, 3.15%)</title>
+            <rect x="93.3566%" y="693" width="3.1469%" height="15" fill="rgb(255,223,223)" fg:x="267" fg:w="9"/>
+            <text x="93.6066%" y="703.50">do_..</text>
+        </g>
+        <g>
+            <title>inet_recvmsg (9 samples, 3.15%)</title>
+            <rect x="93.3566%" y="677" width="3.1469%" height="15" fill="rgb(255,223,223)" fg:x="267" fg:w="9"/>
+            <text x="93.6066%" y="687.50">ine..</text>
+        </g>
+        <g>
+            <title>tcp_recvmsg (7 samples, 2.45%)</title>
+            <rect x="94.0559%" y="661" width="2.4476%" height="15" fill="rgb(255,226,226)" fg:x="269" fg:w="7"/>
+            <text x="94.3059%" y="671.50">tc..</text>
+        </g>
+        <g>
+            <title>tcp_cleanup_rbuf (2 samples, 0.70%)</title>
+            <rect x="95.8042%" y="645" width="0.6993%" height="15" fill="rgb(255,237,237)" fg:x="274" fg:w="2"/>
+            <text x="96.0542%" y="655.50"></text>
+        </g>
+        <g>
+            <title>__tcp_select_window (1 samples, 0.35%)</title>
+            <rect x="96.1538%" y="629" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="275" fg:w="1"/>
+            <text x="96.4038%" y="639.50"></text>
+        </g>
+        <g>
+            <title>io/netty/channel/socket/nio/NioSocketChannel:.doReadBytes (16 samples, 5.59%)</title>
+            <rect x="91.2587%" y="853" width="5.5944%" height="15" fill="rgb(255,214,214)" fg:x="261" fg:w="16"/>
+            <text x="91.5087%" y="863.50">io/nett..</text>
+        </g>
+        <g>
+            <title>sun/nio/ch/SocketChannelImpl:.read (16 samples, 5.59%)</title>
+            <rect x="91.2587%" y="837" width="5.5944%" height="15" fill="rgb(255,214,214)" fg:x="261" fg:w="16"/>
+            <text x="91.5087%" y="847.50">sun/nio..</text>
+        </g>
+        <g>
+            <title>sun/nio/ch/FileDispatcherImpl:.read0 (15 samples, 5.24%)</title>
+            <rect x="91.6084%" y="821" width="5.2448%" height="15" fill="rgb(255,215,215)" fg:x="262" fg:w="15"/>
+            <text x="91.8584%" y="831.50">sun/ni..</text>
+        </g>
+        <g>
+            <title>read (15 samples, 5.24%)</title>
+            <rect x="91.6084%" y="805" width="5.2448%" height="15" fill="rgb(255,215,215)" fg:x="262" fg:w="15"/>
+            <text x="91.8584%" y="815.50">read</text>
+        </g>
+        <g>
+            <title>system_call_fastpath (12 samples, 4.20%)</title>
+            <rect x="92.6573%" y="789" width="4.1958%" height="15" fill="rgb(255,219,219)" fg:x="265" fg:w="12"/>
+            <text x="92.9073%" y="799.50">syste..</text>
+        </g>
+        <g>
+            <title>sys_read (12 samples, 4.20%)</title>
+            <rect x="92.6573%" y="773" width="4.1958%" height="15" fill="rgb(255,219,219)" fg:x="265" fg:w="12"/>
+            <text x="92.9073%" y="783.50">sys_r..</text>
+        </g>
+        <g>
+            <title>vfs_read (10 samples, 3.50%)</title>
+            <rect x="93.3566%" y="757" width="3.4965%" height="15" fill="rgb(255,222,222)" fg:x="267" fg:w="10"/>
+            <text x="93.6066%" y="767.50">vfs..</text>
+        </g>
+        <g>
+            <title>rw_verify_area (1 samples, 0.35%)</title>
+            <rect x="96.5035%" y="741" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="276" fg:w="1"/>
+            <text x="96.7535%" y="751.50"></text>
+        </g>
+        <g>
+            <title>io/netty/channel/nio/AbstractNioByteChannel$NioByteUnsafe:.read (261 samples, 91.26%)</title>
+            <rect x="5.9441%" y="869" width="91.2587%" height="15" fill="rgb(255,106,106)" fg:x="17" fg:w="261"/>
+            <text x="6.1941%" y="879.50">io/netty/channel/nio/AbstractNioByteChannel$NioByteUnsafe:.read</text>
+        </g>
+        <g>
+            <title>io/netty/handler/codec/ByteToMessageDecoder:.channelReadComplete (1 samples, 0.35%)</title>
+            <rect x="96.8531%" y="853" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="277" fg:w="1"/>
+            <text x="97.1031%" y="863.50"></text>
+        </g>
+        <g>
+            <title>JavaThread::run (264 samples, 92.31%)</title>
+            <rect x="5.2448%" y="1077" width="92.3077%" height="15" fill="rgb(255,105,105)" fg:x="15" fg:w="264"/>
+            <text x="5.4948%" y="1087.50">JavaThread::run</text>
+        </g>
+        <g>
+            <title>JavaThread::thread_main_inner (264 samples, 92.31%)</title>
+            <rect x="5.2448%" y="1061" width="92.3077%" height="15" fill="rgb(255,105,105)" fg:x="15" fg:w="264"/>
+            <text x="5.4948%" y="1071.50">JavaThread::thread_main_inner</text>
+        </g>
+        <g>
+            <title>thread_entry (264 samples, 92.31%)</title>
+            <rect x="5.2448%" y="1045" width="92.3077%" height="15" fill="rgb(255,105,105)" fg:x="15" fg:w="264"/>
+            <text x="5.4948%" y="1055.50">thread_entry</text>
+        </g>
+        <g>
+            <title>JavaCalls::call_virtual (264 samples, 92.31%)</title>
+            <rect x="5.2448%" y="1029" width="92.3077%" height="15" fill="rgb(255,105,105)" fg:x="15" fg:w="264"/>
+            <text x="5.4948%" y="1039.50">JavaCalls::call_virtual</text>
+        </g>
+        <g>
+            <title>JavaCalls::call_virtual (264 samples, 92.31%)</title>
+            <rect x="5.2448%" y="1013" width="92.3077%" height="15" fill="rgb(255,105,105)" fg:x="15" fg:w="264"/>
+            <text x="5.4948%" y="1023.50">JavaCalls::call_virtual</text>
+        </g>
+        <g>
+            <title>JavaCalls::call_helper (264 samples, 92.31%)</title>
+            <rect x="5.2448%" y="997" width="92.3077%" height="15" fill="rgb(255,105,105)" fg:x="15" fg:w="264"/>
+            <text x="5.4948%" y="1007.50">JavaCalls::call_helper</text>
+        </g>
+        <g>
+            <title>call_stub (264 samples, 92.31%)</title>
+            <rect x="5.2448%" y="981" width="92.3077%" height="15" fill="rgb(255,105,105)" fg:x="15" fg:w="264"/>
+            <text x="5.4948%" y="991.50">call_stub</text>
+        </g>
+        <g>
+            <title>Interpreter (264 samples, 92.31%)</title>
+            <rect x="5.2448%" y="965" width="92.3077%" height="15" fill="rgb(255,105,105)" fg:x="15" fg:w="264"/>
+            <text x="5.4948%" y="975.50">Interpreter</text>
+        </g>
+        <g>
+            <title>Interpreter (264 samples, 92.31%)</title>
+            <rect x="5.2448%" y="949" width="92.3077%" height="15" fill="rgb(255,105,105)" fg:x="15" fg:w="264"/>
+            <text x="5.4948%" y="959.50">Interpreter</text>
+        </g>
+        <g>
+            <title>io/netty/channel/nio/NioEventLoop:.run (264 samples, 92.31%)</title>
+            <rect x="5.2448%" y="933" width="92.3077%" height="15" fill="rgb(255,105,105)" fg:x="15" fg:w="264"/>
+            <text x="5.4948%" y="943.50">io/netty/channel/nio/NioEventLoop:.run</text>
+        </g>
+        <g>
+            <title>io/netty/channel/nio/NioEventLoop:.processSelectedKeys (263 samples, 91.96%)</title>
+            <rect x="5.5944%" y="917" width="91.9580%" height="15" fill="rgb(255,106,106)" fg:x="16" fg:w="263"/>
+            <text x="5.8444%" y="927.50">io/netty/channel/nio/NioEventLoop:.processSelectedKeys</text>
+        </g>
+        <g>
+            <title>io/netty/channel/nio/NioEventLoop:.processSelectedKeysOptimized (263 samples, 91.96%)</title>
+            <rect x="5.5944%" y="901" width="91.9580%" height="15" fill="rgb(255,106,106)" fg:x="16" fg:w="263"/>
+            <text x="5.8444%" y="911.50">io/netty/channel/nio/NioEventLoop:.processSelectedKeysOptimized</text>
+        </g>
+        <g>
+            <title>io/netty/channel/nio/NioEventLoop:.processSelectedKey (262 samples, 91.61%)</title>
+            <rect x="5.9441%" y="885" width="91.6084%" height="15" fill="rgb(255,106,106)" fg:x="17" fg:w="262"/>
+            <text x="6.1941%" y="895.50">io/netty/channel/nio/NioEventLoop:.processSelectedKey</text>
+        </g>
+        <g>
+            <title>io/netty/channel/socket/nio/NioSocketChannel:.doReadBytes (1 samples, 0.35%)</title>
+            <rect x="97.2028%" y="869" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="278" fg:w="1"/>
+            <text x="97.4528%" y="879.50"></text>
+        </g>
+        <g>
+            <title>PSIsAliveClosure::do_object_b (1 samples, 0.35%)</title>
+            <rect x="97.5524%" y="949" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="279" fg:w="1"/>
+            <text x="97.8024%" y="959.50"></text>
+        </g>
+        <g>
+            <title>StringTable::unlink_or_oops_do (2 samples, 0.70%)</title>
+            <rect x="97.9021%" y="949" width="0.6993%" height="15" fill="rgb(255,237,237)" fg:x="280" fg:w="2"/>
+            <text x="98.1521%" y="959.50"></text>
+        </g>
+        <g>
+            <title>start_thread (282 samples, 98.60%)</title>
+            <rect x="0.3497%" y="1109" width="98.6014%" height="15" fill="rgb(255,101,101)" fg:x="1" fg:w="282"/>
+            <text x="0.5997%" y="1119.50">start_thread</text>
+        </g>
+        <g>
+            <title>java_start (282 samples, 98.60%)</title>
+            <rect x="0.3497%" y="1093" width="98.6014%" height="15" fill="rgb(255,101,101)" fg:x="1" fg:w="282"/>
+            <text x="0.5997%" y="1103.50">java_start</text>
+        </g>
+        <g>
+            <title>VMThread::run (4 samples, 1.40%)</title>
+            <rect x="97.5524%" y="1077" width="1.3986%" height="15" fill="rgb(255,232,232)" fg:x="279" fg:w="4"/>
+            <text x="97.8024%" y="1087.50"></text>
+        </g>
+        <g>
+            <title>VMThread::loop (4 samples, 1.40%)</title>
+            <rect x="97.5524%" y="1061" width="1.3986%" height="15" fill="rgb(255,232,232)" fg:x="279" fg:w="4"/>
+            <text x="97.8024%" y="1071.50"></text>
+        </g>
+        <g>
+            <title>VMThread::evaluate_operation (4 samples, 1.40%)</title>
+            <rect x="97.5524%" y="1045" width="1.3986%" height="15" fill="rgb(255,232,232)" fg:x="279" fg:w="4"/>
+            <text x="97.8024%" y="1055.50"></text>
+        </g>
+        <g>
+            <title>VM_Operation::evaluate (4 samples, 1.40%)</title>
+            <rect x="97.5524%" y="1029" width="1.3986%" height="15" fill="rgb(255,232,232)" fg:x="279" fg:w="4"/>
+            <text x="97.8024%" y="1039.50"></text>
+        </g>
+        <g>
+            <title>VM_ParallelGCFailedAllocation::doit (4 samples, 1.40%)</title>
+            <rect x="97.5524%" y="1013" width="1.3986%" height="15" fill="rgb(255,232,232)" fg:x="279" fg:w="4"/>
+            <text x="97.8024%" y="1023.50"></text>
+        </g>
+        <g>
+            <title>ParallelScavengeHeap::failed_mem_allocate (4 samples, 1.40%)</title>
+            <rect x="97.5524%" y="997" width="1.3986%" height="15" fill="rgb(255,232,232)" fg:x="279" fg:w="4"/>
+            <text x="97.8024%" y="1007.50"></text>
+        </g>
+        <g>
+            <title>PSScavenge::invoke (4 samples, 1.40%)</title>
+            <rect x="97.5524%" y="981" width="1.3986%" height="15" fill="rgb(255,232,232)" fg:x="279" fg:w="4"/>
+            <text x="97.8024%" y="991.50"></text>
+        </g>
+        <g>
+            <title>PSScavenge::invoke_no_policy (4 samples, 1.40%)</title>
+            <rect x="97.5524%" y="965" width="1.3986%" height="15" fill="rgb(255,232,232)" fg:x="279" fg:w="4"/>
+            <text x="97.8024%" y="975.50"></text>
+        </g>
+        <g>
+            <title>pthread_cond_signal@@GLIBC_2.3.2 (1 samples, 0.35%)</title>
+            <rect x="98.6014%" y="949" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="282" fg:w="1"/>
+            <text x="98.8514%" y="959.50"></text>
+        </g>
+        <g>
+            <title>system_call_fastpath (1 samples, 0.35%)</title>
+            <rect x="98.6014%" y="933" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="282" fg:w="1"/>
+            <text x="98.8514%" y="943.50"></text>
+        </g>
+        <g>
+            <title>sys_futex (1 samples, 0.35%)</title>
+            <rect x="98.6014%" y="917" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="282" fg:w="1"/>
+            <text x="98.8514%" y="927.50"></text>
+        </g>
+        <g>
+            <title>do_futex (1 samples, 0.35%)</title>
+            <rect x="98.6014%" y="901" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="282" fg:w="1"/>
+            <text x="98.8514%" y="911.50"></text>
+        </g>
+        <g>
+            <title>futex_wake_op (1 samples, 0.35%)</title>
+            <rect x="98.6014%" y="885" width="0.3497%" height="15" fill="rgb(255,241,241)" fg:x="282" fg:w="1"/>
+            <text x="98.8514%" y="895.50"></text>
+        </g>
+        <g>
+            <title>all (286 samples, 100%)</title>
+            <rect x="0.0000%" y="1141" width="100.0000%" height="15" fill="rgb(255,100,100)" fg:x="0" fg:w="286"/>
+            <text x="0.2500%" y="1151.50"></text>
+        </g>
+        <g>
+            <title>java (286 samples, 100.00%)</title>
+            <rect x="0.0000%" y="1125" width="100.0000%" height="15" fill="rgb(255,100,100)" fg:x="0" fg:w="286"/>
+            <text x="0.2500%" y="1135.50">java</text>
+        </g>
+        <g>
+            <title>write (3 samples, 1.05%)</title>
+            <rect x="98.9510%" y="1109" width="1.0490%" height="15" fill="rgb(255,234,234)" fg:x="283" fg:w="3"/>
+            <text x="99.2010%" y="1119.50"></text>
+        </g>
+        <g>
+            <title>check_events (3 samples, 1.05%)</title>
+            <rect x="98.9510%" y="1093" width="1.0490%" height="15" fill="rgb(255,234,234)" fg:x="283" fg:w="3"/>
+            <text x="99.2010%" y="1103.50"></text>
+        </g>
+        <g>
+            <title>hypercall_page (3 samples, 1.05%)</title>
+            <rect x="98.9510%" y="1077" width="1.0490%" height="15" fill="rgb(255,234,234)" fg:x="283" fg:w="3"/>
+            <text x="99.2010%" y="1087.50"></text>
+        </g>
+    </svg>
+</svg>

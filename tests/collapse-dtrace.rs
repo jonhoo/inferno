@@ -8,8 +8,7 @@ use assert_cmd::cargo::CommandCargoExt;
 use inferno::collapse::dtrace::{Folder, Options};
 use log::Level;
 use pretty_assertions::assert_eq;
-
-use common::test_logger::CapturedLog;
+use testing_logger::CapturedLog;
 
 fn test_collapse_dtrace(test_file: &str, expected_file: &str, options: Options) -> io::Result<()> {
     for &n in &[1, 2] {
@@ -24,7 +23,8 @@ fn test_collapse_dtrace_logs_with_options<F>(input_file: &str, asserter: F, mut 
 where
     F: Fn(&Vec<CapturedLog>),
 {
-    options.nthreads = 2;
+    // We must run log tests in a single thread to play nicely with `testing_logger`.
+    options.nthreads = 1;
     common::test_collapse_logs(Folder::from(options), input_file, asserter);
 }
 
@@ -46,15 +46,11 @@ fn collapse_dtrace_compare_to_upstream() {
 fn collapse_dtrace_compare_to_upstream_with_offsets() {
     let test_file = "./flamegraph/example-dtrace-stacks.txt";
     let result_file = "./tests/data/collapse-dtrace/results/dtrace-example-offsets.txt";
-    test_collapse_dtrace(
-        test_file,
-        result_file,
-        Options {
-            includeoffset: true,
-            ..Default::default()
-        },
-    )
-    .unwrap()
+
+    let mut options = Options::default();
+    options.includeoffset = true;
+
+    test_collapse_dtrace(test_file, result_file, options).unwrap()
 }
 
 #[test]
@@ -80,15 +76,11 @@ fn collapse_dtrace_compare_to_flamegraph_bug() {
     // https://github.com/brendangregg/FlameGraph/issues/202
     let test_file = "./tests/data/collapse-dtrace/flamegraph-bug.txt";
     let result_file = "./tests/data/collapse-dtrace/results/flamegraph-bug.txt";
-    test_collapse_dtrace(
-        test_file,
-        result_file,
-        Options {
-            includeoffset: true,
-            ..Default::default()
-        },
-    )
-    .unwrap()
+
+    let mut options = Options::default();
+    options.includeoffset = true;
+
+    test_collapse_dtrace(test_file, result_file, options).unwrap()
 }
 
 #[test]
@@ -97,7 +89,7 @@ fn collapse_dtrace_should_log_warning_for_only_header_lines() {
         "./tests/data/collapse-dtrace/only-header-lines.txt",
         |captured_logs| {
             let nwarnings = captured_logs
-                .into_iter()
+                .iter()
                 .filter(|log| {
                     log.body == "File ended while skipping headers" && log.level == Level::Warn
                 })
@@ -123,37 +115,6 @@ fn collapse_dtrace_rust_names() {
     let test_file = "./tests/data/collapse-dtrace/rust-names.txt";
     let result_file = "./tests/data/collapse-dtrace/results/rust-names.txt";
     test_collapse_dtrace(test_file, result_file, Options::default()).unwrap()
-}
-
-#[test]
-fn collapse_dtrace_demangle() {
-    let test_file = "./tests/data/collapse-dtrace/mangled.txt";
-    let result_file = "./tests/data/collapse-dtrace/results/demangled.txt";
-    test_collapse_dtrace(
-        test_file,
-        result_file,
-        Options {
-            demangle: true,
-            ..Default::default()
-        },
-    )
-    .unwrap()
-}
-
-#[test]
-fn collapse_dtrace_demangle_includeoffset() {
-    let test_file = "./tests/data/collapse-dtrace/mangled.txt";
-    let result_file = "./tests/data/collapse-dtrace/results/demangled_with_offsets.txt";
-    test_collapse_dtrace(
-        test_file,
-        result_file,
-        Options {
-            demangle: true,
-            includeoffset: true,
-            ..Default::default()
-        },
-    )
-    .unwrap()
 }
 
 #[test]

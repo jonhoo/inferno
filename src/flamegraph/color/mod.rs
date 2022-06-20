@@ -4,10 +4,10 @@ mod palette_map;
 mod palettes;
 
 use std::borrow::Cow;
+use std::cmp::Ordering;
 use std::fmt;
 use std::str::FromStr;
 
-use rand::prelude::*;
 use rgb::RGB8;
 
 pub use self::palette_map::PaletteMap;
@@ -42,7 +42,7 @@ const GRAY_GRADIENT: (&str, &str) = ("#f8f8f8", "#e8e8e8");
 ///  - All other [`MultiPalette`] variants default to [`BackgroundColor::Yellow`].
 ///
 /// `BackgroundColor::default()` is `Yellow`.
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum BackgroundColor {
     /// A yellow gradient from `#EEEEEE` to `#EEEEB0`.
     Yellow,
@@ -67,7 +67,7 @@ impl Default for BackgroundColor {
 /// A flame graph color palette.
 ///
 /// Defaults to [`BasicPalette::Hot`].
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Palette {
     /// A plain color palette in which the color is not chosen based on function semantics.
     ///
@@ -90,7 +90,7 @@ impl Default for Palette {
 /// [`super::Options.consistent_palette`] and [`super::Options.hash`]. In the absence of options
 /// like that, these palettes all choose colors randomly from the indicated spectrum, and does not
 /// consider the name of the frame's function when doing so.
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum BasicPalette {
     /// A palette in which colors are chosen from a red-yellow spectrum.
     Hot,
@@ -116,7 +116,7 @@ pub enum BasicPalette {
 
 /// A semantic color palette in which different hues are used to signifiy semantic aspects of
 /// different function names (kernel functions, JIT functions, etc.).
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum MultiPalette {
     /// Use Java semantics to color frames.
     Java,
@@ -124,6 +124,8 @@ pub enum MultiPalette {
     Js,
     /// Use Perl semantics to color frames.
     Perl,
+    /// Use Rust semantics to color frames.
+    Rust,
     /// Equivalent to [`BasicPalette::Aqua`] with [`BackgroundColor::Blue`].
     Wakeup,
 }
@@ -165,7 +167,7 @@ fn parse_flat_bgcolor(s: &str) -> Option<Color> {
 }
 
 /// `SearchColor::default()` is `rgb(230,0,230)`.
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct SearchColor(Color);
 
 impl FromStr for SearchColor {
@@ -196,6 +198,7 @@ impl FromStr for Palette {
             "java" => Ok(Palette::Multi(MultiPalette::Java)),
             "js" => Ok(Palette::Multi(MultiPalette::Js)),
             "perl" => Ok(Palette::Multi(MultiPalette::Perl)),
+            "rust" => Ok(Palette::Multi(MultiPalette::Rust)),
             "red" => Ok(Palette::Basic(BasicPalette::Red)),
             "green" => Ok(Palette::Basic(BasicPalette::Green)),
             "blue" => Ok(Palette::Basic(BasicPalette::Blue)),
@@ -234,7 +237,7 @@ impl NamehashVariables {
     }
 
     fn result(&self) -> f32 {
-        (1.0 - self.vector / self.max)
+        1.0 - self.vector / self.max
     }
 }
 
@@ -308,6 +311,7 @@ fn rgb_components_for_palette(palette: Palette, name: &str, v1: f32, v2: f32, v3
         Palette::Multi(MultiPalette::Perl) => palettes::perl::resolve(name),
         Palette::Multi(MultiPalette::Js) => palettes::js::resolve(name),
         Palette::Multi(MultiPalette::Wakeup) => palettes::wakeup::resolve(name),
+        Palette::Multi(MultiPalette::Rust) => palettes::rust::resolve(name),
     };
 
     match basic_palette {
@@ -328,36 +332,65 @@ fn rgb_components_for_palette(palette: Palette, name: &str, v1: f32, v2: f32, v3
     }
 }
 
-pub(super) fn color(palette: Palette, hash: bool, name: &str, thread_rng: &mut ThreadRng) -> Color {
+pub(super) fn color(
+    palette: Palette,
+    hash: bool,
+    deterministic: bool,
+    name: &str,
+    mut rng: impl FnMut() -> f32,
+) -> Color {
     let (v1, v2, v3) = if hash {
         let name_hash = namehash(name.bytes());
         let reverse_name_hash = namehash(name.bytes().rev());
 
         (name_hash, reverse_name_hash, reverse_name_hash)
+    } else if deterministic {
+        // Do not use ahash, since it does not have stable output across computers
+        // Instead, just inline the implementation of FNV:
+        // https://github.com/servo/rust-fnv/blob/4b4784ebfd3332dc61f0640764d6f1140e03a9ab/lib.rs#L95
+        let mut hash: u64 = 0xcbf29ce484222325;
+        // https://github.com/servo/rust-fnv/blob/4b4784ebfd3332dc61f0640764d6f1140e03a9ab/lib.rs#L118-L121
+        for byte in name.as_bytes() {
+            hash ^= *byte as u64;
+            hash = hash.wrapping_mul(0x100000001b3);
+        }
+        let hash1 = (hash as f64 / std::u64::MAX as f64) as f32;
+
+        // Rotate hash so we get two more distinct numbers
+        hash ^= 0;
+        hash = hash.wrapping_mul(0x100000001b3);
+        let hash2 = (hash as f64 / std::u64::MAX as f64) as f32;
+        hash ^= 0;
+        hash = hash.wrapping_mul(0x100000001b3);
+        let hash3 = (hash as f64 / std::u64::MAX as f64) as f32;
+
+        (hash1, hash2, hash3)
     } else {
-        (thread_rng.gen(), thread_rng.gen(), thread_rng.gen())
+        (rng(), rng(), rng())
     };
 
     rgb_components_for_palette(palette, name, v1, v2, v3)
 }
 
 pub(super) fn color_scale(value: isize, max: usize) -> Color {
-    if value == 0 {
-        Color {
-            r: 255,
-            g: 255,
-            b: 255,
+    match value.cmp(&0) {
+        Ordering::Equal => Color {
+            r: 250,
+            g: 250,
+            b: 250,
+        },
+        Ordering::Greater => {
+            // A positive value indicates _more_ samples,
+            // and hence more time spent, so we give it a red hue.
+            let c = 100 + (150 * (max as isize - value) / max as isize) as u8;
+            Color { r: 255, g: c, b: c }
         }
-    } else if value > 0 {
-        // A positive value indicates _more_ samples,
-        // and hence more time spent, so we give it a red hue.
-        let c = (210 * (max as isize - value) / max as isize) as u8;
-        Color { r: 255, g: c, b: c }
-    } else {
-        // A negative value indicates _fewer_ samples,
-        // or a speed-up, so we give it a green hue.
-        let c = (210 * (max as isize + value) / max as isize) as u8;
-        Color { r: c, g: c, b: 255 }
+        Ordering::Less => {
+            // A negative value indicates _fewer_ samples,
+            // or a speed-up, so we give it a blue hue.
+            let c = 100 + (150 * (max as isize + value) / max as isize) as u8;
+            Color { r: c, g: c, b: 255 }
+        }
     }
 }
 

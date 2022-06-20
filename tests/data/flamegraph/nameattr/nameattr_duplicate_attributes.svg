@@ -1,4 +1,4 @@
-<?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg version="1.1" width="1200" height="246" onload="init(evt)" viewBox="0 0 1200 246" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg version="1.1" width="1200" height="246" onload="init(evt)" viewBox="0 0 1200 246" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:fg="http://github.com/jonhoo/inferno">
     <!--Flame graph stack visualization. See https://github.com/brendangregg/FlameGraph for latest version, and http://www.brendangregg.com/flamegraphs.html for examples.-->
     <!--NOTES: -->
     <defs>
@@ -18,120 +18,121 @@ text { font-family:"Verdana"; font-size:12px; fill:rgb(0,0,0); }
 .hide { display:none; }
 .parent { opacity:0.5; }
 </style>
-    <script type="text/ecmascript">
-        <![CDATA[var nametype = 'Function:';
-var fontsize = 12;
-var fontwidth = 0.59;
-var xpad = 10;
-var inverted = false;
-var searchcolor = 'rgb(230,0,230)';
-var fluiddrawing = true;]]>
-    </script>
+    <script type="text/ecmascript"><![CDATA[
+        var nametype = 'Function:';
+        var fontsize = 12;
+        var fontwidth = 0.59;
+        var xpad = 10;
+        var inverted = false;
+        var searchcolor = 'rgb(230,0,230)';
+        var fluiddrawing = true;
+        var truncate_text_right = false;
+    ]]></script>
     <rect x="0" y="0" width="100%" height="246" fill="url(#background)"/>
     <text id="title" x="50.0000%" y="24.00">Flame Graph</text>
     <text id="details" x="10" y="229.00"> </text>
     <text id="unzoom" class="hide" x="10" y="24.00">Reset Zoom</text>
     <text id="search" x="1090" y="24.00">Search</text>
     <text id="matched" x="1090" y="229.00"> </text>
-    <svg id="frames" x="10" width="1180">
+    <svg id="frames" x="10" width="1180" total_samples="333">
         <g>
             <title>_start (31 samples, 9.31%)</title>
-            <rect x="0.0000%" y="165" width="9.3093%" height="15" fill="rgb(239,139,37)"/>
+            <rect x="0.0000%" y="165" width="9.3093%" height="15" fill="rgb(239,139,37)" fg:x="0" fg:w="31"/>
             <text x="0.2500%" y="175.50">_start</text>
         </g>
         <g>
             <title>__libc_start_main (31 samples, 9.31%)</title>
-            <rect x="0.0000%" y="149" width="9.3093%" height="15" fill="rgb(247,154,46)"/>
+            <rect x="0.0000%" y="149" width="9.3093%" height="15" fill="rgb(247,154,46)" fg:x="0" fg:w="31"/>
             <text x="0.2500%" y="159.50">__libc_start_..</text>
         </g>
         <a class="inferno2" stroke-width="1" stroke="green" xlink:href="https://github.com/jonhoo/inferno" target="_blank" rel="external" hreflang="en-us">
             <title>foo</title>
-            <rect x="0.0000%" y="133" width="9.3093%" height="15" fill="rgb(247,83,46)"/>
+            <rect x="0.0000%" y="133" width="9.3093%" height="15" fill="rgb(247,83,46)" fg:x="0" fg:w="31"/>
             <text x="0.2500%" y="143.50">main</text>
         </a>
         <g class="flames">
             <title>bar</title>
-            <rect x="0.0000%" y="117" width="9.3093%" height="15" fill="rgb(226,95,23)"/>
+            <rect x="0.0000%" y="117" width="9.3093%" height="15" fill="rgb(226,95,23)" fg:x="0" fg:w="31"/>
             <text x="0.2500%" y="127.50">cksum</text>
         </g>
         <g class="flames">
             <title>bar</title>
-            <rect x="9.3093%" y="165" width="2.1021%" height="15" fill="rgb(226,95,23)"/>
+            <rect x="9.3093%" y="165" width="2.1021%" height="15" fill="rgb(226,95,23)" fg:x="31" fg:w="7"/>
             <text x="9.5593%" y="175.50">c..</text>
         </g>
         <g>
             <title>__GI___fread_unlocked (1 samples, 0.30%)</title>
-            <rect x="11.1111%" y="149" width="0.3003%" height="15" fill="rgb(245,119,44)"/>
+            <rect x="11.1111%" y="149" width="0.3003%" height="15" fill="rgb(245,119,44)" fg:x="37" fg:w="1"/>
             <text x="11.3611%" y="159.50"></text>
         </g>
         <g>
             <title>_IO_file_xsgetn (1 samples, 0.30%)</title>
-            <rect x="11.1111%" y="133" width="0.3003%" height="15" fill="rgb(244,132,43)"/>
+            <rect x="11.1111%" y="133" width="0.3003%" height="15" fill="rgb(244,132,43)" fg:x="37" fg:w="1"/>
             <text x="11.3611%" y="143.50"></text>
         </g>
         <g>
             <title>_IO_file_read (1 samples, 0.30%)</title>
-            <rect x="11.1111%" y="117" width="0.3003%" height="15" fill="rgb(241,132,40)"/>
+            <rect x="11.1111%" y="117" width="0.3003%" height="15" fill="rgb(241,132,40)" fg:x="37" fg:w="1"/>
             <text x="11.3611%" y="127.50"></text>
         </g>
         <g>
             <title>entry_SYSCALL_64_fastpath (1 samples, 0.30%)</title>
-            <rect x="11.1111%" y="101" width="0.3003%" height="15" fill="rgb(236,196,34)"/>
+            <rect x="11.1111%" y="101" width="0.3003%" height="15" fill="rgb(236,196,34)" fg:x="37" fg:w="1"/>
             <text x="11.3611%" y="111.50"></text>
         </g>
         <g>
             <title>sys_read (1 samples, 0.30%)</title>
-            <rect x="11.1111%" y="85" width="0.3003%" height="15" fill="rgb(236,167,34)"/>
+            <rect x="11.1111%" y="85" width="0.3003%" height="15" fill="rgb(236,167,34)" fg:x="37" fg:w="1"/>
             <text x="11.3611%" y="95.50"></text>
         </g>
         <g>
             <title>vfs_read (1 samples, 0.30%)</title>
-            <rect x="11.1111%" y="69" width="0.3003%" height="15" fill="rgb(236,128,34)"/>
+            <rect x="11.1111%" y="69" width="0.3003%" height="15" fill="rgb(236,128,34)" fg:x="37" fg:w="1"/>
             <text x="11.3611%" y="79.50"></text>
         </g>
         <g>
             <title>__vfs_read (1 samples, 0.30%)</title>
-            <rect x="11.1111%" y="53" width="0.3003%" height="15" fill="rgb(236,122,34)"/>
+            <rect x="11.1111%" y="53" width="0.3003%" height="15" fill="rgb(236,122,34)" fg:x="37" fg:w="1"/>
             <text x="11.3611%" y="63.50"></text>
         </g>
         <g>
             <title>ext4_file_read_iter (1 samples, 0.30%)</title>
-            <rect x="11.1111%" y="37" width="0.3003%" height="15" fill="rgb(236,145,34)"/>
+            <rect x="11.1111%" y="37" width="0.3003%" height="15" fill="rgb(236,145,34)" fg:x="37" fg:w="1"/>
             <text x="11.3611%" y="47.50"></text>
         </g>
         <g class="flames">
             <title>bar</title>
-            <rect x="0.0000%" y="181" width="17.1171%" height="15" fill="rgb(226,95,23)"/>
+            <rect x="0.0000%" y="181" width="17.1171%" height="15" fill="rgb(226,95,23)" fg:x="0" fg:w="57"/>
             <text x="0.2500%" y="191.50">cksum</text>
         </g>
         <a class="inferno2" stroke-width="1" stroke="green" xlink:href="https://github.com/jonhoo/inferno" target="_blank" rel="external" hreflang="en-us">
             <title>foo</title>
-            <rect x="11.4114%" y="165" width="5.7057%" height="15" fill="rgb(247,83,46)"/>
+            <rect x="11.4114%" y="165" width="5.7057%" height="15" fill="rgb(247,83,46)" fg:x="38" fg:w="19"/>
             <text x="11.6614%" y="175.50">main</text>
         </a>
         <g class="flames">
             <title>bar</title>
-            <rect x="11.4114%" y="149" width="5.7057%" height="15" fill="rgb(226,95,23)"/>
+            <rect x="11.4114%" y="149" width="5.7057%" height="15" fill="rgb(226,95,23)" fg:x="38" fg:w="19"/>
             <text x="11.6614%" y="159.50">cksum</text>
         </g>
         <g>
             <title>[unknown] (2 samples, 0.60%)</title>
-            <rect x="17.1171%" y="165" width="0.6006%" height="15" fill="rgb(242,180,40)"/>
+            <rect x="17.1171%" y="165" width="0.6006%" height="15" fill="rgb(242,180,40)" fg:x="57" fg:w="2"/>
             <text x="17.3671%" y="175.50"></text>
         </g>
         <g>
             <title>all (333 samples, 100%)</title>
-            <rect x="0.0000%" y="197" width="100.0000%" height="15" fill="rgb(255,230,55)"/>
+            <rect x="0.0000%" y="197" width="100.0000%" height="15" fill="rgb(255,230,55)" fg:x="0" fg:w="333"/>
             <text x="0.2500%" y="207.50"></text>
         </g>
         <g id="test3">
             <title>noploop (276 samples, 82.88%)</title>
-            <rect x="17.1171%" y="181" width="82.8829%" height="15" fill="rgb(248,212,47)"/>
+            <rect x="17.1171%" y="181" width="82.8829%" height="15" fill="rgb(248,212,47)" fg:x="57" fg:w="276"/>
             <text x="17.3671%" y="191.50">noploop</text>
         </g>
         <a class="inferno2" stroke-width="1" stroke="green" xlink:href="https://github.com/jonhoo/inferno" target="_blank" rel="external" hreflang="en-us">
             <title>foo</title>
-            <rect x="17.7177%" y="165" width="82.2823%" height="15" fill="rgb(247,83,46)"/>
+            <rect x="17.7177%" y="165" width="82.2823%" height="15" fill="rgb(247,83,46)" fg:x="59" fg:w="274"/>
             <text x="17.9677%" y="175.50">main</text>
         </a>
     </svg>

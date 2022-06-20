@@ -3,8 +3,8 @@ use std::io::{self, Read};
 
 use criterion::*;
 use inferno::collapse::{dtrace, perf, sample, xdebug, Collapse};
-use lazy_static::lazy_static;
 use libflate::gzip::Decoder;
+use once_cell::sync::Lazy;
 
 const INFILE_DTRACE: &str = "flamegraph/example-dtrace-stacks.txt";
 const INFILE_PERF: &str = "flamegraph/example-perf-stacks.txt.gz";
@@ -12,9 +12,7 @@ const INFILE_SAMPLE: &str = "tests/data/collapse-sample/large.txt.gz";
 const INFILE_XDEBUG: &str = "tests/xdebug.trace.xt";
 const SAMPLE_SIZE: usize = 100;
 
-lazy_static! {
-    static ref NTHREADS: usize = num_cpus::get();
-}
+static NTHREADS: Lazy<usize> = Lazy::new(num_cpus::get);
 
 fn read_infile(infile: &str, buf: &mut Vec<u8>) -> io::Result<()> {
     let mut f = File::open(infile)?;
@@ -35,20 +33,18 @@ macro_rules! benchmark_single {
 
             let mut collapser = $name::Folder::default();
 
-            c.bench(
-                "collapse",
-                ParameterizedBenchmark::new(
-                    $name_str,
-                    move |b, data| {
-                        b.iter(|| {
-                            let _result = collapser.collapse(data.as_slice(), io::sink());
-                        })
-                    },
-                    vec![bytes],
-                )
-                .throughput(|bytes| Throughput::Bytes(bytes.len() as u32))
-                .sample_size(SAMPLE_SIZE),
-            );
+            let mut group = c.benchmark_group($name_str);
+
+            group
+                .bench_with_input("collapse", &bytes, move |b, data| {
+                    b.iter(|| {
+                        let _result = collapser.collapse(data.as_slice(), io::sink());
+                    })
+                })
+                .throughput(Throughput::Bytes(bytes.len() as u64))
+                .sample_size(SAMPLE_SIZE);
+
+            group.finish();
         }
     };
 }
@@ -71,25 +67,31 @@ macro_rules! benchmark_multi {
                 $name::Folder::from(options)
             };
 
-            c.bench(
-                "collapse",
-                ParameterizedBenchmark::new(
-                    format!("{}/1", $name_str),
-                    move |b, data| {
-                        b.iter(|| {
-                            let _result = collapser1.collapse(data.as_slice(), io::sink());
-                        })
-                    },
-                    vec![bytes],
-                )
-                .with_function(format!("{}/{}", $name_str, *NTHREADS), move |b, data| {
+            let mut group = c.benchmark_group("collapse");
+
+            group
+                .bench_with_input(format!("{}/{}", $name_str, 1), &bytes, move |b, data| {
                     b.iter(|| {
-                        let _result = collapser2.collapse(data.as_slice(), io::sink());
+                        let _result = collapser1.collapse(data.as_slice(), io::sink());
                     })
                 })
-                .throughput(|bytes| Throughput::Bytes(bytes.len() as u32))
-                .sample_size(SAMPLE_SIZE),
-            );
+                .throughput(Throughput::Bytes(bytes.len() as u64))
+                .sample_size(SAMPLE_SIZE);
+
+            group
+                .bench_with_input(
+                    format!("{}/{}", $name_str, *NTHREADS),
+                    &bytes,
+                    move |b, data| {
+                        b.iter(|| {
+                            let _result = collapser2.collapse(data.as_slice(), io::sink());
+                        })
+                    },
+                )
+                .throughput(Throughput::Bytes(bytes.len() as u64))
+                .sample_size(SAMPLE_SIZE);
+
+            group.finish();
         }
     };
 }

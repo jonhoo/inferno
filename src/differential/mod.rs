@@ -2,7 +2,7 @@ use std::fs::File;
 use std::io::{self, prelude::*};
 use std::path::Path;
 
-use fnv::FnvHashMap;
+use ahash::AHashMap;
 use log::warn;
 
 const READER_CAPACITY: usize = 128 * 1024;
@@ -46,7 +46,7 @@ where
     R2: BufRead,
     W: Write,
 {
-    let mut stack_counts = FnvHashMap::default();
+    let mut stack_counts = AHashMap::default();
     let total1 = parse_stack_counts(opt, &mut stack_counts, before, true)?;
     let total2 = parse_stack_counts(opt, &mut stack_counts, after, false)?;
     if opt.normalize && total1 != total2 {
@@ -82,7 +82,7 @@ where
 // Populate stack_counts based on lines from the reader and returns the sum of the sample counts.
 fn parse_stack_counts<R>(
     opt: Options,
-    stack_counts: &mut FnvHashMap<String, Counts>,
+    stack_counts: &mut AHashMap<String, Counts>,
     mut reader: R,
     is_first: bool,
 ) -> io::Result<usize>
@@ -90,17 +90,18 @@ where
     R: BufRead,
 {
     let mut total = 0;
-    let mut line = String::new();
+    let mut line = Vec::new();
     let mut stripped_fractional_samples = false;
     loop {
         line.clear();
 
-        if reader.read_line(&mut line)? == 0 {
+        if reader.read_until(0x0A, &mut line)? == 0 {
             break;
         }
 
+        let l = String::from_utf8_lossy(&line);
         if let Some((stack, count)) =
-            parse_line(&line, opt.strip_hex, &mut stripped_fractional_samples)
+            parse_line(&l, opt.strip_hex, &mut stripped_fractional_samples)
         {
             let mut counts = stack_counts.entry(stack).or_default();
             if is_first {
@@ -110,7 +111,7 @@ where
             }
             total += count;
         } else {
-            warn!("Unable to parse line: {}", line);
+            warn!("Unable to parse line: {}", l);
         }
     }
 
@@ -119,7 +120,7 @@ where
 
 // Write three-column lines with the folded stack trace and two value columns,
 // one for each profile.
-fn write_stacks<W>(stack_counts: &FnvHashMap<String, Counts>, mut writer: W) -> io::Result<()>
+fn write_stacks<W>(stack_counts: &AHashMap<String, Counts>, mut writer: W) -> io::Result<()>
 where
     W: Write,
 {
@@ -147,7 +148,7 @@ fn parse_line(
         if !samples[..doti]
             .chars()
             .chain(samples[doti + 1..].chars())
-            .all(|c| c.is_digit(10))
+            .all(|c| c.is_ascii_digit())
         {
             return None;
         }
@@ -175,7 +176,7 @@ fn strip_hex_address(mut stack: &str) -> String {
         stripped.push_str(&stack[..idx + 2]);
         let ndigits = stack[idx + 2..]
             .chars()
-            .take_while(|c| c.is_digit(16))
+            .take_while(|c| c.is_ascii_hexdigit())
             .count();
         if ndigits > 0 {
             stripped.push_str("...");

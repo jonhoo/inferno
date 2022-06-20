@@ -22,26 +22,20 @@ pub(super) mod java {
             }
         }
 
-        let java_prefix = if name.starts_with('L') {
-            &name[1..]
-        } else {
-            name
-        };
+        let java_prefix = name.strip_prefix('L').unwrap_or(name);
 
-        if java_prefix.starts_with("java/")
-            || java_prefix.starts_with("javax/")
-            || java_prefix.starts_with("jdk/")
-            || java_prefix.starts_with("net/")
-            || java_prefix.starts_with("org/")
-            || java_prefix.starts_with("com/")
-            || java_prefix.starts_with("io/")
-            || java_prefix.starts_with("sun/")
+        if name.contains("::") || name.starts_with("-[") || name.starts_with("+[") {
+            // C++ or Objective C
+            BasicPalette::Yellow
+        } else if java_prefix.contains('/')
+            || (java_prefix.contains('.') && !java_prefix.starts_with('['))
+            || match java_prefix.chars().next() {
+                Some(c) => c.is_ascii_uppercase(),
+                _ => false,
+            }
         {
             // Java
             BasicPalette::Green
-        } else if name.contains("::") {
-            // C++
-            BasicPalette::Yellow
         } else {
             // system
             BasicPalette::Red
@@ -84,7 +78,9 @@ pub(super) mod js {
         } else if name.contains(':') {
             return BasicPalette::Aqua;
         } else if let Some(ai) = name.find('/') {
-            if (&name[ai..]).contains(".js") {
+            if (&name[ai..]).contains("node_modules/") {
+                return BasicPalette::Purple;
+            } else if (&name[ai..]).contains(".js") {
                 return BasicPalette::Green;
             }
         }
@@ -98,6 +94,36 @@ pub(super) mod wakeup {
 
     pub fn resolve(_name: &str) -> BasicPalette {
         BasicPalette::Aqua
+    }
+}
+
+pub(super) mod rust {
+    use crate::flamegraph::color::BasicPalette;
+
+    pub fn resolve(name: &str) -> BasicPalette {
+        if name.starts_with("core::")
+            || name.starts_with("std::")
+            || name.starts_with("alloc::")
+            || (name.starts_with("<core::") 
+                // Rust user-defined async functions are desugared into 
+                // GenFutures so we don't want to include those as Rust 
+                // system functions
+                && !name.starts_with("<core::future::from_generator::GenFuture<T>"))
+            || name.starts_with("<std::")
+            || name.starts_with("<alloc::")
+        {
+            // Rust system functions
+            BasicPalette::Orange
+        } else if name.contains("::") {
+            // Rust user functions.
+            // Although this will generate false positives for e.g. C++ code
+            // used with Rust, the intention is to color code from user
+            // crates and dependencies differently than Rust system code.
+            BasicPalette::Aqua
+        } else {
+            // Non-Rust functions
+            BasicPalette::Yellow
+        }
     }
 }
 
@@ -269,11 +295,11 @@ mod tests {
             },
             TestData {
                 input: String::from("jdk/::[ki]"),
-                output: BasicPalette::Green,
+                output: BasicPalette::Yellow,
             },
             TestData {
                 input: String::from("Ajdk/_[ki]"),
-                output: BasicPalette::Red,
+                output: BasicPalette::Green,
             },
             TestData {
                 input: String::from("Ajdk/::[ki]"),
@@ -317,6 +343,34 @@ mod tests {
             },
             TestData {
                 input: String::from("some:thing"),
+                output: BasicPalette::Red,
+            },
+            TestData {
+                input: String::from("scala.tools.nsc.Global$Run.compile"),
+                output: BasicPalette::Green,
+            },
+            TestData {
+                input: String::from("sbt.execute.work"),
+                output: BasicPalette::Green,
+            },
+            TestData {
+                input: String::from("org.scalatest.Suit.run"),
+                output: BasicPalette::Green,
+            },
+            TestData {
+                input: String::from("Compile"),
+                output: BasicPalette::Green,
+            },
+            TestData {
+                input: String::from("-[test]"),
+                output: BasicPalette::Yellow,
+            },
+            TestData {
+                input: String::from("+[test]"),
+                output: BasicPalette::Yellow,
+            },
+            TestData {
+                input: String::from("[test.event]"),
                 output: BasicPalette::Red,
             },
         ];
@@ -417,12 +471,66 @@ mod tests {
                 output: BasicPalette::Green,
             },
             TestData {
+                input: String::from("project/node_modules/dep/index.js"),
+                output: BasicPalette::Purple,
+            },
+            TestData {
                 input: String::from("someai.js"),
                 output: BasicPalette::Red,
             },
         ];
         for elem in test_data.iter() {
             let result = js::resolve(&elem.input);
+            assert_eq!(result, elem.output);
+        }
+    }
+
+    #[test]
+    fn rust_returns_correct() {
+        use super::rust;
+
+        let test_names = [
+            TestData {
+                input: String::from("some::not_rust_system::mod"),
+                output: BasicPalette::Aqua,
+            },
+            TestData {
+                input: String::from("core::mod"),
+                output: BasicPalette::Orange,
+            },
+            TestData {
+                input: String::from("std::mod"),
+                output: BasicPalette::Orange,
+            },
+            TestData {
+                input: String::from("alloc::mod"),
+                output: BasicPalette::Orange,
+            },
+            TestData {
+                input: String::from("something_else"),
+                output: BasicPalette::Yellow,
+            },
+            TestData {
+                input: String::from("<alloc::boxed::Box<F,A> as something::else"),
+                output: BasicPalette::Orange,
+            },
+            TestData {
+                input: String::from("<core::something as something::else"),
+                output: BasicPalette::Orange,
+            },
+            TestData {
+                input: String::from(
+                    "<core::future::from_generator::GenFuture<T> as something::else",
+                ),
+                output: BasicPalette::Aqua,
+            },
+            TestData {
+                input: String::from("<std::something something::else"),
+                output: BasicPalette::Orange,
+            },
+        ];
+        for elem in test_names.iter() {
+            let result = rust::resolve(&elem.input);
             assert_eq!(result, elem.output);
         }
     }

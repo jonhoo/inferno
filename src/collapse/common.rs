@@ -1,12 +1,23 @@
 use std::borrow::Cow;
 use std::io;
+#[cfg(feature = "multithreaded")]
 use std::mem;
+#[cfg(feature = "multithreaded")]
 use std::sync::Arc;
 
-use chashmap::CHashMap;
-use crossbeam::channel;
-use fnv::FnvHashMap;
-use lazy_static::lazy_static;
+use ahash::AHashMap;
+#[cfg(feature = "multithreaded")]
+use dashmap::DashMap;
+use once_cell::sync::Lazy;
+
+macro_rules! invalid_data_error {
+    ($($arg:tt)*) => {{
+        Err(io::Error::new(
+            io::ErrorKind::InvalidData,
+            format!($($arg)*),
+        ))
+    }};
+}
 
 const CAPACITY_HASHMAP: usize = 512;
 
@@ -22,14 +33,17 @@ pub(crate) const DEFAULT_NSTACKS_PER_JOB: usize = 100;
 /// A guess at the number of bytes contained in any given stack of any given format.
 /// Used to calculate the initial capacity of the vector used for sending input
 /// data across threads.
+#[cfg(feature = "multithreaded")]
 const NBYTES_PER_STACK_GUESS: usize = 1024;
 
 const RUST_HASH_LENGTH: usize = 17;
 
-lazy_static! {
-    #[doc(hidden)]
-    pub static ref DEFAULT_NTHREADS: usize = num_cpus::get();
-}
+#[cfg(feature = "multithreaded")]
+#[doc(hidden)]
+pub static DEFAULT_NTHREADS: Lazy<usize> = Lazy::new(num_cpus::get);
+#[cfg(not(feature = "multithreaded"))]
+#[doc(hidden)]
+pub static DEFAULT_NTHREADS: Lazy<usize> = Lazy::new(|| 1);
 
 /// Private trait for internal library authors.
 ///
@@ -65,7 +79,7 @@ pub trait CollapsePrivate: Send + Sized {
     ///
     /// This method receives a reader whose header has already been consumed (see above),
     /// as well as a mutable reference to an `Occurences` instance (just a hashamp that
-    /// works across multiple threads). Implementators should parse the stack data
+    /// works across multiple threads). Implementers should parse the stack data
     /// contained in the reader and write output to the provided `Occurrences` map.
     ///
     /// This method may be called multiple times to process batches of incoming samples.
@@ -90,7 +104,7 @@ pub trait CollapsePrivate: Send + Sized {
     /// `false` otherwise.
     ///
     /// If your format requires more information than merely a line of the input data in order
-    /// to determine whether or not you are at the end of a stack, you can retreive/store
+    /// to determine whether or not you are at the end of a stack, you can retrieve/store
     /// information on the `self` instance, which is also available to you in this method. This
     /// method will be called for every line of input data (excluding those consumed by the
     /// `pre_process` method).
@@ -114,6 +128,7 @@ pub trait CollapsePrivate: Send + Sized {
     /// - `None` means "not sure -- need more input"
     /// - `Some(true)` means "yes, this implementation should work with this string"
     /// - `Some(false)` means "no, this implementation definitely won't work"
+    #[allow(clippy::wrong_self_convention)]
     fn is_applicable(&mut self, input: &str) -> Option<bool>;
 
     /// Returns the number of stacks per job to send to the threadpool.
@@ -154,6 +169,15 @@ pub trait CollapsePrivate: Send + Sized {
         occurrences.write_and_clear(writer)
     }
 
+    #[cfg(not(feature = "multithreaded"))]
+    fn collapse_multi_threaded<R>(&mut self, _: R, _: &mut Occurrences) -> io::Result<()>
+    where
+        R: io::BufRead,
+    {
+        unimplemented!();
+    }
+
+    #[cfg(feature = "multithreaded")]
     fn collapse_multi_threaded<R>(
         &mut self,
         mut reader: R,
@@ -169,19 +193,19 @@ pub trait CollapsePrivate: Send + Sized {
         assert!(nthreads > 1);
         assert!(occurrences.is_concurrent());
 
-        crossbeam::thread::scope(|scope| {
+        crossbeam_utils::thread::scope(|scope| {
             // Channel for sending an error from the worker threads to the main thread
             // in the event a worker has failed.
-            let (tx_error, rx_error) = channel::bounded::<io::Error>(1);
+            let (tx_error, rx_error) = crossbeam_channel::bounded::<io::Error>(1);
 
             // Channel for sending input data from the main thread to the worker threads.
             // We choose `2 * nthreads` as the channel size here in order to limit memory
             // usage in the case of particularly large input files.
-            let (tx_input, rx_input) = channel::bounded::<Vec<u8>>(2 * nthreads);
+            let (tx_input, rx_input) = crossbeam_channel::bounded::<Vec<u8>>(2 * nthreads);
 
             // Channel for worker threads that have errored to signal to all the other
             // worker threads that they should stop work immediately and return.
-            let (tx_stop, rx_stop) = channel::bounded::<()>(nthreads - 1);
+            let (tx_stop, rx_stop) = crossbeam_channel::bounded::<()>(nthreads - 1);
 
             let mut handles = Vec::with_capacity(nthreads);
             for _ in 0..nthreads {
@@ -193,10 +217,8 @@ pub trait CollapsePrivate: Send + Sized {
                 let mut occurrences = occurrences.clone();
 
                 // Launch the worker thread...
-                // TODO: https://github.com/crossbeam-rs/crossbeam/issues/404
-                #[allow(clippy::drop_copy, clippy::zero_ptr)]
                 let handle = scope.spawn(move |_| loop {
-                    channel::select! {
+                    crossbeam_channel::select! {
                         recv(rx_input) -> input => {
                             // Receive input from the main thread.
                             let data = match input {
@@ -327,28 +349,43 @@ pub trait CollapsePrivate: Send + Sized {
 }
 
 /// Occurrences is a HashMap, which uses:
-/// * Fnv if single-threaded
-/// * CHashMap if multi-threaded
+/// * AHashMap if single-threaded
+/// * DashMap if multi-threaded
 #[derive(Clone, Debug)]
 pub enum Occurrences {
-    SingleThreaded(FnvHashMap<String, usize>),
-    MultiThreaded(Arc<CHashMap<String, usize>>),
+    SingleThreaded(AHashMap<String, usize>),
+    #[cfg(feature = "multithreaded")]
+    MultiThreaded(Arc<DashMap<String, usize, ahash::RandomState>>),
 }
 
 impl Occurrences {
+    #[cfg(feature = "multithreaded")]
     pub(crate) fn new(nthreads: usize) -> Self {
         assert_ne!(nthreads, 0);
         if nthreads == 1 {
-            let map = FnvHashMap::with_capacity_and_hasher(
-                CAPACITY_HASHMAP,
-                fnv::FnvBuildHasher::default(),
-            );
-            Occurrences::SingleThreaded(map)
+            Self::new_single_threaded()
         } else {
-            let map = CHashMap::with_capacity(CAPACITY_HASHMAP);
-            let arc = Arc::new(map);
-            Occurrences::MultiThreaded(arc)
+            Self::new_multi_threaded()
         }
+    }
+
+    #[cfg(not(feature = "multithreaded"))]
+    pub(crate) fn new(nthreads: usize) -> Self {
+        assert_ne!(nthreads, 0);
+        Self::new_single_threaded()
+    }
+
+    fn new_single_threaded() -> Self {
+        let map =
+            AHashMap::with_capacity_and_hasher(CAPACITY_HASHMAP, ahash::RandomState::default());
+        Occurrences::SingleThreaded(map)
+    }
+
+    #[cfg(feature = "multithreaded")]
+    fn new_multi_threaded() -> Self {
+        let map =
+            DashMap::with_capacity_and_hasher(CAPACITY_HASHMAP, ahash::RandomState::default());
+        Occurrences::MultiThreaded(Arc::new(map))
     }
 
     /// Inserts a key-count pair into the map. If the map did not have this key
@@ -358,6 +395,7 @@ impl Occurrences {
         use self::Occurrences::*;
         match self {
             SingleThreaded(map) => map.insert(key, count),
+            #[cfg(feature = "multithreaded")]
             MultiThreaded(arc) => arc.insert(key, count),
         }
     }
@@ -369,7 +407,8 @@ impl Occurrences {
         use self::Occurrences::*;
         match self {
             SingleThreaded(map) => *map.entry(key).or_insert(0) += count,
-            MultiThreaded(arc) => arc.upsert(key, || count, |v| *v += count),
+            #[cfg(feature = "multithreaded")]
+            MultiThreaded(arc) => *arc.entry(key).or_insert(0) += count,
         }
     }
 
@@ -377,6 +416,7 @@ impl Occurrences {
         use self::Occurrences::*;
         match self {
             SingleThreaded(_) => false,
+            #[cfg(feature = "multithreaded")]
             MultiThreaded(_) => true,
         }
     }
@@ -394,6 +434,7 @@ impl Occurrences {
                     writeln!(writer, "{} {}", key, value)?;
                 }
             }
+            #[cfg(feature = "multithreaded")]
             MultiThreaded(ref mut arc) => {
                 let map = match Arc::get_mut(arc) {
                     Some(map) => map,
@@ -403,14 +444,22 @@ impl Occurrences {
                          not allowed."
                     ),
                 };
-                let map = mem::replace(map, CHashMap::with_capacity(CAPACITY_HASHMAP));
-                let mut contents: Vec<_> = map.into_iter().collect();
-                contents.sort();
-                for (key, value) in contents {
+                let map = mem::replace(
+                    map,
+                    DashMap::with_capacity_and_hasher(
+                        CAPACITY_HASHMAP,
+                        ahash::RandomState::default(),
+                    ),
+                );
+                let contents = map.iter().collect::<Vec<_>>();
+                let mut pairs = contents.iter().map(|pair| pair.pair()).collect::<Vec<_>>();
+                pairs.sort();
+                for (key, value) in pairs {
                     writeln!(writer, "{} {}", key, value)?;
                 }
             }
         }
+        writer.flush()?;
         Ok(())
     }
 }
@@ -429,7 +478,8 @@ impl Occurrences {
 #[allow(clippy::cognitive_complexity)]
 pub(crate) fn fix_partially_demangled_rust_symbol(symbol: &str) -> Cow<str> {
     // Rust hashes are hex digits with an `h` prepended.
-    let is_rust_hash = |s: &str| s.starts_with('h') && s[1..].chars().all(|c| c.is_digit(16));
+    let is_rust_hash =
+        |s: &str| s.starts_with('h') && s[1..].chars().all(|c| c.is_ascii_hexdigit());
 
     // If there's no trailing Rust hash just return the symbol as is.
     if symbol.len() < RUST_HASH_LENGTH || !is_rust_hash(&symbol[symbol.len() - RUST_HASH_LENGTH..])
@@ -456,7 +506,7 @@ pub(crate) fn fix_partially_demangled_rust_symbol(symbol: &str) -> Cow<str> {
                 demangled.push_str("::");
                 rest = &rest[2..];
             } else {
-                demangled.push_str(".");
+                demangled.push('.');
                 rest = &rest[1..];
             }
         } else if rest.starts_with('$') {
@@ -517,23 +567,12 @@ pub(crate) mod testing {
     use std::io::Write;
     use std::io::{self, BufRead, Read};
     use std::path::{Path, PathBuf};
-    use std::time::{Duration, Instant};
+    use std::time::Instant;
 
     use libflate::gzip::Decoder;
 
     use super::*;
     use crate::collapse::Collapse;
-
-    // TODO: Eventually replace with `as_nanos`, which became part of the standard library in Rust 1.33.0.
-    pub(crate) trait DurationExt {
-        fn as_nanos_compat(&self) -> u128;
-    }
-
-    impl DurationExt for Duration {
-        fn as_nanos_compat(&self) -> u128 {
-            self.as_secs() as u128 * 1_000_000_000 + self.subsec_nanos() as u128
-        }
-    }
 
     pub(crate) fn read_inputs<P>(inputs: &[P]) -> io::Result<HashMap<PathBuf, Vec<u8>>>
     where
@@ -624,7 +663,7 @@ pub(crate) mod testing {
             {
                 let default = folder.nstacks_per_job();
 
-                let (nlines, nstacks) = count_lines_and_stacks(&bytes);
+                let (nlines, nstacks) = count_lines_and_stacks(bytes);
                 if nlines < MIN_LINES {
                     return Ok(None);
                 }
@@ -639,13 +678,13 @@ pub(crate) mod testing {
                     let mut durations = Vec::new();
                     for _ in 0..NSAMPLES {
                         let now = Instant::now();
-                        folder.collapse(&bytes[..], io::sink())?;
-                        durations.push(now.elapsed().as_nanos_compat());
+                        folder.collapse(bytes, io::sink())?;
+                        durations.push(now.elapsed().as_nanos());
                     }
                     let avg_duration =
                         (durations.iter().sum::<u128>() as f64 / durations.len() as f64) as u64;
                     results.insert(nstacks_per_job, avg_duration);
-                    stdout.write(&[b'.'])?;
+                    stdout.write_all(&[b'.'])?;
                     stdout.flush()?;
                 }
                 Ok(Some(Self {
@@ -686,18 +725,19 @@ pub(crate) mod testing {
 
         fn count_lines_and_stacks(bytes: &[u8]) -> (usize, usize) {
             let mut reader = io::BufReader::new(bytes);
-            let mut line = String::new();
+            let mut line = Vec::new();
 
             let (mut nlines, mut nstacks) = (0, 0);
             loop {
                 line.clear();
-                let n = reader.read_line(&mut line).unwrap();
+                let n = reader.read_until(0x0A, &mut line).unwrap();
                 if n == 0 {
                     nstacks += 1;
                     break;
                 }
+                let l = String::from_utf8_lossy(&line);
                 nlines += 1;
-                if line.trim().is_empty() {
+                if l.trim().is_empty() {
                     nstacks += 1;
                 }
             }
@@ -727,10 +767,10 @@ pub(crate) mod testing {
             if let Some(foo) = Foo::new(folder, path, bytes, &mut stdout)? {
                 foos.push(foo);
             }
-            stdout.write(&[b'\n'])?;
+            stdout.write_all(&[b'\n'])?;
             stdout.flush()?;
         }
-        stdout.write(&[b'\n'])?;
+        stdout.write_all(&[b'\n'])?;
         stdout.flush()?;
         foos.sort_by(|a, b| b.nstacks.cmp(&a.nstacks));
         for foo in foos {

@@ -1,14 +1,14 @@
 use std::io;
 use std::path::PathBuf;
 
+use clap::Parser;
 use env_logger::Env;
 use inferno::differential::{self, Options};
-use structopt::StructOpt;
 
-#[derive(Debug, StructOpt)]
-#[structopt(
+#[derive(Debug, Parser)]
+#[clap(
     name = "inferno-diff-folded",
-    author = "",
+    about,
     after_help = "\
 Creates a differential between two folded stack profiles that can be passed
 to inferno-flamegraph to generate a differential flame graph.
@@ -31,30 +31,30 @@ struct Opt {
     // *** FLAGS *** //
     // ************* //
     /// Normalize sample counts
-    #[structopt(short = "n", long = "normalize")]
+    #[clap(short = 'n', long = "normalize")]
     normalize: bool,
 
     /// Strip hex numbers (addresses)
-    #[structopt(short = "s", long = "strip-hex")]
+    #[clap(short = 's', long = "strip-hex")]
     strip_hex: bool,
 
     /// Silence all log output
-    #[structopt(short = "q", long = "quiet")]
+    #[clap(short = 'q', long = "quiet")]
     quiet: bool,
 
     /// Verbose logging mode (-v, -vv, -vvv)
-    #[structopt(short = "v", long = "verbose", parse(from_occurrences))]
+    #[clap(short = 'v', long = "verbose", parse(from_occurrences))]
     verbose: usize,
 
     // ************ //
     // *** ARGS *** //
     // ************ //
     /// Path to folded stack profile 1
-    #[structopt(value_name = "PATH1")]
+    #[clap(value_name = "PATH1")]
     path1: PathBuf,
 
     /// Path to folded stack profile 2
-    #[structopt(value_name = "PATH2")]
+    #[clap(value_name = "PATH2")]
     path2: PathBuf,
 }
 
@@ -72,7 +72,7 @@ impl Opt {
 }
 
 fn main() -> io::Result<()> {
-    let opt = Opt::from_args();
+    let opt = Opt::parse();
 
     // Initialize logger
     if !opt.quiet {
@@ -82,10 +82,20 @@ fn main() -> io::Result<()> {
             2 => "debug",
             _ => "trace",
         }))
-        .default_format_timestamp(false)
+        .format_timestamp(None)
         .init();
     }
 
     let (folded1, folded2, options) = opt.into_parts();
-    differential::from_files(options, folded1, folded2, io::stdout().lock())
+
+    if atty::is(atty::Stream::Stdout) {
+        differential::from_files(options, folded1, folded2, io::stdout().lock())
+    } else {
+        differential::from_files(
+            options,
+            folded1,
+            folded2,
+            io::BufWriter::new(io::stdout().lock()),
+        )
+    }
 }

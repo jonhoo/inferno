@@ -108,6 +108,7 @@ fn flow<'a, LI, TI>(
 
 pub(super) fn frames<'a, I>(
     lines: I,
+    suppress_sort_check: bool,
 ) -> quick_xml::Result<(Vec<TimedFrame<'a>>, usize, usize, usize)>
 where
     I: IntoIterator<Item = &'a str>,
@@ -123,16 +124,15 @@ where
     let mut prev_line = None;
     for line in lines {
         let mut line = line.trim();
-        if line.is_empty() {
-            continue;
-        }
 
-        if let Some(prev_line) = prev_line {
-            if prev_line > line {
-                return Err(quick_xml::Error::Io(io::Error::new(
-                    io::ErrorKind::InvalidData,
-                    "unsorted input lines detected",
-                )));
+        if !suppress_sort_check {
+            if let Some(prev_line) = prev_line {
+                if prev_line > line {
+                    return Err(quick_xml::Error::Io(io::Error::new(
+                        io::ErrorKind::InvalidData,
+                        "unsorted input lines detected",
+                    )));
+                }
             }
         }
 
@@ -147,7 +147,7 @@ where
                     parse_nsamples(&mut line, &mut stripped_fractional_samples)
                 {
                     delta = Some(samples as isize - original_samples as isize);
-                    delta_max = std::cmp::max(delta.unwrap().abs() as usize, delta_max);
+                    delta_max = std::cmp::max(delta.unwrap().unsigned_abs(), delta_max);
                 }
                 samples
             } else {
@@ -248,13 +248,13 @@ pub(super) fn rfind_samples(line: &str) -> Option<(usize, usize)> {
         if samples[..doti]
             .chars()
             .chain(samples[doti + 1..].chars())
-            .all(|c| c.is_digit(10))
+            .all(|c| c.is_ascii_digit())
         {
             Some((samplesi, doti))
         } else {
             None
         }
-    } else if !samples.chars().all(|c| c.is_digit(10)) {
+    } else if !samples.chars().all(|c| c.is_ascii_digit()) {
         None
     } else {
         Some((samplesi, line.len() - samplesi))

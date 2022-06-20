@@ -1,6 +1,6 @@
 use std::io::{self, BufRead};
 
-use log::{error, warn};
+use log::warn;
 
 use crate::collapse::common::{self, Occurrences};
 use crate::collapse::Collapse;
@@ -29,7 +29,8 @@ static START_LINE: &str = "Call graph:";
 static END_LINE: &str = "Total number in stack";
 
 /// `sample` folder configuration options.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
+#[non_exhaustive]
 pub struct Options {
     /// Don't include modules with function names.
     ///
@@ -37,17 +38,11 @@ pub struct Options {
     pub no_modules: bool,
 }
 
-impl Default for Options {
-    fn default() -> Self {
-        Self { no_modules: false }
-    }
-}
-
 /// A stack collapser for the output of `sample` on macOS.
 ///
 /// To construct one, either use `sample::Folder::default()` or create an [`Options`] and use
 /// `sample::Folder::from(options)`.
-#[derive(Clone)]
+#[derive(Clone, Default)]
 pub struct Folder {
     /// Number of samples for the current stack frame.
     current_samples: usize,
@@ -58,16 +53,6 @@ pub struct Folder {
     opt: Options,
 }
 
-impl Default for Folder {
-    fn default() -> Self {
-        Self {
-            current_samples: 0,
-            stack: Vec::default(),
-            opt: Options::default(),
-        }
-    }
-}
-
 impl Collapse for Folder {
     fn collapse<R, W>(&mut self, mut reader: R, writer: W) -> io::Result<()>
     where
@@ -75,14 +60,15 @@ impl Collapse for Folder {
         W: io::Write,
     {
         // Consume the header...
-        let mut line = String::new();
+        let mut line = Vec::new();
         loop {
             line.clear();
-            if reader.read_line(&mut line)? == 0 {
+            if reader.read_until(0x0A, &mut line)? == 0 {
                 warn!("File ended before start of call graph");
                 return Ok(());
             };
-            if line.starts_with(START_LINE) {
+            let l = String::from_utf8_lossy(&line);
+            if l.starts_with(START_LINE) {
                 break;
             }
         }
@@ -91,22 +77,20 @@ impl Collapse for Folder {
         let mut occurrences = Occurrences::new(1);
         loop {
             line.clear();
-            if reader.read_line(&mut line)? == 0 {
-                return Err(io::Error::new(
-                    io::ErrorKind::InvalidData,
-                    "File ended before end of call graph.",
-                ));
+            if reader.read_until(0x0A, &mut line)? == 0 {
+                return invalid_data_error!("File ended before end of call graph");
             }
-            let line = line.trim_end();
+            let l = String::from_utf8_lossy(&line);
+            let line = l.trim_end();
             if line.is_empty() {
                 continue;
             } else if line.starts_with("    ") {
-                self.on_line(line, &mut occurrences);
+                self.on_line(line, &mut occurrences)?;
             } else if line.starts_with(END_LINE) {
                 self.write_stack(&mut occurrences);
                 break;
             } else {
-                error!("Stack line doesn't start with 4 spaces:\n{}", line);
+                return invalid_data_error!("Stack line doesn't start with 4 spaces:\n{}", line);
             }
         }
 
@@ -197,11 +181,14 @@ impl Folder {
     //    +   ! 4282 __doworkq_kernreturn  (in libsystem_kernel.dylib) ...
     //    +   848 _pthread_wqthread  (in libsystem_pthread.dylib) ...
     //    +     848 __doworkq_kernreturn  (in libsystem_kernel.dylib) ...
-    fn on_line(&mut self, line: &str, occurrences: &mut Occurrences) {
+    fn on_line(&mut self, line: &str, occurrences: &mut Occurrences) -> io::Result<()> {
         if let Some(indent_chars) = line[4..].find(|c| !Self::is_indent_char(c)) {
             // Each indent is two characters
             if indent_chars % 2 != 0 {
-                error!("Odd number of indentation characters for line:\n{}", line);
+                return invalid_data_error!(
+                    "Odd number of indentation characters for line:\n{}",
+                    line
+                );
             }
 
             let prev_depth = self.stack.len();
@@ -217,7 +204,7 @@ impl Folder {
                     self.stack.pop();
                 }
             } else if depth > prev_depth + 1 {
-                error!("Skipped indentation level at line:\n{}", line);
+                return invalid_data_error!("Skipped indentation level at line:\n{}", line);
             }
 
             if let Some((samples, func, module)) = self.line_parts(&line[4 + indent_chars..]) {
@@ -234,14 +221,16 @@ impl Folder {
                         self.stack.push(format!("{}`{}", module, func));
                     }
                 } else {
-                    error!("Invalid samples field: {}", samples);
+                    return invalid_data_error!("Invalid samples field: {}", samples);
                 }
             } else {
-                error!("Unable to parse stack line:\n{}", line);
+                return invalid_data_error!("Unable to parse stack line:\n{}", line);
             }
         } else {
-            error!("Found stack line with only indent characters:\n{}", line);
+            return invalid_data_error!("Found stack line with only indent characters:\n{}", line);
         }
+
+        Ok(())
     }
 
     fn write_stack(&self, occurrences: &mut Occurrences) {
@@ -253,13 +242,6 @@ impl Folder {
                 }
             }
         }
-        let mut key = String::new();
-        for (i, frame) in self.stack.iter().enumerate() {
-            if i > 0 {
-                key.push(';');
-            }
-            key.push_str(frame);
-        }
-        occurrences.insert(key, self.current_samples);
+        occurrences.insert(self.stack.join(";"), self.current_samples);
     }
 }
