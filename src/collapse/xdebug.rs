@@ -13,7 +13,6 @@ use std::rc::Rc;
 // Xdebug uses nanoseconds, whereas flamegraph expects seconds, hence a scale
 // factor of one million.
 const SCALE_FACTOR: f32 = 1_000_000.0;
-static CALLS: &[&str] = &["require", "require_once", "include", "include_once"];
 
 const TRACE_START: &str = "TRACE START";
 const TRACE_END: &str = "TRACE END";
@@ -215,12 +214,8 @@ impl CallStack {
     /// Populated with the constant builtins for inclusion, to enable a faster comparison.
     pub fn new() -> Self {
         CallStack {
-            strings: CALLS
-                .iter()
-                .enumerate()
-                .map(|(idx, name)| (name.to_owned().into(), idx))
-                .collect(),
-            interned_string: CALLS.iter().cloned().map(Rc::from).collect(),
+            strings: HashMap::new(),
+            interned_string: Vec::new(),
             calls: HashMap::new(),
             interned: Vec::new(),
             stack: Vec::with_capacity(16),
