@@ -10,16 +10,7 @@ use once_cell::sync::Lazy;
 static NTHREADS: Lazy<String> = Lazy::new(|| format!("{}", *DEFAULT_NTHREADS));
 
 #[derive(Debug, Parser)]
-#[clap(
-    name = "inferno-collapse-xdebug",
-    author = "",
-    after_help = "\
-[1] perf script must emit both PID and TIDs for these to work; eg, Linux < 4.1:
-        perf script -f comm,pid,tid,cpu,time,event,ip,sym,dso,trace
-    for Linux >= 4.1:
-        perf script -F comm,pid,tid,cpu,time,event,ip,sym,dso,trace
-    If you save this output add --header on Linux >= 3.14 to include perf info."
-)]
+#[clap(name = "inferno-collapse-xdebug", author = "")]
 struct Opt {
     /// Silence all log output
     #[clap(short = 'q', long = "quiet")]
