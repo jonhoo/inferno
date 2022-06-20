@@ -75,6 +75,7 @@ struct Fields<'a> {
 }
 
 /// The Folder struct
+#[derive(Default)]
 pub struct Folder;
 
 impl From<Options> for Folder {
