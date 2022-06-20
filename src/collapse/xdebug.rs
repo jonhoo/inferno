@@ -83,28 +83,6 @@ impl From<Options> for Folder {
 }
 
 impl Collapse for Folder {
-    fn is_applicable(&mut self, input: &str) -> Option<bool> {
-        let mut input = input.as_bytes();
-        let mut line = String::new();
-        loop {
-            line.clear();
-
-            if let Ok(n) = input.read_line(&mut line) {
-                if n == 0 {
-                    break;
-                } else {
-                    return Some(false);
-                }
-            }
-
-            if line.starts_with(TRACE_START) {
-                return Some(true);
-            }
-        }
-
-        None
-    }
-
     fn collapse<R, W>(&mut self, mut reader: R, mut writer: W) -> io::Result<()>
     where
         R: BufRead,
@@ -205,12 +183,34 @@ impl Collapse for Folder {
 
         Ok(())
     }
+
+    fn is_applicable(&mut self, input: &str) -> Option<bool> {
+        let mut input = input.as_bytes();
+        let mut line = String::new();
+        loop {
+            line.clear();
+
+            if let Ok(n) = input.read_line(&mut line) {
+                if n == 0 {
+                    break;
+                } else {
+                    return Some(false);
+                }
+            }
+
+            if line.starts_with(TRACE_START) {
+                return Some(true);
+            }
+        }
+
+        None
+    }
 }
 
 impl CallStack {
     /// Create a function name interning call stack tracker.
     ///
-    /// Popoulated with the constant builtins for inclusion, to enable a faster comparison.
+    /// Populated with the constant builtins for inclusion, to enable a faster comparison.
     pub fn new() -> Self {
         CallStack {
             strings: CALLS
@@ -356,7 +356,7 @@ impl<'a> Iterator for Fields<'a> {
             .iter()
             .cloned()
             .position(|b| b != b'\t')
-            .unwrap_or_else(|| self.line.len());
+            .unwrap_or(self.line.len());
 
         self.line = &self.line[begin..];
         if self.line.is_empty() {
@@ -369,7 +369,7 @@ impl<'a> Iterator for Fields<'a> {
             .iter()
             .cloned()
             .position(|b| b == b'\t')
-            .unwrap_or_else(|| self.line.len());
+            .unwrap_or(self.line.len());
         let (result, next) = self.line.split_at(end);
         self.line = next;
         Some(result)
