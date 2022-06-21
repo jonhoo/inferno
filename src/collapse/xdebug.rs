@@ -7,6 +7,9 @@ use std::collections::{HashMap, HashSet, VecDeque};
 use std::io::prelude::*;
 use std::io::{self, Write};
 
+// Convert nanoseconds to milliseconds
+const SCALE_FACTOR: f64 = 1000.0;
+
 const MAIN: &str = "{main}";
 const TRACE_START_VERSION: &str = "version: 1";
 const TRACE_START_XDEBUG: &str = "creator: xdebug";
@@ -43,6 +46,7 @@ enum Call {
 #[derive(Clone, Debug)]
 struct Function {
     function: Call,
+    self_time_ns: usize,
     calls: Vec<Function>,
 }
 
@@ -212,8 +216,8 @@ impl Collapse for Folder {
                 .entry(function_index)
                 .or_insert_with(|| function.expect("function name is not optional"));
 
-            let (_line_number, _time, _memory) = self.read_call_stats(&mut reader, &mut line)?;
-            let mut current_function = Function::new(call);
+            let (_line_number, time, _memory) = self.read_call_stats(&mut reader, &mut line)?;
+            let mut current_function = Function::new(call, time);
 
             // Now read all calls from this function
             loop {
@@ -375,9 +379,10 @@ impl Folder {
 #[allow(clippy::unused_io_amount)]
 impl Function {
     /// Create a function instance, that can keep track of the other functions it calls.
-    pub fn new(function: Call) -> Self {
+    pub fn new(function: Call, self_time_ns: usize) -> Self {
         Function {
             function,
+            self_time_ns,
             calls: Vec::with_capacity(16),
         }
     }
@@ -393,6 +398,7 @@ impl Function {
         self.gather_stacks_recursive(
             &mut String::with_capacity(1024),
             &mut seen,
+            0,
             folder,
             occurrences,
         );
@@ -404,6 +410,7 @@ impl Function {
         &self,
         key: &mut String,
         seen: &mut HashSet<usize>,
+        time_ns: usize,
         folder: &Folder,
         occurrences: &mut Occurrences,
     ) {
@@ -426,8 +433,13 @@ impl Function {
             }
 
             seen.insert(func_id);
-            let func = &folder.function_cache[&func_id];
-            func.gather_stacks_recursive(key, seen, folder, occurrences);
+            call.gather_stacks_recursive(
+                key,
+                seen,
+                time_ns + self.self_time_ns,
+                folder,
+                occurrences,
+            );
             seen.remove(&func_id);
         }
 
