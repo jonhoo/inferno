@@ -3,7 +3,7 @@ use crate::collapse::common;
 use crate::collapse::common::Occurrences;
 use log::error;
 use std::borrow::Cow;
-use std::collections::{HashMap, HashSet};
+use std::collections::{HashMap, HashSet, VecDeque};
 use std::io::prelude::*;
 use std::io::{self, Write};
 
@@ -53,7 +53,7 @@ pub struct Folder {
     /// Functions that have been seen so far, but not yet called. A single function may
     /// appear multiple times, with multiple callers. The file format guarantees that
     /// the function is "defined" before it appears as a called function (cfn).
-    function_cache: HashMap<usize, Function>,
+    function_cache: HashMap<usize, VecDeque<Function>>,
     options: Options,
 }
 
@@ -200,9 +200,9 @@ impl Collapse for Folder {
 
                 let (_, _call_time, _) = self.read_call_stats(&mut reader, &mut line)?;
 
-                match self.function_cache.get(&called_function_id) {
-                    Some(f) => current_function.call(f.clone()), // TODO: Can we remove this clone()?
-                    None => error!("undefined called function {}", called_function_id),
+                match self.function_cache.get_mut(&called_function_id) {
+                    Some(f) if !f.is_empty() => current_function.call(f.pop_front().unwrap()),
+                    _ => error!("undefined called function {}", called_function_id),
                 }
             }
 
@@ -212,9 +212,8 @@ impl Collapse for Folder {
             } else {
                 self.function_cache
                     .entry(function_index)
-                    // TODO: What does it mean if the function is defined multiple times, without
-                    // being called in between those definitions? Should we keep a queue of them?
-                    .or_insert(current_function);
+                    .or_insert_with(|| VecDeque::with_capacity(2))
+                    .push_back(current_function);
             }
         }
 
@@ -416,9 +415,8 @@ impl Call {
         }
     }
 
-    /// Get the call as a formatted string, containing either just the function
-    /// name, or the function name and the filename, depending on
-    /// [Options::include_filenames].
+    /// Get the call as a formatted string, containing either just the function name, or the
+    /// function name and the filename, depending on [Options::include_filenames].
     fn as_str<'f>(&self, folder: &'f Folder) -> Cow<'f, String> {
         match self {
             Call::WithPath(func, file) => {
