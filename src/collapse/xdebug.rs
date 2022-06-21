@@ -1,21 +1,15 @@
 use super::Collapse;
 use crate::collapse::common;
-use hashbrown::hash_map::RawEntryMut;
-use hashbrown::HashMap;
-use log::warn;
-use std::fmt;
-use std::hash::{BuildHasher, Hash, Hasher};
+use crate::collapse::common::Occurrences;
+use log::error;
+use std::borrow::Cow;
+use std::collections::{HashMap, HashSet};
 use std::io::prelude::*;
 use std::io::{self, Write};
-use std::rc::Rc;
-// Ideas: str_stack and colosseum to keep allocations closer together or something.
 
-// Xdebug uses nanoseconds, whereas flamegraph expects seconds, hence a scale
-// factor of one million.
-const SCALE_FACTOR: f32 = 1_000_000.0;
-
+const MAIN: &str = "{main}";
 const TRACE_START: &str = "TRACE START";
-const TRACE_END: &str = "TRACE END";
+const TRACE_SUMMARY: &str = "summary: ";
 
 /// Options for the Xdebug collapser
 #[derive(Clone, Debug)]
@@ -24,84 +18,73 @@ pub struct Options {
     ///
     /// Default is the number of logical cores on your machine.
     pub nthreads: usize,
+
+    /// Whether to write the filenames that called functions are contained
+    /// in in the output.
+    pub include_filenames: bool,
 }
 
 impl Default for Options {
     fn default() -> Self {
         Self {
             nthreads: *common::DEFAULT_NTHREADS,
+            include_filenames: false,
         }
     }
 }
 
-/// A unique key for an interned string.
-#[derive(Clone, Copy, PartialEq, Eq, Hash)]
-struct Str(usize);
-
-#[derive(Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy)]
 enum Call {
-    WithPath(Str, Str),
-    WithoutPath(Str),
+    WithPath(usize, usize),
+    WithoutPath(usize),
 }
 
-enum Interned<T> {
-    Old(T),
-    New(T),
-}
-
-#[derive(Default)]
-struct CallStack {
-    strings: HashMap<Rc<str>, usize>,
-    interned_string: Vec<Rc<str>>,
-
-    calls: HashMap<Call, usize>,
-    interned: Vec<Call>,
-
-    stack: Vec<usize>,
-}
-
-struct Frames<'a> {
-    calls: &'a CallStack,
-    stack: &'a [usize],
-}
-
-/// Iterate over tab separated fields.
-///
-/// This is essentially the same as `str.split('\t').filter(|slice| slice.len() > 0)` but seemingly
-/// faster. This probably because we know that the character in question is ascii, while the
-/// standard library `StrSearcher` for `char` is not optimized around this case.
-struct Fields<'a> {
-    line: &'a str,
+#[derive(Debug)]
+struct Function {
+    function: Call,
+    calls: Vec<Call>,
 }
 
 /// The Folder struct
-#[derive(Default)]
-pub struct Folder;
+#[derive(Debug, Default)]
+pub struct Folder {
+    filenames: HashMap<usize, Option<String>>,
+    function_names: HashMap<usize, String>,
+    functions: HashMap<usize, Function>,
+    options: Options,
+}
 
 impl From<Options> for Folder {
-    fn from(_: Options) -> Self {
-        Self
+    fn from(options: Options) -> Self {
+        Self {
+            options,
+            ..Default::default()
+        }
     }
 }
 
 impl Collapse for Folder {
-    fn collapse<R, W>(&mut self, mut reader: R, mut writer: W) -> io::Result<()>
+    fn collapse<R, W>(&mut self, mut reader: R, writer: W) -> io::Result<()>
     where
         R: BufRead,
         W: Write,
     {
-        // Timings for all call stacks in total.
-        let mut stacks: HashMap<_, f32> = HashMap::new();
-        let mut current_stack = CallStack::new();
-        let mut prev_start_time = 0.0;
+        // Read buffer
         let mut line = String::new();
+        let mut occurrences = Occurrences::new(1);
 
+        // TODO: Handle header correctly.
         loop {
-            if reader.read_line(&mut line)? == 0 {
+            reader.read_line(&mut line)?;
+            if line.trim().is_empty() {
                 break;
             }
 
-            if line.starts_with(TRACE_START) {
+            line.clear();
+        }
+        loop {
+            reader.read_line(&mut line)?;
+            if line.trim().is_empty() {
                 break;
             }
 
@@ -110,88 +93,137 @@ impl Collapse for Folder {
 
         loop {
             line.clear();
+            reader.read_line(&mut line)?;
 
-            if reader.read_line(&mut line)? == 0 {
+            if line.trim().is_empty() {
                 break;
             }
 
-            if line.starts_with(TRACE_END) {
+            // Stop if we reached the end.
+            if line.starts_with(TRACE_SUMMARY) {
                 break;
             }
 
-            // Break the line into tab separated tokens.
-            let mut parts = Fields::new(&line).skip(2);
+            // Process each function, where the format is as follows:
+            //
+            //   fl=(n) filename
+            // Where n is a unique number for the file containing the function,
+            // and the filename may be omitted for PHP's built-in functions, in
+            // which case n=1, or when the filename had a previous occurrence.
+            //
+            //   fn=(n) function:filename
+            // Again, where n is a number uniquely identifying the function, and
+            // the filename is omitted for PHP's built-in functions, e.g.:
+            //   fn=(n) function
+            //
+            // This is followed by a stats line:
+            //   x y z
+            // Where x, y, and z are all unsigned integer, signifying the line
+            // number, time, and memory, respectively.
+            //
+            // This is then followed by the all (0 or more) functions called by
+            // this function, all in the format of:
+            //
+            //   cfl=(a)
+            //   cfn=(b)
+            //   calls=1 0 0
+            //   c d e
+            //
+            // Where:
+            // - a is the unique number of the filename containing the called function,
+            // - b is the unique number of the called function,
+            // - and c, d, and e are again the line number, time, and memory.
+            //
+            // I don't know what `calls=1 0 0` is supposed to signify. Reference:
+            // https://github.com/xdebug/xdebug/blob/393c8f6aed0fc1e63516b7f7f75da06480d82df3/src/profiler/profiler.c#L392
+            //
+            // So a full example would be:
+            //
+            // fl=(7) /vendor/symfony/polyfill-php80/bootstrap.php
+            // fn=(22) require::/vendor/symfony/polyfill-php80/bootstrap.php
+            // 1 1940 0
+            // cfl=(1)
+            // cfn=(2)
+            // calls=1 0 0
+            // 19 96 24
+            // cfl=(1)
+            // cfn=(21)
+            // calls=1 0 0
+            // 40 22 0
 
-            let (is_exit, time) = if let (Some(is_exit), Some(time)) = (parts.next(), parts.next())
-            {
-                let is_exit = match is_exit {
-                    "1" => true,
-                    "0" => false,
-                    a => panic!("uh oh: {}", a),
-                };
+            // Note that we've already read the line starting with fl= by this point.
+            let (file_index, filename) = self.get_index_and_optional_name(&line, "fl", None);
+            let (function_index, function) = self.read_index_and_optional_name(
+                &mut reader,
+                &mut line,
+                "fn",
+                filename.as_deref(),
+            )?;
 
-                let time = time.parse::<f32>().unwrap();
-
-                (is_exit, time)
-            } else {
-                continue;
+            let call = match filename {
+                None => Call::WithoutPath(function_index),
+                Some(_) => Call::WithPath(function_index, file_index),
             };
 
-            if is_exit && current_stack.is_empty() {
-                warn!("Found function exit without corresponding entrance. Discarding line. Check your input.");
-                continue;
-            }
+            let is_main = function
+                .as_ref()
+                .map(|name| name == MAIN)
+                .unwrap_or_default();
 
-            {
-                let current = current_stack.current();
-                let duration = SCALE_FACTOR * (time - prev_start_time);
+            self.filenames.entry(file_index).or_insert(filename);
+            self.function_names
+                .entry(function_index)
+                .or_insert_with(|| function.expect("function name is not optional"));
 
-                // hash `current` for lookup and insertion.
-                let mut hasher = stacks.hasher().build_hasher();
-                current.hash(&mut hasher);
-                let hash = hasher.finish();
+            let (_line_number, _time, _memory) = self.read_call_stats(&mut reader, &mut line)?;
+            let mut current_function = Function::new(call);
 
-                match stacks
-                    .raw_entry_mut()
-                    .from_key_hashed_nocheck(hash, current)
-                {
-                    RawEntryMut::Occupied(mut occ) => *occ.get_mut() += duration,
-                    RawEntryMut::Vacant(vacant) => {
-                        // `Box<str>` has same hash as `str`.
-                        vacant.insert_hashed_nocheck(hash, Box::from(current), duration);
-                    }
+            // Now read all calls to this function
+            loop {
+                line.clear();
+                reader.read_line(&mut line)?;
+
+                if line.trim().is_empty() {
+                    // Done with this function.
+                    break;
                 }
+
+                let (calling_file_index, _) = self.get_index_and_optional_name(&line, "cfl", None);
+                let (calling_function_index, _) =
+                    self.read_index_and_optional_name(&mut reader, &mut line, "cfn", None)?;
+
+                // Skip line "calls=1 0 0"
+                reader.read_line(&mut line)?;
+
+                let (_, _calling_time, _) = self.read_call_stats(&mut reader, &mut line)?;
+
+                current_function.call(if calling_file_index > 1 {
+                    Call::WithPath(calling_function_index, calling_file_index)
+                } else {
+                    Call::WithoutPath(calling_function_index)
+                });
             }
 
-            if is_exit {
-                current_stack.pop();
+            if is_main {
+                current_function.gather_stacks(self, &mut occurrences);
+                break;
             } else {
-                let _ = parts.next();
-                let func_name = parts.next();
-                let _ = parts.next();
-                let path_name = parts.next();
-
-                if let (Some(func_name), Some(path_name)) = (func_name, path_name) {
-                    current_stack.call(func_name, path_name);
-                }
+                self.functions.insert(function_index, current_function);
             }
 
-            prev_start_time = time;
+            // if !current_stack.is_empty() {
+            //     self.write_stack(&current_stack, &mut occurrences)
+            //         .expect("formatting stack as string should not fail");
+            // }
         }
 
-        for (key, value) in stacks {
-            writeln!(writer, "{} {}", current_stack.frames(&key), value)?;
-        }
-
-        Ok(())
+        occurrences.write_and_clear(writer)
     }
 
     fn is_applicable(&mut self, input: &str) -> Option<bool> {
         let mut input = input.as_bytes();
         let mut line = String::new();
         loop {
-            line.clear();
-
             if let Ok(n) = input.read_line(&mut line) {
                 if n == 0 {
                     break;
@@ -209,167 +241,176 @@ impl Collapse for Folder {
     }
 }
 
-impl CallStack {
+impl Folder {
+    /// Read a line from the [reader] and get the identifier and its optional
+    /// name using [Self::get_index_and_optional_name].
+    fn read_index_and_optional_name<R>(
+        &self,
+        reader: &mut R,
+        line: &mut String,
+        expected_prefix: &str,
+        strip_suffix: Option<&str>,
+    ) -> io::Result<(usize, Option<String>)>
+    where
+        R: BufRead,
+    {
+        line.clear();
+
+        reader.read_line(line)?;
+        Ok(self.get_index_and_optional_name(line, expected_prefix, strip_suffix))
+    }
+
+    /// Given a line from the Xdebug trace file, extract the numerical identifier,
+    /// and an optional string value. The format of the line is:
+    /// {expected_prefix}=({identifier}) {filename}
+    ///
+    /// The filename part is optional, the alternative format is:
+    /// {expected_prefix}=({identifier}) {filename}
+    ///
+    /// If a [strip_suffix] is given, it is stripped from the filename, if any.
+    fn get_index_and_optional_name(
+        &self,
+        line: &str,
+        expected_prefix: &str,
+        strip_suffix: Option<&str>,
+    ) -> (usize, Option<String>) {
+        if !line.starts_with(expected_prefix) {
+            error!("Invalid line {}, expected prefix {}", line, expected_prefix);
+            return (0, None);
+        }
+
+        let line = line.trim();
+        if let Some((a, b)) = line.split_once(' ') {
+            (
+                self.get_prefixed_index(a, expected_prefix),
+                Some(match strip_suffix {
+                    Some(suffix) => b
+                        .strip_suffix(&format!(":{}", suffix))
+                        .unwrap_or(b)
+                        .to_owned(),
+                    None => b.to_owned(),
+                }),
+            )
+        } else {
+            (self.get_prefixed_index(line, expected_prefix), None)
+        }
+    }
+
+    fn get_prefixed_index(&self, str: &str, prefix: &str) -> usize {
+        str[prefix.len() + 2..str.len() - 1]
+            .parse()
+            .unwrap_or_else(|_| panic!("unable to parse {} index", prefix))
+    }
+
+    /// Read a line with stats about a function or function call. Such as line
+    /// has three unsigned integers, separated by spaces, signifying the line
+    /// number, time spent, and memory used.
+    fn read_call_stats<R>(
+        &self,
+        reader: &mut R,
+        line: &mut String,
+    ) -> io::Result<(usize, f64, usize)>
+    where
+        R: BufRead,
+    {
+        line.clear();
+        reader.read_line(line)?;
+
+        let mut parts = line.trim().split(' ');
+
+        // TODO: Solve these unwrap calls
+        let line_number = parts.next().unwrap().parse().unwrap();
+        let time = parts.next().unwrap().parse().unwrap();
+        let mem = parts.next().unwrap().parse().unwrap();
+
+        Ok((line_number, time, mem))
+    }
+}
+
+#[allow(clippy::unused_io_amount)]
+impl Function {
     /// Create a function name interning call stack tracker.
     ///
     /// Populated with the constant builtins for inclusion, to enable a faster comparison.
-    pub fn new() -> Self {
-        CallStack {
-            strings: HashMap::new(),
-            interned_string: Vec::new(),
-            calls: HashMap::new(),
-            interned: Vec::new(),
-            stack: Vec::with_capacity(16),
+    pub fn new(function: Call) -> Self {
+        Function {
+            function,
+            calls: Vec::with_capacity(16),
         }
     }
 
-    /// Push a `call` line on top of the stack.
-    pub fn call(&mut self, name: &str, path: &str) {
-        let new_or_not = match self.intern_str(name) {
-            Interned::Old(st @ Str(0..=4)) => match self.intern_str(path) {
-                Interned::Old(other) => Interned::Old(Call::WithPath(st, other)),
-                Interned::New(new) => Interned::New(Call::WithPath(st, new)),
-            },
-            Interned::Old(other) => Interned::Old(Call::WithoutPath(other)),
-            Interned::New(new) => Interned::New(Call::WithoutPath(new)),
-        };
-
-        let idx = self.intern(new_or_not);
-        self.stack.push(idx)
-    }
-
-    /// Pop one call from the current stack.
-    pub fn pop(&mut self) {
-        self.stack.pop();
-    }
-
-    /// An empty stack means we finished main.
+    /// TODO: when is a stack empty?
     fn is_empty(&self) -> bool {
-        self.stack.is_empty()
+        self.calls.is_empty()
     }
 
-    /// Get a comparable, hashable representation of the call stack. of the call stack.
-    fn current(&self) -> &[usize] {
-        self.stack.as_slice()
+    /// Push a `call` line that is called by this function.
+    pub fn call(&mut self, call: Call) {
+        self.calls.push(call);
     }
 
-    /// Intern a string, return the unique index.
-    fn intern_str(&mut self, string: &str) -> Interned<Str> {
-        let mut hasher = self.strings.hasher().build_hasher();
-        string.hash(&mut hasher);
-        let hash = hasher.finish();
+    /// Gather all stacks, uses [Self::gather_stacks_recursive].
+    fn gather_stacks(&self, folder: &Folder, occurrences: &mut Occurrences) {
+        let mut seen = HashSet::with_capacity(16);
+        self.gather_stacks_recursive("", &mut seen, folder, occurrences);
+    }
 
-        let entry = self
-            .strings
-            .raw_entry_mut()
-            .from_key_hashed_nocheck(hash, string);
-
-        let vacant = match entry {
-            RawEntryMut::Occupied(occ) => return Interned::Old(Str(*occ.get())),
-            RawEntryMut::Vacant(vacant) => vacant,
+    fn gather_stacks_recursive(
+        &self,
+        prefix: &str,
+        seen: &mut HashSet<usize>,
+        folder: &Folder,
+        occurrences: &mut Occurrences,
+    ) {
+        let key = if prefix.is_empty() {
+            self.function.as_str(folder)
+        } else {
+            Cow::Owned(format!("{};{}", prefix, self.function.as_str(folder)))
         };
 
-        let index = self.interned_string.len();
-        let element: Rc<str> = Rc::from(string);
-        self.interned_string.push(element.clone());
-        vacant.insert_hashed_nocheck(hash, element, index);
-        Interned::New(Str(index))
+        if self.is_empty() {
+            occurrences.insert_or_add(key.into_owned(), 1);
+            return;
+        }
+
+        for call in &self.calls {
+            let func_id = call.get_function();
+            if seen.contains(&func_id) {
+                // Prevent recursion.
+                continue;
+            }
+
+            seen.insert(func_id);
+            let func = &folder.functions[&func_id];
+            func.gather_stacks_recursive(&key, seen, folder, occurrences);
+            seen.remove(&func_id);
+        }
+    }
+}
+
+impl Call {
+    /// Get the function identifier of this call.
+    fn get_function(&self) -> usize {
+        match self {
+            Call::WithPath(i, _) => *i,
+            Call::WithoutPath(i) => *i,
+        }
     }
 
-    /// Intern a `Call` into a `usize` index.
-    fn intern(&mut self, call: Interned<Call>) -> usize {
-        let new = match call {
-            // The strings were not seen before, definitely new.
-            Interned::New(t) => t,
-            // The strings used were seen before, but maybe not in this call. So retest.
-            Interned::Old(t) => {
-                if let Some(idx) = self.calls.get(&t) {
-                    return *idx;
+    /// Get the call as a formatted string, containing either just the function
+    /// name, or the function name and the filename, depending on
+    /// [Options::include_filenames].
+    fn as_str<'f>(&self, folder: &'f Folder) -> Cow<'f, String> {
+        match self {
+            Call::WithPath(func, file) => {
+                let (name, path) = (&folder.function_names[func], &folder.filenames[file]);
+                if folder.options.include_filenames {
+                    Cow::Owned(format!("{} ({})", name, path.as_deref().unwrap()))
                 } else {
-                    t
+                    Cow::Borrowed(name)
                 }
             }
-        };
-
-        let index = self.interned.len();
-        self.interned.push(new);
-        self.calls.insert(new, index);
-        index
-    }
-
-    /// Prepare the stack frame for printing.
-    fn frames<'a>(&'a self, stack: &'a [usize]) -> Frames<'a> {
-        Frames { calls: self, stack }
-    }
-
-    /// Create a name for the current stack.
-    ///
-    /// This is potentially costly.
-    fn write_name(&self, indices: &[usize], buffer: &mut fmt::Formatter) -> fmt::Result {
-        let mut indices = indices.iter().cloned();
-        if let Some(first) = indices.by_ref().next() {
-            self.write_call(self.interned[first], buffer)?;
+            Call::WithoutPath(func) => Cow::Borrowed(&folder.function_names[func]),
         }
-        for next in indices {
-            buffer.write_str(";")?;
-            self.write_call(self.interned[next], buffer)?;
-        }
-        Ok(())
-    }
-
-    /// Format a single call.
-    fn write_call(&self, call: Call, buffer: &mut fmt::Formatter) -> fmt::Result {
-        match call {
-            Call::WithoutPath(Str(idx)) => buffer.write_str(&self.interned_string[idx]),
-            Call::WithPath(Str(name), Str(path)) => {
-                let (name, path) = (&self.interned_string[name], &self.interned_string[path]);
-                buffer.write_str(name)?;
-                buffer.write_str("(")?;
-                buffer.write_str(path)?;
-                buffer.write_str(")")
-            }
-        }
-    }
-}
-
-impl<'a> fmt::Display for Frames<'a> {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        self.calls.write_name(self.stack, f)
-    }
-}
-
-impl<'a> Fields<'a> {
-    pub fn new(line: &'a str) -> Self {
-        Fields { line }
-    }
-}
-
-impl<'a> Iterator for Fields<'a> {
-    type Item = &'a str;
-
-    fn next(&mut self) -> Option<&'a str> {
-        let begin = self
-            .line
-            .as_bytes()
-            .iter()
-            .cloned()
-            .position(|b| b != b'\t')
-            .unwrap_or(self.line.len());
-
-        self.line = &self.line[begin..];
-        if self.line.is_empty() {
-            return None;
-        }
-
-        let end = self
-            .line
-            .as_bytes()
-            .iter()
-            .cloned()
-            .position(|b| b == b'\t')
-            .unwrap_or(self.line.len());
-        let (result, next) = self.line.split_at(end);
-        self.line = next;
-        Some(result)
     }
 }

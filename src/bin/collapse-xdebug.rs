@@ -38,6 +38,9 @@ struct Opt {
     #[clap(value_name = "PATH")]
     /// Xdebug script output file, or STDIN if not specified
     infile: Option<PathBuf>,
+
+    #[clap(short = 'f')]
+    include_filenames: bool,
 }
 
 impl Opt {
@@ -46,6 +49,7 @@ impl Opt {
             self.infile,
             Options {
                 nthreads: self.nthreads,
+                include_filenames: self.include_filenames,
             },
         )
     }
