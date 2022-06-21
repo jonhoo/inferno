@@ -28,7 +28,6 @@ crossbeam-utils = { version = "0.8", optional = true }
 crossbeam-channel = { version = "0.5", optional = true }
 dashmap = { version = "5", optional = true }
 env_logger = { version = "0.9", default-features = false, optional = true }
-hashbrown = "0.6"
 indexmap = { version = "1.0", optional = true }
 itoa = "1"
 log = "0.4"
