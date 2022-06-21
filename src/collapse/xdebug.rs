@@ -352,24 +352,30 @@ impl Function {
     /// Gather all stacks, uses [Self::gather_stacks_recursive].
     fn gather_stacks(&self, folder: &Folder, occurrences: &mut Occurrences) {
         let mut seen = HashSet::with_capacity(16);
-        self.gather_stacks_recursive("", &mut seen, folder, occurrences);
+        self.gather_stacks_recursive(
+            &mut String::with_capacity(1024),
+            &mut seen,
+            folder,
+            occurrences,
+        );
     }
 
     fn gather_stacks_recursive(
         &self,
-        prefix: &str,
+        key: &mut String,
         seen: &mut HashSet<usize>,
         folder: &Folder,
         occurrences: &mut Occurrences,
     ) {
-        let key = if prefix.is_empty() {
-            self.function.as_str(folder)
-        } else {
-            Cow::Owned(format!("{};{}", prefix, self.function.as_str(folder)))
-        };
+        let old_prefix_len = key.len();
+        if !key.is_empty() {
+            key.push(';');
+        }
+        key.push_str(&self.function.as_str(folder));
 
         if self.is_empty() {
-            occurrences.insert_or_add(key.into_owned(), 1);
+            occurrences.insert_or_add(key.clone(), 1);
+            key.truncate(old_prefix_len);
             return;
         }
 
@@ -382,9 +388,11 @@ impl Function {
 
             seen.insert(func_id);
             let func = &folder.functions[&func_id];
-            func.gather_stacks_recursive(&key, seen, folder, occurrences);
+            func.gather_stacks_recursive(key, seen, folder, occurrences);
             seen.remove(&func_id);
         }
+
+        key.truncate(old_prefix_len);
     }
 }
 
