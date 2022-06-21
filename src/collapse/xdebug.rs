@@ -39,10 +39,10 @@ enum Call {
     WithoutPath(usize),
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 struct Function {
     function: Call,
-    calls: Vec<Call>,
+    calls: Vec<Function>,
 }
 
 /// The Folder struct
@@ -50,7 +50,10 @@ struct Function {
 pub struct Folder {
     filenames: HashMap<usize, Option<String>>,
     function_names: HashMap<usize, String>,
-    functions: HashMap<usize, Function>,
+    /// Functions that have been seen so far, but not yet called. A single function may
+    /// appear multiple times, with multiple callers. The file format guarantees that
+    /// the function is "defined" before it appears as a called function (cfn).
+    function_cache: HashMap<usize, Function>,
     options: Options,
 }
 
@@ -178,7 +181,7 @@ impl Collapse for Folder {
             let (_line_number, _time, _memory) = self.read_call_stats(&mut reader, &mut line)?;
             let mut current_function = Function::new(call);
 
-            // Now read all calls to this function
+            // Now read all calls from this function
             loop {
                 line.clear();
                 reader.read_line(&mut line)?;
@@ -188,33 +191,31 @@ impl Collapse for Folder {
                     break;
                 }
 
-                let (calling_file_index, _) = self.get_index_and_optional_name(&line, "cfl", None);
-                let (calling_function_index, _) =
+                let (_called_file_id, _) = self.get_index_and_optional_name(&line, "cfl", None);
+                let (called_function_id, _) =
                     self.read_index_and_optional_name(&mut reader, &mut line, "cfn", None)?;
 
                 // Skip line "calls=1 0 0"
                 reader.read_line(&mut line)?;
 
-                let (_, _calling_time, _) = self.read_call_stats(&mut reader, &mut line)?;
+                let (_, _call_time, _) = self.read_call_stats(&mut reader, &mut line)?;
 
-                current_function.call(if calling_file_index > 1 {
-                    Call::WithPath(calling_function_index, calling_file_index)
-                } else {
-                    Call::WithoutPath(calling_function_index)
-                });
+                match self.function_cache.get(&called_function_id) {
+                    Some(f) => current_function.call(f.clone()), // TODO: Can we remove this clone()?
+                    None => error!("undefined called function {}", called_function_id),
+                }
             }
 
             if is_main {
                 current_function.gather_stacks(self, &mut occurrences);
                 break;
             } else {
-                self.functions.insert(function_index, current_function);
+                self.function_cache
+                    .entry(function_index)
+                    // TODO: What does it mean if the function is defined multiple times, without
+                    // being called in between those definitions? Should we keep a queue of them?
+                    .or_insert(current_function);
             }
-
-            // if !current_stack.is_empty() {
-            //     self.write_stack(&current_stack, &mut occurrences)
-            //         .expect("formatting stack as string should not fail");
-            // }
         }
 
         occurrences.write_and_clear(writer)
@@ -345,8 +346,8 @@ impl Function {
     }
 
     /// Push a `call` line that is called by this function.
-    pub fn call(&mut self, call: Call) {
-        self.calls.push(call);
+    pub fn call(&mut self, function: Function) {
+        self.calls.push(function);
     }
 
     /// Gather all stacks, uses [Self::gather_stacks_recursive].
@@ -380,14 +381,14 @@ impl Function {
         }
 
         for call in &self.calls {
-            let func_id = call.get_function();
+            let func_id = call.function.get_function_id();
             if seen.contains(&func_id) {
                 // Prevent recursion.
                 continue;
             }
 
             seen.insert(func_id);
-            let func = &folder.functions[&func_id];
+            let func = &folder.function_cache[&func_id];
             func.gather_stacks_recursive(key, seen, folder, occurrences);
             seen.remove(&func_id);
         }
@@ -398,7 +399,7 @@ impl Function {
 
 impl Call {
     /// Get the function identifier of this call.
-    fn get_function(&self) -> usize {
+    fn get_function_id(&self) -> usize {
         match self {
             Call::WithPath(i, _) => *i,
             Call::WithoutPath(i) => *i,
