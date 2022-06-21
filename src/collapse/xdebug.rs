@@ -8,7 +8,8 @@ use std::io::prelude::*;
 use std::io::{self, Write};
 
 const MAIN: &str = "{main}";
-const TRACE_START: &str = "TRACE START";
+const TRACE_START_VERSION: &str = "version: 1";
+const TRACE_START_XDEBUG: &str = "creator: xdebug";
 const TRACE_SUMMARY: &str = "summary: ";
 
 /// Options for the Xdebug collapser
@@ -76,15 +77,48 @@ impl Collapse for Folder {
         let mut line = String::new();
         let mut occurrences = Occurrences::new(1);
 
-        // TODO: Handle header correctly.
+        // Sample header:
+        // version: 1
+        // creator: xdebug 3.1.4 (PHP 7.4.30)
+        // cmd: /var/www/project/index.php
+        // part: 1
+        // positions: line
+        //
+        // events: Time_(10ns) Memory_(bytes)
+        //
+        // (rest of file)
+
+        // Read the first part of the header first, asserting that the version and created lines are
+        // present as expected. Continue until we reach an empty line, signifying the end of the
+        // header.
+        let mut header_stage = 0;
         loop {
             reader.read_line(&mut line)?;
             if line.trim().is_empty() {
                 break;
             }
 
+            match header_stage {
+                0 => {
+                    if line.trim() != TRACE_START_VERSION {
+                        error!("unexpected header version line: {}", line);
+                        return Ok(());
+                    }
+                }
+                1 => {
+                    if !line.trim().starts_with(TRACE_START_XDEBUG) {
+                        error!("expected xdebug creator line: {}", line);
+                        return Ok(());
+                    }
+                }
+                _ => {}
+            }
+
+            header_stage += 1;
             line.clear();
         }
+
+        // Skip over the events line (read until we reach an empty line).
         loop {
             reader.read_line(&mut line)?;
             if line.trim().is_empty() {
@@ -223,21 +257,22 @@ impl Collapse for Folder {
     fn is_applicable(&mut self, input: &str) -> Option<bool> {
         let mut input = input.as_bytes();
         let mut line = String::new();
-        loop {
-            if let Ok(n) = input.read_line(&mut line) {
-                if n == 0 {
-                    break;
-                } else {
+
+        match input.read_line(&mut line) {
+            Ok(n) if n == 0 => return None,
+            Ok(_) => {
+                if line != TRACE_START_VERSION {
                     return Some(false);
                 }
             }
-
-            if line.starts_with(TRACE_START) {
-                return Some(true);
-            }
+            _ => return None,
         }
 
-        None
+        return match input.read_line(&mut line) {
+            Ok(n) if n == 0 => None,
+            Ok(_) => Some(line.starts_with(TRACE_START_XDEBUG)),
+            _ => None,
+        };
     }
 }
 
