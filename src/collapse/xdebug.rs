@@ -272,11 +272,11 @@ impl Collapse for Folder {
             _ => return None,
         }
 
-        return match input.read_line(&mut line) {
+        match input.read_line(&mut line) {
             Ok(n) if n == 0 => None,
             Ok(_) => Some(line.starts_with(TRACE_START_XDEBUG)),
             _ => None,
-        };
+        }
     }
 }
 
