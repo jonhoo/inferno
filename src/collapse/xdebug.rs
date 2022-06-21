@@ -312,7 +312,7 @@ impl Folder {
         &self,
         reader: &mut R,
         line: &mut String,
-    ) -> io::Result<(usize, f64, usize)>
+    ) -> io::Result<(usize, usize, usize)>
     where
         R: BufRead,
     {
@@ -320,13 +320,21 @@ impl Folder {
         reader.read_line(line)?;
 
         let mut parts = line.trim().split(' ');
+        let mut any_errors = false;
 
-        // TODO: Solve these unwrap calls
-        let line_number = parts.next().unwrap().parse().unwrap();
-        let time_ns = parts.next().unwrap().parse().unwrap();
-        let mem = parts.next().unwrap().parse().unwrap();
+        let mut stats = [0; 3];
+        for stat in stats.iter_mut() {
+            match parts.next().map(|s| s.parse()) {
+                Some(Ok(s)) => *stat = s,
+                _ => any_errors = true,
+            }
+        }
 
-        Ok((line_number, time_ns, mem))
+        if any_errors {
+            error!("invalid stats line: {}", line);
+        }
+
+        Ok((stats[0], stats[1], stats[2]))
     }
 }
 
