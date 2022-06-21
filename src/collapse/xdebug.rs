@@ -110,22 +110,22 @@ impl Collapse for Folder {
             // Process each function, where the format is as follows:
             //
             //   fl=(n) filename
-            // Where n is a unique number for the file containing the function,
-            // and the filename may be omitted for PHP's built-in functions, in
-            // which case n=1, or when the filename had a previous occurrence.
+            // Where n is a unique number for the file containing the function, and the filename may
+            // be omitted for PHP's built-in functions, in which case n=1, or when the filename had
+            // a previous occurrence.
             //
             //   fn=(n) function:filename
-            // Again, where n is a number uniquely identifying the function, and
-            // the filename is omitted for PHP's built-in functions, e.g.:
+            // Again, where n is a number uniquely identifying the function, and the filename is
+            // omitted for PHP's built-in functions, e.g.:
             //   fn=(n) function
             //
             // This is followed by a stats line:
             //   x y z
-            // Where x, y, and z are all unsigned integer, signifying the line
-            // number, time, and memory, respectively.
+            // Where x, y, and z are all unsigned integer, signifying the line number, time, and
+            // memory, respectively.
             //
-            // This is then followed by the all (0 or more) functions called by
-            // this function, all in the format of:
+            // This is then followed by all (0 or more) functions called by this function, all in
+            // the format of:
             //
             //   cfl=(a)
             //   cfn=(b)
@@ -283,7 +283,7 @@ impl Folder {
         let line = line.trim();
         if let Some((a, b)) = line.split_once(' ') {
             (
-                self.get_prefixed_index(a, expected_prefix),
+                self.get_prefixed_id(a, expected_prefix),
                 Some(match strip_suffix {
                     Some(suffix) => b
                         .strip_suffix(&format!(":{}", suffix))
@@ -293,19 +293,21 @@ impl Folder {
                 }),
             )
         } else {
-            (self.get_prefixed_index(line, expected_prefix), None)
+            (self.get_prefixed_id(line, expected_prefix), None)
         }
     }
 
-    fn get_prefixed_index(&self, str: &str, prefix: &str) -> usize {
+    /// Get a reference to an id, stripping off the prefix and other characters. The format is:
+    ///
+    /// {prefix}=({id})
+    fn get_prefixed_id(&self, str: &str, prefix: &str) -> usize {
         str[prefix.len() + 2..str.len() - 1]
             .parse()
             .unwrap_or_else(|_| panic!("unable to parse {} index", prefix))
     }
 
-    /// Read a line with stats about a function or function call. Such as line
-    /// has three unsigned integers, separated by spaces, signifying the line
-    /// number, time spent, and memory used.
+    /// Read a line with stats about a function or function call. Such as line has three unsigned
+    /// integers, separated by spaces, signifying the line number, time spent, and memory used.
     fn read_call_stats<R>(
         &self,
         reader: &mut R,
@@ -321,18 +323,16 @@ impl Folder {
 
         // TODO: Solve these unwrap calls
         let line_number = parts.next().unwrap().parse().unwrap();
-        let time = parts.next().unwrap().parse().unwrap();
+        let time_ns = parts.next().unwrap().parse().unwrap();
         let mem = parts.next().unwrap().parse().unwrap();
 
-        Ok((line_number, time, mem))
+        Ok((line_number, time_ns, mem))
     }
 }
 
 #[allow(clippy::unused_io_amount)]
 impl Function {
-    /// Create a function name interning call stack tracker.
-    ///
-    /// Populated with the constant builtins for inclusion, to enable a faster comparison.
+    /// Create a function instance, that can keep track of the other functions it calls.
     pub fn new(function: Call) -> Self {
         Function {
             function,
@@ -340,8 +340,8 @@ impl Function {
         }
     }
 
-    /// TODO: when is a stack empty?
-    fn is_empty(&self) -> bool {
+    /// Does this function call no other functions?
+    fn is_tail(&self) -> bool {
         self.calls.is_empty()
     }
 
@@ -361,6 +361,8 @@ impl Function {
         );
     }
 
+    /// Recursively walk all called functions, until each tail is reached, at which point it's added
+    /// to the occurrences list.
     fn gather_stacks_recursive(
         &self,
         key: &mut String,
@@ -374,7 +376,7 @@ impl Function {
         }
         key.push_str(&self.function.as_str(folder));
 
-        if self.is_empty() {
+        if self.is_tail() {
             occurrences.insert_or_add(key.clone(), 1);
             key.truncate(old_prefix_len);
             return;
