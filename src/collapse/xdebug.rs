@@ -382,11 +382,6 @@ impl Function {
         }
     }
 
-    /// Does this function call no other functions?
-    fn is_tail(&self) -> bool {
-        self.calls.is_empty()
-    }
-
     /// Push a `call` line that is called by this function.
     pub fn call(&mut self, function: Function) {
         self.calls.push(function);
@@ -418,11 +413,10 @@ impl Function {
         }
         key.push_str(&self.function.as_str(folder));
 
-        if self.is_tail() {
-            occurrences.insert_or_add(key.clone(), 1);
-            key.truncate(old_prefix_len);
-            return;
-        }
+        occurrences.insert_or_add(
+            key.clone(),
+            (time_ns + self.self_time_ns) / SCALE_FACTOR as usize,
+        );
 
         for call in &self.calls {
             let func_id = call.function.get_function_id();
