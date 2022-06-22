@@ -201,9 +201,13 @@ impl Collapse for Folder {
                 filename.as_deref(),
             )?;
 
-            let call = match filename {
-                None => Call::WithoutPath(function_index),
-                Some(_) => Call::WithPath(function_index, file_index),
+            let call = match (file_index, &filename) {
+                (_, Some(_)) => Call::WithPath(function_index, file_index),
+                (1, _) => Call::WithoutPath(function_index),
+                (n, _) if self.filenames.contains_key(&n) => {
+                    Call::WithPath(function_index, file_index)
+                }
+                _ => Call::WithoutPath(function_index),
             };
 
             let is_main = function
