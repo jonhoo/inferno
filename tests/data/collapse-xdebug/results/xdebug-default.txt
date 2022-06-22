@@ -1,0 +1,7 @@
+{main} 87
+{main};bar 87
+{main};bar;foo 87
+{main};bar;php::define 174
+{main};baz 87
+{main};baz;qux 88
+{main};php::define 87

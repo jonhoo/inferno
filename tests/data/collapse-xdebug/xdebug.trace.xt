@@ -1,0 +1,67 @@
+version: 1
+creator: xdebug 3.1.4 (PHP 7.4.30)
+cmd: /var/www/project/index.php
+part: 1
+positions: line
+
+events: Time_(10ns) Memory_(bytes)
+
+fl=(1)
+fn=(1) php::define
+4 132 24
+
+fl=(1)
+fn=(1)
+4 132 24
+
+fl=(2) /var/www/project/index.php
+fn=(2) foo:/var/www/project/index.php
+2 123 100
+
+fl=(2)
+fn=(3) bar
+10 456 80
+cfl=(1)
+cfn=(1)
+calls=1 0 0
+12 2 3
+cfl=(2)
+cfn=(2)
+calls=1 0 0
+13 2 3
+cfl=(1)
+cfn=(1)
+calls=1 0 0
+14 2 3
+
+fl=(2)
+fn=(4) qux
+17 789 90
+
+fl=(1)
+fn=(1)
+4 132 24
+
+fl=(2)
+fn=(5) baz
+20 312 338
+cfl=(2)
+cfn=(4)
+calls=1 0 0
+22 712 83
+
+fl=(2)
+fn=(6) {main}
+1 87391 0
+cfl=(1)
+cfn=(1)
+calls=1 0 0
+25 123 48
+cfl=(2)
+cfn=(3)
+calls=1 0 0
+25 456 125
+cfl=(2)
+cfn=(5)
+calls=1 0 0
+25 789 86
