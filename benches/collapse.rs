@@ -9,7 +9,7 @@ use once_cell::sync::Lazy;
 const INFILE_DTRACE: &str = "flamegraph/example-dtrace-stacks.txt";
 const INFILE_PERF: &str = "flamegraph/example-perf-stacks.txt.gz";
 const INFILE_SAMPLE: &str = "tests/data/collapse-sample/large.txt.gz";
-const INFILE_XDEBUG: &str = "tests/xdebug.trace.xt";
+const INFILE_XDEBUG: &str = "tests/data/collapse-xdebug/xdebug.bench.xt";
 const SAMPLE_SIZE: usize = 100;
 
 static NTHREADS: Lazy<usize> = Lazy::new(num_cpus::get);
