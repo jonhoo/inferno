@@ -8,9 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 ### Changed
- - Don't quote generic font families in CSS. [#252](https://github.com/jonhoo/inferno/pull/252)
 
 ### Removed
+
+## [0.11.6] - 2022-06-22
+### Changed
+ - Don't quote generic font families in CSS. [#252](https://github.com/jonhoo/inferno/pull/252)
 
 ## [0.11.5] - 2022-06-18
 ### Changed
@@ -212,7 +215,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Moved to `IndexMap` and FNV hashing ([#127](https://github.com/jonhoo/inferno/pull/127))
 - Moved CI to Azure DevOps Pipelines
 
-[Unreleased]: https://github.com/jonhoo/inferno/compare/v0.11.5...HEAD
+[Unreleased]: https://github.com/jonhoo/inferno/compare/v0.11.6...HEAD
+[0.11.6]: https://github.com/jonhoo/inferno/compare/v0.11.5...v0.11.6
 [0.11.5]: https://github.com/jonhoo/inferno/compare/v0.11.4...v0.11.5
 [0.11.4]: https://github.com/jonhoo/inferno/compare/v0.11.3...v0.11.4
 [0.11.3]: https://github.com/jonhoo/inferno/compare/v0.11.2...v0.11.3
