@@ -10,7 +10,7 @@ use once_cell::sync::Lazy;
 static NTHREADS: Lazy<String> = Lazy::new(|| format!("{}", *DEFAULT_NTHREADS));
 
 #[derive(Debug, Parser)]
-#[clap(name = "inferno-collapse-xdebug", author = "")]
+#[clap(name = "inferno-collapse-xdebug")]
 struct Opt {
     /// Silence all log output
     #[clap(short = 'q', long = "quiet")]
@@ -56,7 +56,7 @@ impl Opt {
 }
 
 fn main() -> io::Result<()> {
-    let opt = Opt::from_args();
+    let opt = Opt::parse();
 
     // Initialize logger
     if !opt.quiet {
