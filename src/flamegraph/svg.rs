@@ -9,6 +9,9 @@ use str_stack::StrStack;
 
 use super::{Direction, Options, TextTruncateDirection};
 
+/// The generic font families should not have quotes around them in the CSS.
+const GENERIC_FONT_FAMILIES: &[&str] = &["cursive", "fantasy", "monospace", "serif", "sans-serif"];
+
 pub(super) enum TextArgument<'a> {
     String(Cow<'a, str>),
     FromBuffer(usize),
@@ -116,13 +119,19 @@ where
         BytesStart::borrowed_name(b"style").with_attributes(iter::once(("type", "text/css"))),
     ))?;
 
+    let font_type: Cow<str> = if GENERIC_FONT_FAMILIES.contains(&opt.font_type.as_str()) {
+        Cow::Borrowed(&opt.font_type)
+    } else {
+        Cow::Owned(enquote('\"', &opt.font_type))
+    };
+
     let titlesize = &opt.font_size + 5;
     svg.write_event(Event::Text(BytesText::from_escaped_str(&format!(
         "
 text {{ font-family:{}; font-size:{}px; fill:rgb(0,0,0); }}
 #title {{ text-anchor:middle; font-size:{}px; }}
 {}",
-        enquote('\"', &opt.font_type),
+        font_type,
         &opt.font_size,
         titlesize,
         include_str!("flamegraph.css")

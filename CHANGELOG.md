@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 ### Changed
+ - Don't quote generic font families in CSS. [#252](https://github.com/jonhoo/inferno/pull/252)
 
 ### Removed
 

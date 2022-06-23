@@ -682,6 +682,23 @@ fn flamegraph_font_type_with_quote() {
 }
 
 #[test]
+fn flamegraph_font_type_generic_families() {
+    let input_file =
+        "./tests/data/flamegraph/differential/perf-cycles-instructions-01-collapsed-all-diff.txt";
+
+    let generic_families = &["cursive", "fantasy", "monospace", "serif", "sans-serif"];
+    for family in generic_families {
+        let expected_result_file =
+            format!("./tests/data/flamegraph/options/font_type_{}.svg", family);
+
+        let mut options = flamegraph::Options::default();
+        options.font_type = family.to_string();
+
+        test_flamegraph(input_file, &expected_result_file, options).unwrap();
+    }
+}
+
+#[test]
 fn search_color_non_default() {
     let input_file =
         "./tests/data/flamegraph/differential/perf-cycles-instructions-01-collapsed-all-diff.txt";
