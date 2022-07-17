@@ -51,6 +51,7 @@ pub(super) struct StyleOptions<'a> {
     pub(super) imageheight: usize,
     pub(super) bgcolor1: Cow<'a, str>,
     pub(super) bgcolor2: Cow<'a, str>,
+    pub(super) strokecolor: Option<String>,
 }
 
 pub fn write_header<W>(
@@ -130,11 +131,17 @@ where
         "
 text {{ font-family:{}; font-size:{}px; fill:rgb(0,0,0); }}
 #title {{ text-anchor:middle; font-size:{}px; }}
-{}",
-        font_type,
-        &opt.font_size,
-        titlesize,
-        include_str!("flamegraph.css")
+",
+        font_type, &opt.font_size, titlesize,
+    ))))?;
+    if let Some(strokecolor) = &style_options.strokecolor {
+        svg.write_event(Event::Text(BytesText::from_escaped_str(&format!(
+            "#frames > g > rect {{ stroke:{}; stroke-width:1; }}\n",
+            strokecolor
+        ))))?;
+    }
+    svg.write_event(Event::Text(BytesText::from_escaped_str(include_str!(
+        "flamegraph.css"
     ))))?;
     svg.write_event(Event::End(BytesEnd::borrowed(b"style")))?;
 
