@@ -244,7 +244,7 @@ text {{ font-family:{}; font-size:{}px; fill:rgb(0,0,0); }}
         svg,
         &mut buf,
         TextItem {
-            x: Dimension::Pixels(image_width as usize - super::XPAD - 100),
+            x: Dimension::Pixels(image_width as usize - super::XPAD),
             y: (opt.font_size * 2) as f64,
             text: "Search".into(),
             extra: vec![("id", "search")],
@@ -255,7 +255,7 @@ text {{ font-family:{}; font-size:{}px; fill:rgb(0,0,0); }}
         svg,
         &mut buf,
         TextItem {
-            x: Dimension::Pixels(image_width as usize - super::XPAD - 100),
+            x: Dimension::Pixels(image_width as usize - super::XPAD),
             y: (style_options.imageheight - (opt.ypad2() / 2)) as f64,
             text: " ".into(),
             extra: iter::once(("id", "matched")),
