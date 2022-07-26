@@ -40,8 +40,8 @@ function init(evt) {
 
             // Keep search elements at a fixed distance from right edge.
             var svgWidth = svg.width.baseVal.value;
-            searchbtn.attributes.x.value = svgWidth - xpad - 100;
-            matchedtxt.attributes.x.value = svgWidth - xpad - 100;
+            searchbtn.attributes.x.value = svgWidth - xpad;
+            matchedtxt.attributes.x.value = svgWidth - xpad;
         };
         window.addEventListener('resize', function() {
             update_for_width_change();

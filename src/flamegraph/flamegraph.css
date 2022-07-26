@@ -1,4 +1,5 @@
-#search { opacity:0.1; cursor:pointer; }
+#matched { text-anchor:end; }
+#search { text-anchor:end; opacity:0.1; cursor:pointer; }
 #search:hover, #search.show { opacity:1; }
 #subtitle { text-anchor:middle; font-color:rgb(160,160,160); }
 #unzoom { cursor:pointer; }

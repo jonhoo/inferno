@@ -10,7 +10,8 @@
     <style type="text/css">
 text { font-family:"Verdana"; font-size:12px; fill:rgb(0,0,0); }
 #title { text-anchor:middle; font-size:17px; }
-#search { opacity:0.1; cursor:pointer; }
+#matched { text-anchor:end; }
+#search { text-anchor:end; opacity:0.1; cursor:pointer; }
 #search:hover, #search.show { opacity:1; }
 #subtitle { text-anchor:middle; font-color:rgb(160,160,160); }
 #unzoom { cursor:pointer; }
@@ -32,8 +33,8 @@ text { font-family:"Verdana"; font-size:12px; fill:rgb(0,0,0); }
     <text id="title" x="50.0000%" y="24.00">Flame Graph</text>
     <text id="details" x="10" y="229.00"> </text>
     <text id="unzoom" class="hide" x="10" y="24.00">Reset Zoom</text>
-    <text id="search" x="1090" y="24.00">Search</text>
-    <text id="matched" x="1090" y="229.00"> </text>
+    <text id="search" x="1190" y="24.00">Search</text>
+    <text id="matched" x="1190" y="229.00"> </text>
     <svg id="frames" x="10" width="1180" total_samples="513">
         <g>
             <title>_start (56 samples, 10.92%; 0.00%)</title>

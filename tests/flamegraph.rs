@@ -63,7 +63,11 @@ fn test_flamegraph_multiple_files(
     }
     // and then compare
     result.set_position(0);
-    compare_results(result, expected, expected_result_file);
+    if std::env::var("INFERNO_BLESS_TESTS").is_ok() {
+        fs::write(expected_result_file, result.get_ref()).unwrap();
+    } else {
+        compare_results(result, expected, expected_result_file);
+    }
     Ok(())
 }
 
@@ -72,21 +76,23 @@ where
     R: BufRead,
     E: BufRead,
 {
+    const BLESS_MSG: &str = "If you have modified the code and specifically want to update the expected test output, set `INFERNO_BLESS_TESTS=1` before the `cargo test`.";
     let mut buf = String::new();
     let mut line_num = 1;
     for line in result.lines() {
         if expected.read_line(&mut buf).unwrap() == 0 {
             panic!(
-                "\noutput has more lines than expected result file: {}",
-                expected_file
+                "\noutput has more lines than expected result file: {}\n\n{}",
+                expected_file, BLESS_MSG
             );
         }
         assert_eq!(
             line.unwrap(),
             buf.trim_end(),
-            "\n{}:{}",
+            "\n{}:{}\n\n{}",
             expected_file,
-            line_num
+            line_num,
+            BLESS_MSG
         );
         buf.clear();
         line_num += 1;
@@ -94,8 +100,8 @@ where
 
     if expected.read_line(&mut buf).unwrap() > 0 {
         panic!(
-            "\n{} has more lines than output, beginning at line: {}",
-            expected_file, line_num
+            "\n{} has more lines than output, beginning at line: {}\n\n{}",
+            expected_file, line_num, BLESS_MSG
         )
     }
 }
