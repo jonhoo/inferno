@@ -186,6 +186,28 @@ impl fmt::Display for SearchColor {
     }
 }
 
+/// `StrokeColor::default()` is `None`.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum StrokeColor {
+    /// Color of the stroke
+    Color(Color),
+    /// No color for the stroke
+    None,
+}
+
+impl FromStr for StrokeColor {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        if s == "none" {
+            return Ok(StrokeColor::None);
+        }
+        parse_flat_bgcolor(s)
+            .map(|c| StrokeColor::Color(c))
+            .ok_or_else(|| format!("unknown color: {}", s))
+    }
+}
+
 impl FromStr for Palette {
     type Err = String;
 

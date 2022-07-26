@@ -2,7 +2,7 @@ use std::io;
 use std::path::{Path, PathBuf};
 
 use env_logger::Env;
-use inferno::flamegraph::color::{BackgroundColor, PaletteMap, SearchColor};
+use inferno::flamegraph::color::{BackgroundColor, PaletteMap, SearchColor, StrokeColor};
 use inferno::flamegraph::{self, defaults, Direction, Options, Palette, TextTruncateDirection};
 
 #[cfg(feature = "nameattr")]
@@ -174,6 +174,14 @@ struct Opt {
     )]
     search_color: SearchColor,
 
+    /// Adds an outline to every frame
+    #[clap(
+        long = "stroke-color",
+        default_value = defaults::STROKE_COLOR,
+        value_name = "STRING"
+    )]
+    stroke_color: StrokeColor,
+
     /// Second level title (optional)
     #[clap(long = "subtitle", value_name = "STRING")]
     subtitle: Option<String>,
@@ -255,6 +263,7 @@ impl<'a> Opt {
         options.negate_differentials = self.negate;
         options.factor = self.factor;
         options.search_color = self.search_color;
+        options.stroke_color = self.stroke_color;
         (self.infiles, options)
     }
 

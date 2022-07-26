@@ -711,6 +711,18 @@ fn search_color_non_default() {
 }
 
 #[test]
+fn stroke_color_non_default() {
+    let input_file =
+        "./tests/data/flamegraph/differential/perf-cycles-instructions-01-collapsed-all-diff.txt";
+    let expected_result_file = "./tests/data/flamegraph/options/stroke_color.svg";
+
+    let mut options = flamegraph::Options::default();
+    options.stroke_color = "#7d7d7d".parse().unwrap();
+
+    test_flamegraph(input_file, expected_result_file, options).unwrap();
+}
+
+#[test]
 fn flamegraph_sorted_input_file() {
     let input_file = "./flamegraph/test/results/perf-vertx-stacks-01-collapsed-all.txt";
     let expected_result_file =

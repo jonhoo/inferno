@@ -32,7 +32,7 @@ use self::attrs::FrameAttrs;
 pub use self::attrs::FuncFrameAttrsMap;
 
 pub use self::color::Palette;
-use self::color::{Color, SearchColor};
+use self::color::{Color, SearchColor, StrokeColor};
 use self::svg::{Dimension, StyleOptions};
 
 const XPAD: usize = 10; // pad left and right
@@ -76,6 +76,7 @@ pub mod defaults {
     define! {
         COLORS: &str = "hot",
         SEARCH_COLOR: &str = "#e600e6",
+        STROKE_COLOR: &str = "none",
         TITLE: &str = "Flame Graph",
         CHART_TITLE: &str = "Flame Chart",
         FRAME_HEIGHT: usize = 16,
@@ -136,6 +137,11 @@ pub struct Options<'a> {
     ///
     /// [Default value](defaults::SEARCH_COLOR).
     pub search_color: SearchColor,
+
+    /// The stroke color for flame graph.
+    ///
+    /// [Default value](defaults::STROKE_COLOR).
+    pub stroke_color: StrokeColor,
 
     /// The title for the flame graph.
     ///
@@ -285,6 +291,7 @@ impl<'a> Default for Options<'a> {
         Options {
             colors: Palette::from_str(defaults::COLORS).unwrap(),
             search_color: SearchColor::from_str(defaults::SEARCH_COLOR).unwrap(),
+            stroke_color: StrokeColor::from_str(defaults::STROKE_COLOR).unwrap(),
             title: defaults::TITLE.to_string(),
             frame_height: defaults::FRAME_HEIGHT,
             min_width: defaults::MIN_WIDTH,
@@ -500,10 +507,15 @@ where
     svg::write_header(&mut svg, imageheight, opt)?;
 
     let (bgcolor1, bgcolor2) = color::bgcolor_for(opt.bgcolors, opt.colors);
+    let strokecolor = match opt.stroke_color {
+        StrokeColor::Color(c) => Some(c.to_string()),
+        StrokeColor::None => None,
+    };
     let style_options = StyleOptions {
         imageheight,
         bgcolor1,
         bgcolor2,
+        strokecolor,
     };
 
     svg::write_prelude(&mut svg, &style_options, opt)?;
