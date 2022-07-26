@@ -11,6 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [0.11.7] - 2022-07-26
+### Added
+ - Ability to set a stroke outline on frames. [#255](https://github.com/jonhoo/inferno/pull/255)
+
+### Changed
+ - Improved text positioning for right-aligned text. [#254](https://github.com/jonhoo/inferno/pull/254)
+
 ## [0.11.6] - 2022-06-22
 ### Changed
  - Don't quote generic font families in CSS. [#252](https://github.com/jonhoo/inferno/pull/252)
@@ -215,7 +222,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Moved to `IndexMap` and FNV hashing ([#127](https://github.com/jonhoo/inferno/pull/127))
 - Moved CI to Azure DevOps Pipelines
 
-[Unreleased]: https://github.com/jonhoo/inferno/compare/v0.11.6...HEAD
+[Unreleased]: https://github.com/jonhoo/inferno/compare/v0.11.7...HEAD
+[0.11.7]: https://github.com/jonhoo/inferno/compare/v0.11.6...v0.11.7
 [0.11.6]: https://github.com/jonhoo/inferno/compare/v0.11.5...v0.11.6
 [0.11.5]: https://github.com/jonhoo/inferno/compare/v0.11.4...v0.11.5
 [0.11.4]: https://github.com/jonhoo/inferno/compare/v0.11.3...v0.11.4
