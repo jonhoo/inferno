@@ -60,6 +60,8 @@ fn test_flamegraph_multiple_files(
     let tm = std::env::temp_dir().join(format!("test-{}.svg", rand));
     if fs::write(&tm, result.get_ref()).is_ok() {
         eprintln!("test output in {}", tm.display());
+        fs::remove_file(&tm)
+            .unwrap_or_else(|_| panic!("failed to clean up temporary file {}", tm.display()));
     }
     // and then compare
     result.set_position(0);

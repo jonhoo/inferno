@@ -86,6 +86,11 @@ path = "src/bin/collapse-guess.rs"
 required-features = ["cli"]
 
 [[bin]]
+name = "inferno-collapse-xdebug"
+path = "src/bin/collapse-xdebug.rs"
+required-features = ["cli"]
+
+[[bin]]
 name = "inferno-flamegraph"
 path = "src/bin/flamegraph.rs"
 required-features = ["cli"]

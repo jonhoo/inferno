@@ -87,6 +87,8 @@ where
     let tm = std::env::temp_dir().join(format!("test-{}.folded", rand));
     if fs::write(&tm, result.get_ref()).is_ok() {
         eprintln!("test output in {}", tm.display());
+        fs::remove_file(&tm)
+            .unwrap_or_else(|_| panic!("failed to clean up temporary file {}", tm.display()));
     }
     // and then compare
     compare_results(result, expected, expected_filename, strip_quotes);

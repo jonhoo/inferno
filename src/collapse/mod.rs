@@ -42,6 +42,13 @@ pub mod vtune;
 ///   [crate-level documentation]: ../../index.html
 pub mod vsprof;
 
+/// Stack collapsing for the output of [`Xdebug`](https://xdebug.org/docs/execution_trace).
+///
+/// See the [crate-level documentation] for details.
+///
+///   [crate-level documentation]: ../../index.html
+pub mod xdebug;
+
 // DEFAULT_NTHREADS is public because we use it in the help text of the binaries,
 // but it doesn't need to be exposed to library users, hence #[doc(hidden)].
 #[doc(hidden)]

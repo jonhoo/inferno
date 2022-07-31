@@ -1,0 +1,7 @@
+{main} (/var/www/project/index.php) 87
+{main} (/var/www/project/index.php);bar (/var/www/project/index.php) 87
+{main} (/var/www/project/index.php);bar (/var/www/project/index.php);foo (/var/www/project/index.php) 87
+{main} (/var/www/project/index.php);bar (/var/www/project/index.php);php::define 174
+{main} (/var/www/project/index.php);baz (/var/www/project/index.php) 87
+{main} (/var/www/project/index.php);baz (/var/www/project/index.php);qux (/var/www/project/index.php) 88
+{main} (/var/www/project/index.php);php::define 87
