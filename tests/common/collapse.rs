@@ -15,7 +15,7 @@ where
     let mut line_num = 1;
     for line in result.lines() {
         let line = if strip_quotes {
-            line.unwrap().replace("\"", "").replace("'", "")
+            line.unwrap().replace('\"', "").replace('\'', "")
         } else {
             line.unwrap()
         };
