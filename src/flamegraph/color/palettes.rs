@@ -5,7 +5,7 @@ pub(super) mod java {
     /// accurate), as well as input that lacks any annotations, as
     /// best as possible. Without annotations, we get a little hacky
     /// and match on java|org|com, etc.
-    pub fn resolve(name: &str) -> BasicPalette {
+    pub(in super::super) fn resolve(name: &str) -> BasicPalette {
         if name.ends_with(']') {
             if let Some(ai) = name.rfind("_[") {
                 if name[ai..].len() == 4 {
@@ -46,7 +46,7 @@ pub(super) mod java {
 pub(super) mod perl {
     use crate::flamegraph::color::BasicPalette;
 
-    pub fn resolve(name: &str) -> BasicPalette {
+    pub(in super::super) fn resolve(name: &str) -> BasicPalette {
         if name.ends_with("_[k]") {
             BasicPalette::Orange
         } else if name.contains("Perl") || name.contains(".pl") {
@@ -62,7 +62,7 @@ pub(super) mod perl {
 pub(super) mod js {
     use crate::flamegraph::color::BasicPalette;
 
-    pub fn resolve(name: &str) -> BasicPalette {
+    pub(in super::super) fn resolve(name: &str) -> BasicPalette {
         if !name.is_empty() && name.trim().is_empty() {
             return BasicPalette::Green;
         } else if name.ends_with("_[k]") {
@@ -92,7 +92,7 @@ pub(super) mod js {
 pub(super) mod wakeup {
     use crate::flamegraph::color::BasicPalette;
 
-    pub fn resolve(_name: &str) -> BasicPalette {
+    pub(in super::super) fn resolve(_name: &str) -> BasicPalette {
         BasicPalette::Aqua
     }
 }
@@ -100,7 +100,7 @@ pub(super) mod wakeup {
 pub(super) mod rust {
     use crate::flamegraph::color::BasicPalette;
 
-    pub fn resolve(name: &str) -> BasicPalette {
+    pub(in super::super) fn resolve(name: &str) -> BasicPalette {
         if name.starts_with("core::")
             || name.starts_with("std::")
             || name.starts_with("alloc::")

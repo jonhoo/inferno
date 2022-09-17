@@ -144,6 +144,7 @@
 #![cfg_attr(doc, warn(rustdoc::all))]
 #![cfg_attr(doc, allow(rustdoc::missing_doc_code_examples))]
 #![deny(missing_docs)]
+#![warn(unreachable_pub)]
 #![cfg_attr(all(test, feature = "nightly"), feature(test))]
 
 #[cfg(all(test, feature = "nightly"))]

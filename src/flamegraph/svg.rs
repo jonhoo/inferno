@@ -54,7 +54,7 @@ pub(super) struct StyleOptions<'a> {
     pub(super) strokecolor: Option<String>,
 }
 
-pub fn write_header<W>(
+pub(super) fn write_header<W>(
     svg: &mut Writer<W>,
     imageheight: usize,
     opt: &Options<'_>,

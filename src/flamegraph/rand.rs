@@ -1,15 +1,15 @@
 use std::cell::RefCell;
 
-pub struct XorShift64 {
+pub(super) struct XorShift64 {
     a: u64,
 }
 
 impl XorShift64 {
-    pub fn new(seed: u64) -> XorShift64 {
+    pub(super) fn new(seed: u64) -> XorShift64 {
         XorShift64 { a: seed }
     }
 
-    pub fn next(&mut self) -> u64 {
+    pub(super) fn next(&mut self) -> u64 {
         let mut x = self.a;
         x ^= x << 13;
         x ^= x >> 7;
@@ -18,13 +18,13 @@ impl XorShift64 {
         x
     }
 
-    pub fn next_f64(&mut self) -> f64 {
+    pub(super) fn next_f64(&mut self) -> f64 {
         sample(self.next())
     }
 }
 
 thread_local! {
-    pub static RNG: RefCell<XorShift64> = RefCell::new(XorShift64::new(1234));
+    pub(super) static RNG: RefCell<XorShift64> = RefCell::new(XorShift64::new(1234));
 }
 
 // Copied from `rand` with minor modifications.
@@ -42,7 +42,7 @@ fn sample(value: u64) -> f64 {
     scale * (value as f64)
 }
 
-pub fn thread_rng() -> impl Fn() -> f32 {
+pub(super) fn thread_rng() -> impl Fn() -> f32 {
     || RNG.with(|rng| rng.borrow_mut().next_f64() as f32)
 }
 

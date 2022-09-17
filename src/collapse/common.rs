@@ -51,7 +51,7 @@ pub static DEFAULT_NTHREADS: Lazy<usize> = Lazy::new(|| 1);
 /// `Collapse` trait as well. Implementing this trait gives you parallelism
 /// for free as long as you adhere to the requirements described in the
 /// comments below.
-pub trait CollapsePrivate: Send + Sized {
+pub(crate) trait CollapsePrivate: Send + Sized {
     // *********************************************************** //
     // ********************* REQUIRED METHODS ******************** //
     // *********************************************************** //
@@ -352,7 +352,7 @@ pub trait CollapsePrivate: Send + Sized {
 /// * AHashMap if single-threaded
 /// * DashMap if multi-threaded
 #[derive(Clone, Debug)]
-pub enum Occurrences {
+pub(crate) enum Occurrences {
     SingleThreaded(AHashMap<String, usize>),
     #[cfg(feature = "multithreaded")]
     MultiThreaded(Arc<DashMap<String, usize, ahash::RandomState>>),

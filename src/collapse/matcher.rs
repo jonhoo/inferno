@@ -7,7 +7,7 @@
 // 7d8 ipv4_conntrack_local+0x7f8f80b8 ([nf_conntrack_ipv4])
 //
 #[inline]
-pub fn is_vmlinux(s: &str) -> bool {
+pub(super) fn is_vmlinux(s: &str) -> bool {
     if let Some(vm) = s.rfind("vmlinux") {
         s[vm..]
             .chars()
@@ -19,7 +19,7 @@ pub fn is_vmlinux(s: &str) -> bool {
 
 // Detect kernel from module name, module file or from vmlinux
 #[inline]
-pub fn is_kernel(s: &str) -> bool {
+pub(super) fn is_kernel(s: &str) -> bool {
     (s.starts_with('[') || s.ends_with(".ko") || is_vmlinux(s)) && s != "[unknown]"
 }
 
