@@ -1,6 +1,6 @@
 on:
   push:
-    branches: [master]
+    branches: [main]
   pull_request:
 name: Minimum Supported Rust Version
 jobs:
@@ -12,7 +12,7 @@ jobs:
           profile: minimal
           toolchain: 1.59.0
           override: true
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: true
       - name: cargo +1.59.0 check

@@ -1,6 +1,6 @@
 on:
   push:
-    branches: [master]
+    branches: [main]
   pull_request:
 name: cargo hack
 jobs:
@@ -11,17 +11,13 @@ jobs:
         with:
           profile: minimal
           toolchain: stable
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: true
       - name: Install cargo-hack
-        uses: actions-rs/install@v0.1
-        with:
-          crate: cargo-hack
-          version: latest
-          use-tool-cache: true
+        uses: taiki-e/install-action@cargo-hack
       - name: cargo hack
         uses: actions-rs/cargo@v1
         with:
           command: hack
-          args: --feature-powerset check
+          args: --feature-powerset check --all-targets

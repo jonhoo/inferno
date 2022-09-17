@@ -2,22 +2,21 @@ on:
   push:
     branches: [main]
   pull_request:
-name: cargo test
+name: os check
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    name: ubuntu / ${{ matrix.toolchain }}
+  os-check:
+    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
-        toolchain: [stable, beta, nightly]
+        os: [macos-latest, windows-latest]
     steps:
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
-          toolchain: ${{ matrix.toolchain }}
+          toolchain: stable
       - uses: actions/checkout@v3
-        with:
-          submodules: true
       - name: cargo test
         uses: actions-rs/cargo@v1
         with:
