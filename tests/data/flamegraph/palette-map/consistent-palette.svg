@@ -263,7 +263,7 @@ text { font-family:"Verdana"; font-size:12px; fill:rgb(0,0,0); }
         </g>
         <g>
             <title>skb_release_data.part.45 (1 samples, 0.35%)</title>
-            <rect x="27.2727%" y="53" width="0.3497%" height="15" fill="rgb(227,0,7)" fg:x="78" fg:w="1"/>
+            <rect x="27.2727%" y="53" width="0.3497%" height="15" fill="rgb(236,143,34)" fg:x="78" fg:w="1"/>
             <text x="27.5227%" y="63.50"></text>
         </g>
         <g>
