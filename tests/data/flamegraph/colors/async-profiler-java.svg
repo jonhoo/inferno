@@ -38,937 +38,937 @@ text { font-family:"Verdana"; font-size:12px; fill:rgb(0,0,0); }
     <svg id="frames" x="10" width="1180" total_samples="3279">
         <g>
             <title>com.github.plokhotnyuk.jsoniter_scala.core.JsonReaderSpec$$Lambda$8575.1705890900.apply$mcV$sp (69 samples, 2.10%)</title>
-            <rect x="0.0000%" y="741" width="2.1043%" height="15" fill="rgb(50,200,50)" fg:x="0" fg:w="69"/>
+            <rect x="0.0000%" y="741" width="2.1043%" height="15" fill="rgb(89,235,89)" fg:x="0" fg:w="69"/>
             <text x="0.2500%" y="751.50">c..</text>
         </g>
         <g>
             <title>com.github.plokhotnyuk.jsoniter_scala.core.JsonReaderSpec.$anonfun$new$124 (69 samples, 2.10%)</title>
-            <rect x="0.0000%" y="725" width="2.1043%" height="15" fill="rgb(50,200,50)" fg:x="0" fg:w="69"/>
+            <rect x="0.0000%" y="725" width="2.1043%" height="15" fill="rgb(89,235,89)" fg:x="0" fg:w="69"/>
             <text x="0.2500%" y="735.50">c..</text>
         </g>
         <g>
             <title>com.github.plokhotnyuk.jsoniter_scala.core.JsonReaderSpec.forAll (69 samples, 2.10%)</title>
-            <rect x="0.0000%" y="709" width="2.1043%" height="15" fill="rgb(100,246,100)" fg:x="0" fg:w="69"/>
+            <rect x="0.0000%" y="709" width="2.1043%" height="15" fill="rgb(89,235,89)" fg:x="0" fg:w="69"/>
             <text x="0.2500%" y="719.50">c..</text>
         </g>
         <g>
             <title>org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks.forAll$ (69 samples, 2.10%)</title>
-            <rect x="0.0000%" y="693" width="2.1043%" height="15" fill="rgb(105,250,105)" fg:x="0" fg:w="69"/>
+            <rect x="0.0000%" y="693" width="2.1043%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="69"/>
             <text x="0.2500%" y="703.50">o..</text>
         </g>
         <g>
             <title>org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks.forAll (69 samples, 2.10%)</title>
-            <rect x="0.0000%" y="677" width="2.1043%" height="15" fill="rgb(67,216,67)" fg:x="0" fg:w="69"/>
+            <rect x="0.0000%" y="677" width="2.1043%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="69"/>
             <text x="0.2500%" y="687.50">o..</text>
         </g>
         <g>
             <title>org.scalatestplus.scalacheck.UnitCheckerAsserting$CheckerAssertingImpl.check (69 samples, 2.10%)</title>
-            <rect x="0.0000%" y="661" width="2.1043%" height="15" fill="rgb(83,230,83)" fg:x="0" fg:w="69"/>
+            <rect x="0.0000%" y="661" width="2.1043%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="69"/>
             <text x="0.2500%" y="671.50">o..</text>
         </g>
         <g>
             <title>org.scalacheck.Test$.check (69 samples, 2.10%)</title>
-            <rect x="0.0000%" y="645" width="2.1043%" height="15" fill="rgb(91,238,91)" fg:x="0" fg:w="69"/>
+            <rect x="0.0000%" y="645" width="2.1043%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="69"/>
             <text x="0.2500%" y="655.50">o..</text>
         </g>
         <g>
             <title>org.scalacheck.Platform$.runWorkers (69 samples, 2.10%)</title>
-            <rect x="0.0000%" y="629" width="2.1043%" height="15" fill="rgb(56,205,56)" fg:x="0" fg:w="69"/>
+            <rect x="0.0000%" y="629" width="2.1043%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="69"/>
             <text x="0.2500%" y="639.50">o..</text>
         </g>
         <g>
             <title>org.scalacheck.Test$$$Lambda$8420.1048877523.apply (69 samples, 2.10%)</title>
-            <rect x="0.0000%" y="613" width="2.1043%" height="15" fill="rgb(58,207,58)" fg:x="0" fg:w="69"/>
+            <rect x="0.0000%" y="613" width="2.1043%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="69"/>
             <text x="0.2500%" y="623.50">o..</text>
         </g>
         <g>
             <title>org.scalacheck.Test$.$anonfun$check$1$adapted (69 samples, 2.10%)</title>
-            <rect x="0.0000%" y="597" width="2.1043%" height="15" fill="rgb(81,229,81)" fg:x="0" fg:w="69"/>
+            <rect x="0.0000%" y="597" width="2.1043%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="69"/>
             <text x="0.2500%" y="607.50">o..</text>
         </g>
         <g>
             <title>org.scalacheck.Test$.$anonfun$check$1 (69 samples, 2.10%)</title>
-            <rect x="0.0000%" y="581" width="2.1043%" height="15" fill="rgb(109,254,109)" fg:x="0" fg:w="69"/>
+            <rect x="0.0000%" y="581" width="2.1043%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="69"/>
             <text x="0.2500%" y="591.50">o..</text>
         </g>
         <g>
             <title>org.scalacheck.Test$.workerFun$1 (69 samples, 2.10%)</title>
-            <rect x="0.0000%" y="565" width="2.1043%" height="15" fill="rgb(100,246,100)" fg:x="0" fg:w="69"/>
+            <rect x="0.0000%" y="565" width="2.1043%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="69"/>
             <text x="0.2500%" y="575.50">o..</text>
         </g>
         <g>
             <title>org.scalacheck.PropFromFun.apply (69 samples, 2.10%)</title>
-            <rect x="0.0000%" y="549" width="2.1043%" height="15" fill="rgb(55,204,55)" fg:x="0" fg:w="69"/>
+            <rect x="0.0000%" y="549" width="2.1043%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="69"/>
             <text x="0.2500%" y="559.50">o..</text>
         </g>
         <g>
             <title>org.scalacheck.Prop$$$Lambda$8392.1163160283.apply (69 samples, 2.10%)</title>
-            <rect x="0.0000%" y="533" width="2.1043%" height="15" fill="rgb(99,244,99)" fg:x="0" fg:w="69"/>
+            <rect x="0.0000%" y="533" width="2.1043%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="69"/>
             <text x="0.2500%" y="543.50">o..</text>
         </g>
         <g>
             <title>org.scalacheck.Prop$.$anonfun$apply$1 (69 samples, 2.10%)</title>
-            <rect x="0.0000%" y="517" width="2.1043%" height="15" fill="rgb(104,249,104)" fg:x="0" fg:w="69"/>
+            <rect x="0.0000%" y="517" width="2.1043%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="69"/>
             <text x="0.2500%" y="527.50">o..</text>
         </g>
         <g>
             <title>org.scalacheck.Prop$$$Lambda$8391.1460249324.apply (69 samples, 2.10%)</title>
-            <rect x="0.0000%" y="501" width="2.1043%" height="15" fill="rgb(69,217,69)" fg:x="0" fg:w="69"/>
+            <rect x="0.0000%" y="501" width="2.1043%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="69"/>
             <text x="0.2500%" y="511.50">o..</text>
         </g>
         <g>
             <title>org.scalacheck.Prop$.$anonfun$forAllShrink$1 (69 samples, 2.10%)</title>
-            <rect x="0.0000%" y="485" width="2.1043%" height="15" fill="rgb(55,204,55)" fg:x="0" fg:w="69"/>
+            <rect x="0.0000%" y="485" width="2.1043%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="69"/>
             <text x="0.2500%" y="495.50">o..</text>
         </g>
         <g>
             <title>org.scalacheck.Prop$.result$1 (69 samples, 2.10%)</title>
-            <rect x="0.0000%" y="469" width="2.1043%" height="15" fill="rgb(58,207,58)" fg:x="0" fg:w="69"/>
+            <rect x="0.0000%" y="469" width="2.1043%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="69"/>
             <text x="0.2500%" y="479.50">o..</text>
         </g>
         <g>
             <title>org.scalacheck.PropFromFun.apply (69 samples, 2.10%)</title>
-            <rect x="0.0000%" y="453" width="2.1043%" height="15" fill="rgb(102,247,102)" fg:x="0" fg:w="69"/>
+            <rect x="0.0000%" y="453" width="2.1043%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="69"/>
             <text x="0.2500%" y="463.50">o..</text>
         </g>
         <g>
             <title>org.scalacheck.Prop$$$Lambda$8392.1163160283.apply (69 samples, 2.10%)</title>
-            <rect x="0.0000%" y="437" width="2.1043%" height="15" fill="rgb(56,206,56)" fg:x="0" fg:w="69"/>
+            <rect x="0.0000%" y="437" width="2.1043%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="69"/>
             <text x="0.2500%" y="447.50">o..</text>
         </g>
         <g>
             <title>org.scalacheck.Prop$.$anonfun$apply$1 (69 samples, 2.10%)</title>
-            <rect x="0.0000%" y="421" width="2.1043%" height="15" fill="rgb(58,207,58)" fg:x="0" fg:w="69"/>
+            <rect x="0.0000%" y="421" width="2.1043%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="69"/>
             <text x="0.2500%" y="431.50">o..</text>
         </g>
         <g>
             <title>org.scalacheck.Prop$$$Lambda$8391.1460249324.apply (69 samples, 2.10%)</title>
-            <rect x="0.0000%" y="405" width="2.1043%" height="15" fill="rgb(97,243,97)" fg:x="0" fg:w="69"/>
+            <rect x="0.0000%" y="405" width="2.1043%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="69"/>
             <text x="0.2500%" y="415.50">o..</text>
         </g>
         <g>
             <title>org.scalacheck.Prop$.$anonfun$forAllShrink$1 (69 samples, 2.10%)</title>
-            <rect x="0.0000%" y="389" width="2.1043%" height="15" fill="rgb(51,201,51)" fg:x="0" fg:w="69"/>
+            <rect x="0.0000%" y="389" width="2.1043%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="69"/>
             <text x="0.2500%" y="399.50">o..</text>
         </g>
         <g>
             <title>org.scalacheck.Prop$.result$1 (69 samples, 2.10%)</title>
-            <rect x="0.0000%" y="373" width="2.1043%" height="15" fill="rgb(54,204,54)" fg:x="0" fg:w="69"/>
+            <rect x="0.0000%" y="373" width="2.1043%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="69"/>
             <text x="0.2500%" y="383.50">o..</text>
         </g>
         <g>
             <title>org.scalacheck.Prop$.secure (69 samples, 2.10%)</title>
-            <rect x="0.0000%" y="357" width="2.1043%" height="15" fill="rgb(84,231,84)" fg:x="0" fg:w="69"/>
+            <rect x="0.0000%" y="357" width="2.1043%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="69"/>
             <text x="0.2500%" y="367.50">o..</text>
         </g>
         <g>
             <title>org.scalacheck.Prop$$$Lambda$8437.980556189.apply (69 samples, 2.10%)</title>
-            <rect x="0.0000%" y="341" width="2.1043%" height="15" fill="rgb(58,207,58)" fg:x="0" fg:w="69"/>
+            <rect x="0.0000%" y="341" width="2.1043%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="69"/>
             <text x="0.2500%" y="351.50">o..</text>
         </g>
         <g>
             <title>org.scalacheck.Prop$.$anonfun$forAllShrink$2 (69 samples, 2.10%)</title>
-            <rect x="0.0000%" y="325" width="2.1043%" height="15" fill="rgb(79,226,79)" fg:x="0" fg:w="69"/>
+            <rect x="0.0000%" y="325" width="2.1043%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="69"/>
             <text x="0.2500%" y="335.50">o..</text>
         </g>
         <g>
             <title>org.scalacheck.Prop$$$Lambda$9326.169489320.apply (69 samples, 2.10%)</title>
-            <rect x="0.0000%" y="309" width="2.1043%" height="15" fill="rgb(91,238,91)" fg:x="0" fg:w="69"/>
+            <rect x="0.0000%" y="309" width="2.1043%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="69"/>
             <text x="0.2500%" y="319.50">o..</text>
         </g>
         <g>
             <title>org.scalacheck.Prop$.$anonfun$forAll$3 (69 samples, 2.10%)</title>
-            <rect x="0.0000%" y="293" width="2.1043%" height="15" fill="rgb(88,235,88)" fg:x="0" fg:w="69"/>
+            <rect x="0.0000%" y="293" width="2.1043%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="69"/>
             <text x="0.2500%" y="303.50">o..</text>
         </g>
         <g>
             <title>org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks$$Lambda$9322.742157558.apply (69 samples, 2.10%)</title>
-            <rect x="0.0000%" y="277" width="2.1043%" height="15" fill="rgb(59,208,59)" fg:x="0" fg:w="69"/>
+            <rect x="0.0000%" y="277" width="2.1043%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="69"/>
             <text x="0.2500%" y="287.50">o..</text>
         </g>
         <g>
             <title>org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks.$anonfun$forAll$21 (69 samples, 2.10%)</title>
-            <rect x="0.0000%" y="261" width="2.1043%" height="15" fill="rgb(76,224,76)" fg:x="0" fg:w="69"/>
+            <rect x="0.0000%" y="261" width="2.1043%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="69"/>
             <text x="0.2500%" y="271.50">o..</text>
         </g>
         <g>
             <title>org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks.liftedTree13$1 (69 samples, 2.10%)</title>
-            <rect x="0.0000%" y="245" width="2.1043%" height="15" fill="rgb(73,221,73)" fg:x="0" fg:w="69"/>
+            <rect x="0.0000%" y="245" width="2.1043%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="69"/>
             <text x="0.2500%" y="255.50">o..</text>
         </g>
         <g>
             <title>com.github.plokhotnyuk.jsoniter_scala.core.JsonReaderSpec$$Lambda$9984.1092558103.apply (69 samples, 2.10%)</title>
-            <rect x="0.0000%" y="229" width="2.1043%" height="15" fill="rgb(97,243,97)" fg:x="0" fg:w="69"/>
+            <rect x="0.0000%" y="229" width="2.1043%" height="15" fill="rgb(89,235,89)" fg:x="0" fg:w="69"/>
             <text x="0.2500%" y="239.50">c..</text>
         </g>
         <g>
             <title>com.github.plokhotnyuk.jsoniter_scala.core.JsonReaderSpec.$anonfun$new$128$adapted (69 samples, 2.10%)</title>
-            <rect x="0.0000%" y="213" width="2.1043%" height="15" fill="rgb(100,245,100)" fg:x="0" fg:w="69"/>
+            <rect x="0.0000%" y="213" width="2.1043%" height="15" fill="rgb(89,235,89)" fg:x="0" fg:w="69"/>
             <text x="0.2500%" y="223.50">c..</text>
         </g>
         <g>
             <title>com.github.plokhotnyuk.jsoniter_scala.core.JsonReaderSpec.$anonfun$new$128 (69 samples, 2.10%)</title>
-            <rect x="0.0000%" y="197" width="2.1043%" height="15" fill="rgb(71,220,71)" fg:x="0" fg:w="69"/>
+            <rect x="0.0000%" y="197" width="2.1043%" height="15" fill="rgb(89,235,89)" fg:x="0" fg:w="69"/>
             <text x="0.2500%" y="207.50">c..</text>
         </g>
         <g>
             <title>com.github.plokhotnyuk.jsoniter_scala.core.JsonReaderSpec.check$5 (69 samples, 2.10%)</title>
-            <rect x="0.0000%" y="181" width="2.1043%" height="15" fill="rgb(59,208,59)" fg:x="0" fg:w="69"/>
+            <rect x="0.0000%" y="181" width="2.1043%" height="15" fill="rgb(89,235,89)" fg:x="0" fg:w="69"/>
             <text x="0.2500%" y="191.50">c..</text>
         </g>
         <g>
             <title>com.github.plokhotnyuk.jsoniter_scala.core.JsonReader.readBase16AsBytes (69 samples, 2.10%)</title>
-            <rect x="0.0000%" y="165" width="2.1043%" height="15" fill="rgb(50,200,50)" fg:x="0" fg:w="69"/>
+            <rect x="0.0000%" y="165" width="2.1043%" height="15" fill="rgb(89,235,89)" fg:x="0" fg:w="69"/>
             <text x="0.2500%" y="175.50">c..</text>
         </g>
         <g>
             <title>com.github.plokhotnyuk.jsoniter_scala.core.JsonReader.parseBase16 (69 samples, 2.10%)</title>
-            <rect x="0.0000%" y="149" width="2.1043%" height="15" fill="rgb(100,246,100)" fg:x="0" fg:w="69"/>
+            <rect x="0.0000%" y="149" width="2.1043%" height="15" fill="rgb(89,235,89)" fg:x="0" fg:w="69"/>
             <text x="0.2500%" y="159.50">c..</text>
         </g>
         <g>
             <title>scoverage.Invoker$.invoked (69 samples, 2.10%)</title>
-            <rect x="0.0000%" y="133" width="2.1043%" height="15" fill="rgb(93,240,93)" fg:x="0" fg:w="69"/>
+            <rect x="0.0000%" y="133" width="2.1043%" height="15" fill="rgb(97,243,97)" fg:x="0" fg:w="69"/>
             <text x="0.2500%" y="143.50">s..</text>
         </g>
         <g>
             <title>scala.collection.AbstractMap.contains (69 samples, 2.10%)</title>
-            <rect x="0.0000%" y="117" width="2.1043%" height="15" fill="rgb(97,243,97)" fg:x="0" fg:w="69"/>
+            <rect x="0.0000%" y="117" width="2.1043%" height="15" fill="rgb(98,244,98)" fg:x="0" fg:w="69"/>
             <text x="0.2500%" y="127.50">s..</text>
         </g>
         <g>
             <title>scala.collection.MapOps.contains$ (69 samples, 2.10%)</title>
-            <rect x="0.0000%" y="101" width="2.1043%" height="15" fill="rgb(65,214,65)" fg:x="0" fg:w="69"/>
+            <rect x="0.0000%" y="101" width="2.1043%" height="15" fill="rgb(98,244,98)" fg:x="0" fg:w="69"/>
             <text x="0.2500%" y="111.50">s..</text>
         </g>
         <g>
             <title>scala.collection.MapOps.contains (69 samples, 2.10%)</title>
-            <rect x="0.0000%" y="85" width="2.1043%" height="15" fill="rgb(68,216,68)" fg:x="0" fg:w="69"/>
+            <rect x="0.0000%" y="85" width="2.1043%" height="15" fill="rgb(98,244,98)" fg:x="0" fg:w="69"/>
             <text x="0.2500%" y="95.50">s..</text>
         </g>
         <g>
             <title>scala.collection.concurrent.TrieMap.get (69 samples, 2.10%)</title>
-            <rect x="0.0000%" y="69" width="2.1043%" height="15" fill="rgb(74,222,74)" fg:x="0" fg:w="69"/>
+            <rect x="0.0000%" y="69" width="2.1043%" height="15" fill="rgb(98,244,98)" fg:x="0" fg:w="69"/>
             <text x="0.2500%" y="79.50">s..</text>
         </g>
         <g>
             <title>scala.collection.concurrent.TrieMap.lookuphc (69 samples, 2.10%)</title>
-            <rect x="0.0000%" y="53" width="2.1043%" height="15" fill="rgb(80,227,80)" fg:x="0" fg:w="69"/>
+            <rect x="0.0000%" y="53" width="2.1043%" height="15" fill="rgb(98,244,98)" fg:x="0" fg:w="69"/>
             <text x="0.2500%" y="63.50">s..</text>
         </g>
         <g>
             <title>scala.collection.concurrent.INode.rec_lookup (69 samples, 2.10%)</title>
-            <rect x="0.0000%" y="37" width="2.1043%" height="15" fill="rgb(104,249,104)" fg:x="0" fg:w="69"/>
+            <rect x="0.0000%" y="37" width="2.1043%" height="15" fill="rgb(98,244,98)" fg:x="0" fg:w="69"/>
             <text x="0.2500%" y="47.50">s..</text>
         </g>
         <g>
             <title>com.github.plokhotnyuk.jsoniter_scala.core.JsonReader.readBase64AsBytes (52 samples, 1.59%)</title>
-            <rect x="2.1043%" y="165" width="1.5858%" height="15" fill="rgb(75,223,75)" fg:x="69" fg:w="52"/>
+            <rect x="2.1043%" y="165" width="1.5858%" height="15" fill="rgb(89,235,89)" fg:x="69" fg:w="52"/>
             <text x="2.3543%" y="175.50"></text>
         </g>
         <g>
             <title>com.github.plokhotnyuk.jsoniter_scala.core.JsonReader.parseBase64 (52 samples, 1.59%)</title>
-            <rect x="2.1043%" y="149" width="1.5858%" height="15" fill="rgb(86,233,86)" fg:x="69" fg:w="52"/>
+            <rect x="2.1043%" y="149" width="1.5858%" height="15" fill="rgb(89,235,89)" fg:x="69" fg:w="52"/>
             <text x="2.3543%" y="159.50"></text>
         </g>
         <g>
             <title>scoverage.Invoker$.invoked (52 samples, 1.59%)</title>
-            <rect x="2.1043%" y="133" width="1.5858%" height="15" fill="rgb(99,245,99)" fg:x="69" fg:w="52"/>
+            <rect x="2.1043%" y="133" width="1.5858%" height="15" fill="rgb(97,243,97)" fg:x="69" fg:w="52"/>
             <text x="2.3543%" y="143.50"></text>
         </g>
         <g>
             <title>scala.collection.AbstractMap.contains (52 samples, 1.59%)</title>
-            <rect x="2.1043%" y="117" width="1.5858%" height="15" fill="rgb(65,214,65)" fg:x="69" fg:w="52"/>
+            <rect x="2.1043%" y="117" width="1.5858%" height="15" fill="rgb(98,244,98)" fg:x="69" fg:w="52"/>
             <text x="2.3543%" y="127.50"></text>
         </g>
         <g>
             <title>scala.collection.MapOps.contains$ (52 samples, 1.59%)</title>
-            <rect x="2.1043%" y="101" width="1.5858%" height="15" fill="rgb(57,206,57)" fg:x="69" fg:w="52"/>
+            <rect x="2.1043%" y="101" width="1.5858%" height="15" fill="rgb(98,244,98)" fg:x="69" fg:w="52"/>
             <text x="2.3543%" y="111.50"></text>
         </g>
         <g>
             <title>scala.collection.MapOps.contains (52 samples, 1.59%)</title>
-            <rect x="2.1043%" y="85" width="1.5858%" height="15" fill="rgb(59,208,59)" fg:x="69" fg:w="52"/>
+            <rect x="2.1043%" y="85" width="1.5858%" height="15" fill="rgb(98,244,98)" fg:x="69" fg:w="52"/>
             <text x="2.3543%" y="95.50"></text>
         </g>
         <g>
             <title>scala.collection.concurrent.TrieMap.get (52 samples, 1.59%)</title>
-            <rect x="2.1043%" y="69" width="1.5858%" height="15" fill="rgb(105,251,105)" fg:x="69" fg:w="52"/>
+            <rect x="2.1043%" y="69" width="1.5858%" height="15" fill="rgb(98,244,98)" fg:x="69" fg:w="52"/>
             <text x="2.3543%" y="79.50"></text>
         </g>
         <g>
             <title>scala.collection.concurrent.TrieMap.lookuphc (52 samples, 1.59%)</title>
-            <rect x="2.1043%" y="53" width="1.5858%" height="15" fill="rgb(82,229,82)" fg:x="69" fg:w="52"/>
+            <rect x="2.1043%" y="53" width="1.5858%" height="15" fill="rgb(98,244,98)" fg:x="69" fg:w="52"/>
             <text x="2.3543%" y="63.50"></text>
         </g>
         <g>
             <title>scala.collection.concurrent.INode.rec_lookup (52 samples, 1.59%)</title>
-            <rect x="2.1043%" y="37" width="1.5858%" height="15" fill="rgb(86,233,86)" fg:x="69" fg:w="52"/>
+            <rect x="2.1043%" y="37" width="1.5858%" height="15" fill="rgb(98,244,98)" fg:x="69" fg:w="52"/>
             <text x="2.3543%" y="47.50"></text>
         </g>
         <g>
             <title>java.lang.Thread.run (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="1893" width="5.6115%" height="15" fill="rgb(88,234,88)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="1893" width="5.6115%" height="15" fill="rgb(77,224,77)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="1903.50">java.la..</text>
         </g>
         <g>
             <title>java.util.concurrent.ThreadPoolExecutor$Worker.run (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="1877" width="5.6115%" height="15" fill="rgb(80,228,80)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="1877" width="5.6115%" height="15" fill="rgb(77,224,77)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="1887.50">java.ut..</text>
         </g>
         <g>
             <title>java.util.concurrent.ThreadPoolExecutor.runWorker (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="1861" width="5.6115%" height="15" fill="rgb(88,235,88)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="1861" width="5.6115%" height="15" fill="rgb(77,224,77)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="1871.50">java.ut..</text>
         </g>
         <g>
             <title>java.util.concurrent.FutureTask.run (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="1845" width="5.6115%" height="15" fill="rgb(71,219,71)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="1845" width="5.6115%" height="15" fill="rgb(77,224,77)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="1855.50">java.ut..</text>
         </g>
         <g>
             <title>java.util.concurrent.Executors$RunnableAdapter.call (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="1829" width="5.6115%" height="15" fill="rgb(53,202,53)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="1829" width="5.6115%" height="15" fill="rgb(77,224,77)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="1839.50">java.ut..</text>
         </g>
         <g>
             <title>java.util.concurrent.FutureTask.run (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="1813" width="5.6115%" height="15" fill="rgb(50,200,50)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="1813" width="5.6115%" height="15" fill="rgb(77,224,77)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="1823.50">java.ut..</text>
         </g>
         <g>
             <title>sbt.CompletionService$$anon$2.call (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="1797" width="5.6115%" height="15" fill="rgb(62,211,62)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="1797" width="5.6115%" height="15" fill="rgb(79,227,79)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="1807.50">sbt.Com..</text>
         </g>
         <g>
             <title>sbt.ConcurrentRestrictions$$anon$4$$Lambda$2176.1600330912.apply (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="1781" width="5.6115%" height="15" fill="rgb(52,202,52)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="1781" width="5.6115%" height="15" fill="rgb(79,227,79)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="1791.50">sbt.Con..</text>
         </g>
         <g>
             <title>sbt.ConcurrentRestrictions$$anon$4.$anonfun$submitValid$1 (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="1765" width="5.6115%" height="15" fill="rgb(109,254,109)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="1765" width="5.6115%" height="15" fill="rgb(79,227,79)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="1775.50">sbt.Con..</text>
         </g>
         <g>
             <title>sbt.Execute$$Lambda$2169.2034046523.apply (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="1749" width="5.6115%" height="15" fill="rgb(88,235,88)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="1749" width="5.6115%" height="15" fill="rgb(79,227,79)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="1759.50">sbt.Exe..</text>
         </g>
         <g>
             <title>sbt.Execute.$anonfun$submit$1 (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="1733" width="5.6115%" height="15" fill="rgb(67,216,67)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="1733" width="5.6115%" height="15" fill="rgb(79,227,79)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="1743.50">sbt.Exe..</text>
         </g>
         <g>
             <title>sbt.Execute.work (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="1717" width="5.6115%" height="15" fill="rgb(75,223,75)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="1717" width="5.6115%" height="15" fill="rgb(79,227,79)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="1727.50">sbt.Exe..</text>
         </g>
         <g>
             <title>sbt.internal.util.ErrorHandling$.wideConvert (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="1701" width="5.6115%" height="15" fill="rgb(86,233,86)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="1701" width="5.6115%" height="15" fill="rgb(79,227,79)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="1711.50">sbt.int..</text>
         </g>
         <g>
             <title>sbt.Execute$$Lambda$2178.2095669414.apply (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="1685" width="5.6115%" height="15" fill="rgb(70,218,70)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="1685" width="5.6115%" height="15" fill="rgb(79,227,79)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="1695.50">sbt.Exe..</text>
         </g>
         <g>
             <title>sbt.Execute.$anonfun$submit$2 (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="1669" width="5.6115%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="1669" width="5.6115%" height="15" fill="rgb(79,227,79)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="1679.50">sbt.Exe..</text>
         </g>
         <g>
             <title>sbt.std.Transform$$anon$4.work (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="1653" width="5.6115%" height="15" fill="rgb(66,215,66)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="1653" width="5.6115%" height="15" fill="rgb(79,227,79)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="1663.50">sbt.std..</text>
         </g>
         <g>
             <title>sbt.std.Transform$$anon$3$$Lambda$2167.231900526.apply (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="1637" width="5.6115%" height="15" fill="rgb(90,236,90)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="1637" width="5.6115%" height="15" fill="rgb(79,227,79)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="1647.50">sbt.std..</text>
         </g>
         <g>
             <title>sbt.std.Transform$$anon$3.$anonfun$apply$2 (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="1621" width="5.6115%" height="15" fill="rgb(59,208,59)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="1621" width="5.6115%" height="15" fill="rgb(79,227,79)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="1631.50">sbt.std..</text>
         </g>
         <g>
             <title>sbt.Tests$$$Lambda$7842.1208470949.apply (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="1605" width="5.6115%" height="15" fill="rgb(80,227,80)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="1605" width="5.6115%" height="15" fill="rgb(79,227,79)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="1615.50">sbt.Tes..</text>
         </g>
         <g>
             <title>sbt.Tests$.$anonfun$toTask$1 (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="1589" width="5.6115%" height="15" fill="rgb(64,212,64)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="1589" width="5.6115%" height="15" fill="rgb(79,227,79)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="1599.50">sbt.Tes..</text>
         </g>
         <g>
             <title>sbt.TestFunction.apply (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="1573" width="5.6115%" height="15" fill="rgb(71,220,71)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="1573" width="5.6115%" height="15" fill="rgb(79,227,79)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="1583.50">sbt.Tes..</text>
         </g>
         <g>
             <title>sbt.TestFramework$$anon$3$$anonfun$$lessinit$greater$1.apply (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="1557" width="5.6115%" height="15" fill="rgb(80,228,80)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="1557" width="5.6115%" height="15" fill="rgb(79,227,79)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="1567.50">sbt.Tes..</text>
         </g>
         <g>
             <title>sbt.TestFramework$$anon$3$$anonfun$$lessinit$greater$1.apply (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="1541" width="5.6115%" height="15" fill="rgb(61,210,61)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="1541" width="5.6115%" height="15" fill="rgb(79,227,79)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="1551.50">sbt.Tes..</text>
         </g>
         <g>
             <title>sbt.TestFramework$.sbt$TestFramework$$withContextLoader (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="1525" width="5.6115%" height="15" fill="rgb(59,209,59)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="1525" width="5.6115%" height="15" fill="rgb(79,227,79)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="1535.50">sbt.Tes..</text>
         </g>
         <g>
             <title>sbt.TestFramework$$anon$3$$anonfun$$lessinit$greater$1$$Lambda$7850.1117892339.apply (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="1509" width="5.6115%" height="15" fill="rgb(105,250,105)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="1509" width="5.6115%" height="15" fill="rgb(79,227,79)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="1519.50">sbt.Tes..</text>
         </g>
         <g>
             <title>sbt.TestFramework$$anon$3$$anonfun$$lessinit$greater$1.$anonfun$apply$1 (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="1493" width="5.6115%" height="15" fill="rgb(70,219,70)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="1493" width="5.6115%" height="15" fill="rgb(79,227,79)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="1503.50">sbt.Tes..</text>
         </g>
         <g>
             <title>sbt.TestRunner.run (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="1477" width="5.6115%" height="15" fill="rgb(75,223,75)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="1477" width="5.6115%" height="15" fill="rgb(79,227,79)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="1487.50">sbt.Tes..</text>
         </g>
         <g>
             <title>sbt.TestRunner.runTest$1 (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="1461" width="5.6115%" height="15" fill="rgb(106,251,106)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="1461" width="5.6115%" height="15" fill="rgb(79,227,79)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="1471.50">sbt.Tes..</text>
         </g>
         <g>
             <title>org.scalatest.tools.Framework$ScalaTestTask.execute (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="1445" width="5.6115%" height="15" fill="rgb(71,219,71)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="1445" width="5.6115%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="1455.50">org.sca..</text>
         </g>
         <g>
             <title>org.scalatest.tools.Framework.org$scalatest$tools$Framework$$runSuite (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="1429" width="5.6115%" height="15" fill="rgb(99,245,99)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="1429" width="5.6115%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="1439.50">org.sca..</text>
         </g>
         <g>
             <title>org.scalatest.wordspec.AnyWordSpec.run (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="1413" width="5.6115%" height="15" fill="rgb(105,250,105)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="1413" width="5.6115%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="1423.50">org.sca..</text>
         </g>
         <g>
             <title>org.scalatest.wordspec.AnyWordSpecLike.run$ (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="1397" width="5.6115%" height="15" fill="rgb(81,229,81)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="1397" width="5.6115%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="1407.50">org.sca..</text>
         </g>
         <g>
             <title>org.scalatest.wordspec.AnyWordSpecLike.run (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="1381" width="5.6115%" height="15" fill="rgb(107,252,107)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="1381" width="5.6115%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="1391.50">org.sca..</text>
         </g>
         <g>
             <title>org.scalatest.SuperEngine.runImpl (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="1365" width="5.6115%" height="15" fill="rgb(67,216,67)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="1365" width="5.6115%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="1375.50">org.sca..</text>
         </g>
         <g>
             <title>org.scalatest.wordspec.AnyWordSpecLike$$Lambda$7943.1056778999.apply (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="1349" width="5.6115%" height="15" fill="rgb(54,204,54)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="1349" width="5.6115%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="1359.50">org.sca..</text>
         </g>
         <g>
             <title>org.scalatest.wordspec.AnyWordSpecLike.$anonfun$run$1 (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="1333" width="5.6115%" height="15" fill="rgb(82,229,82)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="1333" width="5.6115%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="1343.50">org.sca..</text>
         </g>
         <g>
             <title>org.scalatest.wordspec.AnyWordSpec.org$scalatest$wordspec$AnyWordSpecLike$$super$run (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="1317" width="5.6115%" height="15" fill="rgb(94,240,94)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="1317" width="5.6115%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="1327.50">org.sca..</text>
         </g>
         <g>
             <title>org.scalatest.Suite.run$ (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="1301" width="5.6115%" height="15" fill="rgb(93,239,93)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="1301" width="5.6115%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="1311.50">org.sca..</text>
         </g>
         <g>
             <title>org.scalatest.Suite.run (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="1285" width="5.6115%" height="15" fill="rgb(106,251,106)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="1285" width="5.6115%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="1295.50">org.sca..</text>
         </g>
         <g>
             <title>org.scalatest.wordspec.AnyWordSpec.runTests (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="1269" width="5.6115%" height="15" fill="rgb(80,227,80)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="1269" width="5.6115%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="1279.50">org.sca..</text>
         </g>
         <g>
             <title>org.scalatest.wordspec.AnyWordSpecLike.runTests$ (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="1253" width="5.6115%" height="15" fill="rgb(76,223,76)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="1253" width="5.6115%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="1263.50">org.sca..</text>
         </g>
         <g>
             <title>org.scalatest.wordspec.AnyWordSpecLike.runTests (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="1237" width="5.6115%" height="15" fill="rgb(52,202,52)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="1237" width="5.6115%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="1247.50">org.sca..</text>
         </g>
         <g>
             <title>org.scalatest.SuperEngine.runTestsImpl (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="1221" width="5.6115%" height="15" fill="rgb(87,234,87)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="1221" width="5.6115%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="1231.50">org.sca..</text>
         </g>
         <g>
             <title>org.scalatest.SuperEngine.runTestsInBranch (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="1205" width="5.6115%" height="15" fill="rgb(75,223,75)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="1205" width="5.6115%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="1215.50">org.sca..</text>
         </g>
         <g>
             <title>org.scalatest.SuperEngine.traverseSubNodes$1 (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="1189" width="5.6115%" height="15" fill="rgb(104,249,104)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="1189" width="5.6115%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="1199.50">org.sca..</text>
         </g>
         <g>
             <title>scala.collection.immutable.List.foreach (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="1173" width="5.6115%" height="15" fill="rgb(93,239,93)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="1173" width="5.6115%" height="15" fill="rgb(98,244,98)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="1183.50">scala.c..</text>
         </g>
         <g>
             <title>org.scalatest.SuperEngine$$Lambda$7952.1547585176.apply (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="1157" width="5.6115%" height="15" fill="rgb(83,230,83)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="1157" width="5.6115%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="1167.50">org.sca..</text>
         </g>
         <g>
             <title>org.scalatest.SuperEngine.$anonfun$runTestsInBranch$1 (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="1141" width="5.6115%" height="15" fill="rgb(54,204,54)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="1141" width="5.6115%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="1151.50">org.sca..</text>
         </g>
         <g>
             <title>org.scalatest.SuperEngine.runTestsInBranch (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="1125" width="5.6115%" height="15" fill="rgb(77,225,77)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="1125" width="5.6115%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="1135.50">org.sca..</text>
         </g>
         <g>
             <title>org.scalatest.SuperEngine.traverseSubNodes$1 (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="1109" width="5.6115%" height="15" fill="rgb(57,206,57)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="1109" width="5.6115%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="1119.50">org.sca..</text>
         </g>
         <g>
             <title>scala.collection.immutable.List.foreach (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="1093" width="5.6115%" height="15" fill="rgb(108,253,108)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="1093" width="5.6115%" height="15" fill="rgb(98,244,98)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="1103.50">scala.c..</text>
         </g>
         <g>
             <title>org.scalatest.SuperEngine$$Lambda$7952.1547585176.apply (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="1077" width="5.6115%" height="15" fill="rgb(55,205,55)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="1077" width="5.6115%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="1087.50">org.sca..</text>
         </g>
         <g>
             <title>org.scalatest.SuperEngine.$anonfun$runTestsInBranch$1 (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="1061" width="5.6115%" height="15" fill="rgb(56,205,56)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="1061" width="5.6115%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="1071.50">org.sca..</text>
         </g>
         <g>
             <title>org.scalatest.wordspec.AnyWordSpecLike$$Lambda$7951.1136212450.apply (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="1045" width="5.6115%" height="15" fill="rgb(51,201,51)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="1045" width="5.6115%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="1055.50">org.sca..</text>
         </g>
         <g>
             <title>org.scalatest.wordspec.AnyWordSpecLike.$anonfun$runTests$1 (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="1029" width="5.6115%" height="15" fill="rgb(71,219,71)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="1029" width="5.6115%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="1039.50">org.sca..</text>
         </g>
         <g>
             <title>org.scalatest.wordspec.AnyWordSpec.runTest (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="1013" width="5.6115%" height="15" fill="rgb(68,216,68)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="1013" width="5.6115%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="1023.50">org.sca..</text>
         </g>
         <g>
             <title>org.scalatest.wordspec.AnyWordSpecLike.runTest$ (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="997" width="5.6115%" height="15" fill="rgb(67,216,67)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="997" width="5.6115%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="1007.50">org.sca..</text>
         </g>
         <g>
             <title>org.scalatest.wordspec.AnyWordSpecLike.runTest (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="981" width="5.6115%" height="15" fill="rgb(98,244,98)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="981" width="5.6115%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="991.50">org.sca..</text>
         </g>
         <g>
             <title>org.scalatest.SuperEngine.runTestImpl (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="965" width="5.6115%" height="15" fill="rgb(79,227,79)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="965" width="5.6115%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="975.50">org.sca..</text>
         </g>
         <g>
             <title>org.scalatest.wordspec.AnyWordSpecLike$$Lambda$7967.812636372.apply (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="949" width="5.6115%" height="15" fill="rgb(100,246,100)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="949" width="5.6115%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="959.50">org.sca..</text>
         </g>
         <g>
             <title>org.scalatest.wordspec.AnyWordSpecLike.$anonfun$runTest$1 (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="933" width="5.6115%" height="15" fill="rgb(78,225,78)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="933" width="5.6115%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="943.50">org.sca..</text>
         </g>
         <g>
             <title>org.scalatest.wordspec.AnyWordSpecLike.invokeWithFixture$1 (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="917" width="5.6115%" height="15" fill="rgb(95,241,95)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="917" width="5.6115%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="927.50">org.sca..</text>
         </g>
         <g>
             <title>org.scalatest.wordspec.AnyWordSpec.withFixture (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="901" width="5.6115%" height="15" fill="rgb(79,227,79)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="901" width="5.6115%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="911.50">org.sca..</text>
         </g>
         <g>
             <title>org.scalatest.TestSuite.withFixture$ (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="885" width="5.6115%" height="15" fill="rgb(91,238,91)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="885" width="5.6115%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="895.50">org.sca..</text>
         </g>
         <g>
             <title>org.scalatest.TestSuite.withFixture (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="869" width="5.6115%" height="15" fill="rgb(95,241,95)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="869" width="5.6115%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="879.50">org.sca..</text>
         </g>
         <g>
             <title>org.scalatest.wordspec.AnyWordSpecLike$$anon$3.apply (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="853" width="5.6115%" height="15" fill="rgb(56,205,56)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="853" width="5.6115%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="863.50">org.sca..</text>
         </g>
         <g>
             <title>org.scalatest.Transformer.apply (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="837" width="5.6115%" height="15" fill="rgb(80,228,80)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="837" width="5.6115%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="847.50">org.sca..</text>
         </g>
         <g>
             <title>org.scalatest.Transformer.apply (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="821" width="5.6115%" height="15" fill="rgb(69,217,69)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="821" width="5.6115%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="831.50">org.sca..</text>
         </g>
         <g>
             <title>org.scalatest.OutcomeOf$.outcomeOf (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="805" width="5.6115%" height="15" fill="rgb(68,216,68)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="805" width="5.6115%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="815.50">org.sca..</text>
         </g>
         <g>
             <title>org.scalatest.OutcomeOf.outcomeOf$ (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="789" width="5.6115%" height="15" fill="rgb(82,230,82)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="789" width="5.6115%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="799.50">org.sca..</text>
         </g>
         <g>
             <title>org.scalatest.OutcomeOf.outcomeOf (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="773" width="5.6115%" height="15" fill="rgb(59,208,59)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="773" width="5.6115%" height="15" fill="rgb(96,242,96)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="783.50">org.sca..</text>
         </g>
         <g>
             <title>scala.runtime.java8.JFunction0$mcV$sp.apply (184 samples, 5.61%)</title>
-            <rect x="0.0000%" y="757" width="5.6115%" height="15" fill="rgb(82,229,82)" fg:x="0" fg:w="184"/>
+            <rect x="0.0000%" y="757" width="5.6115%" height="15" fill="rgb(98,244,98)" fg:x="0" fg:w="184"/>
             <text x="0.2500%" y="767.50">scala.r..</text>
         </g>
         <g>
             <title>com.github.plokhotnyuk.jsoniter_scala.core.JsonReaderSpec$$Lambda$8582.1627656208.apply$mcV$sp (115 samples, 3.51%)</title>
-            <rect x="2.1043%" y="741" width="3.5072%" height="15" fill="rgb(53,203,53)" fg:x="69" fg:w="115"/>
+            <rect x="2.1043%" y="741" width="3.5072%" height="15" fill="rgb(89,235,89)" fg:x="69" fg:w="115"/>
             <text x="2.3543%" y="751.50">com..</text>
         </g>
         <g>
             <title>com.github.plokhotnyuk.jsoniter_scala.core.JsonReaderSpec.$anonfun$new$136 (115 samples, 3.51%)</title>
-            <rect x="2.1043%" y="725" width="3.5072%" height="15" fill="rgb(84,231,84)" fg:x="69" fg:w="115"/>
+            <rect x="2.1043%" y="725" width="3.5072%" height="15" fill="rgb(89,235,89)" fg:x="69" fg:w="115"/>
             <text x="2.3543%" y="735.50">com..</text>
         </g>
         <g>
             <title>com.github.plokhotnyuk.jsoniter_scala.core.JsonReaderSpec.forAll (115 samples, 3.51%)</title>
-            <rect x="2.1043%" y="709" width="3.5072%" height="15" fill="rgb(63,211,63)" fg:x="69" fg:w="115"/>
+            <rect x="2.1043%" y="709" width="3.5072%" height="15" fill="rgb(89,235,89)" fg:x="69" fg:w="115"/>
             <text x="2.3543%" y="719.50">com..</text>
         </g>
         <g>
             <title>org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks.forAll$ (115 samples, 3.51%)</title>
-            <rect x="2.1043%" y="693" width="3.5072%" height="15" fill="rgb(97,243,97)" fg:x="69" fg:w="115"/>
+            <rect x="2.1043%" y="693" width="3.5072%" height="15" fill="rgb(96,242,96)" fg:x="69" fg:w="115"/>
             <text x="2.3543%" y="703.50">org..</text>
         </g>
         <g>
             <title>org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks.forAll (115 samples, 3.51%)</title>
-            <rect x="2.1043%" y="677" width="3.5072%" height="15" fill="rgb(53,203,53)" fg:x="69" fg:w="115"/>
+            <rect x="2.1043%" y="677" width="3.5072%" height="15" fill="rgb(96,242,96)" fg:x="69" fg:w="115"/>
             <text x="2.3543%" y="687.50">org..</text>
         </g>
         <g>
             <title>org.scalatestplus.scalacheck.UnitCheckerAsserting$CheckerAssertingImpl.check (115 samples, 3.51%)</title>
-            <rect x="2.1043%" y="661" width="3.5072%" height="15" fill="rgb(109,254,109)" fg:x="69" fg:w="115"/>
+            <rect x="2.1043%" y="661" width="3.5072%" height="15" fill="rgb(96,242,96)" fg:x="69" fg:w="115"/>
             <text x="2.3543%" y="671.50">org..</text>
         </g>
         <g>
             <title>org.scalacheck.Test$.check (115 samples, 3.51%)</title>
-            <rect x="2.1043%" y="645" width="3.5072%" height="15" fill="rgb(64,213,64)" fg:x="69" fg:w="115"/>
+            <rect x="2.1043%" y="645" width="3.5072%" height="15" fill="rgb(96,242,96)" fg:x="69" fg:w="115"/>
             <text x="2.3543%" y="655.50">org..</text>
         </g>
         <g>
             <title>org.scalacheck.Platform$.runWorkers (115 samples, 3.51%)</title>
-            <rect x="2.1043%" y="629" width="3.5072%" height="15" fill="rgb(52,202,52)" fg:x="69" fg:w="115"/>
+            <rect x="2.1043%" y="629" width="3.5072%" height="15" fill="rgb(96,242,96)" fg:x="69" fg:w="115"/>
             <text x="2.3543%" y="639.50">org..</text>
         </g>
         <g>
             <title>org.scalacheck.Test$$$Lambda$8420.1048877523.apply (115 samples, 3.51%)</title>
-            <rect x="2.1043%" y="613" width="3.5072%" height="15" fill="rgb(65,214,65)" fg:x="69" fg:w="115"/>
+            <rect x="2.1043%" y="613" width="3.5072%" height="15" fill="rgb(96,242,96)" fg:x="69" fg:w="115"/>
             <text x="2.3543%" y="623.50">org..</text>
         </g>
         <g>
             <title>org.scalacheck.Test$.$anonfun$check$1$adapted (115 samples, 3.51%)</title>
-            <rect x="2.1043%" y="597" width="3.5072%" height="15" fill="rgb(81,229,81)" fg:x="69" fg:w="115"/>
+            <rect x="2.1043%" y="597" width="3.5072%" height="15" fill="rgb(96,242,96)" fg:x="69" fg:w="115"/>
             <text x="2.3543%" y="607.50">org..</text>
         </g>
         <g>
             <title>org.scalacheck.Test$.$anonfun$check$1 (115 samples, 3.51%)</title>
-            <rect x="2.1043%" y="581" width="3.5072%" height="15" fill="rgb(78,226,78)" fg:x="69" fg:w="115"/>
+            <rect x="2.1043%" y="581" width="3.5072%" height="15" fill="rgb(96,242,96)" fg:x="69" fg:w="115"/>
             <text x="2.3543%" y="591.50">org..</text>
         </g>
         <g>
             <title>org.scalacheck.Test$.workerFun$1 (115 samples, 3.51%)</title>
-            <rect x="2.1043%" y="565" width="3.5072%" height="15" fill="rgb(54,204,54)" fg:x="69" fg:w="115"/>
+            <rect x="2.1043%" y="565" width="3.5072%" height="15" fill="rgb(96,242,96)" fg:x="69" fg:w="115"/>
             <text x="2.3543%" y="575.50">org..</text>
         </g>
         <g>
             <title>org.scalacheck.PropFromFun.apply (115 samples, 3.51%)</title>
-            <rect x="2.1043%" y="549" width="3.5072%" height="15" fill="rgb(60,209,60)" fg:x="69" fg:w="115"/>
+            <rect x="2.1043%" y="549" width="3.5072%" height="15" fill="rgb(96,242,96)" fg:x="69" fg:w="115"/>
             <text x="2.3543%" y="559.50">org..</text>
         </g>
         <g>
             <title>org.scalacheck.Prop$$$Lambda$8392.1163160283.apply (115 samples, 3.51%)</title>
-            <rect x="2.1043%" y="533" width="3.5072%" height="15" fill="rgb(82,229,82)" fg:x="69" fg:w="115"/>
+            <rect x="2.1043%" y="533" width="3.5072%" height="15" fill="rgb(96,242,96)" fg:x="69" fg:w="115"/>
             <text x="2.3543%" y="543.50">org..</text>
         </g>
         <g>
             <title>org.scalacheck.Prop$.$anonfun$apply$1 (115 samples, 3.51%)</title>
-            <rect x="2.1043%" y="517" width="3.5072%" height="15" fill="rgb(82,229,82)" fg:x="69" fg:w="115"/>
+            <rect x="2.1043%" y="517" width="3.5072%" height="15" fill="rgb(96,242,96)" fg:x="69" fg:w="115"/>
             <text x="2.3543%" y="527.50">org..</text>
         </g>
         <g>
             <title>org.scalacheck.Prop$$$Lambda$8391.1460249324.apply (115 samples, 3.51%)</title>
-            <rect x="2.1043%" y="501" width="3.5072%" height="15" fill="rgb(75,223,75)" fg:x="69" fg:w="115"/>
+            <rect x="2.1043%" y="501" width="3.5072%" height="15" fill="rgb(96,242,96)" fg:x="69" fg:w="115"/>
             <text x="2.3543%" y="511.50">org..</text>
         </g>
         <g>
             <title>org.scalacheck.Prop$.$anonfun$forAllShrink$1 (115 samples, 3.51%)</title>
-            <rect x="2.1043%" y="485" width="3.5072%" height="15" fill="rgb(98,244,98)" fg:x="69" fg:w="115"/>
+            <rect x="2.1043%" y="485" width="3.5072%" height="15" fill="rgb(96,242,96)" fg:x="69" fg:w="115"/>
             <text x="2.3543%" y="495.50">org..</text>
         </g>
         <g>
             <title>org.scalacheck.Prop$.result$1 (115 samples, 3.51%)</title>
-            <rect x="2.1043%" y="469" width="3.5072%" height="15" fill="rgb(104,249,104)" fg:x="69" fg:w="115"/>
+            <rect x="2.1043%" y="469" width="3.5072%" height="15" fill="rgb(96,242,96)" fg:x="69" fg:w="115"/>
             <text x="2.3543%" y="479.50">org..</text>
         </g>
         <g>
             <title>org.scalacheck.PropFromFun.apply (115 samples, 3.51%)</title>
-            <rect x="2.1043%" y="453" width="3.5072%" height="15" fill="rgb(102,247,102)" fg:x="69" fg:w="115"/>
+            <rect x="2.1043%" y="453" width="3.5072%" height="15" fill="rgb(96,242,96)" fg:x="69" fg:w="115"/>
             <text x="2.3543%" y="463.50">org..</text>
         </g>
         <g>
             <title>org.scalacheck.Prop$$$Lambda$8392.1163160283.apply (115 samples, 3.51%)</title>
-            <rect x="2.1043%" y="437" width="3.5072%" height="15" fill="rgb(102,248,102)" fg:x="69" fg:w="115"/>
+            <rect x="2.1043%" y="437" width="3.5072%" height="15" fill="rgb(96,242,96)" fg:x="69" fg:w="115"/>
             <text x="2.3543%" y="447.50">org..</text>
         </g>
         <g>
             <title>org.scalacheck.Prop$.$anonfun$apply$1 (115 samples, 3.51%)</title>
-            <rect x="2.1043%" y="421" width="3.5072%" height="15" fill="rgb(62,211,62)" fg:x="69" fg:w="115"/>
+            <rect x="2.1043%" y="421" width="3.5072%" height="15" fill="rgb(96,242,96)" fg:x="69" fg:w="115"/>
             <text x="2.3543%" y="431.50">org..</text>
         </g>
         <g>
             <title>org.scalacheck.Prop$$$Lambda$8391.1460249324.apply (115 samples, 3.51%)</title>
-            <rect x="2.1043%" y="405" width="3.5072%" height="15" fill="rgb(59,208,59)" fg:x="69" fg:w="115"/>
+            <rect x="2.1043%" y="405" width="3.5072%" height="15" fill="rgb(96,242,96)" fg:x="69" fg:w="115"/>
             <text x="2.3543%" y="415.50">org..</text>
         </g>
         <g>
             <title>org.scalacheck.Prop$.$anonfun$forAllShrink$1 (115 samples, 3.51%)</title>
-            <rect x="2.1043%" y="389" width="3.5072%" height="15" fill="rgb(58,207,58)" fg:x="69" fg:w="115"/>
+            <rect x="2.1043%" y="389" width="3.5072%" height="15" fill="rgb(96,242,96)" fg:x="69" fg:w="115"/>
             <text x="2.3543%" y="399.50">org..</text>
         </g>
         <g>
             <title>org.scalacheck.Prop$.result$1 (115 samples, 3.51%)</title>
-            <rect x="2.1043%" y="373" width="3.5072%" height="15" fill="rgb(102,248,102)" fg:x="69" fg:w="115"/>
+            <rect x="2.1043%" y="373" width="3.5072%" height="15" fill="rgb(96,242,96)" fg:x="69" fg:w="115"/>
             <text x="2.3543%" y="383.50">org..</text>
         </g>
         <g>
             <title>org.scalacheck.Prop$.secure (115 samples, 3.51%)</title>
-            <rect x="2.1043%" y="357" width="3.5072%" height="15" fill="rgb(76,224,76)" fg:x="69" fg:w="115"/>
+            <rect x="2.1043%" y="357" width="3.5072%" height="15" fill="rgb(96,242,96)" fg:x="69" fg:w="115"/>
             <text x="2.3543%" y="367.50">org..</text>
         </g>
         <g>
             <title>org.scalacheck.Prop$$$Lambda$8437.980556189.apply (115 samples, 3.51%)</title>
-            <rect x="2.1043%" y="341" width="3.5072%" height="15" fill="rgb(78,226,78)" fg:x="69" fg:w="115"/>
+            <rect x="2.1043%" y="341" width="3.5072%" height="15" fill="rgb(96,242,96)" fg:x="69" fg:w="115"/>
             <text x="2.3543%" y="351.50">org..</text>
         </g>
         <g>
             <title>org.scalacheck.Prop$.$anonfun$forAllShrink$2 (115 samples, 3.51%)</title>
-            <rect x="2.1043%" y="325" width="3.5072%" height="15" fill="rgb(69,217,69)" fg:x="69" fg:w="115"/>
+            <rect x="2.1043%" y="325" width="3.5072%" height="15" fill="rgb(96,242,96)" fg:x="69" fg:w="115"/>
             <text x="2.3543%" y="335.50">org..</text>
         </g>
         <g>
             <title>org.scalacheck.Prop$$$Lambda$9326.169489320.apply (115 samples, 3.51%)</title>
-            <rect x="2.1043%" y="309" width="3.5072%" height="15" fill="rgb(76,223,76)" fg:x="69" fg:w="115"/>
+            <rect x="2.1043%" y="309" width="3.5072%" height="15" fill="rgb(96,242,96)" fg:x="69" fg:w="115"/>
             <text x="2.3543%" y="319.50">org..</text>
         </g>
         <g>
             <title>org.scalacheck.Prop$.$anonfun$forAll$3 (115 samples, 3.51%)</title>
-            <rect x="2.1043%" y="293" width="3.5072%" height="15" fill="rgb(55,205,55)" fg:x="69" fg:w="115"/>
+            <rect x="2.1043%" y="293" width="3.5072%" height="15" fill="rgb(96,242,96)" fg:x="69" fg:w="115"/>
             <text x="2.3543%" y="303.50">org..</text>
         </g>
         <g>
             <title>org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks$$Lambda$9322.742157558.apply (115 samples, 3.51%)</title>
-            <rect x="2.1043%" y="277" width="3.5072%" height="15" fill="rgb(92,239,92)" fg:x="69" fg:w="115"/>
+            <rect x="2.1043%" y="277" width="3.5072%" height="15" fill="rgb(96,242,96)" fg:x="69" fg:w="115"/>
             <text x="2.3543%" y="287.50">org..</text>
         </g>
         <g>
             <title>org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks.$anonfun$forAll$21 (115 samples, 3.51%)</title>
-            <rect x="2.1043%" y="261" width="3.5072%" height="15" fill="rgb(56,206,56)" fg:x="69" fg:w="115"/>
+            <rect x="2.1043%" y="261" width="3.5072%" height="15" fill="rgb(96,242,96)" fg:x="69" fg:w="115"/>
             <text x="2.3543%" y="271.50">org..</text>
         </g>
         <g>
             <title>org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks.liftedTree13$1 (115 samples, 3.51%)</title>
-            <rect x="2.1043%" y="245" width="3.5072%" height="15" fill="rgb(77,225,77)" fg:x="69" fg:w="115"/>
+            <rect x="2.1043%" y="245" width="3.5072%" height="15" fill="rgb(96,242,96)" fg:x="69" fg:w="115"/>
             <text x="2.3543%" y="255.50">org..</text>
         </g>
         <g>
             <title>com.github.plokhotnyuk.jsoniter_scala.core.JsonReaderSpec$$Lambda$10462.775835262.apply (115 samples, 3.51%)</title>
-            <rect x="2.1043%" y="229" width="3.5072%" height="15" fill="rgb(60,209,60)" fg:x="69" fg:w="115"/>
+            <rect x="2.1043%" y="229" width="3.5072%" height="15" fill="rgb(89,235,89)" fg:x="69" fg:w="115"/>
             <text x="2.3543%" y="239.50">com..</text>
         </g>
         <g>
             <title>com.github.plokhotnyuk.jsoniter_scala.core.JsonReaderSpec.$anonfun$new$137$adapted (115 samples, 3.51%)</title>
-            <rect x="2.1043%" y="213" width="3.5072%" height="15" fill="rgb(67,216,67)" fg:x="69" fg:w="115"/>
+            <rect x="2.1043%" y="213" width="3.5072%" height="15" fill="rgb(89,235,89)" fg:x="69" fg:w="115"/>
             <text x="2.3543%" y="223.50">com..</text>
         </g>
         <g>
             <title>com.github.plokhotnyuk.jsoniter_scala.core.JsonReaderSpec.$anonfun$new$137 (115 samples, 3.51%)</title>
-            <rect x="2.1043%" y="197" width="3.5072%" height="15" fill="rgb(52,201,52)" fg:x="69" fg:w="115"/>
+            <rect x="2.1043%" y="197" width="3.5072%" height="15" fill="rgb(89,235,89)" fg:x="69" fg:w="115"/>
             <text x="2.3543%" y="207.50">com..</text>
         </g>
         <g>
             <title>com.github.plokhotnyuk.jsoniter_scala.core.JsonReaderSpec.check$6 (115 samples, 3.51%)</title>
-            <rect x="2.1043%" y="181" width="3.5072%" height="15" fill="rgb(55,204,55)" fg:x="69" fg:w="115"/>
+            <rect x="2.1043%" y="181" width="3.5072%" height="15" fill="rgb(89,235,89)" fg:x="69" fg:w="115"/>
             <text x="2.3543%" y="191.50">com..</text>
         </g>
         <g>
             <title>com.github.plokhotnyuk.jsoniter_scala.core.JsonReader.readBase64UrlAsBytes (63 samples, 1.92%)</title>
-            <rect x="3.6901%" y="165" width="1.9213%" height="15" fill="rgb(71,219,71)" fg:x="121" fg:w="63"/>
+            <rect x="3.6901%" y="165" width="1.9213%" height="15" fill="rgb(89,235,89)" fg:x="121" fg:w="63"/>
             <text x="3.9401%" y="175.50">c..</text>
         </g>
         <g>
             <title>com.github.plokhotnyuk.jsoniter_scala.core.JsonReader.parseBase64 (63 samples, 1.92%)</title>
-            <rect x="3.6901%" y="149" width="1.9213%" height="15" fill="rgb(57,206,57)" fg:x="121" fg:w="63"/>
+            <rect x="3.6901%" y="149" width="1.9213%" height="15" fill="rgb(89,235,89)" fg:x="121" fg:w="63"/>
             <text x="3.9401%" y="159.50">c..</text>
         </g>
         <g>
             <title>scoverage.Invoker$.invoked (63 samples, 1.92%)</title>
-            <rect x="3.6901%" y="133" width="1.9213%" height="15" fill="rgb(98,244,98)" fg:x="121" fg:w="63"/>
+            <rect x="3.6901%" y="133" width="1.9213%" height="15" fill="rgb(97,243,97)" fg:x="121" fg:w="63"/>
             <text x="3.9401%" y="143.50">s..</text>
         </g>
         <g>
             <title>scala.collection.AbstractMap.contains (63 samples, 1.92%)</title>
-            <rect x="3.6901%" y="117" width="1.9213%" height="15" fill="rgb(95,241,95)" fg:x="121" fg:w="63"/>
+            <rect x="3.6901%" y="117" width="1.9213%" height="15" fill="rgb(98,244,98)" fg:x="121" fg:w="63"/>
             <text x="3.9401%" y="127.50">s..</text>
         </g>
         <g>
             <title>scala.collection.MapOps.contains$ (63 samples, 1.92%)</title>
-            <rect x="3.6901%" y="101" width="1.9213%" height="15" fill="rgb(102,248,102)" fg:x="121" fg:w="63"/>
+            <rect x="3.6901%" y="101" width="1.9213%" height="15" fill="rgb(98,244,98)" fg:x="121" fg:w="63"/>
             <text x="3.9401%" y="111.50">s..</text>
         </g>
         <g>
             <title>scala.collection.MapOps.contains (63 samples, 1.92%)</title>
-            <rect x="3.6901%" y="85" width="1.9213%" height="15" fill="rgb(70,218,70)" fg:x="121" fg:w="63"/>
+            <rect x="3.6901%" y="85" width="1.9213%" height="15" fill="rgb(98,244,98)" fg:x="121" fg:w="63"/>
             <text x="3.9401%" y="95.50">s..</text>
         </g>
         <g>
             <title>scala.collection.concurrent.TrieMap.get (63 samples, 1.92%)</title>
-            <rect x="3.6901%" y="69" width="1.9213%" height="15" fill="rgb(83,230,83)" fg:x="121" fg:w="63"/>
+            <rect x="3.6901%" y="69" width="1.9213%" height="15" fill="rgb(98,244,98)" fg:x="121" fg:w="63"/>
             <text x="3.9401%" y="79.50">s..</text>
         </g>
         <g>
             <title>scala.collection.concurrent.TrieMap.lookuphc (63 samples, 1.92%)</title>
-            <rect x="3.6901%" y="53" width="1.9213%" height="15" fill="rgb(62,211,62)" fg:x="121" fg:w="63"/>
+            <rect x="3.6901%" y="53" width="1.9213%" height="15" fill="rgb(98,244,98)" fg:x="121" fg:w="63"/>
             <text x="3.9401%" y="63.50">s..</text>
         </g>
         <g>
             <title>scala.collection.concurrent.INode.rec_lookup (63 samples, 1.92%)</title>
-            <rect x="3.6901%" y="37" width="1.9213%" height="15" fill="rgb(67,216,67)" fg:x="121" fg:w="63"/>
+            <rect x="3.6901%" y="37" width="1.9213%" height="15" fill="rgb(98,244,98)" fg:x="121" fg:w="63"/>
             <text x="3.9401%" y="47.50">s..</text>
         </g>
         <g>
             <title>DrainStacksCompactionTask::do_it(GCTaskManager*, unsigned int) (105 samples, 3.20%)</title>
-            <rect x="5.6115%" y="1845" width="3.2022%" height="15" fill="rgb(195,195,57)" fg:x="184" fg:w="105"/>
+            <rect x="5.6115%" y="1845" width="3.2022%" height="15" fill="rgb(209,209,62)" fg:x="184" fg:w="105"/>
             <text x="5.8615%" y="1855.50">Dra..</text>
         </g>
         <g>
             <title>ParCompactionManager::drain_region_stacks() (105 samples, 3.20%)</title>
-            <rect x="5.6115%" y="1829" width="3.2022%" height="15" fill="rgb(185,185,53)" fg:x="184" fg:w="105"/>
+            <rect x="5.6115%" y="1829" width="3.2022%" height="15" fill="rgb(214,214,64)" fg:x="184" fg:w="105"/>
             <text x="5.8615%" y="1839.50">Par..</text>
         </g>
         <g>
             <title>PSParallelCompact::fill_region(ParCompactionManager*, unsigned long) (105 samples, 3.20%)</title>
-            <rect x="5.6115%" y="1813" width="3.2022%" height="15" fill="rgb(212,212,63)" fg:x="184" fg:w="105"/>
+            <rect x="5.6115%" y="1813" width="3.2022%" height="15" fill="rgb(216,216,65)" fg:x="184" fg:w="105"/>
             <text x="5.8615%" y="1823.50">PSP..</text>
         </g>
         <g>
             <title>ParMarkBitMap::iterate(ParMarkBitMapClosure*, unsigned long, unsigned long) const (105 samples, 3.20%)</title>
-            <rect x="5.6115%" y="1797" width="3.2022%" height="15" fill="rgb(188,188,54)" fg:x="184" fg:w="105"/>
+            <rect x="5.6115%" y="1797" width="3.2022%" height="15" fill="rgb(214,214,64)" fg:x="184" fg:w="105"/>
             <text x="5.8615%" y="1807.50">Par..</text>
         </g>
         <g>
             <title>MoveAndUpdateClosure::do_addr(HeapWord*, unsigned long) (105 samples, 3.20%)</title>
-            <rect x="5.6115%" y="1781" width="3.2022%" height="15" fill="rgb(175,175,50)" fg:x="184" fg:w="105"/>
+            <rect x="5.6115%" y="1781" width="3.2022%" height="15" fill="rgb(207,207,61)" fg:x="184" fg:w="105"/>
             <text x="5.8615%" y="1791.50">Mov..</text>
         </g>
         <g>
             <title>InstanceKlass::oop_update_pointers(ParCompactionManager*, oopDesc*) (105 samples, 3.20%)</title>
-            <rect x="5.6115%" y="1765" width="3.2022%" height="15" fill="rgb(182,182,52)" fg:x="184" fg:w="105"/>
+            <rect x="5.6115%" y="1765" width="3.2022%" height="15" fill="rgb(218,218,65)" fg:x="184" fg:w="105"/>
             <text x="5.8615%" y="1775.50">Ins..</text>
         </g>
         <g>
             <title>ParallelCompactData::calc_new_pointer(HeapWord*) (105 samples, 3.20%)</title>
-            <rect x="5.6115%" y="1749" width="3.2022%" height="15" fill="rgb(193,193,56)" fg:x="184" fg:w="105"/>
+            <rect x="5.6115%" y="1749" width="3.2022%" height="15" fill="rgb(214,214,64)" fg:x="184" fg:w="105"/>
             <text x="5.8615%" y="1759.50">Par..</text>
         </g>
         <g>
             <title>ParMarkBitMap::live_words_in_range(HeapWord*, oopDesc*) const (105 samples, 3.20%)</title>
-            <rect x="5.6115%" y="1733" width="3.2022%" height="15" fill="rgb(209,209,62)" fg:x="184" fg:w="105"/>
+            <rect x="5.6115%" y="1733" width="3.2022%" height="15" fill="rgb(214,214,64)" fg:x="184" fg:w="105"/>
             <text x="5.8615%" y="1743.50">Par..</text>
         </g>
         <g>
             <title>OldToYoungRootsTask::do_it(GCTaskManager*, unsigned int) (490 samples, 14.94%)</title>
-            <rect x="8.8137%" y="1845" width="14.9436%" height="15" fill="rgb(180,180,51)" fg:x="289" fg:w="490"/>
+            <rect x="8.8137%" y="1845" width="14.9436%" height="15" fill="rgb(198,198,58)" fg:x="289" fg:w="490"/>
             <text x="9.0637%" y="1855.50">OldToYoungRootsTask::do..</text>
         </g>
         <g>
             <title>CardTableExtension::scavenge_contents_parallel(ObjectStartArray*, MutableSpace*, HeapWord*, PSPromotionManager*, unsigned int, unsigned int) (490 samples, 14.94%)</title>
-            <rect x="8.8137%" y="1829" width="14.9436%" height="15" fill="rgb(215,215,64)" fg:x="289" fg:w="490"/>
+            <rect x="8.8137%" y="1829" width="14.9436%" height="15" fill="rgb(201,201,59)" fg:x="289" fg:w="490"/>
             <text x="9.0637%" y="1839.50">CardTableExtension::sca..</text>
         </g>
         <g>
             <title>PSPromotionManager::drain_stacks_depth(bool) (490 samples, 14.94%)</title>
-            <rect x="8.8137%" y="1813" width="14.9436%" height="15" fill="rgb(212,212,63)" fg:x="289" fg:w="490"/>
+            <rect x="8.8137%" y="1813" width="14.9436%" height="15" fill="rgb(216,216,65)" fg:x="289" fg:w="490"/>
             <text x="9.0637%" y="1823.50">PSPromotionManager::dra..</text>
         </g>
         <g>
             <title>oopDesc* PSPromotionManager::copy_to_survivor_space&lt;false&gt;(oopDesc*) (358 samples, 10.92%)</title>
-            <rect x="12.8393%" y="1797" width="10.9180%" height="15" fill="rgb(226,226,68)" fg:x="421" fg:w="358"/>
+            <rect x="12.8393%" y="1797" width="10.9180%" height="15" fill="rgb(223,223,67)" fg:x="421" fg:w="358"/>
             <text x="13.0893%" y="1807.50">oopDesc* PSPromo..</text>
         </g>
         <g>
             <title>InstanceKlass::oop_push_contents(PSPromotionManager*, oopDesc*) (161 samples, 4.91%)</title>
-            <rect x="18.8472%" y="1781" width="4.9100%" height="15" fill="rgb(176,176,50)" fg:x="618" fg:w="161"/>
+            <rect x="18.8472%" y="1781" width="4.9100%" height="15" fill="rgb(218,218,65)" fg:x="618" fg:w="161"/>
             <text x="19.0972%" y="1791.50">Instan..</text>
         </g>
         <g>
             <title>GCTaskThread::run() (793 samples, 24.18%)</title>
-            <rect x="5.6115%" y="1861" width="24.1842%" height="15" fill="rgb(199,199,58)" fg:x="184" fg:w="793"/>
+            <rect x="5.6115%" y="1861" width="24.1842%" height="15" fill="rgb(226,226,68)" fg:x="184" fg:w="793"/>
             <text x="5.8615%" y="1871.50">GCTaskThread::run()</text>
         </g>
         <g>
             <title>StealTask::do_it(GCTaskManager*, unsigned int) (198 samples, 6.04%)</title>
-            <rect x="23.7572%" y="1845" width="6.0384%" height="15" fill="rgb(198,198,58)" fg:x="779" fg:w="198"/>
+            <rect x="23.7572%" y="1845" width="6.0384%" height="15" fill="rgb(213,213,63)" fg:x="779" fg:w="198"/>
             <text x="24.0072%" y="1855.50">StealTas..</text>
         </g>
         <g>
             <title>PSPromotionManager::drain_stacks_depth(bool) (198 samples, 6.04%)</title>
-            <rect x="23.7572%" y="1829" width="6.0384%" height="15" fill="rgb(211,211,63)" fg:x="779" fg:w="198"/>
+            <rect x="23.7572%" y="1829" width="6.0384%" height="15" fill="rgb(216,216,65)" fg:x="779" fg:w="198"/>
             <text x="24.0072%" y="1839.50">PSPromot..</text>
         </g>
         <g>
@@ -978,112 +978,112 @@ text { font-family:"Verdana"; font-size:12px; fill:rgb(0,0,0); }
         </g>
         <g>
             <title>InstanceKlass::oop_push_contents(PSPromotionManager*, oopDesc*) (80 samples, 2.44%)</title>
-            <rect x="27.3559%" y="1797" width="2.4398%" height="15" fill="rgb(180,180,51)" fg:x="897" fg:w="80"/>
+            <rect x="27.3559%" y="1797" width="2.4398%" height="15" fill="rgb(218,218,65)" fg:x="897" fg:w="80"/>
             <text x="27.6059%" y="1807.50">In..</text>
         </g>
         <g>
             <title>Matcher::match() (109 samples, 3.32%)</title>
-            <rect x="29.7957%" y="1749" width="3.3242%" height="15" fill="rgb(187,187,54)" fg:x="977" fg:w="109"/>
+            <rect x="29.7957%" y="1749" width="3.3242%" height="15" fill="rgb(199,199,58)" fg:x="977" fg:w="109"/>
             <text x="30.0457%" y="1759.50">Mat..</text>
         </g>
         <g>
             <title>Matcher::xform(Node*, int) (109 samples, 3.32%)</title>
-            <rect x="29.7957%" y="1733" width="3.3242%" height="15" fill="rgb(181,181,52)" fg:x="977" fg:w="109"/>
+            <rect x="29.7957%" y="1733" width="3.3242%" height="15" fill="rgb(199,199,58)" fg:x="977" fg:w="109"/>
             <text x="30.0457%" y="1743.50">Mat..</text>
         </g>
         <g>
             <title>Arena::contains(void const*) const (109 samples, 3.32%)</title>
-            <rect x="29.7957%" y="1717" width="3.3242%" height="15" fill="rgb(184,184,53)" fg:x="977" fg:w="109"/>
+            <rect x="29.7957%" y="1717" width="3.3242%" height="15" fill="rgb(211,211,63)" fg:x="977" fg:w="109"/>
             <text x="30.0457%" y="1727.50">Are..</text>
         </g>
         <g>
             <title>PhaseAggressiveCoalesce::insert_copies(Matcher&amp;) (86 samples, 2.62%)</title>
-            <rect x="33.1199%" y="1733" width="2.6228%" height="15" fill="rgb(227,227,69)" fg:x="1086" fg:w="86"/>
+            <rect x="33.1199%" y="1733" width="2.6228%" height="15" fill="rgb(223,223,67)" fg:x="1086" fg:w="86"/>
             <text x="33.3699%" y="1743.50">Ph..</text>
         </g>
         <g>
             <title>PhaseChaitin::Split(unsigned int, ResourceArea*) (213 samples, 6.50%)</title>
-            <rect x="35.7426%" y="1733" width="6.4959%" height="15" fill="rgb(181,181,52)" fg:x="1172" fg:w="213"/>
+            <rect x="35.7426%" y="1733" width="6.4959%" height="15" fill="rgb(223,223,67)" fg:x="1172" fg:w="213"/>
             <text x="35.9926%" y="1743.50">PhaseChai..</text>
         </g>
         <g>
             <title>PhaseChaitin::build_ifg_physical(ResourceArea*) (305 samples, 9.30%)</title>
-            <rect x="42.2385%" y="1733" width="9.3016%" height="15" fill="rgb(188,188,54)" fg:x="1385" fg:w="305"/>
+            <rect x="42.2385%" y="1733" width="9.3016%" height="15" fill="rgb(223,223,67)" fg:x="1385" fg:w="305"/>
             <text x="42.4885%" y="1743.50">PhaseChaitin:..</text>
         </g>
         <g>
             <title>PhaseChaitin::interfere_with_live(unsigned int, IndexSet*) (183 samples, 5.58%)</title>
-            <rect x="45.9591%" y="1717" width="5.5810%" height="15" fill="rgb(206,206,61)" fg:x="1507" fg:w="183"/>
+            <rect x="45.9591%" y="1717" width="5.5810%" height="15" fill="rgb(223,223,67)" fg:x="1507" fg:w="183"/>
             <text x="46.2091%" y="1727.50">PhaseCh..</text>
         </g>
         <g>
             <title>IndexSetIterator::advance_and_next() (66 samples, 2.01%)</title>
-            <rect x="49.5273%" y="1701" width="2.0128%" height="15" fill="rgb(225,225,68)" fg:x="1624" fg:w="66"/>
+            <rect x="49.5273%" y="1701" width="2.0128%" height="15" fill="rgb(221,221,66)" fg:x="1624" fg:w="66"/>
             <text x="49.7773%" y="1711.50">I..</text>
         </g>
         <g>
             <title>PhaseChaitin::gather_lrg_masks(bool) (95 samples, 2.90%)</title>
-            <rect x="51.5401%" y="1733" width="2.8972%" height="15" fill="rgb(182,182,52)" fg:x="1690" fg:w="95"/>
+            <rect x="51.5401%" y="1733" width="2.8972%" height="15" fill="rgb(223,223,67)" fg:x="1690" fg:w="95"/>
             <text x="51.7901%" y="1743.50">Ph..</text>
         </g>
         <g>
             <title>PhaseChaitin::post_allocate_copy_removal() (139 samples, 4.24%)</title>
-            <rect x="54.4373%" y="1733" width="4.2391%" height="15" fill="rgb(210,210,63)" fg:x="1785" fg:w="139"/>
+            <rect x="54.4373%" y="1733" width="4.2391%" height="15" fill="rgb(223,223,67)" fg:x="1785" fg:w="139"/>
             <text x="54.6873%" y="1743.50">Phase..</text>
         </g>
         <g>
             <title>PhaseChaitin::elide_copy(Node*, int, Block*, Node_List&amp;, Node_List&amp;, bool) (76 samples, 2.32%)</title>
-            <rect x="56.3586%" y="1717" width="2.3178%" height="15" fill="rgb(212,212,63)" fg:x="1848" fg:w="76"/>
+            <rect x="56.3586%" y="1717" width="2.3178%" height="15" fill="rgb(223,223,67)" fg:x="1848" fg:w="76"/>
             <text x="56.6086%" y="1727.50">P..</text>
         </g>
         <g>
             <title>PhaseCoalesce::coalesce_driver() (92 samples, 2.81%)</title>
-            <rect x="58.6764%" y="1733" width="2.8057%" height="15" fill="rgb(221,221,66)" fg:x="1924" fg:w="92"/>
+            <rect x="58.6764%" y="1733" width="2.8057%" height="15" fill="rgb(223,223,67)" fg:x="1924" fg:w="92"/>
             <text x="58.9264%" y="1743.50">Ph..</text>
         </g>
         <g>
             <title>PhaseConservativeCoalesce::coalesce(Block*) (92 samples, 2.81%)</title>
-            <rect x="58.6764%" y="1717" width="2.8057%" height="15" fill="rgb(207,207,61)" fg:x="1924" fg:w="92"/>
+            <rect x="58.6764%" y="1717" width="2.8057%" height="15" fill="rgb(223,223,67)" fg:x="1924" fg:w="92"/>
             <text x="58.9264%" y="1727.50">Ph..</text>
         </g>
         <g>
             <title>PhaseConservativeCoalesce::update_ifg(unsigned int, unsigned int, IndexSet*, IndexSet*) (92 samples, 2.81%)</title>
-            <rect x="58.6764%" y="1701" width="2.8057%" height="15" fill="rgb(186,186,54)" fg:x="1924" fg:w="92"/>
+            <rect x="58.6764%" y="1701" width="2.8057%" height="15" fill="rgb(223,223,67)" fg:x="1924" fg:w="92"/>
             <text x="58.9264%" y="1711.50">Ph..</text>
         </g>
         <g>
             <title>PhaseIFG::Compute_Effective_Degree() (53 samples, 1.62%)</title>
-            <rect x="61.4822%" y="1733" width="1.6163%" height="15" fill="rgb(185,185,53)" fg:x="2016" fg:w="53"/>
+            <rect x="61.4822%" y="1733" width="1.6163%" height="15" fill="rgb(223,223,67)" fg:x="2016" fg:w="53"/>
             <text x="61.7322%" y="1743.50"></text>
         </g>
         <g>
             <title>IndexSetIterator::advance_and_next() (53 samples, 1.62%)</title>
-            <rect x="61.4822%" y="1717" width="1.6163%" height="15" fill="rgb(178,178,51)" fg:x="2016" fg:w="53"/>
+            <rect x="61.4822%" y="1717" width="1.6163%" height="15" fill="rgb(221,221,66)" fg:x="2016" fg:w="53"/>
             <text x="61.7322%" y="1727.50"></text>
         </g>
         <g>
             <title>PhaseIFG::SquareUp() (48 samples, 1.46%)</title>
-            <rect x="63.0985%" y="1733" width="1.4639%" height="15" fill="rgb(218,218,65)" fg:x="2069" fg:w="48"/>
+            <rect x="63.0985%" y="1733" width="1.4639%" height="15" fill="rgb(223,223,67)" fg:x="2069" fg:w="48"/>
             <text x="63.3485%" y="1743.50"></text>
         </g>
         <g>
             <title>IndexSetIterator::advance_and_next() (48 samples, 1.46%)</title>
-            <rect x="63.0985%" y="1717" width="1.4639%" height="15" fill="rgb(216,216,65)" fg:x="2069" fg:w="48"/>
+            <rect x="63.0985%" y="1717" width="1.4639%" height="15" fill="rgb(221,221,66)" fg:x="2069" fg:w="48"/>
             <text x="63.3485%" y="1727.50"></text>
         </g>
         <g>
             <title>Compile::Code_Gen() (1,250 samples, 38.12%)</title>
-            <rect x="29.7957%" y="1765" width="38.1214%" height="15" fill="rgb(175,175,50)" fg:x="977" fg:w="1250"/>
+            <rect x="29.7957%" y="1765" width="38.1214%" height="15" fill="rgb(214,214,64)" fg:x="977" fg:w="1250"/>
             <text x="30.0457%" y="1775.50">Compile::Code_Gen()</text>
         </g>
         <g>
             <title>PhaseChaitin::Register_Allocate() (1,141 samples, 34.80%)</title>
-            <rect x="33.1199%" y="1749" width="34.7972%" height="15" fill="rgb(204,204,60)" fg:x="1086" fg:w="1141"/>
+            <rect x="33.1199%" y="1749" width="34.7972%" height="15" fill="rgb(223,223,67)" fg:x="1086" fg:w="1141"/>
             <text x="33.3699%" y="1759.50">PhaseChaitin::Register_Allocate()</text>
         </g>
         <g>
             <title>PhaseLive::compute(unsigned int) (110 samples, 3.35%)</title>
-            <rect x="64.5624%" y="1733" width="3.3547%" height="15" fill="rgb(180,180,51)" fg:x="2117" fg:w="110"/>
+            <rect x="64.5624%" y="1733" width="3.3547%" height="15" fill="rgb(223,223,67)" fg:x="2117" fg:w="110"/>
             <text x="64.8124%" y="1743.50">Pha..</text>
         </g>
         <g>
@@ -1093,122 +1093,122 @@ text { font-family:"Verdana"; font-size:12px; fill:rgb(0,0,0); }
         </g>
         <g>
             <title>PhaseIdealLoop::build_loop_early(VectorSet&amp;, Node_List&amp;, Node_Stack&amp;) (108 samples, 3.29%)</title>
-            <rect x="69.9604%" y="1733" width="3.2937%" height="15" fill="rgb(189,189,55)" fg:x="2294" fg:w="108"/>
+            <rect x="69.9604%" y="1733" width="3.2937%" height="15" fill="rgb(223,223,67)" fg:x="2294" fg:w="108"/>
             <text x="70.2104%" y="1743.50">Pha..</text>
         </g>
         <g>
             <title>PhaseIdealLoop::build_loop_late(VectorSet&amp;, Node_List&amp;, Node_Stack&amp;) (655 samples, 19.98%)</title>
-            <rect x="73.2540%" y="1733" width="19.9756%" height="15" fill="rgb(224,224,68)" fg:x="2402" fg:w="655"/>
+            <rect x="73.2540%" y="1733" width="19.9756%" height="15" fill="rgb(223,223,67)" fg:x="2402" fg:w="655"/>
             <text x="73.5040%" y="1743.50">PhaseIdealLoop::build_loop_late..</text>
         </g>
         <g>
             <title>PhaseIdealLoop::build_loop_late_post(Node*) (556 samples, 16.96%)</title>
-            <rect x="76.2733%" y="1717" width="16.9564%" height="15" fill="rgb(188,188,54)" fg:x="2501" fg:w="556"/>
+            <rect x="76.2733%" y="1717" width="16.9564%" height="15" fill="rgb(223,223,67)" fg:x="2501" fg:w="556"/>
             <text x="76.5233%" y="1727.50">PhaseIdealLoop::build_loop..</text>
         </g>
         <g>
             <title>PhaseIdealLoop::get_late_ctrl(Node*, Node*) (556 samples, 16.96%)</title>
-            <rect x="76.2733%" y="1701" width="16.9564%" height="15" fill="rgb(193,193,56)" fg:x="2501" fg:w="556"/>
+            <rect x="76.2733%" y="1701" width="16.9564%" height="15" fill="rgb(223,223,67)" fg:x="2501" fg:w="556"/>
             <text x="76.5233%" y="1711.50">PhaseIdealLoop::get_late_c..</text>
         </g>
         <g>
             <title>PhaseIdealLoop::is_dominator(Node*, Node*) [clone .part.114] (496 samples, 15.13%)</title>
-            <rect x="78.1031%" y="1685" width="15.1266%" height="15" fill="rgb(204,204,60)" fg:x="2561" fg:w="496"/>
+            <rect x="78.1031%" y="1685" width="15.1266%" height="15" fill="rgb(223,223,67)" fg:x="2561" fg:w="496"/>
             <text x="78.3531%" y="1695.50">PhaseIdealLoop::is_domi..</text>
         </g>
         <g>
             <title>C2Compiler::compile_method(ciEnv*, ciMethod*, int) (2,130 samples, 64.96%)</title>
-            <rect x="29.7957%" y="1797" width="64.9588%" height="15" fill="rgb(221,221,66)" fg:x="977" fg:w="2130"/>
+            <rect x="29.7957%" y="1797" width="64.9588%" height="15" fill="rgb(203,203,60)" fg:x="977" fg:w="2130"/>
             <text x="30.0457%" y="1807.50">C2Compiler::compile_method(ciEnv*, ciMethod*, int)</text>
         </g>
         <g>
             <title>Compile::Compile(ciEnv*, C2Compiler*, ciMethod*, int, bool, bool, bool) (2,130 samples, 64.96%)</title>
-            <rect x="29.7957%" y="1781" width="64.9588%" height="15" fill="rgb(216,216,65)" fg:x="977" fg:w="2130"/>
+            <rect x="29.7957%" y="1781" width="64.9588%" height="15" fill="rgb(214,214,64)" fg:x="977" fg:w="2130"/>
             <text x="30.0457%" y="1791.50">Compile::Compile(ciEnv*, C2Compiler*, ciMethod*, int, bool, bool, bool)</text>
         </g>
         <g>
             <title>Compile::Optimize() (880 samples, 26.84%)</title>
-            <rect x="67.9170%" y="1765" width="26.8375%" height="15" fill="rgb(223,223,67)" fg:x="2227" fg:w="880"/>
+            <rect x="67.9170%" y="1765" width="26.8375%" height="15" fill="rgb(214,214,64)" fg:x="2227" fg:w="880"/>
             <text x="68.1670%" y="1775.50">Compile::Optimize()</text>
         </g>
         <g>
             <title>PhaseIdealLoop::build_and_optimize(bool, bool) (880 samples, 26.84%)</title>
-            <rect x="67.9170%" y="1749" width="26.8375%" height="15" fill="rgb(188,188,55)" fg:x="2227" fg:w="880"/>
+            <rect x="67.9170%" y="1749" width="26.8375%" height="15" fill="rgb(223,223,67)" fg:x="2227" fg:w="880"/>
             <text x="68.1670%" y="1759.50">PhaseIdealLoop::build_and_optimize(bool, bo..</text>
         </g>
         <g>
             <title>PhaseIdealLoop::build_loop_tree() (50 samples, 1.52%)</title>
-            <rect x="93.2296%" y="1733" width="1.5249%" height="15" fill="rgb(217,217,65)" fg:x="3057" fg:w="50"/>
+            <rect x="93.2296%" y="1733" width="1.5249%" height="15" fill="rgb(223,223,67)" fg:x="3057" fg:w="50"/>
             <text x="93.4796%" y="1743.50"></text>
         </g>
         <g>
             <title>all (3,279 samples, 100%)</title>
-            <rect x="0.0000%" y="1909" width="100.0000%" height="15" fill="rgb(250,123,123)" fg:x="0" fg:w="3279"/>
+            <rect x="0.0000%" y="1909" width="100.0000%" height="15" fill="rgb(255,130,130)" fg:x="0" fg:w="3279"/>
             <text x="0.2500%" y="1919.50"></text>
         </g>
         <g>
             <title>start_thread (3,095 samples, 94.39%)</title>
-            <rect x="5.6115%" y="1893" width="94.3885%" height="15" fill="rgb(230,94,94)" fg:x="184" fg:w="3095"/>
+            <rect x="5.6115%" y="1893" width="94.3885%" height="15" fill="rgb(237,104,104)" fg:x="184" fg:w="3095"/>
             <text x="5.8615%" y="1903.50">start_thread</text>
         </g>
         <g>
             <title>java_start(Thread*) (3,095 samples, 94.39%)</title>
-            <rect x="5.6115%" y="1877" width="94.3885%" height="15" fill="rgb(239,107,107)" fg:x="184" fg:w="3095"/>
+            <rect x="5.6115%" y="1877" width="94.3885%" height="15" fill="rgb(224,86,86)" fg:x="184" fg:w="3095"/>
             <text x="5.8615%" y="1887.50">java_start(Thread*)</text>
         </g>
         <g>
             <title>JavaThread::run() (2,302 samples, 70.20%)</title>
-            <rect x="29.7957%" y="1861" width="70.2043%" height="15" fill="rgb(215,215,64)" fg:x="977" fg:w="2302"/>
+            <rect x="29.7957%" y="1861" width="70.2043%" height="15" fill="rgb(203,203,60)" fg:x="977" fg:w="2302"/>
             <text x="30.0457%" y="1871.50">JavaThread::run()</text>
         </g>
         <g>
             <title>JavaThread::thread_main_inner() (2,302 samples, 70.20%)</title>
-            <rect x="29.7957%" y="1845" width="70.2043%" height="15" fill="rgb(209,209,62)" fg:x="977" fg:w="2302"/>
+            <rect x="29.7957%" y="1845" width="70.2043%" height="15" fill="rgb(203,203,60)" fg:x="977" fg:w="2302"/>
             <text x="30.0457%" y="1855.50">JavaThread::thread_main_inner()</text>
         </g>
         <g>
             <title>CompileBroker::compiler_thread_loop() (2,302 samples, 70.20%)</title>
-            <rect x="29.7957%" y="1829" width="70.2043%" height="15" fill="rgb(210,210,63)" fg:x="977" fg:w="2302"/>
+            <rect x="29.7957%" y="1829" width="70.2043%" height="15" fill="rgb(214,214,64)" fg:x="977" fg:w="2302"/>
             <text x="30.0457%" y="1839.50">CompileBroker::compiler_thread_loop()</text>
         </g>
         <g>
             <title>CompileBroker::invoke_compiler_on_method(CompileTask*) (2,302 samples, 70.20%)</title>
-            <rect x="29.7957%" y="1813" width="70.2043%" height="15" fill="rgb(183,183,53)" fg:x="977" fg:w="2302"/>
+            <rect x="29.7957%" y="1813" width="70.2043%" height="15" fill="rgb(214,214,64)" fg:x="977" fg:w="2302"/>
             <text x="30.0457%" y="1823.50">CompileBroker::invoke_compiler_on_method(CompileTask*)</text>
         </g>
         <g>
             <title>Compiler::compile_method(ciEnv*, ciMethod*, int) (172 samples, 5.25%)</title>
-            <rect x="94.7545%" y="1797" width="5.2455%" height="15" fill="rgb(196,196,57)" fg:x="3107" fg:w="172"/>
+            <rect x="94.7545%" y="1797" width="5.2455%" height="15" fill="rgb(214,214,64)" fg:x="3107" fg:w="172"/>
             <text x="95.0045%" y="1807.50">Compil..</text>
         </g>
         <g>
             <title>Compilation::Compilation(AbstractCompiler*, ciEnv*, ciMethod*, int, BufferBlob*) (172 samples, 5.25%)</title>
-            <rect x="94.7545%" y="1781" width="5.2455%" height="15" fill="rgb(226,226,68)" fg:x="3107" fg:w="172"/>
+            <rect x="94.7545%" y="1781" width="5.2455%" height="15" fill="rgb(214,214,64)" fg:x="3107" fg:w="172"/>
             <text x="95.0045%" y="1791.50">Compil..</text>
         </g>
         <g>
             <title>Compilation::compile_method() (172 samples, 5.25%)</title>
-            <rect x="94.7545%" y="1765" width="5.2455%" height="15" fill="rgb(208,208,62)" fg:x="3107" fg:w="172"/>
+            <rect x="94.7545%" y="1765" width="5.2455%" height="15" fill="rgb(214,214,64)" fg:x="3107" fg:w="172"/>
             <text x="95.0045%" y="1775.50">Compil..</text>
         </g>
         <g>
             <title>ciEnv::register_method(ciMethod*, int, CodeOffsets*, int, CodeBuffer*, int, OopMapSet*, ExceptionHandlerTable*, ImplicitExceptionTable*, AbstractCompiler*, int, bool, bool, RTMState) (172 samples, 5.25%)</title>
-            <rect x="94.7545%" y="1749" width="5.2455%" height="15" fill="rgb(215,215,64)" fg:x="3107" fg:w="172"/>
+            <rect x="94.7545%" y="1749" width="5.2455%" height="15" fill="rgb(198,198,58)" fg:x="3107" fg:w="172"/>
             <text x="95.0045%" y="1759.50">ciEnv:..</text>
         </g>
         <g>
             <title>nmethod::new_nmethod(methodHandle, int, int, CodeOffsets*, int, DebugInformationRecorder*, Dependencies*, CodeBuffer*, int, OopMapSet*, ExceptionHandlerTable*, ImplicitExceptionTable*, AbstractCompiler*, int) (172 samples, 5.25%)</title>
-            <rect x="94.7545%" y="1733" width="5.2455%" height="15" fill="rgb(226,226,68)" fg:x="3107" fg:w="172"/>
+            <rect x="94.7545%" y="1733" width="5.2455%" height="15" fill="rgb(214,214,64)" fg:x="3107" fg:w="172"/>
             <text x="95.0045%" y="1743.50">nmetho..</text>
         </g>
         <g>
             <title>CodeCache::allocate(int, bool) (172 samples, 5.25%)</title>
-            <rect x="94.7545%" y="1717" width="5.2455%" height="15" fill="rgb(196,196,57)" fg:x="3107" fg:w="172"/>
+            <rect x="94.7545%" y="1717" width="5.2455%" height="15" fill="rgb(212,212,63)" fg:x="3107" fg:w="172"/>
             <text x="95.0045%" y="1727.50">CodeCa..</text>
         </g>
         <g>
             <title>CodeHeap::allocate(unsigned long, bool) (172 samples, 5.25%)</title>
-            <rect x="94.7545%" y="1701" width="5.2455%" height="15" fill="rgb(221,221,66)" fg:x="3107" fg:w="172"/>
+            <rect x="94.7545%" y="1701" width="5.2455%" height="15" fill="rgb(212,212,63)" fg:x="3107" fg:w="172"/>
             <text x="95.0045%" y="1711.50">CodeHe..</text>
         </g>
     </svg>

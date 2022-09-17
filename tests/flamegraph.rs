@@ -158,6 +158,7 @@ fn flamegraph_colors_java_async_profile() {
 
     let mut options = flamegraph::Options::default();
     options.colors = Palette::from_str("java").unwrap();
+    options.hash = true;
 
     test_flamegraph(input_file, expected_result_file, options).unwrap();
 }
@@ -388,6 +389,7 @@ fn flamegraph_palette_map() {
 
     let mut options = flamegraph::Options::default();
     options.palette_map = Some(&mut palette_map);
+    options.hash = true;
 
     test_flamegraph(input_file, expected_result_file, options).unwrap();
 }
@@ -915,6 +917,7 @@ fn flamegraph_flamechart() {
     let mut opts = flamegraph::Options::default();
     opts.title = flamegraph::defaults::CHART_TITLE.to_owned();
     opts.flame_chart = true;
+    opts.hash = true;
 
     test_flamegraph(input_file, expected_result_file, opts).unwrap();
 }

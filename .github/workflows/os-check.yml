@@ -2,15 +2,16 @@ on:
   push:
     branches: [main]
   pull_request:
-name: With dependencies at minimal versions
+name: os check
 jobs:
-  test:
-    runs-on: ubuntu-latest
+  os-check:
+    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest]
     steps:
-      - uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: nightly
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
@@ -18,12 +19,6 @@ jobs:
       - uses: actions/checkout@v3
         with:
           submodules: true
-      - name: cargo update -Zminimal-versions
-        uses: actions-rs/cargo@v1
-        with:
-          command: update
-          toolchain: nightly
-          args: -Zminimal-versions
       - name: cargo test
         uses: actions-rs/cargo@v1
         with:
