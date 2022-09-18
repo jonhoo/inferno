@@ -4,4 +4,3 @@
 *.log
 /*.svg
 .DS_Store
-/Cargo.lock
