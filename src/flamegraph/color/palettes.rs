@@ -67,23 +67,20 @@ pub(super) mod python {
     }
 
     pub fn resolve(name: &str) -> BasicPalette {
-        if name.starts_with("native@") {
-            // austin-specific format for native calls
-            return BasicPalette::Aqua;
-        } else if split_any_path(name).any(|part| part == "site-packages") {
-            return BasicPalette::Yellow;
+      if split_any_path(name).any(|part| part == "site-packages") {
+            return BasicPalette::Mem;
         } else if split_any_path(name).any(|part| {
             part.strip_prefix("python")
                 .or_else(|| part.strip_prefix("Python"))
                 .map_or(false, |version| {
                     version.chars().all(|c| c.is_digit(10) || c == '.')
                 })
-        }) || name.starts_with("<frozen importlib")
+        }) || name.starts_with("<")
         {
             // stdlib
-            return BasicPalette::Green;
+            return BasicPalette::Io
         }
-        BasicPalette::Red
+        BasicPalette::Hot
     }
 }
 
@@ -132,9 +129,9 @@ pub(super) mod rust {
         if name.starts_with("core::")
             || name.starts_with("std::")
             || name.starts_with("alloc::")
-            || (name.starts_with("<core::") 
-                // Rust user-defined async functions are desugared into 
-                // GenFutures so we don't want to include those as Rust 
+            || (name.starts_with("<core::")
+                // Rust user-defined async functions are desugared into
+                // GenFutures so we don't want to include those as Rust
                 // system functions
                 && !name.starts_with("<core::future::from_generator::GenFuture<T>"))
             || name.starts_with("<std::")
