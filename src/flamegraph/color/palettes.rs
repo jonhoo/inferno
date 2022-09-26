@@ -66,7 +66,7 @@ pub(super) mod python {
         path.split(|c| c == '/' || c == '\\')
     }
 
-    pub fn resolve(name: &str) -> BasicPalette {
+    pub(in super::super) fn resolve(name: &str) -> BasicPalette {
       if split_any_path(name).any(|part| part == "site-packages") {
             return BasicPalette::Mem;
         } else if split_any_path(name).any(|part| {
@@ -78,7 +78,7 @@ pub(super) mod python {
         }) || name.starts_with("<")
         {
             // stdlib
-            return BasicPalette::Io
+            return BasicPalette::Gray
         }
         BasicPalette::Hot
     }
