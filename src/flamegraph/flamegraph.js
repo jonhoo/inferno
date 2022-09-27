@@ -34,9 +34,7 @@ function init(evt) {
 
             // Text truncation needs to be adjusted for the current width.
             var el = frames.children;
-            for(var i = 0; i < el.length; i++) {
-                update_text(el[i]);
-            }
+            update_text_for_elements(frames.children);
 
             // Keep search elements at a fixed distance from right edge.
             var svgWidth = svg.width.baseVal.value;
@@ -162,12 +160,91 @@ function g_to_func(e) {
     // name before it's searched, do it here before returning.
     return (func);
 }
+function get_monospace_width(frames) {
+    // Given the id="frames" element, return the width of text characters if
+    // this is a monospace font, otherwise return 0.
+    text = find_child(frames.children[0], "text");
+    originalContent = text.textContent;
+    text.textContent = "!";
+    bangWidth = text.getComputedTextLength();
+    text.textContent = "W";
+    wWidth = text.getComputedTextLength();
+    text.textContent = originalContent;
+    if (bangWidth === wWidth) {
+        console.log("IS MONOSPACE");
+        return bangWidth;
+    } else {
+        return 0;
+    }
+}
+function update_text_for_elements(elements) {
+    var known_font_width = get_monospace_width(frames);
+
+    // Fall back to inefficient calculation, if we're variable-width font. TODO
+    // This should be optimized somehow too, so much like the monospace path
+    // below, reading happens in one pass, writing in a second pass. Or at least
+    // less writing, e.g. with binary search.
+    if (known_font_width === 0) {
+        for (var i = 0; i < elements.length; i++) {
+            update_text(elements[i]);
+        }
+        return;
+    }
+
+    var textElemNewAttributes = [];
+    for (var i = 0; i < elements.length; i++) {
+        var e = elements[i];
+        var r = find_child(e, "rect");
+        var t = find_child(e, "text");
+        var w = parseFloat(r.attributes.width.value) * frames.attributes.width.value / 100 - 3;
+        var txt = find_child(e, "title").textContent.replace(/\([^(]*\)$/,"");
+        var newX = format_percent((parseFloat(r.attributes.x.value) + (100 * 3 / frames.attributes.width.value)));
+
+        // Smaller than this size won't fit anything
+        if (w < 2 * known_font_width) {
+            textElemNewAttributes.push([newX, ""]);
+            continue;
+        }
+
+        // Fit in full text width
+        if (/^ *\$/.test(txt) || txt.length * known_font_width < w) {
+            textElemNewAttributes.push([newX, txt]);
+            continue;
+        }
+
+        var substringLength = Math.floor(w / known_font_width) - 2;
+        if (truncate_text_right) {
+            // Truncate the right side of the text.
+            textElemNewAttributes.push([newX, txt.substring(0, substringLength) + ".."]);
+            continue;
+        } else {
+            // Truncate the left side of the text.
+            textElemNewAttributes.push([newX, ".." + txt.substring(txt.length - substringLength, txt.length)]);
+            continue;
+        }
+    }
+    if (textElemNewAttributes.length !== elements.length) {
+        console.log("UH OH", textElemNewAttributes.length, elements.length);
+        return;
+    }
+
+    // Now that we know new textContent, set it all in one go so we don't refresh a bazillion times.
+    for (var i = 0; i < elements.length; i++) {
+        var e = elements[i];
+        var values = textElemNewAttributes[i];
+        var t = find_child(e, "text");
+        t.attributes.x.value = values[0];
+        t.textContent = values[1];
+    }
+}
+
 function update_text(e) {
     var r = find_child(e, "rect");
     var t = find_child(e, "text");
     var w = parseFloat(r.attributes.width.value) * frames.attributes.width.value / 100 - 3;
     var txt = find_child(e, "title").textContent.replace(/\([^(]*\)$/,"");
     t.attributes.x.value = format_percent((parseFloat(r.attributes.x.value) + (100 * 3 / frames.attributes.width.value)));
+
     // Smaller than this size won't fit anything
     if (w < 2 * fontsize * fontwidth) {
         t.textContent = "";
@@ -284,8 +361,8 @@ function unzoom() {
         el[i].classList.remove("parent");
         el[i].classList.remove("hide");
         zoom_reset(el[i]);
-        update_text(el[i]);
     }
+    update_text_for_elements(el);
 }
 // search
 function reset_search() {
