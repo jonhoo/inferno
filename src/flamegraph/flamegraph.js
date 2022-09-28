@@ -1,5 +1,5 @@
 "use strict";
-var details, searchbtn, unzoombtn, matchedtxt, svg, searching, frames;
+var details, searchbtn, unzoombtn, matchedtxt, svg, searching, frames, known_font_width;
 function init(evt) {
     details = document.getElementById("details").firstChild;
     searchbtn = document.getElementById("search");
@@ -7,6 +7,7 @@ function init(evt) {
     matchedtxt = document.getElementById("matched");
     svg = document.getElementsByTagName("svg")[0];
     frames = document.getElementById("frames");
+    known_font_width = get_monospace_width(frames);
     total_samples = parseInt(frames.attributes.total_samples.value);
     searching = 0;
 
@@ -178,12 +179,12 @@ function get_monospace_width(frames) {
     }
 }
 function update_text_for_elements(elements) {
-    var known_font_width = get_monospace_width(frames);
+    // In order to render quickly in the browser, you want to do one pass of
+    // reading attributes, and one pass of mutating attributes. See
+    // https://web.dev/avoid-large-complex-layouts-and-layout-thrashing/ for details.
 
-    // Fall back to inefficient calculation, if we're variable-width font. TODO
-    // This should be optimized somehow too, so much like the monospace path
-    // below, reading happens in one pass, writing in a second pass. Or at least
-    // less writing, e.g. with binary search.
+    // Fall back to inefficient calculation, if we're variable-width font.
+    // TODO This should be optimized somehow too.
     if (known_font_width === 0) {
         for (var i = 0; i < elements.length; i++) {
             update_text(elements[i]);
