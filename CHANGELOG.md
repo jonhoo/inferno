@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [0.11.8] - 2022-09-27
+### Changed
+ - Revert broken Firefox canvas height computation change. [#263](https://github.com/jonhoo/inferno/pull/263)
+
 ## [0.11.7] - 2022-07-26
 ### Added
  - Ability to set a stroke outline on frames. [#255](https://github.com/jonhoo/inferno/pull/255)
@@ -28,7 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.11.4] - 2022-05-28
 ### Changed
- - Fix for Firefox canvas heigh unpredictability. [#242](https://github.com/jonhoo/inferno/pull/242)
+ - Fix for Firefox canvas height unpredictability. [#242](https://github.com/jonhoo/inferno/pull/242)
  - Update `quick-xml` to 0.23.
 
 ## [0.11.3] - 2022-05-08
