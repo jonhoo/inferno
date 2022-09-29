@@ -43,7 +43,7 @@ struct Opt {
     #[clap(
         short = 'n',
         long = "nthreads",
-        default_value = &NTHREADS,
+        default_value = &**NTHREADS,
         value_name = "UINT"
     )]
     nthreads: usize,

@@ -103,7 +103,7 @@ struct Opt {
     /// Factor to scale sample counts by
     #[clap(
         long = "factor",
-        default_value = &defaults::str::FACTOR,
+        default_value = &**defaults::str::FACTOR,
         value_name = "FLOAT"
     )]
     factor: f64,
@@ -111,7 +111,7 @@ struct Opt {
     /// Font size
     #[clap(
         long = "fontsize",
-        default_value = &defaults::str::FONT_SIZE,
+        default_value = &**defaults::str::FONT_SIZE,
         value_name = "UINT"
     )]
     fontsize: usize,
@@ -127,7 +127,7 @@ struct Opt {
     /// Font width
     #[clap(
         long = "fontwidth",
-        default_value = &defaults::str::FONT_WIDTH,
+        default_value = &**defaults::str::FONT_WIDTH,
         value_name = "FLOAT"
     )]
     fontwidth: f64,
@@ -147,7 +147,7 @@ struct Opt {
     /// Height of each frame
     #[clap(
         long = "height",
-        default_value = &defaults::str::FRAME_HEIGHT,
+        default_value = &**defaults::str::FRAME_HEIGHT,
         value_name = "UINT"
     )]
     height: usize,
@@ -155,7 +155,7 @@ struct Opt {
     /// Omit functions smaller than <FLOAT> percent
     #[clap(
         long = "minwidth",
-        default_value = &defaults::str::MIN_WIDTH,
+        default_value = &**defaults::str::MIN_WIDTH,
         value_name = "FLOAT"
     )]
     minwidth: f64,
