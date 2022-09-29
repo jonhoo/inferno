@@ -1,6 +1,7 @@
 use std::io;
 use std::path::{Path, PathBuf};
 
+use clap::{ArgAction, Parser};
 use env_logger::Env;
 use inferno::flamegraph::color::{
     parse_hex_color, BackgroundColor, Color, PaletteMap, SearchColor, StrokeColor,
@@ -9,8 +10,6 @@ use inferno::flamegraph::{self, defaults, Direction, Options, Palette, TextTrunc
 
 #[cfg(feature = "nameattr")]
 use inferno::flamegraph::FuncFrameAttrsMap;
-
-use clap::Parser;
 
 #[derive(Debug, Parser)]
 #[clap(name = "inferno-flamegraph", about)]
@@ -69,7 +68,7 @@ struct Opt {
     reverse: bool,
 
     /// Verbose logging mode (-v, -vv, -vvv)
-    #[clap(short = 'v', long = "verbose", parse(from_occurrences))]
+    #[clap(short = 'v', long = "verbose", action = ArgAction::Count)]
     verbose: usize,
 
     // *************** //
@@ -84,7 +83,7 @@ struct Opt {
         short = 'c',
         long = "colors",
         default_value = defaults::COLORS,
-        possible_values = &["aqua","blue","green","hot","io","java","js","mem","orange","perl","python","purple","red","rust","wakeup","yellow"],
+        value_parser = ["aqua","blue","green","hot","io","java","js","mem","orange","perl","python","purple","red","rust","wakeup","yellow"],
         value_name = "STRING"
     )]
     colors: Palette,
@@ -223,7 +222,7 @@ struct Opt {
     // *** ARGS *** //
     // ************ //
     /// Collapsed perf output files. With no PATH, or PATH is -, read STDIN.
-    #[clap(name = "PATH", parse(from_os_str))]
+    #[clap(name = "PATH", value_parser)]
     infiles: Vec<PathBuf>,
 
     /// Produce a flame chart (sort by time, do not merge stacks)

@@ -1,7 +1,7 @@
 use std::io;
 use std::path::PathBuf;
 
-use clap::Parser;
+use clap::{ArgAction, Parser};
 use env_logger::Env;
 use inferno::collapse::perf::{Folder, Options};
 use inferno::collapse::{Collapse, DEFAULT_NTHREADS};
@@ -53,7 +53,7 @@ struct Opt {
     quiet: bool,
 
     /// Verbose logging mode (-v, -vv, -vvv)
-    #[clap(short = 'v', long = "verbose", parse(from_occurrences))]
+    #[clap(short = 'v', long = "verbose", action = ArgAction::Count)]
     verbose: usize,
 
     // *************** //
