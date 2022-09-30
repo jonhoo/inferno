@@ -320,6 +320,7 @@ function zoom(node) {
     var ymin = parseFloat(attr.y.value);
     unzoombtn.classList.remove("hide");
     var el = frames.children;
+    var to_update_text = [];
     for (var i = 0; i < el.length; i++) {
         var e = el[i];
         var a = find_child(e, "rect").attributes;
@@ -336,7 +337,7 @@ function zoom(node) {
             if (ex <= xmin && (ex+ew) >= xmax) {
                 e.classList.add("parent");
                 zoom_parent(e);
-                update_text(e);
+                to_update_text.push(e);
             }
             // not in current path
             else
@@ -350,10 +351,11 @@ function zoom(node) {
             }
             else {
                 zoom_child(e, xmin, width);
-                update_text(e);
+                to_update_text.push(e);
             }
         }
     }
+    update_text_for_elements(to_update_text);
 }
 function unzoom() {
     unzoombtn.classList.add("hide");
