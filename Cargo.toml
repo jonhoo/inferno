@@ -32,7 +32,7 @@ indexmap = { version = "1.0", optional = true }
 itoa = "1"
 log = "0.4"
 num_cpus = { version = "1.10", optional = true }
-num-format = { version = "0.4", default-features = false }
+num-format = { version = "0.4.3", default-features = false }
 quick-xml = { version = "0.23", default-features = false }
 rgb = "0.8.13"
 str_stack = "0.1"
