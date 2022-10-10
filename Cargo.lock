@@ -387,6 +387,7 @@ dependencies = [
  "pretty_assertions",
  "quick-xml",
  "rand",
+ "regex",
  "rgb",
  "str_stack",
  "testing_logger",
