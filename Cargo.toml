@@ -48,6 +48,8 @@ pretty_assertions = "1"
 rand = { version = "0.8", features = ["small_rng"] }
 # Force criterion to pull in regex 1.6 instead of 1.5 during minimal version CI
 regex = { version = "1.6", default-features = false, features = ["std"] }
+# Force criterion to pull in serde 1.0.145 instead of 1.0.0 during minimal version CI
+serde = { version = "1.0.145" }
 testing_logger = "0.1.1"
 
 [profile.release]
