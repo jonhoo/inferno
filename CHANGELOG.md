@@ -8,9 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 ### Changed
- - Reverted an internal cleanup from 0.11.8 to fix compilation. [#265](https://github.com/jonhoo/inferno/pull/265)
 
 ### Removed
+
+## [0.11.10] - 2022-10-10
+### Changed
+ - Update particularly-old dependencies.
 
 ## [0.11.9] - 2022-09-28
 ### Changed
@@ -231,7 +234,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Moved to `IndexMap` and FNV hashing ([#127](https://github.com/jonhoo/inferno/pull/127))
 - Moved CI to Azure DevOps Pipelines
 
-[Unreleased]: https://github.com/jonhoo/inferno/compare/v0.11.9...HEAD
+[Unreleased]: https://github.com/jonhoo/inferno/compare/v0.11.10...HEAD
+[0.11.10]: https://github.com/jonhoo/inferno/compare/v0.11.9...v0.11.10
 [0.11.9]: https://github.com/jonhoo/inferno/compare/v0.11.8...v0.11.9
 [0.11.8]: https://github.com/jonhoo/inferno/compare/v0.11.7...v0.11.8
 [0.11.7]: https://github.com/jonhoo/inferno/compare/v0.11.6...v0.11.7
