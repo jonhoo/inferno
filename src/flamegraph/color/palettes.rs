@@ -78,7 +78,7 @@ pub(super) mod python {
         }) || name.starts_with("<")
         {
             // stdlib
-            BasicPalette::Gray
+            BasicPalette::Yellow
         } else {
             BasicPalette::Red
         }
@@ -470,19 +470,23 @@ mod tests {
         let test_names = [
             TestData {
                 input: String::from("<frozen importlib._bootstrap>:_load_unlocked:680"),
-                output: BasicPalette::Green,
+                output: BasicPalette::Yellow,
+            },
+            TestData {
+                input: String::from("<built-in>:0:_SSLSocket.do_handshake"),
+                output: BasicPalette::Yellow,
             },
             TestData {
                 input: String::from(".venv/lib/python3.9/time.py:12"),
-                output: BasicPalette::Green,
+                output: BasicPalette::Yellow,
             },
             TestData {
                 input: String::from("C:/Users/User/AppData/Local/Programs/Python/Python39/lib/concurrent/futures/thread.py"),
-                output: BasicPalette::Green,
+                output: BasicPalette::Yellow,
             },
             TestData {
                 input: String::from("C:\\Users\\User\\AppData\\Local\\Programs\\Python\\Python39\\lib\\concurrent\\futures\\thread.py"),
-                output: BasicPalette::Green,
+                output: BasicPalette::Yellow,
             },
             TestData {
                 input: String::from("my_file.py:55"),
@@ -490,23 +494,7 @@ mod tests {
             },
             TestData {
                 input: String::from(".venv/lib/python3.9/site-packages/package/file.py:12"),
-                output: BasicPalette::Yellow,
-            },
-            TestData {
-                input: String::from("native@511863:_PyFunction_Vectorcall:339"),
                 output: BasicPalette::Aqua,
-            },
-            TestData {
-                input: String::from("L339"),
-                output: BasicPalette::Gray,
-            },
-            TestData {
-                input: String::from("T339"),
-                output: BasicPalette::Gray,
-            },
-            TestData {
-                input: String::from("P339"),
-                output: BasicPalette::Gray,
             },
         ];
 
