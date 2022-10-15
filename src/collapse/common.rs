@@ -45,13 +45,13 @@ pub static DEFAULT_NTHREADS: Lazy<usize> = Lazy::new(num_cpus::get);
 #[doc(hidden)]
 pub static DEFAULT_NTHREADS: Lazy<usize> = Lazy::new(|| 1);
 
-/// Private trait for internal library authors.
+/// Sealed trait for internal library authors.
 ///
 /// If you implement this trait, your type will implement the public-facing
 /// `Collapse` trait as well. Implementing this trait gives you parallelism
 /// for free as long as you adhere to the requirements described in the
 /// comments below.
-pub(crate) trait CollapsePrivate: Send + Sized {
+pub trait CollapsePrivate: Send + Sized {
     // *********************************************************** //
     // ********************* REQUIRED METHODS ******************** //
     // *********************************************************** //
@@ -351,8 +351,11 @@ pub(crate) trait CollapsePrivate: Send + Sized {
 /// Occurrences is a HashMap, which uses:
 /// * AHashMap if single-threaded
 /// * DashMap if multi-threaded
+///
+/// This is public because it is part of the sealed `CollapsePrivate` trait's API, but it
+/// is in a crate-private module so is not nameable by downstream library users.
 #[derive(Clone, Debug)]
-pub(crate) enum Occurrences {
+pub enum Occurrences {
     SingleThreaded(AHashMap<String, usize>),
     #[cfg(feature = "multithreaded")]
     MultiThreaded(Arc<DashMap<String, usize, ahash::RandomState>>),
