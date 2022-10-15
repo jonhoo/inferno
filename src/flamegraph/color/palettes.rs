@@ -67,8 +67,8 @@ pub(super) mod python {
     }
 
     pub(in super::super) fn resolve(name: &str) -> BasicPalette {
-      if split_any_path(name).any(|part| part == "site-packages") {
-            return BasicPalette::Mem;
+        if split_any_path(name).any(|part| part == "site-packages") {
+            BasicPalette::Aqua
         } else if split_any_path(name).any(|part| {
             part.strip_prefix("python")
                 .or_else(|| part.strip_prefix("Python"))
@@ -78,9 +78,10 @@ pub(super) mod python {
         }) || name.starts_with("<")
         {
             // stdlib
-            return BasicPalette::Gray
+            BasicPalette::Gray
+        } else {
+            BasicPalette::Red
         }
-        BasicPalette::Hot
     }
 }
 
