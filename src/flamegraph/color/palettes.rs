@@ -75,7 +75,9 @@ pub(super) mod python {
                 .map_or(false, |version| {
                     version.chars().all(|c| c.is_digit(10) || c == '.')
                 })
-        }) || name.starts_with("<")
+        }) || name.starts_with("<built-in")
+            || name.starts_with("<method")
+            || name.starts_with("<frozen")
         {
             // stdlib
             BasicPalette::Yellow
@@ -473,7 +475,11 @@ mod tests {
                 output: BasicPalette::Yellow,
             },
             TestData {
-                input: String::from("<built-in>:0:_SSLSocket.do_handshake"),
+                input: String::from("<built-in method time.sleep>"),
+                output: BasicPalette::Yellow,
+            },
+            TestData {
+                input: String::from("<method 'append' of 'list' objects>"),
                 output: BasicPalette::Yellow,
             },
             TestData {
