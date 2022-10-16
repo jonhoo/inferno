@@ -59,6 +59,34 @@ pub(super) mod perl {
     }
 }
 
+pub(super) mod python {
+    use crate::flamegraph::color::BasicPalette;
+
+    fn split_any_path(path: &str) -> impl Iterator<Item = &str> {
+        path.split(|c| c == '/' || c == '\\')
+    }
+
+    pub(in super::super) fn resolve(name: &str) -> BasicPalette {
+        if split_any_path(name).any(|part| part == "site-packages") {
+            BasicPalette::Aqua
+        } else if split_any_path(name).any(|part| {
+            part.strip_prefix("python")
+                .or_else(|| part.strip_prefix("Python"))
+                .map_or(false, |version| {
+                    version.chars().all(|c| c.is_digit(10) || c == '.')
+                })
+        }) || name.starts_with("<built-in")
+            || name.starts_with("<method")
+            || name.starts_with("<frozen")
+        {
+            // stdlib
+            BasicPalette::Yellow
+        } else {
+            BasicPalette::Red
+        }
+    }
+}
+
 pub(super) mod js {
     use crate::flamegraph::color::BasicPalette;
 
@@ -104,9 +132,9 @@ pub(super) mod rust {
         if name.starts_with("core::")
             || name.starts_with("std::")
             || name.starts_with("alloc::")
-            || (name.starts_with("<core::") 
-                // Rust user-defined async functions are desugared into 
-                // GenFutures so we don't want to include those as Rust 
+            || (name.starts_with("<core::")
+                // Rust user-defined async functions are desugared into
+                // GenFutures so we don't want to include those as Rust
                 // system functions
                 && !name.starts_with("<core::future::from_generator::GenFuture<T>"))
             || name.starts_with("<std::")
@@ -428,6 +456,51 @@ mod tests {
             TestData {
                 input: String::from("somethingPerl"),
                 output: BasicPalette::Green,
+            },
+        ];
+
+        for item in test_names.iter() {
+            let resolved_color = resolve(&item.input);
+            assert_eq!(resolved_color, item.output)
+        }
+    }
+
+    #[test]
+    fn python_returns_correct() {
+        use super::python::resolve;
+
+        let test_names = [
+            TestData {
+                input: String::from("<frozen importlib._bootstrap>:_load_unlocked:680"),
+                output: BasicPalette::Yellow,
+            },
+            TestData {
+                input: String::from("<built-in method time.sleep>"),
+                output: BasicPalette::Yellow,
+            },
+            TestData {
+                input: String::from("<method 'append' of 'list' objects>"),
+                output: BasicPalette::Yellow,
+            },
+            TestData {
+                input: String::from(".venv/lib/python3.9/time.py:12"),
+                output: BasicPalette::Yellow,
+            },
+            TestData {
+                input: String::from("C:/Users/User/AppData/Local/Programs/Python/Python39/lib/concurrent/futures/thread.py"),
+                output: BasicPalette::Yellow,
+            },
+            TestData {
+                input: String::from("C:\\Users\\User\\AppData\\Local\\Programs\\Python\\Python39\\lib\\concurrent\\futures\\thread.py"),
+                output: BasicPalette::Yellow,
+            },
+            TestData {
+                input: String::from("my_file.py:55"),
+                output: BasicPalette::Red,
+            },
+            TestData {
+                input: String::from(".venv/lib/python3.9/site-packages/package/file.py:12"),
+                output: BasicPalette::Aqua,
             },
         ];
 
