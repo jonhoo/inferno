@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [0.11.11] - 2022.10-16
+### Added
+ - Add Python language palette. [#240](https://github.com/jonhoo/inferno/pull/240)
+
 ## [0.11.10] - 2022-10-10
 ### Changed
  - Update particularly-old dependencies.
@@ -234,7 +238,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Moved to `IndexMap` and FNV hashing ([#127](https://github.com/jonhoo/inferno/pull/127))
 - Moved CI to Azure DevOps Pipelines
 
-[Unreleased]: https://github.com/jonhoo/inferno/compare/v0.11.10...HEAD
+[Unreleased]: https://github.com/jonhoo/inferno/compare/v0.11.11...HEAD
+[0.11.11]: https://github.com/jonhoo/inferno/compare/v0.11.10...v0.11.11
 [0.11.10]: https://github.com/jonhoo/inferno/compare/v0.11.9...v0.11.10
 [0.11.9]: https://github.com/jonhoo/inferno/compare/v0.11.8...v0.11.9
 [0.11.8]: https://github.com/jonhoo/inferno/compare/v0.11.7...v0.11.8
