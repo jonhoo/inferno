@@ -132,7 +132,9 @@ text {{ font-family:{}; font-size:{}px; fill:rgb(0,0,0); }}
             strokecolor
         ))))?;
     }
-    svg.write_event(Event::Text(BytesText::from_escaped(include_str!("flamegraph.css"))))?;
+    svg.write_event(Event::Text(BytesText::from_escaped(include_str!(
+        "flamegraph.css"
+    ))))?;
     svg.write_event(Event::End(BytesEnd::new("style")))?;
 
     svg.write_event(Event::Start(
