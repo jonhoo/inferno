@@ -172,7 +172,6 @@ function get_monospace_width(frames) {
     wWidth = text.getComputedTextLength();
     text.textContent = originalContent;
     if (bangWidth === wWidth) {
-        console.log("IS MONOSPACE");
         return bangWidth;
     } else {
         return 0;
