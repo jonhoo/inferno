@@ -223,10 +223,8 @@ function update_text_for_elements(elements) {
             continue;
         }
     }
-    if (textElemNewAttributes.length !== elements.length) {
-        console.log("UH OH", textElemNewAttributes.length, elements.length);
-        return;
-    }
+
+    console.assert(textElemNewAttributes.length === elements.length, "Resize failed, please file a bug at https://github.com/jonhoo/inferno/");
 
     // Now that we know new textContent, set it all in one go so we don't refresh a bazillion times.
     for (var i = 0; i < elements.length; i++) {
