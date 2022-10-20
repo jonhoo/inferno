@@ -208,7 +208,7 @@ function update_text_for_elements(elements) {
         }
 
         // Fit in full text width
-        if (/^ *\$/.test(txt) || txt.length * known_font_width < w) {
+        if (txt.length * known_font_width < w) {
             textElemNewAttributes.push([newX, txt]);
             continue;
         }
@@ -253,7 +253,7 @@ function update_text(e) {
     }
     t.textContent = txt;
     // Fit in full text width
-    if (/^ *\$/.test(txt) || t.getComputedTextLength() < w)
+    if (t.getComputedTextLength() < w)
         return;
     if (truncate_text_right) {
         // Truncate the right side of the text.
