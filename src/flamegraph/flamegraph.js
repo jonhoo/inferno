@@ -37,7 +37,6 @@ function init(evt) {
             frames.attributes.width.value = svg.width.baseVal.value - xpad * 2;
 
             // Text truncation needs to be adjusted for the current width.
-            var el = frames.children;
             update_text_for_elements(frames.children);
 
             // Keep search elements at a fixed distance from right edge.
