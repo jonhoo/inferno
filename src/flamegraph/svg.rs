@@ -213,7 +213,7 @@ text {{ font-family:{}; font-size:{}px }}
                 opt.ypad1() - opt.font_size
             } as f64,
             text: " ".into(),
-            extra: iter::once(("id", "details")),
+            extra: vec![("id", "details"), ("fill", &style_options.uicolor)],
         },
     )?;
 
@@ -250,7 +250,7 @@ text {{ font-family:{}; font-size:{}px }}
             x: Dimension::Pixels(image_width as usize - super::XPAD),
             y: (style_options.imageheight - (opt.ypad2() / 2)) as f64,
             text: " ".into(),
-            extra: iter::once(("id", "matched")),
+            extra: vec![("id", "matched"), ("fill", &style_options.uicolor)],
         },
     )?;
 

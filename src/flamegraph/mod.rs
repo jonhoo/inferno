@@ -102,7 +102,7 @@ pub struct Options<'a> {
     /// If `None`, the background color will be selected based on the value of `colors`.
     pub bgcolors: Option<color::BackgroundColor>,
 
-    /// The color of the title, reset zoom and search text. Defaults to black
+    /// The color of UI text such as the search and reset view button. Defaults to black
     pub uicolor: color::Color,
 
     /// Choose names based on the hashes of function names.
