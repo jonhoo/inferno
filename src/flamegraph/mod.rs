@@ -102,6 +102,9 @@ pub struct Options<'a> {
     /// If `None`, the background color will be selected based on the value of `colors`.
     pub bgcolors: Option<color::BackgroundColor>,
 
+    /// The color of the title, reset zoom and search text. Defaults to black
+    pub uicolor: color::Color,
+
     /// Choose names based on the hashes of function names.
     ///
     /// This will cause similar functions to be colored similarly.
@@ -306,6 +309,7 @@ impl<'a> Default for Options<'a> {
             notes: Default::default(),
             subtitle: Default::default(),
             bgcolors: Default::default(),
+            uicolor: Default::default(),
             hash: Default::default(),
             deterministic: Default::default(),
             palette_map: Default::default(),
@@ -511,10 +515,12 @@ where
         StrokeColor::Color(c) => Some(c.to_string()),
         StrokeColor::None => None,
     };
+    let uicolor = opt.uicolor.to_string();
     let style_options = StyleOptions {
         imageheight,
         bgcolor1,
         bgcolor2,
+        uicolor,
         strokecolor,
     };
 
