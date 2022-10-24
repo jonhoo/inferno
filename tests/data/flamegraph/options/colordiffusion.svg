@@ -8,7 +8,7 @@
         </linearGradient>
     </defs>
     <style type="text/css">
-text { font-family:"Verdana"; font-size:12px; fill:rgb(0,0,0); }
+text { font-family:monospace; font-size:12px; fill:rgb(0,0,0); }
 #title { text-anchor:middle; font-size:17px; }
 #matched { text-anchor:end; }
 #search { text-anchor:end; opacity:0.1; cursor:pointer; }
