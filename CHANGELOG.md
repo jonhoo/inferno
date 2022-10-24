@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 ### Changed
+ - Improved initial render and resize speed for large flamegraphs when a fixed-width (monospace) font is used. [#262](https://github.com/jonhoo/inferno/pull/262)
+ - Changed default font of flame graphs to browser's default monospace font to take advantage of this speedup. [#262](https://github.com/jonhoo/inferno/pull/262)
 
 ### Removed
 
