@@ -1,5 +1,5 @@
 "use strict";
-var details, searchbtn, unzoombtn, matchedtxt, svg, searching, frames;
+var details, searchbtn, unzoombtn, matchedtxt, svg, searching, frames, known_font_width;
 function init(evt) {
     details = document.getElementById("details").firstChild;
     searchbtn = document.getElementById("search");
@@ -7,6 +7,7 @@ function init(evt) {
     matchedtxt = document.getElementById("matched");
     svg = document.getElementsByTagName("svg")[0];
     frames = document.getElementById("frames");
+    known_font_width = get_monospace_width(frames);
     total_samples = parseInt(frames.attributes.total_samples.value);
     searching = 0;
 
@@ -36,10 +37,7 @@ function init(evt) {
             frames.attributes.width.value = svg.width.baseVal.value - xpad * 2;
 
             // Text truncation needs to be adjusted for the current width.
-            var el = frames.children;
-            for(var i = 0; i < el.length; i++) {
-                update_text(el[i]);
-            }
+            update_text_for_elements(frames.children);
 
             // Keep search elements at a fixed distance from right edge.
             var svgWidth = svg.width.baseVal.value;
@@ -162,12 +160,88 @@ function g_to_func(e) {
     // name before it's searched, do it here before returning.
     return (func);
 }
+function get_monospace_width(frames) {
+    // Given the id="frames" element, return the width of text characters if
+    // this is a monospace font, otherwise return 0.
+    text = find_child(frames.children[0], "text");
+    originalContent = text.textContent;
+    text.textContent = "!";
+    bangWidth = text.getComputedTextLength();
+    text.textContent = "W";
+    wWidth = text.getComputedTextLength();
+    text.textContent = originalContent;
+    if (bangWidth === wWidth) {
+        return bangWidth;
+    } else {
+        return 0;
+    }
+}
+function update_text_for_elements(elements) {
+    // In order to render quickly in the browser, you want to do one pass of
+    // reading attributes, and one pass of mutating attributes. See
+    // https://web.dev/avoid-large-complex-layouts-and-layout-thrashing/ for details.
+
+    // Fall back to inefficient calculation, if we're variable-width font.
+    // TODO This should be optimized somehow too.
+    if (known_font_width === 0) {
+        for (var i = 0; i < elements.length; i++) {
+            update_text(elements[i]);
+        }
+        return;
+    }
+
+    var textElemNewAttributes = [];
+    for (var i = 0; i < elements.length; i++) {
+        var e = elements[i];
+        var r = find_child(e, "rect");
+        var t = find_child(e, "text");
+        var w = parseFloat(r.attributes.width.value) * frames.attributes.width.value / 100 - 3;
+        var txt = find_child(e, "title").textContent.replace(/\([^(]*\)$/,"");
+        var newX = format_percent((parseFloat(r.attributes.x.value) + (100 * 3 / frames.attributes.width.value)));
+
+        // Smaller than this size won't fit anything
+        if (w < 2 * known_font_width) {
+            textElemNewAttributes.push([newX, ""]);
+            continue;
+        }
+
+        // Fit in full text width
+        if (txt.length * known_font_width < w) {
+            textElemNewAttributes.push([newX, txt]);
+            continue;
+        }
+
+        var substringLength = Math.floor(w / known_font_width) - 2;
+        if (truncate_text_right) {
+            // Truncate the right side of the text.
+            textElemNewAttributes.push([newX, txt.substring(0, substringLength) + ".."]);
+            continue;
+        } else {
+            // Truncate the left side of the text.
+            textElemNewAttributes.push([newX, ".." + txt.substring(txt.length - substringLength, txt.length)]);
+            continue;
+        }
+    }
+
+    console.assert(textElemNewAttributes.length === elements.length, "Resize failed, please file a bug at https://github.com/jonhoo/inferno/");
+
+    // Now that we know new textContent, set it all in one go so we don't refresh a bazillion times.
+    for (var i = 0; i < elements.length; i++) {
+        var e = elements[i];
+        var values = textElemNewAttributes[i];
+        var t = find_child(e, "text");
+        t.attributes.x.value = values[0];
+        t.textContent = values[1];
+    }
+}
+
 function update_text(e) {
     var r = find_child(e, "rect");
     var t = find_child(e, "text");
     var w = parseFloat(r.attributes.width.value) * frames.attributes.width.value / 100 - 3;
     var txt = find_child(e, "title").textContent.replace(/\([^(]*\)$/,"");
     t.attributes.x.value = format_percent((parseFloat(r.attributes.x.value) + (100 * 3 / frames.attributes.width.value)));
+
     // Smaller than this size won't fit anything
     if (w < 2 * fontsize * fontwidth) {
         t.textContent = "";
@@ -175,7 +249,7 @@ function update_text(e) {
     }
     t.textContent = txt;
     // Fit in full text width
-    if (/^ *\$/.test(txt) || t.getComputedTextLength() < w)
+    if (t.getComputedTextLength() < w)
         return;
     if (truncate_text_right) {
         // Truncate the right side of the text.
@@ -242,6 +316,7 @@ function zoom(node) {
     var ymin = parseFloat(attr.y.value);
     unzoombtn.classList.remove("hide");
     var el = frames.children;
+    var to_update_text = [];
     for (var i = 0; i < el.length; i++) {
         var e = el[i];
         var a = find_child(e, "rect").attributes;
@@ -258,7 +333,7 @@ function zoom(node) {
             if (ex <= xmin && (ex+ew) >= xmax) {
                 e.classList.add("parent");
                 zoom_parent(e);
-                update_text(e);
+                to_update_text.push(e);
             }
             // not in current path
             else
@@ -272,10 +347,11 @@ function zoom(node) {
             }
             else {
                 zoom_child(e, xmin, width);
-                update_text(e);
+                to_update_text.push(e);
             }
         }
     }
+    update_text_for_elements(to_update_text);
 }
 function unzoom() {
     unzoombtn.classList.add("hide");
@@ -284,8 +360,8 @@ function unzoom() {
         el[i].classList.remove("parent");
         el[i].classList.remove("hide");
         zoom_reset(el[i]);
-        update_text(el[i]);
     }
+    update_text_for_elements(el);
 }
 // search
 function reset_search() {

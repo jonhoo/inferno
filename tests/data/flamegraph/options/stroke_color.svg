@@ -8,7 +8,7 @@
         </linearGradient>
     </defs>
     <style type="text/css">
-text { font-family:"Verdana"; font-size:12px; fill:rgb(0,0,0); }
+text { font-family:monospace; font-size:12px; fill:rgb(0,0,0); }
 #title { text-anchor:middle; font-size:17px; }
 #frames > g > rect { stroke:rgb(125,125,125); stroke-width:1; }
 #matched { text-anchor:end; }

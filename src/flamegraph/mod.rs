@@ -81,7 +81,7 @@ pub mod defaults {
         CHART_TITLE: &str = "Flame Chart",
         FRAME_HEIGHT: usize = 16,
         MIN_WIDTH: f64 = 0.01,
-        FONT_TYPE: &str = "Verdana",
+        FONT_TYPE: &str = "monospace",
         FONT_SIZE: usize = 12,
         FONT_WIDTH: f64 = 0.59,
         COUNT_NAME: &str = "samples",
