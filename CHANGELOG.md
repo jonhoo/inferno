@@ -8,10 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 ### Changed
- - Improved initial render and resize speed for large flamegraphs when a fixed-width (monospace) font is used. [#262](https://github.com/jonhoo/inferno/pull/262)
- - Changed default font of flame graphs to browser's default monospace font to take advantage of this speedup. [#262](https://github.com/jonhoo/inferno/pull/262)
 
 ### Removed
+
+## [0.11.12] - 2022-10-24
+### Changed
+ - Improved initial render and resize speed for large flamegraphs when a fixed-width (monospace) font is used. [#262](https://github.com/jonhoo/inferno/pull/262)
+ - Changed default font of flame graphs to browser's default monospace font to take advantage of this speedup. [#262](https://github.com/jonhoo/inferno/pull/262)
 
 ## [0.11.11] - 2022.10-16
 ### Added
@@ -240,7 +243,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Moved to `IndexMap` and FNV hashing ([#127](https://github.com/jonhoo/inferno/pull/127))
 - Moved CI to Azure DevOps Pipelines
 
-[Unreleased]: https://github.com/jonhoo/inferno/compare/v0.11.11...HEAD
+[Unreleased]: https://github.com/jonhoo/inferno/compare/v0.11.12...HEAD
+[0.11.12]: https://github.com/jonhoo/inferno/compare/v0.11.11...v0.11.12
 [0.11.11]: https://github.com/jonhoo/inferno/compare/v0.11.10...v0.11.11
 [0.11.10]: https://github.com/jonhoo/inferno/compare/v0.11.9...v0.11.10
 [0.11.9]: https://github.com/jonhoo/inferno/compare/v0.11.8...v0.11.9
