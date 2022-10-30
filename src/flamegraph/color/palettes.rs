@@ -73,7 +73,7 @@ pub(super) mod python {
             part.strip_prefix("python")
                 .or_else(|| part.strip_prefix("Python"))
                 .map_or(false, |version| {
-                    version.chars().all(|c| c.is_digit(10) || c == '.')
+                    version.chars().all(|c| c.is_ascii_digit() || c == '.')
                 })
         }) || name.starts_with("<built-in")
             || name.starts_with("<method")

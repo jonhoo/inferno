@@ -3,7 +3,7 @@ use std::cell::RefCell;
 use std::io::prelude::*;
 use std::iter;
 
-use quick_xml::events::{BytesCData, BytesEnd, BytesStart, BytesText, Event};
+use quick_xml::events::{BytesCData, BytesDecl, BytesEnd, BytesStart, BytesText, Event};
 use quick_xml::Writer;
 use str_stack::StrStack;
 
@@ -62,27 +62,25 @@ pub(super) fn write_header<W>(
 where
     W: Write,
 {
-    svg.write(br#"<?xml version="1.0" standalone="no"?>"#)?;
-    svg.write(br#"<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">"#)?;
+    svg.write_event(Event::Decl(BytesDecl::new("1.0", None, Some("no"))))?;
+    svg.write_event(Event::DocType(BytesText::from_escaped(r#"svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd""#)))?;
     let imagewidth = opt.image_width.unwrap_or(super::DEFAULT_IMAGE_WIDTH);
-    svg.write_event(Event::Start(
-        BytesStart::borrowed_name(b"svg").with_attributes(vec![
-            ("version", "1.1"),
-            ("width", &*format!("{}", imagewidth)),
-            ("height", &*format!("{}", imageheight)),
-            ("onload", "init(evt)"),
-            ("viewBox", &*format!("0 0 {} {}", imagewidth, imageheight)),
-            ("xmlns", "http://www.w3.org/2000/svg"),
-            ("xmlns:xlink", "http://www.w3.org/1999/xlink"),
-            ("xmlns:fg", "http://github.com/jonhoo/inferno"),
-        ]),
-    ))?;
-    svg.write_event(Event::Comment(BytesText::from_plain_str(
+    svg.write_event(Event::Start(BytesStart::new("svg").with_attributes(vec![
+        ("version", "1.1"),
+        ("width", &*format!("{}", imagewidth)),
+        ("height", &*format!("{}", imageheight)),
+        ("onload", "init(evt)"),
+        ("viewBox", &*format!("0 0 {} {}", imagewidth, imageheight)),
+        ("xmlns", "http://www.w3.org/2000/svg"),
+        ("xmlns:xlink", "http://www.w3.org/1999/xlink"),
+        ("xmlns:fg", "http://github.com/jonhoo/inferno"),
+    ])))?;
+    svg.write_event(Event::Comment(BytesText::new(
         "Flame graph stack visualization. \
          See https://github.com/brendangregg/FlameGraph for latest version, \
          and http://www.brendangregg.com/flamegraphs.html for examples.",
     )))?;
-    svg.write_event(Event::Comment(BytesText::from_plain_str(
+    svg.write_event(Event::Comment(BytesText::new(
         format!("NOTES: {}", opt.notes).as_str(),
     )))?;
     Ok(())
@@ -96,28 +94,22 @@ pub(super) fn write_prelude<'a, W>(
 where
     W: Write,
 {
-    svg.write_event(Event::Start(BytesStart::borrowed_name(b"defs")))?;
-    svg.write_event(Event::Start(BytesStart::borrowed(
-        br#"linearGradient id="background" y1="0" y2="1" x1="0" x2="0""#,
+    svg.write_event(Event::Start(BytesStart::new("defs")))?;
+    svg.write_event(Event::Start(BytesStart::from_content(
+        r#"linearGradient id="background" y1="0" y2="1" x1="0" x2="0""#,
         "linearGradient".len(),
     )))?;
-    svg.write_event(Event::Empty(
-        BytesStart::borrowed_name(b"stop").with_attributes(
-            iter::once(("stop-color", &*style_options.bgcolor1))
-                .chain(iter::once(("offset", "5%"))),
-        ),
-    ))?;
-    svg.write_event(Event::Empty(
-        BytesStart::borrowed_name(b"stop").with_attributes(
-            iter::once(("stop-color", &*style_options.bgcolor2))
-                .chain(iter::once(("offset", "95%"))),
-        ),
-    ))?;
-    svg.write_event(Event::End(BytesEnd::borrowed(b"linearGradient")))?;
-    svg.write_event(Event::End(BytesEnd::borrowed(b"defs")))?;
+    svg.write_event(Event::Empty(BytesStart::new("stop").with_attributes(
+        iter::once(("stop-color", &*style_options.bgcolor1)).chain(iter::once(("offset", "5%"))),
+    )))?;
+    svg.write_event(Event::Empty(BytesStart::new("stop").with_attributes(
+        iter::once(("stop-color", &*style_options.bgcolor2)).chain(iter::once(("offset", "95%"))),
+    )))?;
+    svg.write_event(Event::End(BytesEnd::new("linearGradient")))?;
+    svg.write_event(Event::End(BytesEnd::new("defs")))?;
 
     svg.write_event(Event::Start(
-        BytesStart::borrowed_name(b"style").with_attributes(iter::once(("type", "text/css"))),
+        BytesStart::new("style").with_attributes(iter::once(("type", "text/css"))),
     ))?;
 
     let font_type: Cow<str> = if GENERIC_FONT_FAMILIES.contains(&opt.font_type.as_str()) {
@@ -127,7 +119,7 @@ where
     };
 
     let titlesize = &opt.font_size + 5;
-    svg.write_event(Event::Text(BytesText::from_escaped_str(&format!(
+    svg.write_event(Event::Text(BytesText::from_escaped(&format!(
         "
 text {{ font-family:{}; font-size:{}px; fill:rgb(0,0,0); }}
 #title {{ text-anchor:middle; font-size:{}px; }}
@@ -135,21 +127,20 @@ text {{ font-family:{}; font-size:{}px; fill:rgb(0,0,0); }}
         font_type, &opt.font_size, titlesize,
     ))))?;
     if let Some(strokecolor) = &style_options.strokecolor {
-        svg.write_event(Event::Text(BytesText::from_escaped_str(&format!(
+        svg.write_event(Event::Text(BytesText::from_escaped(&format!(
             "#frames > g > rect {{ stroke:{}; stroke-width:1; }}\n",
             strokecolor
         ))))?;
     }
-    svg.write_event(Event::Text(BytesText::from_escaped_str(include_str!(
+    svg.write_event(Event::Text(BytesText::from_escaped(include_str!(
         "flamegraph.css"
     ))))?;
-    svg.write_event(Event::End(BytesEnd::borrowed(b"style")))?;
+    svg.write_event(Event::End(BytesEnd::new("style")))?;
 
     svg.write_event(Event::Start(
-        BytesStart::borrowed_name(b"script")
-            .with_attributes(iter::once(("type", "text/ecmascript"))),
+        BytesStart::new("script").with_attributes(iter::once(("type", "text/ecmascript"))),
     ))?;
-    svg.write_event(Event::CData(BytesCData::from_str(&format!(
+    svg.write_event(Event::CData(BytesCData::new(&format!(
         "
         var nametype = {};
         var fontsize = {};
@@ -169,21 +160,17 @@ text {{ font-family:{}; font-size:{}px; fill:rgb(0,0,0); }}
         opt.text_truncate_direction == TextTruncateDirection::Right
     ))))?;
     if !opt.no_javascript {
-        svg.write_event(Event::CData(BytesCData::from_str(include_str!(
-            "flamegraph.js"
-        ))))?;
+        svg.write_event(Event::CData(BytesCData::new(include_str!("flamegraph.js"))))?;
     }
-    svg.write_event(Event::End(BytesEnd::borrowed(b"script")))?;
+    svg.write_event(Event::End(BytesEnd::new("script")))?;
 
-    svg.write_event(Event::Empty(
-        BytesStart::borrowed_name(b"rect").with_attributes(vec![
-            ("x", "0"),
-            ("y", "0"),
-            ("width", "100%"),
-            ("height", &*format!("{}", style_options.imageheight)),
-            ("fill", "url(#background)"),
-        ]),
-    ))?;
+    svg.write_event(Event::Empty(BytesStart::new("rect").with_attributes(vec![
+        ("x", "0"),
+        ("y", "0"),
+        ("width", "100%"),
+        ("height", &*format!("{}", style_options.imageheight)),
+        ("fill", "url(#background)"),
+    ])))?;
 
     // We don't care too much about allocating just for the prelude
     let mut buf = StrStack::new();
@@ -284,7 +271,7 @@ where
 
     thread_local! {
         // reuse for all text elements to avoid allocations
-        static TEXT: RefCell<Event<'static>> = RefCell::new(Event::Start(BytesStart::owned_name("text")))
+        static TEXT: RefCell<Event<'static>> = RefCell::new(Event::Start(BytesStart::new("text")))
     };
     TEXT.with(|start_event| {
         if let Event::Start(ref mut text) = *start_event.borrow_mut() {
@@ -304,8 +291,8 @@ where
         TextArgument::String(ref s) => s,
         TextArgument::FromBuffer(i) => &buf[i],
     };
-    svg.write_event(Event::Text(BytesText::from_plain_str(s)))?;
-    svg.write_event(Event::End(BytesEnd::borrowed(b"text")))
+    svg.write_event(Event::Text(BytesText::new(s)))?;
+    svg.write_event(Event::End(BytesEnd::new("text")))
 }
 
 // Imported from the `enquote` crate @ 1.0.3.

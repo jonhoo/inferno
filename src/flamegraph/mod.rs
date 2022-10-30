@@ -478,7 +478,7 @@ where
                 extra: None,
             },
         )?;
-        svg.write_event(Event::End(BytesEnd::borrowed(b"svg")))?;
+        svg.write_event(Event::End(BytesEnd::new("svg")))?;
         svg.write_event(Event::Eof)?;
         return Err(quick_xml::Error::Io(io::Error::new(
             io::ErrorKind::InvalidData,
@@ -526,23 +526,21 @@ where
     let mut thread_rng = rand::thread_rng();
 
     // structs to reuse across loops to avoid allocations
-    let mut cache_g = Event::Start(BytesStart::owned_name("g"));
-    let mut cache_a = Event::Start(BytesStart::owned_name("a"));
-    let mut cache_rect = Event::Empty(BytesStart::owned_name("rect"));
-    let cache_g_end = Event::End(BytesEnd::borrowed(b"g"));
-    let cache_a_end = Event::End(BytesEnd::borrowed(b"a"));
+    let mut cache_g = Event::Start(BytesStart::new("g"));
+    let mut cache_a = Event::Start(BytesStart::new("a"));
+    let mut cache_rect = Event::Empty(BytesStart::new("rect"));
+    let cache_g_end = Event::End(BytesEnd::new("g"));
+    let cache_a_end = Event::End(BytesEnd::new("a"));
 
     // create frames container
     let container_x = format!("{}", XPAD);
     let container_width = format!("{}", image_width as usize - XPAD - XPAD);
-    svg.write_event(Event::Start(
-        BytesStart::borrowed_name(b"svg").with_attributes(vec![
-            ("id", "frames"),
-            ("x", &container_x),
-            ("width", &container_width),
-            ("total_samples", &format!("{}", timemax)),
-        ]),
-    ))?;
+    svg.write_event(Event::Start(BytesStart::new("svg").with_attributes(vec![
+        ("id", "frames"),
+        ("x", &container_x),
+        ("width", &container_width),
+        ("total_samples", &format!("{}", timemax)),
+    ])))?;
 
     // draw frames
     let mut samples_txt_buffer = num_format::Buffer::default();
@@ -625,9 +623,9 @@ where
             &buffer[info],
         )?;
 
-        svg.write_event(Event::Start(BytesStart::borrowed_name(b"title")))?;
-        svg.write_event(Event::Text(BytesText::from_plain_str(title)))?;
-        svg.write_event(Event::End(BytesEnd::borrowed(b"title")))?;
+        svg.write_event(Event::Start(BytesStart::new("title")))?;
+        svg.write_event(Event::Text(BytesText::new(title)))?;
+        svg.write_event(Event::End(BytesEnd::new("title")))?;
 
         // select the color of the rectangle
         let color = if frame.location.function == "--" {
@@ -710,8 +708,8 @@ where
         }
     }
 
-    svg.write_event(Event::End(BytesEnd::borrowed(b"svg")))?;
-    svg.write_event(Event::End(BytesEnd::borrowed(b"svg")))?;
+    svg.write_event(Event::End(BytesEnd::new("svg")))?;
+    svg.write_event(Event::End(BytesEnd::new("svg")))?;
     svg.write_event(Event::Eof)?;
 
     svg.into_inner().flush()?;

@@ -205,7 +205,7 @@ impl FromStr for StrokeColor {
             return Ok(StrokeColor::None);
         }
         parse_flat_bgcolor(s)
-            .map(|c| StrokeColor::Color(c))
+            .map(StrokeColor::Color)
             .ok_or_else(|| format!("unknown color: {}", s))
     }
 }
