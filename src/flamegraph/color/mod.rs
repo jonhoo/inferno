@@ -141,7 +141,7 @@ impl FromStr for BackgroundColor {
             "blue" => Ok(BackgroundColor::Blue),
             "green" => Ok(BackgroundColor::Green),
             "grey" => Ok(BackgroundColor::Grey),
-            flat => parse_flat_bgcolor(flat)
+            flat => parse_hex_color(flat)
                 .map(BackgroundColor::Flat)
                 .ok_or_else(|| format!("unknown background color: {}", flat)),
         }
@@ -154,7 +154,8 @@ macro_rules! u8_from_hex_iter {
     };
 }
 
-fn parse_flat_bgcolor(s: &str) -> Option<Color> {
+/// Parses a string as a hex color, returning None if it is an invalid color
+pub fn parse_hex_color(s: &str) -> Option<Color> {
     if !s.starts_with('#') || (s.len() != 7) {
         None
     } else {
@@ -176,7 +177,7 @@ impl FromStr for SearchColor {
     type Err = String;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        parse_flat_bgcolor(s)
+        parse_hex_color(s)
             .map(SearchColor)
             .ok_or_else(|| format!("unknown color: {}", s))
     }
@@ -204,8 +205,30 @@ impl FromStr for StrokeColor {
         if s == "none" {
             return Ok(StrokeColor::None);
         }
-        parse_flat_bgcolor(s)
+        parse_hex_color(s)
             .map(StrokeColor::Color)
+            .ok_or_else(|| format!("unknown color: {}", s))
+    }
+}
+
+/// `StrokeColor::default()` is `None`.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum UiColor {
+    /// Color of the stroke
+    Color(Color),
+    /// No color for the stroke
+    None,
+}
+
+impl FromStr for UiColor {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        if s == "none" {
+            return Ok(UiColor::None);
+        }
+        parse_hex_color(s)
+            .map(|c| UiColor::Color(c))
             .ok_or_else(|| format!("unknown color: {}", s))
     }
 }
@@ -466,36 +489,21 @@ pub(super) fn bgcolor_for<'a>(
 #[cfg(test)]
 mod tests {
     use super::namehash;
-    use super::parse_flat_bgcolor;
+    use super::parse_hex_color;
     use super::Color;
     use pretty_assertions::assert_eq;
 
     #[test]
     fn bgcolor_parse_test() {
-        assert_eq!(
-            parse_flat_bgcolor("#ffffff"),
-            Some(color!(0xff, 0xff, 0xff))
-        );
-        assert_eq!(
-            parse_flat_bgcolor("#000000"),
-            Some(color!(0x00, 0x00, 0x00))
-        );
-        assert_eq!(
-            parse_flat_bgcolor("#abcdef"),
-            Some(color!(0xab, 0xcd, 0xef))
-        );
-        assert_eq!(
-            parse_flat_bgcolor("#123456"),
-            Some(color!(0x12, 0x34, 0x56))
-        );
-        assert_eq!(
-            parse_flat_bgcolor("#789000"),
-            Some(color!(0x78, 0x90, 0x00))
-        );
-        assert_eq!(parse_flat_bgcolor("ffffff"), None);
-        assert_eq!(parse_flat_bgcolor("#fffffff"), None);
-        assert_eq!(parse_flat_bgcolor("#xfffff"), None);
-        assert_eq!(parse_flat_bgcolor("# fffff"), None);
+        assert_eq!(parse_hex_color("#ffffff"), Some(color!(0xff, 0xff, 0xff)));
+        assert_eq!(parse_hex_color("#000000"), Some(color!(0x00, 0x00, 0x00)));
+        assert_eq!(parse_hex_color("#abcdef"), Some(color!(0xab, 0xcd, 0xef)));
+        assert_eq!(parse_hex_color("#123456"), Some(color!(0x12, 0x34, 0x56)));
+        assert_eq!(parse_hex_color("#789000"), Some(color!(0x78, 0x90, 0x00)));
+        assert_eq!(parse_hex_color("ffffff"), None);
+        assert_eq!(parse_hex_color("#fffffff"), None);
+        assert_eq!(parse_hex_color("#xfffff"), None);
+        assert_eq!(parse_hex_color("# fffff"), None);
     }
 
     macro_rules! test_hash {

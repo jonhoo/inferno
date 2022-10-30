@@ -227,7 +227,7 @@ text {{ font-family:{}; font-size:{}px }}
             extra: vec![
                 ("id", "unzoom"),
                 ("class", "hide"),
-                ("fill", &style_options.uicolor)
+                ("fill", &style_options.uicolor),
             ],
         },
     )?;

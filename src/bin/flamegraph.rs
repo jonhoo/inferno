@@ -2,7 +2,9 @@ use std::io;
 use std::path::{Path, PathBuf};
 
 use env_logger::Env;
-use inferno::flamegraph::color::{BackgroundColor, PaletteMap, SearchColor, StrokeColor};
+use inferno::flamegraph::color::{
+    parse_hex_color, BackgroundColor, Color, PaletteMap, SearchColor, UiColor,
+};
 use inferno::flamegraph::{self, defaults, Direction, Options, Palette, TextTruncateDirection};
 
 #[cfg(feature = "nameattr")]
@@ -131,6 +133,18 @@ struct Opt {
     )]
     fontwidth: f64,
 
+    /// Color of UI text such as the search and reset zoom buttons
+    #[clap(
+        long = "uicolor",
+        default_value = defaults::UI_COLOR,
+        value_parser = |s: &str| {
+            parse_hex_color(s)
+                .ok_or_else(|| format!("unknown ui color: {}", s))
+        },
+        value_name = "STRING"
+    )]
+    uicolor: Color,
+
     /// Height of each frame
     #[clap(
         long = "height",
@@ -177,10 +191,10 @@ struct Opt {
     /// Adds an outline to every frame
     #[clap(
         long = "stroke-color",
-        default_value = defaults::STROKE_COLOR,
+        default_value = defaults::UI_COLOR,
         value_name = "STRING"
     )]
-    stroke_color: StrokeColor,
+    stroke_color: UiColor,
 
     /// Second level title (optional)
     #[clap(long = "subtitle", value_name = "STRING")]
@@ -264,6 +278,7 @@ impl<'a> Opt {
         options.factor = self.factor;
         options.search_color = self.search_color;
         options.stroke_color = self.stroke_color;
+        options.uicolor = self.uicolor;
         (self.infiles, options)
     }
 

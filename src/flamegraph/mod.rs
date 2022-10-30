@@ -76,6 +76,7 @@ pub mod defaults {
     define! {
         COLORS: &str = "hot",
         SEARCH_COLOR: &str = "#e600e6",
+        UI_COLOR: &str = "#000000",
         STROKE_COLOR: &str = "none",
         TITLE: &str = "Flame Graph",
         CHART_TITLE: &str = "Flame Chart",
