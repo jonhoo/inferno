@@ -211,28 +211,6 @@ impl FromStr for StrokeColor {
     }
 }
 
-/// `StrokeColor::default()` is `None`.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum UiColor {
-    /// Color of the stroke
-    Color(Color),
-    /// No color for the stroke
-    None,
-}
-
-impl FromStr for UiColor {
-    type Err = String;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        if s == "none" {
-            return Ok(UiColor::None);
-        }
-        parse_hex_color(s)
-            .map(|c| UiColor::Color(c))
-            .ok_or_else(|| format!("unknown color: {}", s))
-    }
-}
-
 impl FromStr for Palette {
     type Err = String;
 

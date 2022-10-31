@@ -3,7 +3,7 @@ use std::path::{Path, PathBuf};
 
 use env_logger::Env;
 use inferno::flamegraph::color::{
-    parse_hex_color, BackgroundColor, Color, PaletteMap, SearchColor, UiColor,
+    parse_hex_color, BackgroundColor, Color, PaletteMap, SearchColor, StrokeColor,
 };
 use inferno::flamegraph::{self, defaults, Direction, Options, Palette, TextTruncateDirection};
 
@@ -191,10 +191,10 @@ struct Opt {
     /// Adds an outline to every frame
     #[clap(
         long = "stroke-color",
-        default_value = defaults::UI_COLOR,
+        default_value = defaults::STROKE_COLOR,
         value_name = "STRING"
     )]
-    stroke_color: UiColor,
+    stroke_color: StrokeColor,
 
     /// Second level title (optional)
     #[clap(long = "subtitle", value_name = "STRING")]
