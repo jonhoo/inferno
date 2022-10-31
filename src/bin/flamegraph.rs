@@ -139,7 +139,7 @@ struct Opt {
         default_value = defaults::UI_COLOR,
         value_parser = |s: &str| {
             parse_hex_color(s)
-                .ok_or_else(|| format!("unknown ui color: {}", s))
+                .ok_or_else(|| format!("Expected a color in hexadecimal format, got: {}", s))
         },
         value_name = "STRING"
     )]
