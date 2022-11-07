@@ -141,7 +141,7 @@ struct Opt {
             parse_hex_color(s)
                 .ok_or_else(|| format!("Expected a color in hexadecimal format, got: {}", s))
         },
-        value_name = "STRING"
+        value_name = "#RRGGBB"
     )]
     uicolor: Color,
 
