@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 ### Changed
+- Updated `ahash` to version 0.8
+- Updated `quick-xml` to version 0.26
 
 ### Removed
 
