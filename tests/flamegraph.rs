@@ -737,7 +737,7 @@ fn ui_color_non_default() {
     let expected_result_file = "./tests/data/flamegraph/options/uicolor_color.svg";
 
     let mut options = flamegraph::Options::default();
-    options.uicolor = rgb::RGB8{r: 255, g: 0, b: 0};
+    options.uicolor = rgb::RGB8 { r: 255, g: 0, b: 0 };
 
     test_flamegraph(input_file, expected_result_file, options).unwrap();
 }
