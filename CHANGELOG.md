@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated `ahash` to version 0.8
 - Updated `quick-xml` to version 0.26
 
+- Bumped `clap` to 3.2.0
+
 ### Removed
 
 ## [0.11.12] - 2022-10-24
