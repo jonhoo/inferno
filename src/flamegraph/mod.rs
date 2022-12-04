@@ -76,6 +76,7 @@ pub mod defaults {
     define! {
         COLORS: &str = "hot",
         SEARCH_COLOR: &str = "#e600e6",
+        UI_COLOR: &str = "#000000",
         STROKE_COLOR: &str = "none",
         TITLE: &str = "Flame Graph",
         CHART_TITLE: &str = "Flame Chart",
@@ -101,6 +102,9 @@ pub struct Options<'a> {
     ///
     /// If `None`, the background color will be selected based on the value of `colors`.
     pub bgcolors: Option<color::BackgroundColor>,
+
+    /// The color of UI text such as the search and reset view button. Defaults to black
+    pub uicolor: color::Color,
 
     /// Choose names based on the hashes of function names.
     ///
@@ -306,6 +310,7 @@ impl<'a> Default for Options<'a> {
             notes: Default::default(),
             subtitle: Default::default(),
             bgcolors: Default::default(),
+            uicolor: Default::default(),
             hash: Default::default(),
             deterministic: Default::default(),
             palette_map: Default::default(),
@@ -511,10 +516,12 @@ where
         StrokeColor::Color(c) => Some(c.to_string()),
         StrokeColor::None => None,
     };
+    let uicolor = opt.uicolor.to_string();
     let style_options = StyleOptions {
         imageheight,
         bgcolor1,
         bgcolor2,
+        uicolor,
         strokecolor,
     };
 

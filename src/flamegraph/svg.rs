@@ -51,6 +51,7 @@ pub(super) struct StyleOptions<'a> {
     pub(super) imageheight: usize,
     pub(super) bgcolor1: Cow<'a, str>,
     pub(super) bgcolor2: Cow<'a, str>,
+    pub(super) uicolor: String,
     pub(super) strokecolor: Option<String>,
 }
 
@@ -121,7 +122,7 @@ where
     let titlesize = &opt.font_size + 5;
     svg.write_event(Event::Text(BytesText::from_escaped(&format!(
         "
-text {{ font-family:{}; font-size:{}px; fill:rgb(0,0,0); }}
+text {{ font-family:{}; font-size:{}px }}
 #title {{ text-anchor:middle; font-size:{}px; }}
 ",
         font_type, &opt.font_size, titlesize,
@@ -181,7 +182,7 @@ text {{ font-family:{}; font-size:{}px; fill:rgb(0,0,0); }}
             x: Dimension::Percent(50.0),
             y: (opt.font_size * 2) as f64,
             text: (&*opt.title).into(),
-            extra: vec![("id", "title")],
+            extra: vec![("id", "title"), ("fill", &style_options.uicolor)],
         },
     )?;
 
@@ -212,7 +213,7 @@ text {{ font-family:{}; font-size:{}px; fill:rgb(0,0,0); }}
                 opt.ypad1() - opt.font_size
             } as f64,
             text: " ".into(),
-            extra: iter::once(("id", "details")),
+            extra: vec![("id", "details"), ("fill", &style_options.uicolor)],
         },
     )?;
 
@@ -223,7 +224,11 @@ text {{ font-family:{}; font-size:{}px; fill:rgb(0,0,0); }}
             x: Dimension::Pixels(super::XPAD),
             y: (opt.font_size * 2) as f64,
             text: "Reset Zoom".into(),
-            extra: vec![("id", "unzoom"), ("class", "hide")],
+            extra: vec![
+                ("id", "unzoom"),
+                ("class", "hide"),
+                ("fill", &style_options.uicolor),
+            ],
         },
     )?;
 
@@ -234,7 +239,7 @@ text {{ font-family:{}; font-size:{}px; fill:rgb(0,0,0); }}
             x: Dimension::Pixels(image_width as usize - super::XPAD),
             y: (opt.font_size * 2) as f64,
             text: "Search".into(),
-            extra: vec![("id", "search")],
+            extra: vec![("id", "search"), ("fill", &style_options.uicolor)],
         },
     )?;
 
@@ -245,7 +250,7 @@ text {{ font-family:{}; font-size:{}px; fill:rgb(0,0,0); }}
             x: Dimension::Pixels(image_width as usize - super::XPAD),
             y: (style_options.imageheight - (opt.ypad2() / 2)) as f64,
             text: " ".into(),
-            extra: iter::once(("id", "matched")),
+            extra: vec![("id", "matched"), ("fill", &style_options.uicolor)],
         },
     )?;
 

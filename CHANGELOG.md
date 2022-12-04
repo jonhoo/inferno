@@ -7,9 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 
+- Add flag `--uicolor` to specify the color to draw UI element text, like the Reset view button. [#271](https://github.com/jonhoo/inferno/pull/271)
+
 ### Changed
 - Updated `ahash` to version 0.8
 - Updated `quick-xml` to version 0.26
+
+- Bumped `clap` to 3.2.0
 
 ### Removed
 

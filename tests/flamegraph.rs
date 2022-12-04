@@ -731,6 +731,18 @@ fn stroke_color_non_default() {
 }
 
 #[test]
+fn ui_color_non_default() {
+    let input_file =
+        "./tests/data/flamegraph/differential/perf-cycles-instructions-01-collapsed-all-diff.txt";
+    let expected_result_file = "./tests/data/flamegraph/options/uicolor_color.svg";
+
+    let mut options = flamegraph::Options::default();
+    options.uicolor = rgb::RGB8 { r: 255, g: 0, b: 0 };
+
+    test_flamegraph(input_file, expected_result_file, options).unwrap();
+}
+
+#[test]
 fn flamegraph_sorted_input_file() {
     let input_file = "./flamegraph/test/results/perf-vertx-stacks-01-collapsed-all.txt";
     let expected_result_file =
