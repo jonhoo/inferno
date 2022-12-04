@@ -7,15 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 
+### Changed
+
+### Removed
+
+## [0.11.13] - 2022-12-03
+### Added
+
 - Add flag `--uicolor` to specify the color to draw UI element text, like the Reset view button. [#271](https://github.com/jonhoo/inferno/pull/271)
 
 ### Changed
+
 - Updated `ahash` to version 0.8
 - Updated `quick-xml` to version 0.26
-
 - Bumped `clap` to 3.2.0
-
-### Removed
 
 ## [0.11.12] - 2022-10-24
 ### Changed
@@ -249,7 +254,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Moved to `IndexMap` and FNV hashing ([#127](https://github.com/jonhoo/inferno/pull/127))
 - Moved CI to Azure DevOps Pipelines
 
-[Unreleased]: https://github.com/jonhoo/inferno/compare/v0.11.12...HEAD
+[Unreleased]: https://github.com/jonhoo/inferno/compare/v0.11.13...HEAD
+[0.11.13]: https://github.com/jonhoo/inferno/compare/v0.11.12...v0.11.13
 [0.11.12]: https://github.com/jonhoo/inferno/compare/v0.11.11...v0.11.12
 [0.11.11]: https://github.com/jonhoo/inferno/compare/v0.11.10...v0.11.11
 [0.11.10]: https://github.com/jonhoo/inferno/compare/v0.11.9...v0.11.10
