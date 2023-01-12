@@ -212,12 +212,12 @@ struct Opt {
     #[clap(long = "width", value_name = "UINT")]
     width: Option<usize>,
 
-    /// Filter out stacks that do not contain this symbol, when this symbol is in the stack,
-    /// truncate the call stack so that this is the bottom-most symbol.
+    /// Omit samples whose stacks do not contain this symbol. When this symbol is in a sample's
+    /// stack, truncate the call stack so that this is the bottom-most symbol.
     /// This is particularly useful when you want to profile a specific function in a codebase that
     /// uses some kind of heavy runtime like rayon, tokio, or the rustc query system.
-    #[clap(long = "base")]
-    base: Option<String>,
+    #[clap(long = "base", value_name = "STRING")]
+    base: Vec<String>,
 
     // ************ //
     // *** ARGS *** //
