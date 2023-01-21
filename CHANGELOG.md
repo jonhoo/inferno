@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [0.11.14] - 2023-01-21
+### Added
+
+- Add flag `--base` to filter flamegraphs to only frames at or below a particular set of base frames. [#274](https://github.com/jonhoo/inferno/pull/274)
+
 ## [0.11.13] - 2022-12-03
 ### Added
 
