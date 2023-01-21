@@ -258,6 +258,9 @@ pub struct Options<'a> {
     ///
     /// Note that stack is not sorted and will be reversed
     pub flame_chart: bool,
+
+    /// Base symbols
+    pub base: Vec<String>,
 }
 
 impl<'a> Options<'a> {
@@ -322,6 +325,7 @@ impl<'a> Default for Options<'a> {
             no_javascript: Default::default(),
             color_diffusion: Default::default(),
             flame_chart: Default::default(),
+            base: Default::default(),
 
             #[cfg(feature = "nameattr")]
             func_frameattrs: Default::default(),
@@ -450,7 +454,28 @@ where
         merge::frames(lines, false)?
     } else {
         // Sort lines by default.
-        let mut lines: Vec<&str> = lines.into_iter().collect();
+        let mut lines: Vec<&str> = if opt.base.is_empty() {
+            lines.into_iter().collect()
+        } else {
+            lines
+                .into_iter()
+                .filter_map(|line| {
+                    let mut cursor = line.len();
+                    for symbol in line.rsplit(';') {
+                        cursor -= symbol.len();
+                        if opt.base.iter().any(|b| b == symbol) {
+                            break;
+                        }
+                        cursor = cursor.saturating_sub(1);
+                    }
+                    if cursor == 0 {
+                        None
+                    } else {
+                        Some(&line[cursor..])
+                    }
+                })
+                .collect()
+        };
         lines.sort_unstable();
         merge::frames(lines, false)?
     };

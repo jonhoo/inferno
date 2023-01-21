@@ -212,6 +212,13 @@ struct Opt {
     #[clap(long = "width", value_name = "UINT")]
     width: Option<usize>,
 
+    /// Omit samples whose stacks do not contain this symbol. When this symbol is in a sample's
+    /// stack, truncate the call stack so that this is the bottom-most symbol.
+    /// This is particularly useful when you want to profile a specific function in a codebase that
+    /// uses some kind of heavy runtime like rayon, tokio, or the rustc query system.
+    #[clap(long = "base", value_name = "STRING")]
+    base: Vec<String>,
+
     // ************ //
     // *** ARGS *** //
     // ************ //
@@ -256,6 +263,7 @@ impl<'a> Opt {
         options.color_diffusion = self.color_diffusion;
         options.reverse_stack_order = self.reverse;
         options.flame_chart = self.flame_chart;
+        options.base = self.base;
 
         if self.flame_chart && self.title == defaults::TITLE {
             options.title = defaults::CHART_TITLE.to_owned();

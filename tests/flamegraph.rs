@@ -935,6 +935,30 @@ fn flamegraph_flamechart() {
 }
 
 #[test]
+fn flamegraph_base_symbol() {
+    let input_file = "./tests/data/flamegraph/base/flames.txt";
+    let expected_result_file = "./tests/data/flamegraph/base/single-base.svg";
+
+    let mut opts = flamegraph::Options::default();
+    opts.title = flamegraph::defaults::CHART_TITLE.to_owned();
+    opts.base = vec!["Final".to_string()];
+
+    test_flamegraph(input_file, expected_result_file, opts).unwrap();
+}
+
+#[test]
+fn flamegraph_multiple_base_symbol() {
+    let input_file = "./tests/data/flamegraph/base/flames.txt";
+    let expected_result_file = "./tests/data/flamegraph/base/multi-base.svg";
+
+    let mut opts = flamegraph::Options::default();
+    opts.title = flamegraph::defaults::CHART_TITLE.to_owned();
+    opts.base = vec!["Final".to_string(), "Samples".to_string()];
+
+    test_flamegraph(input_file, expected_result_file, opts).unwrap();
+}
+
+#[test]
 fn flamegraph_austin() {
     let input_file = "./tests/data/flamegraph/austin/flames.txt";
     let expected_result_file = "./tests/data/flamegraph/austin/flame.svg";
