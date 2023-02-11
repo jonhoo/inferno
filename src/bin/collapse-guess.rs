@@ -27,7 +27,7 @@ struct Opt {
 
     /// Verbose logging mode (-v, -vv, -vvv)
     #[clap(short = 'v', long = "verbose", action = ArgAction::Count)]
-    verbose: usize,
+    verbose: u8,
 
     // *************** //
     // *** OPTIONS *** //

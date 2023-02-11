@@ -1,6 +1,7 @@
 use std::io;
 use std::path::{Path, PathBuf};
 
+use clap::builder::TypedValueParser;
 use clap::{ArgAction, Parser};
 use env_logger::Env;
 use inferno::flamegraph::color::{
@@ -69,7 +70,7 @@ struct Opt {
 
     /// Verbose logging mode (-v, -vv, -vvv)
     #[clap(short = 'v', long = "verbose", action = ArgAction::Count)]
-    verbose: usize,
+    verbose: u8,
 
     // *************** //
     // *** OPTIONS *** //
@@ -83,7 +84,7 @@ struct Opt {
         short = 'c',
         long = "colors",
         default_value = defaults::COLORS,
-        value_parser = ["aqua","blue","green","hot","io","java","js","mem","orange","perl","python","purple","red","rust","wakeup","yellow"],
+        value_parser = clap::builder::PossibleValuesParser::new(Palette::VARIANTS).map(|s| s.parse::<Palette>().unwrap()),
         value_name = "STRING"
     )]
     colors: Palette,

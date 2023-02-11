@@ -78,6 +78,14 @@ pub enum Palette {
     Multi(MultiPalette),
 }
 
+impl Palette {
+    /// The valid set of palettes (via `FromStr`).
+    pub const VARIANTS: &[&'static str] = &[
+        "aqua", "blue", "green", "hot", "io", "java", "js", "mem", "orange", "perl", "python",
+        "purple", "red", "rust", "wakeup", "yellow",
+    ];
+}
+
 impl Default for Palette {
     fn default() -> Self {
         Palette::Basic(BasicPalette::Hot)
