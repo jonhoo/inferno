@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Updated to clap `v4`, which bumped MSRV to 1.64.0. [#267](https://github.com/jonhoo/inferno/pull/267)
+
 ### Removed
 
 ## [0.11.14] - 2023-01-21
