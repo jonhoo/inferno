@@ -18,7 +18,7 @@ exclude = ["/tests/**", "/flamegraph/**", "/*.perf"]
 [features]
 default = ["cli", "multithreaded", "nameattr"]
 cli = ["clap", "env_logger"]
-multithreaded = ["dashmap", "crossbeam-utils", "crossbeam-channel", "num_cpus"]
+multithreaded = ["dashmap", "crossbeam-utils", "crossbeam-channel"]
 nameattr = ["indexmap"]
 
 [dependencies]
@@ -31,7 +31,6 @@ env_logger = { version = "0.9", default-features = false, optional = true }
 indexmap = { version = "1.0", optional = true }
 itoa = "1"
 log = "0.4"
-num_cpus = { version = "1.10", optional = true }
 num-format = { version = "0.4.3", default-features = false }
 quick-xml = { version = "0.26", default-features = false }
 rgb = "0.8.13"

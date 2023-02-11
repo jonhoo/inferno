@@ -40,7 +40,8 @@ const RUST_HASH_LENGTH: usize = 17;
 
 #[cfg(feature = "multithreaded")]
 #[doc(hidden)]
-pub static DEFAULT_NTHREADS: Lazy<usize> = Lazy::new(num_cpus::get);
+pub static DEFAULT_NTHREADS: Lazy<usize> =
+    Lazy::new(|| std::thread::available_parallelism().unwrap().into());
 #[cfg(not(feature = "multithreaded"))]
 #[doc(hidden)]
 pub static DEFAULT_NTHREADS: Lazy<usize> = Lazy::new(|| 1);
