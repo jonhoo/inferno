@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 ### Changed
+- Updated to [`quick-xml 0.27`](https://github.com/tafia/quick-xml/blob/master/Changelog.md#0270----2022-12-25).
 
 ### Removed
 
@@ -16,7 +17,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Updated to clap `v4`, which bumped MSRV to 1.64.0. [#267](https://github.com/jonhoo/inferno/pull/267)
 - Updated to [`env_logger 0.10`](https://github.com/rust-cli/env_logger/blob/main/CHANGELOG.md#0100---2022-11-24). [#281](https://github.com/jonhoo/inferno/pull/281)
-- `cargo update`
 
 ### Removed
 

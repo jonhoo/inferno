@@ -12,12 +12,12 @@ mod merge;
 mod rand;
 mod svg;
 
-use std::fs::File;
 use std::io::prelude::*;
 use std::io::{self, BufReader};
 use std::iter;
 use std::path::PathBuf;
 use std::str::FromStr;
+use std::{fs::File, sync::Arc};
 
 use log::{error, warn};
 use num_format::Locale;
@@ -510,10 +510,10 @@ where
         )?;
         svg.write_event(Event::End(BytesEnd::new("svg")))?;
         svg.write_event(Event::Eof)?;
-        return Err(quick_xml::Error::Io(io::Error::new(
+        return Err(quick_xml::Error::Io(Arc::new(io::Error::new(
             io::ErrorKind::InvalidData,
             "No stack counts found",
-        )));
+        ))));
     }
 
     let image_width = opt.image_width.unwrap_or(DEFAULT_IMAGE_WIDTH) as f64;
@@ -843,6 +843,7 @@ where
     for mut reader in readers {
         reader
             .read_to_string(&mut input)
+            .map_err(Arc::new)
             .map_err(quick_xml::Error::Io)?;
     }
     from_lines(opt, input.lines(), writer)
@@ -862,7 +863,9 @@ pub fn from_files<W: Write>(
         let r = BufReader::with_capacity(128 * 1024, stdin.lock());
         from_reader(opt, r, writer)
     } else if files.len() == 1 {
-        let r = File::open(&files[0]).map_err(quick_xml::Error::Io)?;
+        let r = File::open(&files[0])
+            .map_err(Arc::new)
+            .map_err(quick_xml::Error::Io)?;
         from_reader(opt, r, writer)
     } else {
         let stdin = io::stdin();
@@ -876,7 +879,9 @@ pub fn from_files<W: Write>(
                     stdin_added = true;
                 }
             } else {
-                let r = File::open(infile).map_err(quick_xml::Error::Io)?;
+                let r = File::open(infile)
+                    .map_err(Arc::new)
+                    .map_err(quick_xml::Error::Io)?;
                 readers.push(Box::new(r));
             }
         }
