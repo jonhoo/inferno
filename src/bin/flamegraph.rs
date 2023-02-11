@@ -1,6 +1,8 @@
 use std::io;
 use std::path::{Path, PathBuf};
 
+use clap::builder::TypedValueParser;
+use clap::{ArgAction, Parser};
 use env_logger::Env;
 use inferno::flamegraph::color::{
     parse_hex_color, BackgroundColor, Color, PaletteMap, SearchColor, StrokeColor,
@@ -9,8 +11,6 @@ use inferno::flamegraph::{self, defaults, Direction, Options, Palette, TextTrunc
 
 #[cfg(feature = "nameattr")]
 use inferno::flamegraph::FuncFrameAttrsMap;
-
-use clap::Parser;
 
 #[derive(Debug, Parser)]
 #[clap(name = "inferno-flamegraph", about)]
@@ -69,8 +69,8 @@ struct Opt {
     reverse: bool,
 
     /// Verbose logging mode (-v, -vv, -vvv)
-    #[clap(short = 'v', long = "verbose", parse(from_occurrences))]
-    verbose: usize,
+    #[clap(short = 'v', long = "verbose", action = ArgAction::Count)]
+    verbose: u8,
 
     // *************** //
     // *** OPTIONS *** //
@@ -84,7 +84,7 @@ struct Opt {
         short = 'c',
         long = "colors",
         default_value = defaults::COLORS,
-        possible_values = &["aqua","blue","green","hot","io","java","js","mem","orange","perl","python","purple","red","rust","wakeup","yellow"],
+        value_parser = clap::builder::PossibleValuesParser::new(Palette::VARIANTS).map(|s| s.parse::<Palette>().unwrap()),
         value_name = "STRING"
     )]
     colors: Palette,
@@ -104,7 +104,7 @@ struct Opt {
     /// Factor to scale sample counts by
     #[clap(
         long = "factor",
-        default_value = &defaults::str::FACTOR,
+        default_value = &**defaults::str::FACTOR,
         value_name = "FLOAT"
     )]
     factor: f64,
@@ -112,7 +112,7 @@ struct Opt {
     /// Font size
     #[clap(
         long = "fontsize",
-        default_value = &defaults::str::FONT_SIZE,
+        default_value = &**defaults::str::FONT_SIZE,
         value_name = "UINT"
     )]
     fontsize: usize,
@@ -128,7 +128,7 @@ struct Opt {
     /// Font width
     #[clap(
         long = "fontwidth",
-        default_value = &defaults::str::FONT_WIDTH,
+        default_value = &**defaults::str::FONT_WIDTH,
         value_name = "FLOAT"
     )]
     fontwidth: f64,
@@ -148,7 +148,7 @@ struct Opt {
     /// Height of each frame
     #[clap(
         long = "height",
-        default_value = &defaults::str::FRAME_HEIGHT,
+        default_value = &**defaults::str::FRAME_HEIGHT,
         value_name = "UINT"
     )]
     height: usize,
@@ -156,7 +156,7 @@ struct Opt {
     /// Omit functions smaller than <FLOAT> percent
     #[clap(
         long = "minwidth",
-        default_value = &defaults::str::MIN_WIDTH,
+        default_value = &**defaults::str::MIN_WIDTH,
         value_name = "FLOAT"
     )]
     minwidth: f64,
@@ -223,7 +223,7 @@ struct Opt {
     // *** ARGS *** //
     // ************ //
     /// Collapsed perf output files. With no PATH, or PATH is -, read STDIN.
-    #[clap(name = "PATH", parse(from_os_str))]
+    #[clap(name = "PATH", value_parser)]
     infiles: Vec<PathBuf>,
 
     /// Produce a flame chart (sort by time, do not merge stacks)
