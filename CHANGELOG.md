@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Updated to clap `v4`, which bumped MSRV to 1.64.0. [#267](https://github.com/jonhoo/inferno/pull/267)
+- Updated to [`env_logger 0.10`](https://github.com/rust-cli/env_logger/blob/main/CHANGELOG.md#0100---2022-11-24). [#281](https://github.com/jonhoo/inferno/pull/281)
 
 ### Removed
 
