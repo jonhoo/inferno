@@ -402,7 +402,6 @@ dependencies = [
  "log",
  "maplit",
  "num-format",
- "num_cpus",
  "once_cell",
  "pretty_assertions",
  "quick-xml",

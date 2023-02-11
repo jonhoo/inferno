@@ -11,7 +11,7 @@ const INFILE_PERF: &str = "flamegraph/example-perf-stacks.txt.gz";
 const INFILE_SAMPLE: &str = "tests/data/collapse-sample/large.txt.gz";
 const SAMPLE_SIZE: usize = 100;
 
-static NTHREADS: Lazy<usize> = Lazy::new(num_cpus::get);
+static NTHREADS: Lazy<usize> = Lazy::new(|| std::thread::available_parallelism().unwrap().into());
 
 fn read_infile(infile: &str, buf: &mut Vec<u8>) -> io::Result<()> {
     let mut f = File::open(infile)?;
