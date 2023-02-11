@@ -23,7 +23,7 @@ nameattr = ["indexmap"]
 
 [dependencies]
 ahash = "0.8"
-atty = "0.2"
+is-terminal = "0.4.3"
 crossbeam-utils = { version = "0.8", optional = true }
 crossbeam-channel = { version = "0.5", optional = true }
 dashmap = { version = "5", optional = true }

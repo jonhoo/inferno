@@ -11,6 +11,7 @@ use inferno::flamegraph::{self, defaults, Direction, Options, Palette, TextTrunc
 
 #[cfg(feature = "nameattr")]
 use inferno::flamegraph::FuncFrameAttrsMap;
+use is_terminal::IsTerminal;
 
 #[derive(Debug, Parser)]
 #[clap(name = "inferno-flamegraph", about)]
@@ -332,7 +333,7 @@ fn main() -> quick_xml::Result<()> {
 
     options.palette_map = palette_map.as_mut();
 
-    if atty::is(atty::Stream::Stdout) {
+    if std::io::stdout().is_terminal() {
         flamegraph::from_files(&mut options, &infiles, io::stdout().lock())?;
     } else {
         flamegraph::from_files(

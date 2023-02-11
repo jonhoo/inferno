@@ -42,6 +42,8 @@ pub mod vtune;
 ///   [crate-level documentation]: ../../index.html
 pub mod vsprof;
 
+use is_terminal::IsTerminal;
+
 // DEFAULT_NTHREADS is public because we use it in the help text of the binaries,
 // but it doesn't need to be exposed to library users, hence #[doc(hidden)].
 #[doc(hidden)]
@@ -100,7 +102,7 @@ pub trait Collapse {
     where
         P: AsRef<Path>,
     {
-        if atty::is(atty::Stream::Stdout) {
+        if std::io::stdout().is_terminal() {
             self.collapse_file(infile, io::stdout().lock())
         } else {
             self.collapse_file(infile, io::BufWriter::new(io::stdout().lock()))
