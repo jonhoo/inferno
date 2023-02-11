@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 - Removed the dependency on `num_cpus` in favor of `std::thread::available_parallelism`. [#279](https://github.com/jonhoo/inferno/pull/279)
+- Removed the dependency on `atty` in favor of `is_terminal`. [#280](https://github.com/jonhoo/inferno/pull/280)
 
 ## [0.11.14] - 2023-01-21
 ### Added

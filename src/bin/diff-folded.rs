@@ -4,6 +4,7 @@ use std::path::PathBuf;
 use clap::{ArgAction, Parser};
 use env_logger::Env;
 use inferno::differential::{self, Options};
+use is_terminal::IsTerminal;
 
 #[derive(Debug, Parser)]
 #[clap(
@@ -88,7 +89,7 @@ fn main() -> io::Result<()> {
 
     let (folded1, folded2, options) = opt.into_parts();
 
-    if atty::is(atty::Stream::Stdout) {
+    if std::io::stdout().is_terminal() {
         differential::from_files(options, folded1, folded2, io::stdout().lock())
     } else {
         differential::from_files(
