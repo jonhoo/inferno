@@ -93,6 +93,13 @@ fn collapse_guess_vsprof() {
 }
 
 #[test]
+fn collapse_guess_xctrace() {
+    let test_file = "./tests/data/collapse-xctrace/basic.xml";
+    let result_file = "./tests/data/collapse-xctrace/results/basic.folded";
+    test_collapse_guess(test_file, result_file, false).unwrap()
+}
+
+#[test]
 fn collapse_guess_unknown_format_should_log_error() {
     test_collapse_guess_logs(
         "./tests/data/collapse-guess/unknown-format.txt",

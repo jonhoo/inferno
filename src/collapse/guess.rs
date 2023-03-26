@@ -3,7 +3,7 @@ use std::io::{self, Cursor};
 
 use log::{error, info};
 
-use crate::collapse::{self, dtrace, ghcprof, perf, sample, vsprof, vtune, Collapse};
+use crate::collapse::{self, dtrace, ghcprof, perf, sample, vsprof, vtune, xctrace, Collapse};
 
 const LINES_PER_ITERATION: usize = 10;
 
@@ -70,6 +70,7 @@ impl Collapse for Folder {
         let mut sample = sample::Folder::default();
         let mut vtune = vtune::Folder::default();
         let mut vsprof = vsprof::Folder::default();
+        let mut xctrace = xctrace::Folder::default();
         let mut ghcprof = ghcprof::Folder::default();
 
         // Each Collapse impl gets its own flag in this array.
@@ -109,6 +110,7 @@ impl Collapse for Folder {
             try_collapse_impl!(sample, 2);
             try_collapse_impl!(vtune, 3);
             try_collapse_impl!(vsprof, 4);
+            try_collapse_impl!(xctrace, 5);
             try_collapse_impl!(ghcprof, 5);
 
             if eof {
