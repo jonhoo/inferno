@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Support for collapsing the xml output of the xctrace tool. [#286](https://github.com/jonhoo/inferno/pull/286)
+
 ### Changed
 
 ### Deprecated
