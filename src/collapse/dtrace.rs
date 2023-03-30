@@ -455,17 +455,18 @@ mod tests {
 
     #[test]
     fn test_collapse_multi_dtrace_non_utf8() {
-        let invalid_utf8 = unsafe { std::str::from_utf8_unchecked(&[0xf0, 0x28, 0x8c, 0xbc]) };
-        let invalid_stack = format!("genunix`cv_broadcast+0x1{}\n1\n\n", invalid_utf8);
-        let valid_stack = "genunix`cv_broadcast+0x1\n1\n\n";
+        let invalid_utf8 = &[0xf0, 0x28, 0x8c, 0xbc];
+        let mk_stack = |bytes: &[u8]| [b"genunix`cv_broadcast+0x1", bytes, b"\n1\n\n"].concat();
+        let invalid_stack = &mk_stack(invalid_utf8);
+        let valid_stack = &mk_stack(b"");
 
         let mut input = Vec::new();
         for _ in 0..100 {
-            input.extend_from_slice(valid_stack.as_bytes());
+            input.extend_from_slice(valid_stack);
         }
-        input.extend_from_slice(invalid_stack.as_bytes());
+        input.extend_from_slice(invalid_stack);
         for _ in 0..100 {
-            input.extend_from_slice(valid_stack.as_bytes());
+            input.extend_from_slice(valid_stack);
         }
 
         let mut folder = Folder {
