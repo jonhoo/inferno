@@ -73,7 +73,7 @@ pub enum Palette {
     ///
     /// See [`BasicPalette`] for details.
     Basic(BasicPalette),
-    /// A semantic color palette in which different hues are used to signifiy semantic aspects of
+    /// A semantic color palette in which different hues are used to signify semantic aspects of
     /// different function names (kernel functions, JIT functions, etc.).
     Multi(MultiPalette),
 }
@@ -122,7 +122,7 @@ pub enum BasicPalette {
     Orange,
 }
 
-/// A semantic color palette in which different hues are used to signifiy semantic aspects of
+/// A semantic color palette in which different hues are used to signify semantic aspects of
 /// different function names (kernel functions, JIT functions, etc.).
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum MultiPalette {
