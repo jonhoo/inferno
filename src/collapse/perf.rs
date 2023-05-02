@@ -744,6 +744,7 @@ mod tests {
     }
 
     static INPUT: Lazy<Vec<PathBuf>> = Lazy::new(|| {
+        common::testing::check_flamegraph_git_submodule_initialised();
         [
             "./flamegraph/example-perf-stacks.txt.gz",
             "./flamegraph/test/perf-cycles-instructions-01.txt",

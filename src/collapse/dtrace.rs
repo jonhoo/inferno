@@ -415,6 +415,7 @@ mod tests {
     use crate::collapse::Collapse;
 
     static INPUT: Lazy<Vec<PathBuf>> = Lazy::new(|| {
+        common::testing::check_flamegraph_git_submodule_initialised();
         [
             "./flamegraph/example-dtrace-stacks.txt",
             "./tests/data/collapse-dtrace/flamegraph-bug.txt",
