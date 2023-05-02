@@ -786,9 +786,9 @@ pub(crate) mod testing {
     }
 
     pub(crate) fn check_flamegraph_git_submodule_initialised() {
-        if !std::path::Path::new("./flamegraph/.git").exists() {
+        if !Path::new("./flamegraph/.git").exists() {
             panic!(
-                "Some tests require the flamegraph submodule to be initialised, but it is not.
+                "Some tests require the flamegraph git submodule to be initialised, but it is not.
 Initialise it with `git submodule update --init flamegraph`."
             );
         }

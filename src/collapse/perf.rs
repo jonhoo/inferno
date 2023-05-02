@@ -779,6 +779,7 @@ mod tests {
 
     #[test]
     fn test_collapse_multi_perf_simple() -> io::Result<()> {
+        common::testing::check_flamegraph_git_submodule_initialised();
         let path = "./flamegraph/test/perf-cycles-instructions-01.txt";
         let mut file = fs::File::open(path)?;
         let mut bytes = Vec::new();
