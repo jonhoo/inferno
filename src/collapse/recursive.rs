@@ -75,7 +75,7 @@ impl CollapsePrivate for Folder {
             let (stack, count) = Self::line_parts(&line)
                 .ok_or_else(|| io::Error::from(io::ErrorKind::InvalidData))?;
 
-            occurrences.insert_or_add(Self::collapse_stack(stack).into_owned(), count);
+            occurrences.insert_or_add(Self::collapse_stack(stack.into()).into_owned(), count);
         }
         Ok(())
     }
@@ -115,37 +115,43 @@ impl CollapsePrivate for Folder {
 impl Folder {
     fn line_parts(line: &str) -> Option<(&str, usize)> {
         let mut parts = line.rsplitn(2, ' ');
-        let stack = parts.next()?;
         let count = parts.next()?.parse().ok()?;
+        let stack = parts.next()?;
         Some((stack, count))
     }
 
-    fn collapse_stack(stack: &str) -> Cow<str> {
+    fn collapse_stack(stack: Cow<str>) -> Cow<str> {
         // First, determine whether we can avoid allocation by just returning
         // the original stack (in the case that there is no recursion, which is
         // likely the mainline case).
-        if !Self::is_recursive(stack) {
-            return Cow::Borrowed(stack);
+        if !Self::is_recursive(&stack) {
+            return stack;
         }
 
-        // There is recursion, so we can't get away without allocating.
-        let mut result = vec![];
+        // There is recursion, so we can't get away without allocating a new
+        // String.
+        let mut result = String::with_capacity(stack.len());
         let mut last = None;
         for frame in stack.split(';') {
             match last {
                 None => {
-                    result.push(frame);
+                    result.push_str(frame);
+                    result.push(';')
                 }
                 Some(l) => {
                     if l != frame {
-                        result.push(frame);
+                        result.push_str(frame);
+                        result.push(';')
                     }
                 }
             }
             last = Some(frame);
         }
 
-        Cow::Owned(result.join(";"))
+        // Remove the trailing semicolon
+        result.pop();
+
+        result.into()
     }
 
     /// Determine whether or not a stack contains direct recursion.
@@ -167,5 +173,43 @@ impl Folder {
             }
         }
         false
+    }
+}
+
+#[cfg(test)]
+mod test {
+
+    use super::*;
+
+    #[test]
+    fn test_collapse_stack() {
+        assert_eq!(Folder::collapse_stack("".into()), "");
+        assert_eq!(Folder::collapse_stack("single".into()), "single");
+        assert_eq!(
+            Folder::collapse_stack("not;recursive".into()),
+            "not;recursive"
+        );
+        assert_eq!(
+            Folder::collapse_stack("has;some;some;recursion;recursion".into()),
+            "has;some;recursion"
+        );
+        assert_eq!(
+            Folder::collapse_stack("co;recursive;co;recursive".into()),
+            "co;recursive;co;recursive"
+        );
+    }
+
+    #[test]
+    fn test_line_parts() {
+        assert_eq!(
+            Folder::line_parts("foo;bar;baz 42"),
+            Some(("foo;bar;baz", 42))
+        );
+        assert_eq!(
+            Folder::line_parts("something; including spaces  42"),
+            Some(("something; including spaces ", 42))
+        );
+        assert_eq!(Folder::line_parts(""), None);
+        assert_eq!(Folder::line_parts("no;number"), None);
     }
 }
