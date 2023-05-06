@@ -35,9 +35,18 @@ pub mod sample;
 ///   [crate-level documentation]: ../../index.html
 pub mod vtune;
 
-/// Collapse direct recursive backtraces
+/// Collapse direct recursive backtraces.
 ///
-/// Post-process a stack list and merge direct recursive calls
+/// Post-process a stack list and merge direct recursive calls.
+/// 
+/// For example, collapses
+/// ```text
+/// main;recursive;recursive;recursive;helper 1
+/// ```
+/// into
+/// ```text
+/// main;recursive;helper 1
+/// ```
 ///
 /// See the [crate-level documentation] for details.
 ///
