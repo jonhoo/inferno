@@ -626,21 +626,27 @@ where
                     "{} ({} {}, {:.2}%)",
                     function, samples_txt, opt.count_name, pct
                 ),
-                // Special case delta == 0 so we don't format percentage with a + sign.
-                Some(delta) if delta == 0 => write!(
-                    buffer,
-                    "{} ({} {}, {:.2}%; 0.00%)",
-                    function, samples_txt, opt.count_name, pct,
-                ),
-                Some(mut delta) => {
-                    if opt.negate_differentials {
-                        delta = -delta;
-                    }
-                    let delta_pct = (100 * delta) as f64 / (timemax as f64 * opt.factor);
+                Some(delta) => {
+                    let samples = frame.end_time as isize - frame.start_time as isize;
+                    let (old, new) = if opt.negate_differentials {
+                        (samples, samples - delta)
+                    } else {
+                        (samples - delta, samples)
+                    };
+                    let change = match (old, new) {
+                        (0, _) => "↑ added in new".to_string(),
+                        (_, 0) => "↓ removed in new".to_string(),
+                        (x, y) if x == y => "unchanged".to_string(),
+                        (old, new) => {
+                            let ratio = new as f64 / old as f64;
+                            let direction = if ratio > 1.0 { '↑' } else { '↓' };
+                            format!("{} new = {:.3} × old", direction, ratio)
+                        }
+                    };
                     write!(
                         buffer,
-                        "{} ({} {}, {:.2}%; {:+.2}%)",
-                        function, samples_txt, opt.count_name, pct, delta_pct
+                        "{} ({} {}, {:.2}%; {})",
+                        function, samples_txt, opt.count_name, pct, change
                     )
                 }
             }
