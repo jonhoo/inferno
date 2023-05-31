@@ -634,19 +634,22 @@ where
                         (samples - delta, samples)
                     };
                     let change = match (old, new) {
-                        (0, _) => "↑ added in new".to_string(),
-                        (_, 0) => "↓ removed in new".to_string(),
+                        (0, _) => "all newly added".to_string(),
+                        (_, 0) => "were all removed".to_string(),
                         (x, y) if x == y => "unchanged".to_string(),
                         (old, new) => {
-                            let ratio = new as f64 / old as f64;
-                            let direction = if ratio > 1.0 { '↑' } else { '↓' };
-                            format!("{} new = {:.3} × old", direction, ratio)
+                            let (ratio, compared_to) = if opt.negate_differentials {
+                                (old as f64 / new as f64, "new")
+                            } else {
+                                (new as f64 / old as f64, "old")
+                            };
+                            format!(" = {ratio:.3} × {compared_to} {}", opt.count_name)
                         }
                     };
                     write!(
                         buffer,
-                        "{} ({} {}, {:.2}%; {})",
-                        function, samples_txt, opt.count_name, pct, change
+                        "{} ({} {} {}, {:.2}%)",
+                        function, samples_txt, opt.count_name, change, pct
                     )
                 }
             }
