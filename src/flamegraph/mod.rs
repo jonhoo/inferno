@@ -636,7 +636,7 @@ where
                     let change = match (old, new) {
                         (0, _) => "all newly added".to_string(),
                         (_, 0) => "were all removed".to_string(),
-                        (x, y) if x == y => "unchanged".to_string(),
+                        (x, y) if x == y => "".to_string(),
                         (old, new) => {
                             let (ratio, compared_to) = if opt.negate_differentials {
                                 (old as f64 / new as f64, "new")
