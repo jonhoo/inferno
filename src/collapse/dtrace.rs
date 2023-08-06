@@ -415,6 +415,7 @@ mod tests {
     use crate::collapse::Collapse;
 
     static INPUT: Lazy<Vec<PathBuf>> = Lazy::new(|| {
+        common::testing::check_flamegraph_git_submodule_initialised();
         [
             "./flamegraph/example-dtrace-stacks.txt",
             "./tests/data/collapse-dtrace/flamegraph-bug.txt",
@@ -482,6 +483,7 @@ mod tests {
 
     #[test]
     fn test_collapse_multi_dtrace_simple() -> io::Result<()> {
+        common::testing::check_flamegraph_git_submodule_initialised();
         let path = "./flamegraph/example-dtrace-stacks.txt";
         let mut file = fs::File::open(path)?;
         let mut bytes = Vec::new();
