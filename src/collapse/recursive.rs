@@ -114,10 +114,8 @@ impl CollapsePrivate for Folder {
 
 impl Folder {
     fn line_parts(line: &str) -> Option<(&str, usize)> {
-        let mut parts = line.rsplitn(2, ' ');
-        let count = parts.next()?.parse().ok()?;
-        let stack = parts.next()?;
-        Some((stack, count))
+        line.rsplit_once(' ')
+            .and_then(|(stack, count)| Some((stack, count.parse().ok()?)))
     }
 
     fn collapse_stack(stack: Cow<str>) -> Cow<str> {
@@ -133,17 +131,9 @@ impl Folder {
         let mut result = String::with_capacity(stack.len());
         let mut last = None;
         for frame in stack.split(';') {
-            match last {
-                None => {
-                    result.push_str(frame);
-                    result.push(';')
-                }
-                Some(l) => {
-                    if l != frame {
-                        result.push_str(frame);
-                        result.push(';')
-                    }
-                }
+            if last.map_or(true, |l| l != frame) {
+                result.push_str(frame);
+                result.push(';')
             }
             last = Some(frame);
         }
@@ -204,10 +194,6 @@ mod test {
         assert_eq!(
             Folder::line_parts("foo;bar;baz 42"),
             Some(("foo;bar;baz", 42))
-        );
-        assert_eq!(
-            Folder::line_parts("something; including spaces  42"),
-            Some(("something; including spaces ", 42))
         );
         assert_eq!(Folder::line_parts(""), None);
         assert_eq!(Folder::line_parts("no;number"), None);

@@ -38,7 +38,7 @@ pub mod vtune;
 /// Collapse direct recursive backtraces.
 ///
 /// Post-process a stack list and merge direct recursive calls.
-/// 
+///
 /// For example, collapses
 /// ```text
 /// main;recursive;recursive;recursive;helper 1
