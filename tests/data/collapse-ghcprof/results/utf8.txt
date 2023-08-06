@@ -1,0 +1,14 @@
+MAIN.MAIN 26
+MAIN.MAIN;GHC.Conc.Signal.CAF 0
+MAIN.MAIN;GHC.Event.Thread.CAF 0
+MAIN.MAIN;GHC.IO.Encoding.CAF 0
+MAIN.MAIN;GHC.IO.Encoding.Iconv.CAF 0
+MAIN.MAIN;GHC.IO.Handle.FD.CAF 0
+MAIN.MAIN;Lib.CAF:f_rPV 0
+MAIN.MAIN;Lib.CAF:一些函数1 0
+MAIN.MAIN;Lib.CAF:一些函数1;Lib.一二三 0
+MAIN.MAIN;Lib.CAF:一些函数1;Lib.一些函数 0
+MAIN.MAIN;Lib.CAF:一些函数1;Lib.你好世界 0
+MAIN.MAIN;Lib.你好世界 974
+MAIN.MAIN;Main.CAF:main1 0
+MAIN.MAIN;Main.CAF:main1;Main.main 0
