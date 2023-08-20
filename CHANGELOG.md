@@ -11,6 +11,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [0.11.16] - 2023-08-20
+### Added
+
+- Added stackcollapse-recursive. [#291](https://github.com/jonhoo/inferno/pull/291)
+
+### Changed
+
+- Upgraded indexmap and libflate to 2.0.
+
 ## [0.11.15] - 2023-02-11
 ### Changed
 
