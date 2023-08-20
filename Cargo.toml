@@ -103,6 +103,11 @@ path = "src/bin/collapse-guess.rs"
 required-features = ["cli"]
 
 [[bin]]
+name = "inferno-collapse-recursive"
+path = "src/bin/collapse-recursive.rs"
+required-features = ["cli"]
+
+[[bin]]
 name = "inferno-flamegraph"
 path = "src/bin/flamegraph.rs"
 required-features = ["cli"]
