@@ -85,9 +85,9 @@ impl Collapse for Folder {
                 // "%time %alloc   %time %alloc  ticks  bytes"
                 let source = match self.opt.source {
                     Source::PercentTime => l.find("%time").unwrap(),
-                    // ticks and bytes columns are weirdly aligned so find the end of the col before
-                    Source::Ticks => l.rfind("%alloc").unwrap() + 6,
-                    Source::Bytes => l.rfind("ticks").unwrap() + 5,
+                    // See note above about ticks and bytes columns
+                    Source::Ticks => one_off_end_of_col_before(l.as_ref(), "ticks")?,
+                    Source::Bytes => one_off_end_of_col_before(l.as_ref(), "bytes")?,
                 };
                 break Cols {
                     cost_centre,
@@ -149,6 +149,16 @@ impl Collapse for Folder {
         }
         None
     }
+}
+
+fn one_off_end_of_col_before(line: &str, col: &str) -> io::Result<usize> {
+    let Some(col_start) = line.find(col) else {
+        return invalid_data_error!("Expected '{col}' column but it was not present");
+    };
+    let Some(col_end) = line[..col_start].rfind(|c: char| !c.is_whitespace()) else {
+        return invalid_data_error!("Expected a column before '{col}' but there was none");
+    };
+    Ok(col_end + 1)
 }
 
 impl From<Options> for Folder {
