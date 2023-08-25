@@ -18,16 +18,16 @@ pub struct Options {
     pub source: Source,
 }
 
-/// `ghcprof` folder configuration options.
+/// Which prof column to use as the cost centre of the output stacks
 #[derive(Clone, Debug, Default)]
 #[non_exhaustive]
 pub enum Source {
     #[default]
-    /// The %time column
+    /// The indivial %time column representing individual time as a percent of the total
     PercentTime,
-    /// The ticks column
+    /// The ticks column representing individual runtime ticks
     Ticks,
-    /// The bytes column
+    /// The bytes column representing individual bytes allocated
     Bytes,
 }
 
@@ -46,7 +46,7 @@ pub struct Folder {
     opt: Options,
 }
 
-// the first character and last + 1
+// The starting character offset of important columns
 #[derive(Debug)]
 struct Cols {
     cost_centre: usize,
@@ -78,9 +78,10 @@ impl Collapse for Folder {
                 let module = l.find(START_LINE[2]).unwrap_or(0);
                 // Pick out these fixed columns, first two are individual only
                 // "%time %alloc   %time %alloc"
-                // `ticks` and `bytes` columns might appear on the end
+                // `ticks` and `bytes` columns are optional and might appear on the end
                 // ticks header is right aligned
-                // bytes header tries to be right aligned but has a max width
+                // bytes header is right aligned
+                //   - BUT it has a max width of 9 whilst its values can exceed (but are always space separted)
                 // "%time %alloc   %time %alloc  ticks  bytes"
                 let source = match self.opt.source {
                     Source::PercentTime => l.find("%time").unwrap(),
@@ -103,6 +104,7 @@ impl Collapse for Folder {
         loop {
             line.clear();
             if reader.read_until(b'\n', &mut line)? == 0 {
+                // The format is not expected to contain any blank lines within the callgraph
                 break;
             }
             let l = String::from_utf8_lossy(&line);
@@ -196,6 +198,8 @@ impl Folder {
                 line.chars()
                     .skip(col_start)
                     .skip_while(|c| c.is_whitespace())
+                    // it is expected that the values to extract do not contain whitespace
+                    // since this is used for functions/modules/costs where it is not allowed
                     .take_while(|c| !c.is_whitespace())
                     .collect::<String>()
             };
@@ -203,9 +207,10 @@ impl Folder {
             if let Ok(cost) = cost.trim().parse::<f64>() {
                 let func = string_range(cols.cost_centre);
                 let module = string_range(cols.module);
-                // Costs include self + calls (at least in what we parse)
+                // The columns we extract costs from all exclude the cost of their children
                 self.current_cost = match self.opt.source {
-                    Source::PercentTime => cost * 10.0, // Do not lose the 1 decimal place
+                    // We must `insert_or_add` a `usize` so convert to per-mille to not lose the 1dp
+                    Source::PercentTime => cost * 10.0, 
                     Source::Ticks => cost,
                     Source::Bytes => cost,
                 } as usize;
