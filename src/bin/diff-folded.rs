@@ -1,10 +1,9 @@
-use std::io;
+use std::io::{self, IsTerminal};
 use std::path::PathBuf;
 
 use clap::{ArgAction, Parser};
 use env_logger::Env;
 use inferno::differential::{self, Options};
-use is_terminal::IsTerminal;
 
 #[derive(Debug, Parser)]
 #[clap(
