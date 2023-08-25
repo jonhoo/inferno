@@ -1,4 +1,4 @@
-use std::io;
+use std::io::{self, IsTerminal};
 use std::path::{Path, PathBuf};
 
 use clap::builder::TypedValueParser;
@@ -11,7 +11,6 @@ use inferno::flamegraph::{self, defaults, Direction, Options, Palette, TextTrunc
 
 #[cfg(feature = "nameattr")]
 use inferno::flamegraph::FuncFrameAttrsMap;
-use is_terminal::IsTerminal;
 
 #[derive(Debug, Parser)]
 #[clap(name = "inferno-flamegraph", about)]

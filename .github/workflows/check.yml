@@ -75,7 +75,7 @@ jobs:
     # https://docs.github.com/en/actions/learn-github-actions/contexts#context-availability
     strategy:
       matrix:
-        msrv: [1.64.0] # clap 4 (via clap_lex)
+        msrv: [1.70.0] # clap 4
     name: ubuntu / ${{ matrix.msrv }}
     steps:
       - uses: actions/checkout@v3

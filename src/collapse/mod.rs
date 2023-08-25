@@ -60,16 +60,14 @@ pub mod recursive;
 ///   [crate-level documentation]: ../../index.html
 pub mod vsprof;
 
-use is_terminal::IsTerminal;
-
 // DEFAULT_NTHREADS is public because we use it in the help text of the binaries,
 // but it doesn't need to be exposed to library users, hence #[doc(hidden)].
 #[doc(hidden)]
 pub use self::common::DEFAULT_NTHREADS;
 
-use std::fs::File;
 use std::io;
 use std::path::Path;
+use std::{fs::File, io::IsTerminal};
 
 use self::common::{CollapsePrivate, CAPACITY_READER};
 
