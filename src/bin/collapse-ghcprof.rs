@@ -1,7 +1,7 @@
 use std::io;
 use std::path::PathBuf;
 
-use clap::{ArgAction, Parser};
+use clap::{ArgAction, ArgGroup, Parser};
 use env_logger::Env;
 use inferno::collapse::ghcprof::{Folder, Options, Source};
 use inferno::collapse::Collapse;
@@ -14,6 +14,11 @@ use inferno::collapse::Collapse;
 [1] This processes the .prof output of GHC (Glorious Haskell Compiler)
     "
 )]
+#[command(group(
+    ArgGroup::new("source")
+        .required(false)
+        .args(["bytes", "ticks"]),
+))]
 struct Opt {
     // ************* //
     // *** FLAGS *** //
@@ -47,11 +52,11 @@ impl Opt {
         options.source =
             if self.ticks {
                 Source::Ticks
-            } else if self.bytes {
-                Source::Bytes
-            } else {
-                Source::PercentTime
-            };
+        } else if self.bytes {
+            Source::Bytes
+        } else {
+            Source::PercentTime
+        };
         (self.infile, options)
     }
 }

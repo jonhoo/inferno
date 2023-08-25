@@ -104,4 +104,14 @@ fn collapse_ghcprof_cli() {
     let output = child.wait_with_output().expect("Failed to read stdout");
     let expected = BufReader::new(File::open(expected_file).unwrap());
     common::compare_results(Cursor::new(output.stdout), expected, expected_file, false);
+
+    // Test --ticks and --bytes conflict
+    let output = Command::cargo_bin("inferno-collapse-ghcprof")
+        .unwrap()
+        .arg(input_file)
+        .arg("--ticks")
+        .arg("--bytes")
+        .output()
+        .expect("failed to execute process");
+    assert_eq!(output.status.success(), false);
 }
