@@ -202,14 +202,14 @@ impl Folder {
             let cost = string_range(cols.source);
             if let Ok(cost) = cost.trim().parse::<f64>() {
                 let func = string_range(cols.cost_centre);
-                let file = string_range(cols.module);
+                let module = string_range(cols.module);
                 // Costs include self + calls (at least in what we parse)
                 self.current_cost = match self.opt.source {
                     Source::PercentTime => cost * 10.0, // Do not lose the 1 decimal place
                     Source::Ticks => cost,
                     Source::Bytes => cost,
                 } as usize;
-                self.stack.push(format!("{}.{}", file.trim(), func.trim()));
+                self.stack.push(format!("{}.{}", module.trim(), func.trim()));
                 // identical stacks from other threads can appear so need to insert or add
                 occurrences.insert_or_add(self.stack.join(";"), self.current_cost);
             } else {
