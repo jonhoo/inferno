@@ -75,7 +75,7 @@ impl Collapse for Folder {
                 .eq(START_LINE.iter().cloned())
             {
                 let cost_centre = 0;
-                let module = l.find(START_LINE[2]).unwrap_or(0);
+                let module = l.find("MODULE").unwrap_or(0);
                 // Pick out these fixed columns, first two are individual only
                 // "%time %alloc   %time %alloc"
                 // `ticks` and `bytes` columns are optional and might appear on the end
