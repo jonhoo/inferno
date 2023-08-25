@@ -103,7 +103,7 @@ where
         if let Some((stack, count)) =
             parse_line(&l, opt.strip_hex, &mut stripped_fractional_samples)
         {
-            let mut counts = stack_counts.entry(stack).or_default();
+            let counts = stack_counts.entry(stack).or_default();
             if is_first {
                 counts.first += count;
             } else {

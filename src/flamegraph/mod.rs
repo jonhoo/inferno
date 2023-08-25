@@ -334,11 +334,12 @@ impl<'a> Default for Options<'a> {
 }
 
 /// The direction the plot should grow.
-#[derive(Debug, Clone, Copy, Eq, PartialEq)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Default)]
 pub enum Direction {
     /// Stacks grow from the bottom to the top.
     ///
     /// The `(all)` meta frame will be at the bottom.
+    #[default]
     Straight,
 
     /// Stacks grow from the top to the bottom.
@@ -347,26 +348,15 @@ pub enum Direction {
     Inverted,
 }
 
-impl Default for Direction {
-    fn default() -> Self {
-        Direction::Straight
-    }
-}
-
 /// The direction text is truncated when it's too long.
-#[derive(Debug, Clone, Copy, Eq, PartialEq)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Default)]
 pub enum TextTruncateDirection {
     /// Truncate text on the left.
+    #[default]
     Left,
 
     /// Truncate text on the right.
     Right,
-}
-
-impl Default for TextTruncateDirection {
-    fn default() -> Self {
-        TextTruncateDirection::Left
-    }
 }
 
 struct Rectangle {
@@ -694,7 +684,7 @@ where
         };
         filled_rectangle(&mut svg, &mut buffer, &rect, color, &mut cache_rect)?;
 
-        let fitchars = (rect.width_pct() as f64
+        let fitchars = (rect.width_pct()
             / (100.0 * opt.font_size as f64 * opt.font_width / image_width))
             .trunc() as usize;
         let text: svg::TextArgument<'_> = if fitchars >= 3 {

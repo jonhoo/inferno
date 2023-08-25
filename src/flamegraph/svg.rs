@@ -87,9 +87,9 @@ where
     Ok(())
 }
 
-pub(super) fn write_prelude<'a, W>(
+pub(super) fn write_prelude<W>(
     svg: &mut Writer<W>,
-    style_options: &StyleOptions<'a>,
+    style_options: &StyleOptions,
     opt: &Options<'_>,
 ) -> quick_xml::Result<()>
 where

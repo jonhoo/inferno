@@ -106,9 +106,9 @@ pub(super) mod js {
         } else if name.contains(':') {
             return BasicPalette::Aqua;
         } else if let Some(ai) = name.find('/') {
-            if (&name[ai..]).contains("node_modules/") {
+            if name[ai..].contains("node_modules/") {
                 return BasicPalette::Purple;
-            } else if (&name[ai..]).contains(".js") {
+            } else if name[ai..].contains(".js") {
                 return BasicPalette::Green;
             }
         }
