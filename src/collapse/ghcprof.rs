@@ -5,7 +5,7 @@ use log::warn;
 use crate::collapse::common::Occurrences;
 use crate::collapse::Collapse;
 
-// If source is included traces start after this line (ignoring spaces)
+// These are the identifying words of the callgraph table, note that ticks and bytes columns are optional so not present
 static START_LINE: &[&str] = &[
     "COST", "CENTRE", "MODULE", "SRC", "no.", "entries", "%time", "%alloc", "%time", "%alloc",
 ];
