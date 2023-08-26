@@ -152,11 +152,13 @@ impl Collapse for Folder {
 }
 
 fn one_off_end_of_col_before(line: &str, col: &str) -> io::Result<usize> {
-    let Some(col_start) = line.find(col) else {
-        return invalid_data_error!("Expected '{col}' column but it was not present");
+    let col_start = match line.find(col) {
+        Some(col_start) => col_start,
+        _ => return invalid_data_error!("Expected '{col}' column but it was not present"),
     };
-    let Some(col_end) = line[..col_start].rfind(|c: char| !c.is_whitespace()) else {
-        return invalid_data_error!("Expected a column before '{col}' but there was none");
+    let col_end = match line[..col_start].rfind(|c: char| !c.is_whitespace()) {
+        Some(col_end) => col_end,
+        _ => return invalid_data_error!("Expected a column before '{col}' but there was none"),
     };
     Ok(col_end + 1)
 }
@@ -220,11 +222,12 @@ impl Folder {
                 // The columns we extract costs from all exclude the cost of their children
                 self.current_cost = match self.opt.source {
                     // We must `insert_or_add` a `usize` so convert to per-mille to not lose the 1dp
-                    Source::PercentTime => cost * 10.0, 
+                    Source::PercentTime => cost * 10.0,
                     Source::Ticks => cost,
                     Source::Bytes => cost,
                 } as usize;
-                self.stack.push(format!("{}.{}", module.trim(), func.trim()));
+                self.stack
+                    .push(format!("{}.{}", module.trim(), func.trim()));
                 // identical stacks from other threads can appear so need to insert or add
                 occurrences.insert_or_add(self.stack.join(";"), self.current_cost);
             } else {
