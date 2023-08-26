@@ -23,13 +23,14 @@ struct Opt {
     // ************* //
     // *** FLAGS *** //
     // ************* //
-    /// Count %time (the default)
+    /// Source stack cost centre from the %time column (individual total % of runtime)
+    /// (This is the default if no cost centre specified)
     #[clap(long = "time")]
     time: bool,
-    /// Count bytes
+    /// Source stack cost centre from the bytes column (bytes allocated)
     #[clap(long = "bytes")]
     bytes: bool,
-    /// Count ticks
+    /// Source stack cost centre from the ticks column (runtime ticks)
     #[clap(long = "ticks")]
     ticks: bool,
 
@@ -44,7 +45,7 @@ struct Opt {
     // ************ //
     // *** ARGS *** //
     // ************ //
-    /// ghcprof CSV output file, or STDIN if not specified
+    /// ghc .prof output file, or STDIN if not specified
     #[clap(value_name = "PATH")]
     infile: Option<PathBuf>,
 }
