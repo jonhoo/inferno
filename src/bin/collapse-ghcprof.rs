@@ -17,12 +17,15 @@ use inferno::collapse::Collapse;
 #[command(group(
     ArgGroup::new("source")
         .required(false)
-        .args(["bytes", "ticks"]),
+        .args(["time", "bytes", "ticks"]),
 ))]
 struct Opt {
     // ************* //
     // *** FLAGS *** //
     // ************* //
+    /// Count %time (the default)
+    #[clap(long = "time")]
+    time: bool,
     /// Count bytes
     #[clap(long = "bytes")]
     bytes: bool,
@@ -49,11 +52,12 @@ struct Opt {
 impl Opt {
     fn into_parts(self) -> (Option<PathBuf>, Options) {
         let mut options = Options::default();
-        options.source =
-            if self.ticks {
-                Source::Ticks
+        options.source = if self.ticks {
+            Source::Ticks
         } else if self.bytes {
             Source::Bytes
+        } else if self.time {
+            Source::PercentTime
         } else {
             Source::PercentTime
         };
