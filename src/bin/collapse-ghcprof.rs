@@ -11,7 +11,7 @@ use inferno::collapse::Collapse;
     name = "inferno-collapse-ghcprof",
     about,
     after_help = "\
-[1] This processes the .prof output of GHC (Glorious Haskell Compiler)
+[1] This processes the .prof output of GHC (Glasgow Haskell Compiler)
     "
 )]
 #[command(group(
