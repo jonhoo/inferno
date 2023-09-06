@@ -460,13 +460,16 @@ where
             lines
                 .into_iter()
                 .filter_map(|line| {
-                    let mut cursor = line.len();
-                    for symbol in line.rsplit(';') {
-                        cursor -= symbol.len();
-                        if opt.base.iter().any(|b| b == symbol) {
-                            break;
+                    let mut cursor = 0;
+                    if let Some(symbols) = line.split_whitespace().next() {
+                        cursor = symbols.len();
+                        for symbol in symbols.rsplit(';') {
+                            cursor -= symbol.len();
+                            if opt.base.iter().any(|b| b == symbol) {
+                                break;
+                            }
+                            cursor = cursor.saturating_sub(1);
                         }
-                        cursor = cursor.saturating_sub(1);
                     }
                     if cursor == 0 {
                         None
