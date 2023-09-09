@@ -84,7 +84,9 @@ impl Collapse for Folder {
                 //   - BUT it has a max width of 9 whilst its values can exceed (but are always space separted)
                 // "%time %alloc   %time %alloc  ticks  bytes"
                 let source = match self.opt.source {
-                    Source::PercentTime => l.find("%time").unwrap(),
+                    Source::PercentTime => l
+                        .find("%time")
+                        .expect("%time is present from matching START_LINE"),
                     // See note above about ticks and bytes columns
                     Source::Ticks => one_off_end_of_col_before(l.as_ref(), "ticks")?,
                     Source::Bytes => one_off_end_of_col_before(l.as_ref(), "bytes")?,
