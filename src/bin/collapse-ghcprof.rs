@@ -57,8 +57,6 @@ impl Opt {
             Source::Ticks
         } else if self.bytes {
             Source::Bytes
-        } else if self.time {
-            Source::PercentTime
         } else {
             Source::PercentTime
         };
