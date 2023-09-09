@@ -42,9 +42,10 @@ const GRAY_GRADIENT: (&str, &str) = ("#f8f8f8", "#e8e8e8");
 ///  - All other [`MultiPalette`] variants default to [`BackgroundColor::Yellow`].
 ///
 /// `BackgroundColor::default()` is `Yellow`.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Default)]
 pub enum BackgroundColor {
     /// A yellow gradient from `#EEEEEE` to `#EEEEB0`.
+    #[default]
     Yellow,
     /// A blue gradient from `#EEEEEE` to `#E0E0FF`.
     Blue,
@@ -56,12 +57,6 @@ pub enum BackgroundColor {
     ///
     /// Expressed in string form as `#RRGGBB` where each component is written in hexadecimal.
     Flat(Color),
-}
-
-impl Default for BackgroundColor {
-    fn default() -> Self {
-        BackgroundColor::Yellow
-    }
 }
 
 /// A flame graph color palette.

@@ -22,7 +22,7 @@ fn test_diff_folded(
             if e.kind() == io::ErrorKind::NotFound {
                 // be nice to the dev and make the file
                 let mut f = File::create(expected_result_file).unwrap();
-                differential::from_files(options, &infile1, &infile2, &mut f)?;
+                differential::from_files(options, infile1, infile2, &mut f)?;
                 fs::metadata(expected_result_file).unwrap()
             } else {
                 return Err(e);

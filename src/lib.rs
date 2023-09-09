@@ -146,6 +146,7 @@
 #![deny(missing_docs)]
 #![warn(unreachable_pub)]
 #![cfg_attr(all(test, feature = "nightly"), feature(test))]
+#![allow(clippy::disallowed_names)]
 
 #[cfg(all(test, feature = "nightly"))]
 extern crate test;
