@@ -60,6 +60,13 @@ pub mod recursive;
 ///   [crate-level documentation]: ../../index.html
 pub mod vsprof;
 
+/// Stack collapsing for the output of the [GHC's built-in profiler](https://downloads.haskell.org/ghc/latest/docs/users_guide/profiling.html).
+///
+/// See the [crate-level documentation] for details.
+///
+///   [crate-level documentation]: ../../index.html
+pub mod ghcprof;
+
 use is_terminal::IsTerminal;
 
 // DEFAULT_NTHREADS is public because we use it in the help text of the binaries,

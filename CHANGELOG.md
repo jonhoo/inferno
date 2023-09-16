@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 
+- Added collapse-ghcprof. [#300](https://github.com/jonhoo/inferno/pull/300)
+
 ### Changed
 
 ### Removed

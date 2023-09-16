@@ -98,6 +98,11 @@ path = "src/bin/collapse-vsprof.rs"
 required-features = ["cli"]
 
 [[bin]]
+name = "inferno-collapse-ghcprof"
+path = "src/bin/collapse-ghcprof.rs"
+required-features = ["cli"]
+
+[[bin]]
 name = "inferno-collapse-guess"
 path = "src/bin/collapse-guess.rs"
 required-features = ["cli"]
