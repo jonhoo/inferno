@@ -22,7 +22,7 @@ multithreaded = ["dashmap", "crossbeam-utils", "crossbeam-channel"]
 nameattr = ["indexmap"]
 
 [dependencies]
-ahash = "0.8"
+ahash = "0.8.6"
 is-terminal = "0.4.3"
 crossbeam-utils = { version = "0.8", optional = true }
 crossbeam-channel = { version = "0.5", optional = true }
