@@ -11,6 +11,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [0.11.18] - 2023-11-11
+### Changed
+
+- Updated ahash version in Cargo.lock for binary consumers.
+  See https://github.com/tkaitchuck/aHash/issues/163.
+
+### Removed
+
 ## [0.11.17] - 2023-09-16
 ### Added
 
