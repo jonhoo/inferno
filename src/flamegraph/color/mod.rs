@@ -75,7 +75,7 @@ pub enum Palette {
 
 impl Palette {
     /// The valid set of palettes (via `FromStr`).
-    pub const VARIANTS: &[&'static str] = &[
+    pub const VARIANTS: &'static [&'static str] = &[
         "aqua", "blue", "green", "hot", "io", "java", "js", "mem", "orange", "perl", "python",
         "purple", "red", "rust", "wakeup", "yellow",
     ];
