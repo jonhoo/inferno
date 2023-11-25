@@ -15,6 +15,10 @@ license = "CDDL-1.0"
 
 exclude = ["/tests/**", "/flamegraph/**", "/*.perf"]
 
+[profile.release]
+strip = true   # To use flamegraph on inferno binaries, comment this line
+# debug = true # and uncomment this line.
+
 [features]
 default = ["cli", "multithreaded", "nameattr"]
 cli = ["clap", "env_logger"]
@@ -64,9 +68,6 @@ regex = { version = "1.6", default-features = false, features = ["std"] }
 # by our minimum supported rust version of 1.59.0, being on >= 1.0.145 is fine
 serde = { version = "1.0.145" }
 testing_logger = "0.1.1"
-
-[profile.release]
-debug = true
 
 [lib]
 name = "inferno"
