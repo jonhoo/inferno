@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- By default, make `cargo install` strip all binaries. [#310](https://github.com/jonhoo/inferno/pull/310)
+
 ### Removed
 
 ## [0.11.18] - 2023-11-11
