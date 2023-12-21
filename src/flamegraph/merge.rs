@@ -1,6 +1,6 @@
-use std::collections::HashMap;
 use std::io;
 use std::iter;
+use std::{collections::HashMap, sync::Arc};
 
 use log::warn;
 
@@ -128,10 +128,10 @@ where
         if !suppress_sort_check {
             if let Some(prev_line) = prev_line {
                 if prev_line > line {
-                    return Err(quick_xml::Error::Io(io::Error::new(
+                    return Err(quick_xml::Error::Io(Arc::new(io::Error::new(
                         io::ErrorKind::InvalidData,
                         "unsorted input lines detected",
-                    )));
+                    ))));
                 }
             }
         }
