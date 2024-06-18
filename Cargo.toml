@@ -31,7 +31,7 @@ ahash = "0.8"
 is-terminal = "0.4.3"
 crossbeam-utils = { version = "0.8", optional = true }
 crossbeam-channel = { version = "0.5", optional = true }
-dashmap = { version = "5", optional = true }
+dashmap = { version = "6", optional = true }
 env_logger = { version = "0.10", default-features = false, optional = true }
 indexmap = { version = "2.0", optional = true }
 itoa = "1"
