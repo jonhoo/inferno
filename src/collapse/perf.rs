@@ -130,6 +130,9 @@ pub struct Folder {
     /// Function entries on the stack in this entry thus far.
     stack: VecDeque<String>,
 
+    /// period of current event
+    period: Option<usize>,
+
     // Options...
     opt: Options,
 }
@@ -148,6 +151,7 @@ impl From<Options> for Folder {
             pname: String::default(),
             stack_filter: StackFilter::Keep,
             stack: VecDeque::default(),
+            period: None,
             opt,
         }
     }
@@ -262,6 +266,7 @@ impl CollapsePrivate for Folder {
             pname: String::new(),
             stack_filter: StackFilter::Keep,
             stack: VecDeque::default(),
+            period: None,
             opt: self.opt.clone(),
         }
     }
@@ -375,9 +380,12 @@ impl Folder {
 
         if let Some((comm, pid, tid, end)) = Self::event_line_parts(line) {
             let mut by_colons = line[end..].splitn(3, ':').skip(1);
-            let event = by_colons
-                .next()
-                .and_then(|has_event| has_event.rsplit(' ').next());
+            let event = by_colons.next().and_then(|period_and_event| {
+                let mut it = period_and_event.rsplit(' ');
+                let event_name = it.next();
+                self.period = it.next().and_then(|s| s.parse::<usize>().ok());
+                event_name
+            });
             if let Some(event) = event {
                 if let Some(ref event_filter) = self.event_filter {
                     if event != event_filter {
@@ -586,13 +594,14 @@ impl Folder {
             stack_str.pop();
 
             // count it!
-            occurrences.insert_or_add(stack_str, 1);
+            occurrences.insert_or_add(stack_str, self.period.unwrap_or(1));
         }
 
         // reset for the next event
         self.in_event = false;
         self.stack_filter = StackFilter::Keep;
         self.stack.clear();
+        self.period = None;
     }
 }
 
