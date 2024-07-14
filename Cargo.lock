@@ -450,7 +450,7 @@ dependencies = [
 
 [[package]]
 name = "inferno"
-version = "0.11.19"
+version = "0.11.20"
 dependencies = [
  "ahash",
  "assert_cmd",
