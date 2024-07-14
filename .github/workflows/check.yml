@@ -79,7 +79,7 @@ jobs:
     # https://docs.github.com/en/actions/learn-github-actions/contexts#context-availability
     strategy:
       matrix:
-        msrv: ["1.65.0"] # dashmap 6
+        msrv: ["1.71.0"] # env_logger and clap
     name: ubuntu / ${{ matrix.msrv }}
     steps:
       - uses: actions/checkout@v4
