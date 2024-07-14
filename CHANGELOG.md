@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - More reliably detect Java and avoid double-annotating. [#319](https://github.com/jonhoo/inferno/pull/319)
 - Take period into account when collapsing stacks. [#319](https://github.com/jonhoo/inferno/pull/319)
 - Updated dashmap to v6
+- MSRV (sadly) bumped to 1.71.0 for env_logger and clap and dashmap
 
 ## [0.11.19] - 2023-11-25
 ### Changed
