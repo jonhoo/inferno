@@ -3,7 +3,7 @@ name = "inferno"
 version = "0.11.19"
 edition = "2021"
 authors = ["Jon Gjengset <jon@thesquareplanet.com>"]
-rust-version = "1.64.0"
+rust-version = "1.65.0"
 
 readme = "README.md"
 description = "Rust port of the FlameGraph performance profiling tool suite"
