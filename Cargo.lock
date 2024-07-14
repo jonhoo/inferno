@@ -541,6 +541,7 @@ dependencies = [
  "rand",
  "regex",
  "rgb",
+ "rle-decode-fast",
  "serde",
  "str_stack",
  "testing_logger",
