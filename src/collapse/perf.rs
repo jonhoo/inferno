@@ -524,7 +524,7 @@ impl Folder {
                     func = tidy_generic(func);
                 }
 
-                if TIDY_JAVA && self.pname == "java" {
+                if TIDY_JAVA && self.pname.starts_with("java") {
                     func = tidy_java(func);
                 }
 
@@ -541,14 +541,18 @@ impl Folder {
                 //
                 //     7f722d142778 Ljava/io/PrintStream;::print (/tmp/perf-19982.map)
                 if !self.cache_line.is_empty() {
-                    func.push_str("_[i]"); // inlined
+                    if !func.contains("_[i]") {
+                        func.push_str("_[i]"); // inlined
+                    }
                 } else if self.opt.annotate_kernel && is_kernel(module) {
                     func.push_str("_[k]"); // kernel
                 } else if self.opt.annotate_jit
                     && ((module.starts_with("/tmp/perf-") && module.ends_with(".map"))
                         || (module.contains("/jitted-") && module.ends_with(".so")))
                 {
-                    func.push_str("_[j]"); // jitted
+                    if !func.contains("_[j]") {
+                        func.push_str("_[j]"); // jitted
+                    }
                 }
 
                 self.cache_line.push(func);
