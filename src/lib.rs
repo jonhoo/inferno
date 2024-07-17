@@ -141,6 +141,9 @@
 //!   [sample]: https://gist.github.com/loderunner/36724cc9ee8db66db305#profiling-with-sample
 //!   [VTune]: https://software.intel.com/en-us/vtune-amplifier-help-command-line-interface
 
+// Remove when https://github.com/rust-lang/rust/issues/101730 lands
+#![allow(unknown_lints)]
+
 #![cfg_attr(doc, warn(rustdoc::all))]
 #![cfg_attr(doc, allow(rustdoc::missing_doc_code_examples))]
 #![deny(missing_docs)]
