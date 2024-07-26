@@ -129,6 +129,11 @@ pub(super) mod rust {
     use crate::flamegraph::color::BasicPalette;
 
     pub(in super::super) fn resolve(name: &str) -> BasicPalette {
+        let name = if let Some(i) = name.find('`') {
+            &name[i + 1..]
+        } else {
+            name
+        };
         if name.starts_with("core::")
             || name.starts_with("std::")
             || name.starts_with("alloc::")
@@ -600,6 +605,14 @@ mod tests {
             TestData {
                 input: String::from("<std::something something::else"),
                 output: BasicPalette::Orange,
+            },
+            TestData {
+                input: String::from("my-app`std::sys::unix::thread::Thread::new::thread_start"),
+                output: BasicPalette::Orange,
+            },
+            TestData {
+                input: String::from("my-app`foobar::extent::Extent::write"),
+                output: BasicPalette::Aqua,
             },
         ];
         for elem in test_names.iter() {
