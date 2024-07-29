@@ -129,11 +129,7 @@ pub(super) mod rust {
     use crate::flamegraph::color::BasicPalette;
 
     pub(in super::super) fn resolve(name: &str) -> BasicPalette {
-        let name = if let Some(i) = name.find('`') {
-            &name[i + 1..]
-        } else {
-            name
-        };
+        let name = name.split_once('`').map(|(_, after)| after).unwrap_or(name);
         if name.starts_with("core::")
             || name.starts_with("std::")
             || name.starts_with("alloc::")
