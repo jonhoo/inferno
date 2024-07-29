@@ -47,9 +47,6 @@ pub struct Folder {
     /// Keep track of stack string size while we consume a stack
     stack_str_size: usize,
 
-    /// Track whether we've seen a count yet in `would_end_stack`
-    has_seen_digit: bool,
-
     opt: Options,
 }
 
@@ -63,7 +60,6 @@ impl From<Options> for Folder {
             nstacks_per_job: common::DEFAULT_NSTACKS_PER_JOB,
             stack: VecDeque::default(),
             stack_str_size: 0,
-            has_seen_digit: false,
             opt,
         }
     }
@@ -214,7 +210,6 @@ impl CollapsePrivate for Folder {
                 }
                 State::MiddleOfLine => {
                     if c.is_ascii_digit() {
-                        self.has_seen_digit = true;
                         continue;
                     } else if c.is_whitespace() {
                         state = State::EndOfLine;
@@ -231,7 +226,7 @@ impl CollapsePrivate for Folder {
                 }
             }
         }
-        std::mem::take(&mut self.has_seen_digit)
+        matches!(state, State::EndOfLine)
     }
 
     fn clone_and_reset_stack_context(&self) -> Self {
@@ -240,7 +235,6 @@ impl CollapsePrivate for Folder {
             nstacks_per_job: self.nstacks_per_job,
             stack: VecDeque::default(),
             stack_str_size: 0,
-            has_seen_digit: false,
             opt: self.opt.clone(),
         }
     }
@@ -496,6 +490,51 @@ mod tests {
         file.read_to_end(&mut bytes)?;
         let mut folder = Folder::default();
         <Folder as Collapse>::collapse(&mut folder, &bytes[..], io::sink())
+    }
+
+    #[test]
+    fn test_collapse_dtrace_would_end_stack() {
+        let mut folder = Folder::default();
+        assert!(!folder.would_end_stack(b"function_name"));
+        assert!(!folder.would_end_stack(b"  function_name  "));
+        assert!(!folder.would_end_stack(b"  "));
+        assert!(!folder.would_end_stack(b""));
+        assert!(!folder.would_end_stack(b""));
+        assert!(!folder.would_end_stack(b"  function_name  "));
+        assert!(folder.would_end_stack(b"  256  "));
+
+        assert!(!folder.would_end_stack(b"  "));
+        assert!(!folder.would_end_stack(b"  "));
+        assert!(!folder.would_end_stack(b""));
+        assert!(!folder.would_end_stack(b"function_name"));
+        assert!(!folder.would_end_stack(b"  function_name  "));
+        assert!(!folder.would_end_stack(b"  function_name  "));
+        assert!(!folder.would_end_stack(b" "));
+        assert!(folder.would_end_stack(b"  12  "));
+
+        assert!(!folder.would_end_stack(b"function_name"));
+        assert!(!folder.would_end_stack(b"  function_name  "));
+        assert!(!folder.would_end_stack(b"  function_name  "));
+        assert!(!folder.would_end_stack(b" "));
+        assert!(!folder.would_end_stack(b"  function_name  "));
+        assert!(!folder.would_end_stack(b"  function_name  "));
+        assert!(folder.would_end_stack(b"  3  "));
+
+        assert!(!folder.would_end_stack(b"function_name"));
+        assert!(!folder.would_end_stack(b"  function_name  "));
+        assert!(!folder.would_end_stack(b"  5function_name  "));
+        assert!(!folder.would_end_stack(b" "));
+        assert!(!folder.would_end_stack(b"  function_name  "));
+        assert!(!folder.would_end_stack(b"  function_name  "));
+        assert!(folder.would_end_stack(b"  3  "));
+
+        assert!(!folder.would_end_stack(b"function_name"));
+        assert!(!folder.would_end_stack(b"  function_name  "));
+        assert!(!folder.would_end_stack(b"  5424 f"));
+        assert!(!folder.would_end_stack(b" "));
+        assert!(!folder.would_end_stack(b"  function_name  "));
+        assert!(!folder.would_end_stack(b"  function_name  "));
+        assert!(folder.would_end_stack(b"  3  "));
     }
 
     /// Varies the nstacks_per_job parameter and outputs the 10 fastests configurations by file.
