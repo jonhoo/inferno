@@ -11,6 +11,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [0.11.21] - 2024-08-03
+### Added
+
+- Support for combined stack + ustack DTrace collapse. [#328](https://github.com/jonhoo/inferno/pull/328)
+
+### Changed
+
+- Trim executable name when getting function color. [#329](https://github.com/jonhoo/inferno/pull/329)
+
 ## [0.11.20] - 2024-07-14
 ### Changed
 
@@ -306,7 +315,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Moved to `IndexMap` and FNV hashing ([#127](https://github.com/jonhoo/inferno/pull/127))
 - Moved CI to Azure DevOps Pipelines
 
-[Unreleased]: https://github.com/jonhoo/inferno/compare/v0.11.20...HEAD
+[Unreleased]: https://github.com/jonhoo/inferno/compare/v0.11.21...HEAD
+[0.11.21]: https://github.com/jonhoo/inferno/compare/v0.11.20...v0.11.21
 [0.11.20]: https://github.com/jonhoo/inferno/compare/v0.11.19...v0.11.20
 [0.11.19]: https://github.com/jonhoo/inferno/compare/v0.11.18...v0.11.19
 [0.11.18]: https://github.com/jonhoo/inferno/compare/v0.11.17...v0.11.18
