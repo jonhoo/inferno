@@ -145,11 +145,7 @@
 #![cfg_attr(doc, allow(rustdoc::missing_doc_code_examples))]
 #![deny(missing_docs)]
 #![warn(unreachable_pub)]
-#![cfg_attr(all(test, feature = "nightly"), feature(test))]
 #![allow(clippy::disallowed_names)]
-
-#[cfg(all(test, feature = "nightly"))]
-extern crate test;
 
 /// Stack collapsing for various input formats.
 ///
