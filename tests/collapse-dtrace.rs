@@ -84,6 +84,14 @@ fn collapse_dtrace_compare_to_flamegraph_bug() {
 }
 
 #[test]
+fn collapse_dtrace_stack_ustack() {
+    let test_file = "./tests/data/collapse-dtrace/stack-ustack.txt";
+    let result_file = "./tests/data/collapse-dtrace/results/stack-ustack.txt";
+
+    test_collapse_dtrace(test_file, result_file, Options::default()).unwrap()
+}
+
+#[test]
 fn collapse_dtrace_should_log_warning_for_only_header_lines() {
     test_collapse_dtrace_logs(
         "./tests/data/collapse-dtrace/only-header-lines.txt",

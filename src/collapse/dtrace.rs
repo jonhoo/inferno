@@ -226,7 +226,7 @@ impl CollapsePrivate for Folder {
                 }
             }
         }
-        true
+        matches!(state, State::EndOfLine)
     }
 
     fn clone_and_reset_stack_context(&self) -> Self {
@@ -490,6 +490,51 @@ mod tests {
         file.read_to_end(&mut bytes)?;
         let mut folder = Folder::default();
         <Folder as Collapse>::collapse(&mut folder, &bytes[..], io::sink())
+    }
+
+    #[test]
+    fn test_collapse_dtrace_would_end_stack() {
+        let mut folder = Folder::default();
+        assert!(!folder.would_end_stack(b"function_name"));
+        assert!(!folder.would_end_stack(b"  function_name  "));
+        assert!(!folder.would_end_stack(b"  "));
+        assert!(!folder.would_end_stack(b""));
+        assert!(!folder.would_end_stack(b""));
+        assert!(!folder.would_end_stack(b"  function_name  "));
+        assert!(folder.would_end_stack(b"  256  "));
+
+        assert!(!folder.would_end_stack(b"  "));
+        assert!(!folder.would_end_stack(b"  "));
+        assert!(!folder.would_end_stack(b""));
+        assert!(!folder.would_end_stack(b"function_name"));
+        assert!(!folder.would_end_stack(b"  function_name  "));
+        assert!(!folder.would_end_stack(b"  function_name  "));
+        assert!(!folder.would_end_stack(b" "));
+        assert!(folder.would_end_stack(b"  12  "));
+
+        assert!(!folder.would_end_stack(b"function_name"));
+        assert!(!folder.would_end_stack(b"  function_name  "));
+        assert!(!folder.would_end_stack(b"  function_name  "));
+        assert!(!folder.would_end_stack(b" "));
+        assert!(!folder.would_end_stack(b"  function_name  "));
+        assert!(!folder.would_end_stack(b"  function_name  "));
+        assert!(folder.would_end_stack(b"  3  "));
+
+        assert!(!folder.would_end_stack(b"function_name"));
+        assert!(!folder.would_end_stack(b"  function_name  "));
+        assert!(!folder.would_end_stack(b"  5function_name  "));
+        assert!(!folder.would_end_stack(b" "));
+        assert!(!folder.would_end_stack(b"  function_name  "));
+        assert!(!folder.would_end_stack(b"  function_name  "));
+        assert!(folder.would_end_stack(b"  3  "));
+
+        assert!(!folder.would_end_stack(b"function_name"));
+        assert!(!folder.would_end_stack(b"  function_name  "));
+        assert!(!folder.would_end_stack(b"  5424 f"));
+        assert!(!folder.would_end_stack(b" "));
+        assert!(!folder.would_end_stack(b"  function_name  "));
+        assert!(!folder.would_end_stack(b"  function_name  "));
+        assert!(folder.would_end_stack(b"  3  "));
     }
 
     /// Varies the nstacks_per_job parameter and outputs the 10 fastests configurations by file.
