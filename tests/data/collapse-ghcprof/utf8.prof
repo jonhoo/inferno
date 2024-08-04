@@ -1,0 +1,30 @@
+	Sun Aug 13 10:47 2023 Time and Allocation Profiling Report  (Final)
+
+	   utf8test-exe +RTS -N -P -RTS
+
+	total time  =       10.25 secs   (19827 ticks @ 1000 us, 32 processors)
+	total alloc = 90,486,853,312 bytes  (excludes profiling overheads)
+
+COST CENTRE MODULE SRC                        %time %alloc  ticks     bytes
+
+你好世界        Lib    src/Lib.hs:(14,1)-(15,41)   97.4  100.0  19317 90486357376
+MAIN        MAIN   <built-in>                   2.6    0.0    510    456096
+
+
+                                                                                individual      inherited
+COST CENTRE  MODULE                SRC                       no.     entries  %time %alloc   %time %alloc  ticks     bytes
+
+MAIN         MAIN                  <built-in>                168           0    2.6    0.0   100.0  100.0    510    456096
+ CAF         GHC.Conc.Signal       <entire-module>           289           0    0.0    0.0     0.0    0.0      0       640
+ CAF         GHC.IO.Encoding       <entire-module>           279           0    0.0    0.0     0.0    0.0      0      2448
+ CAF         GHC.IO.Encoding.Iconv <entire-module>           277           0    0.0    0.0     0.0    0.0      0       200
+ CAF         GHC.IO.Handle.FD      <entire-module>           269           0    0.0    0.0     0.0    0.0      0     34736
+ CAF         GHC.Event.Thread      <entire-module>           228           0    0.0    0.0     0.0    0.0      0      1528
+ CAF:f_rPV   Lib                   <no location info>        295           0    0.0    0.0     0.0    0.0      0       256
+ CAF:main1   Main                  <no location info>        334           0    0.0    0.0     0.0    0.0      0        16
+  main       Main                  app/Main.hs:6:1-11        336           1    0.0    0.0     0.0    0.0      0         0
+ CAF:一些函数1   Lib                   <no location info>        296           0    0.0    0.0     0.0    0.0      0        16
+  一二三        Lib                   src/Lib.hs:11:1-10        338           1    0.0    0.0     0.0    0.0      0         0
+  一些函数       Lib                   src/Lib.hs:8:1-10         337           1    0.0    0.0     0.0    0.0      0         0
+  你好世界       Lib                   src/Lib.hs:(14,1)-(15,41) 339           1    0.0    0.0     0.0    0.0      0         0
+ 你好世界        Lib                   src/Lib.hs:(14,1)-(15,41) 340           0   97.4  100.0    97.4  100.0  19317 90486357376

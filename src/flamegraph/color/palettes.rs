@@ -106,9 +106,9 @@ pub(super) mod js {
         } else if name.contains(':') {
             return BasicPalette::Aqua;
         } else if let Some(ai) = name.find('/') {
-            if (&name[ai..]).contains("node_modules/") {
+            if name[ai..].contains("node_modules/") {
                 return BasicPalette::Purple;
-            } else if (&name[ai..]).contains(".js") {
+            } else if name[ai..].contains(".js") {
                 return BasicPalette::Green;
             }
         }
@@ -129,6 +129,7 @@ pub(super) mod rust {
     use crate::flamegraph::color::BasicPalette;
 
     pub(in super::super) fn resolve(name: &str) -> BasicPalette {
+        let name = name.split_once('`').map(|(_, after)| after).unwrap_or(name);
         if name.starts_with("core::")
             || name.starts_with("std::")
             || name.starts_with("alloc::")
@@ -600,6 +601,14 @@ mod tests {
             TestData {
                 input: String::from("<std::something something::else"),
                 output: BasicPalette::Orange,
+            },
+            TestData {
+                input: String::from("my-app`std::sys::unix::thread::Thread::new::thread_start"),
+                output: BasicPalette::Orange,
+            },
+            TestData {
+                input: String::from("my-app`foobar::extent::Extent::write"),
+                output: BasicPalette::Aqua,
             },
         ];
         for elem in test_names.iter() {

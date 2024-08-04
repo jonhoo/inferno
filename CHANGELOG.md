@@ -11,6 +11,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [0.11.21] - 2024-08-03
+### Added
+
+- Support for combined stack + ustack DTrace collapse. [#328](https://github.com/jonhoo/inferno/pull/328)
+
+### Changed
+
+- Trim executable name when getting function color. [#329](https://github.com/jonhoo/inferno/pull/329)
+
+## [0.11.20] - 2024-07-14
+### Changed
+
+- More reliably detect Java and avoid double-annotating. [#319](https://github.com/jonhoo/inferno/pull/319)
+- Take period into account when collapsing stacks. [#319](https://github.com/jonhoo/inferno/pull/319)
+- Updated dashmap to v6
+- MSRV (sadly) bumped to 1.71.0 for env_logger and clap and dashmap
+
+## [0.11.19] - 2023-11-25
+### Changed
+
+- By default, make `cargo install` strip all binaries. [#310](https://github.com/jonhoo/inferno/pull/310)
+
+## [0.11.18] - 2023-11-11
+### Changed
+
+- Updated ahash version in Cargo.lock for binary consumers.
+  See https://github.com/tkaitchuck/aHash/issues/163.
+
+### Removed
+
+## [0.11.17] - 2023-09-16
+### Added
+
+- Added collapse-ghcprof. [#300](https://github.com/jonhoo/inferno/pull/300)
+
+## [0.11.16] - 2023-08-20
+### Added
+
+- Added stackcollapse-recursive. [#291](https://github.com/jonhoo/inferno/pull/291)
+
+### Changed
+
+- Upgraded indexmap and libflate to 2.0.
+
 ## [0.11.15] - 2023-02-11
 ### Changed
 
@@ -271,7 +315,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Moved to `IndexMap` and FNV hashing ([#127](https://github.com/jonhoo/inferno/pull/127))
 - Moved CI to Azure DevOps Pipelines
 
-[Unreleased]: https://github.com/jonhoo/inferno/compare/v0.11.13...HEAD
+[Unreleased]: https://github.com/jonhoo/inferno/compare/v0.11.21...HEAD
+[0.11.21]: https://github.com/jonhoo/inferno/compare/v0.11.20...v0.11.21
+[0.11.20]: https://github.com/jonhoo/inferno/compare/v0.11.19...v0.11.20
+[0.11.19]: https://github.com/jonhoo/inferno/compare/v0.11.18...v0.11.19
+[0.11.18]: https://github.com/jonhoo/inferno/compare/v0.11.17...v0.11.18
+[0.11.17]: https://github.com/jonhoo/inferno/compare/v0.11.16...v0.11.17
+[0.11.16]: https://github.com/jonhoo/inferno/compare/v0.11.15...v0.11.16
+[0.11.15]: https://github.com/jonhoo/inferno/compare/v0.11.14...v0.11.15
+[0.11.14]: https://github.com/jonhoo/inferno/compare/v0.11.13...v0.11.14
 [0.11.13]: https://github.com/jonhoo/inferno/compare/v0.11.12...v0.11.13
 [0.11.12]: https://github.com/jonhoo/inferno/compare/v0.11.11...v0.11.12
 [0.11.11]: https://github.com/jonhoo/inferno/compare/v0.11.10...v0.11.11

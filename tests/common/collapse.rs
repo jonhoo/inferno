@@ -15,7 +15,7 @@ where
     let mut line_num = 1;
     for line in result.lines() {
         let line = if strip_quotes {
-            line.unwrap().replace('\"', "").replace('\'', "")
+            line.unwrap().replace(['\"', '\''], "")
         } else {
             line.unwrap()
         };
@@ -89,7 +89,15 @@ where
         eprintln!("test output in {}", tm.display());
     }
     // and then compare
-    compare_results(result, expected, expected_filename, strip_quotes);
+    if let Err(e) = std::panic::catch_unwind(|| {
+        compare_results(result.clone(), expected, expected_filename, strip_quotes)
+    }) {
+        if std::env::var("INFERNO_BLESS_TESTS").is_ok() {
+            fs::write(expected_filename, result.get_ref()).unwrap();
+        } else {
+            std::panic::resume_unwind(e);
+        }
+    }
     Ok(())
 }
 

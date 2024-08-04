@@ -1,0 +1,87 @@
+CPU     ID                    FUNCTION:NAME
+ 30  76446                       :tick-10ms 
+
+
+
+              cru-ds-fdsync-v1`<tokio_util::codec::framed_impl::FramedImpl<T,U,R> as futures_core::stream::Stream>::poll_next::h375c4bf72398a9c9+0x451
+              cru-ds-fdsync-v1`<tokio::future::poll_fn::PollFn<F> as core::future::future::Future>::poll::hdb622d175ae42c67+0x376
+              cru-ds-fdsync-v1`crucible_downstairs::recv_task::_$u7b$$u7b$closure$u7d$$u7d$::h2313d0ca35c97b46 (.llvm.9599067906520872268)+0x1e8
+              cru-ds-fdsync-v1`tokio::runtime::task::core::Core<T,S>::poll::ha1b200ead37ecb81+0x3e
+              cru-ds-fdsync-v1`tokio::runtime::task::harness::Harness<T,S>::poll::h6096748dfbf63e3f+0x47
+              cru-ds-fdsync-v1`tokio::runtime::scheduler::multi_thread::worker::Context::run_task::hbc7adf21738f2cc8+0x146
+              cru-ds-fdsync-v1`tokio::runtime::scheduler::multi_thread::worker::Context::run::h8894624b64f9ebd1+0xabe
+              cru-ds-fdsync-v1`tokio::runtime::context::scoped::Scoped<T>::set::h7f53e80a35be279f+0x2b
+              cru-ds-fdsync-v1`tokio::runtime::context::runtime::enter_runtime::ha36cde2fe36fc9dc+0x172
+              cru-ds-fdsync-v1`tokio::runtime::scheduler::multi_thread::worker::run::heea3712ec5628e2e+0x4b
+              cru-ds-fdsync-v1`tokio::runtime::task::core::Core<T,S>::poll::h4fdbe1f8b2e046e9+0x43
+              cru-ds-fdsync-v1`tokio::runtime::task::harness::Harness<T,S>::poll::hdaaa15b8bfc6c3b5+0x45
+              cru-ds-fdsync-v1`std::sys_common::backtrace::__rust_begin_short_backtrace::h07e5ebb552c48fa6+0x1b6
+              cru-ds-fdsync-v1`core::ops::function::FnOnce::call_once{{vtable.shim}}::hfb58463ecc052a89+0x75
+              cru-ds-fdsync-v1`std::sys::unix::thread::Thread::new::thread_start::h1783cbcbbf061711+0x29
+              libc.so.1`_thrp_setup+0x77
+              libc.so.1`_lwp_start
+                1
+
+              zfs`arc_memory_throttle+0x1
+              zfs`dsl_dir_tempreserve_space+0x9e
+              zfs`dmu_tx_try_assign+0x149
+              zfs`dmu_tx_assign+0x56
+              zfs`zfs_write+0x475
+              genunix`fop_write+0x5d
+              genunix`pwrite+0x172
+              unix`sys_syscall+0x17d
+
+              libc.so.1`__pwrite+0xa
+              cru-ds-fdsync-v1`<crucible_downstairs::extent_inner_raw::RawInner as crucible_downstairs::extent::ExtentInner>::write::hef63fa757835e3ff+0x1621
+              cru-ds-fdsync-v1`crucible_downstairs::extent::Extent::write::hfeced6743c01c23b+0x2fd
+              cru-ds-fdsync-v1`crucible_downstairs::region::Region::region_write::hfbbb7f74fb6b1568+0x654
+              cru-ds-fdsync-v1`crucible_downstairs::ActiveConnection::do_work::{{closure}}::h50e10780011359fc+0x1128
+              cru-ds-fdsync-v1`crucible_downstairs::ActiveConnection::do_work_if_ready::{{closure}}::h65a7bded82d12d6c+0x148
+              cru-ds-fdsync-v1`crucible_downstairs::Downstairs::run::_$u7b$$u7b$closure$u7d$$u7d$::h7a3087a6f836e6c7 (.llvm.14070482526595365531)+0x2012
+              cru-ds-fdsync-v1`tokio::runtime::task::core::Core<T,S>::poll::hf3cf7a78e14ca649+0x47
+              cru-ds-fdsync-v1`tokio::runtime::task::harness::Harness<T,S>::poll::h2d72b7b7afc40df2+0x49
+              cru-ds-fdsync-v1`tokio::runtime::scheduler::multi_thread::worker::Context::run_task::hbc7adf21738f2cc8+0x190
+              cru-ds-fdsync-v1`tokio::runtime::scheduler::multi_thread::worker::Context::run::h8894624b64f9ebd1+0xabe
+              cru-ds-fdsync-v1`tokio::runtime::context::scoped::Scoped<T>::set::h7f53e80a35be279f+0x2b
+              cru-ds-fdsync-v1`tokio::runtime::context::runtime::enter_runtime::ha36cde2fe36fc9dc+0x172
+              cru-ds-fdsync-v1`tokio::runtime::scheduler::multi_thread::worker::run::heea3712ec5628e2e+0x4b
+              cru-ds-fdsync-v1`tokio::runtime::task::core::Core<T,S>::poll::h4fdbe1f8b2e046e9+0x43
+              cru-ds-fdsync-v1`tokio::runtime::task::harness::Harness<T,S>::poll::hdaaa15b8bfc6c3b5+0x45
+              cru-ds-fdsync-v1`std::sys_common::backtrace::__rust_begin_short_backtrace::h07e5ebb552c48fa6+0x1b6
+              cru-ds-fdsync-v1`core::ops::function::FnOnce::call_once{{vtable.shim}}::hfb58463ecc052a89+0x75
+              cru-ds-fdsync-v1`std::sys::unix::thread::Thread::new::thread_start::h1783cbcbbf061711+0x29
+              libc.so.1`_thrp_setup+0x77
+              libc.so.1`_lwp_start
+                1
+
+              zfs`metaslab_group_alloc_verify+0x1
+              zfs`zio_execute+0xa7
+              genunix`taskq_thread+0x2a6
+              unix`thread_start+0xb
+
+                1
+
+              zfs`dmu_objset_ds+0x1
+              zfs`zil_itx_assign+0x194
+              zfs`zil_commit_itx_assign+0x65
+              zfs`zil_commit_impl+0x26
+              zfs`zil_commit+0x4b
+              zfs`zfs_fsync+0xf6
+              genunix`fop_fsync+0x4a
+              genunix`fdsync+0xc4
+              unix`sys_syscall+0x17d
+
+              libc.so.1`__fdsync+0xa
+              cru-ds-fdsync-v1`std::fs::File::sync_all::hcd4d0768a77cbc2e+0x14
+              cru-ds-fdsync-v1`<crucible_downstairs::extent_inner_raw::RawInner as crucible_downstairs::extent::ExtentInner>::flush::h68fcf1774758d74e+0x9c
+              cru-ds-fdsync-v1`crucible_downstairs::extent::Extent::flush::h0eac5b95dfa4f5f0+0x472
+              cru-ds-fdsync-v1`std::panicking::try::h7ba6611983f64757+0x4c
+              cru-ds-fdsync-v1`_$LT$rayon_core..job..HeapJob$LT$BODY$GT$$u20$as$u20$rayon_core..job..Job$GT$::execute::h60b9d586fc4f8a0f (.llvm.8052073739315931670)+0x46
+              cru-ds-fdsync-v1`rayon_core::registry::WorkerThread::wait_until_cold::haa78671c0e7aa9b1+0x50f
+              cru-ds-fdsync-v1`rayon_core::registry::ThreadBuilder::run::hf28d413d115bded0+0x398
+              cru-ds-fdsync-v1`std::sys_common::backtrace::__rust_begin_short_backtrace::hfcd6324a3e87fc1e+0x48
+              cru-ds-fdsync-v1`core::ops::function::FnOnce::call_once{{vtable.shim}}::hbfa4fc2e086997af+0xb2
+              cru-ds-fdsync-v1`std::sys::unix::thread::Thread::new::thread_start::h1783cbcbbf061711+0x29
+              libc.so.1`_thrp_setup+0x77
+              libc.so.1`_lwp_start
+                1

@@ -130,6 +130,9 @@ pub struct Folder {
     /// Function entries on the stack in this entry thus far.
     stack: VecDeque<String>,
 
+    /// period of current event
+    period: Option<usize>,
+
     // Options...
     opt: Options,
 }
@@ -148,6 +151,7 @@ impl From<Options> for Folder {
             pname: String::default(),
             stack_filter: StackFilter::Keep,
             stack: VecDeque::default(),
+            period: None,
             opt,
         }
     }
@@ -262,6 +266,7 @@ impl CollapsePrivate for Folder {
             pname: String::new(),
             stack_filter: StackFilter::Keep,
             stack: VecDeque::default(),
+            period: None,
             opt: self.opt.clone(),
         }
     }
@@ -375,9 +380,12 @@ impl Folder {
 
         if let Some((comm, pid, tid, end)) = Self::event_line_parts(line) {
             let mut by_colons = line[end..].splitn(3, ':').skip(1);
-            let event = by_colons
-                .next()
-                .and_then(|has_event| has_event.rsplit(' ').next());
+            let event = by_colons.next().and_then(|period_and_event| {
+                let mut it = period_and_event.rsplit(' ');
+                let event_name = it.next();
+                self.period = it.next().and_then(|s| s.parse::<usize>().ok());
+                event_name
+            });
             if let Some(event) = event {
                 if let Some(ref event_filter) = self.event_filter {
                     if event != event_filter {
@@ -516,7 +524,7 @@ impl Folder {
                     func = tidy_generic(func);
                 }
 
-                if TIDY_JAVA && self.pname == "java" {
+                if TIDY_JAVA && self.pname.starts_with("java") {
                     func = tidy_java(func);
                 }
 
@@ -533,14 +541,18 @@ impl Folder {
                 //
                 //     7f722d142778 Ljava/io/PrintStream;::print (/tmp/perf-19982.map)
                 if !self.cache_line.is_empty() {
-                    func.push_str("_[i]"); // inlined
+                    if !func.contains("_[i]") {
+                        func.push_str("_[i]"); // inlined
+                    }
                 } else if self.opt.annotate_kernel && is_kernel(module) {
                     func.push_str("_[k]"); // kernel
                 } else if self.opt.annotate_jit
                     && ((module.starts_with("/tmp/perf-") && module.ends_with(".map"))
                         || (module.contains("/jitted-") && module.ends_with(".so")))
                 {
-                    func.push_str("_[j]"); // jitted
+                    if !func.contains("_[j]") {
+                        func.push_str("_[j]"); // jitted
+                    }
                 }
 
                 self.cache_line.push(func);
@@ -586,13 +598,14 @@ impl Folder {
             stack_str.pop();
 
             // count it!
-            occurrences.insert_or_add(stack_str, 1);
+            occurrences.insert_or_add(stack_str, self.period.unwrap_or(1));
         }
 
         // reset for the next event
         self.in_event = false;
         self.stack_filter = StackFilter::Keep;
         self.stack.clear();
+        self.period = None;
     }
 }
 
@@ -744,6 +757,7 @@ mod tests {
     }
 
     static INPUT: Lazy<Vec<PathBuf>> = Lazy::new(|| {
+        common::testing::check_flamegraph_git_submodule_initialised();
         [
             "./flamegraph/example-perf-stacks.txt.gz",
             "./flamegraph/test/perf-cycles-instructions-01.txt",
@@ -778,6 +792,7 @@ mod tests {
 
     #[test]
     fn test_collapse_multi_perf_simple() -> io::Result<()> {
+        common::testing::check_flamegraph_git_submodule_initialised();
         let path = "./flamegraph/test/perf-cycles-instructions-01.txt";
         let mut file = fs::File::open(path)?;
         let mut bytes = Vec::new();

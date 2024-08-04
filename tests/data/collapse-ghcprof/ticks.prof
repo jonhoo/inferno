@@ -1,0 +1,321 @@
+	Sun Aug  6 14:52 2023 Time and Allocation Profiling Report  (Final)
+
+	   ghc-prof-flamegraph +RTS -P -RTS big.prof
+
+	total time  =        0.02 secs   (23 ticks @ 1000 us, 1 processor)
+	total alloc =  59,542,424 bytes  (excludes profiling overheads)
+
+COST CENTRE              MODULE   SRC                                      %time %alloc  ticks     bytes
+
+main                     Main     ghc-prof-flamegraph.hs:(108,1)-(120,56)   30.4    9.4      7   5617272
+parse                    ProfFile ProfFile.hs:(157,1)-(159,57)              26.1   23.5      6  13979640
+parseLine.readEither'    ProfFile ProfFile.hs:(117,5)-(118,43)              21.7   26.8      5  15935632
+generateFrames.go.frame  Main     ghc-prof-flamegraph.hs:95:11-83           17.4   27.5      4  16391432
+generateFrames.go.symbol Main     ghc-prof-flamegraph.hs:94:11-68            4.3    1.2      1    699032
+processLines.go.(...)    ProfFile ProfFile.hs:133:11-53                      0.0    2.0      0   1191040
+parseLine                ProfFile ProfFile.hs:(57,1)-(118,43)                0.0    7.7      0   4595648
+
+
+                                                                                                                                                           individual      inherited
+COST CENTRE                           MODULE                               SRC                                                          no.     entries  %time %alloc   %time %alloc  ticks     bytes
+
+MAIN                                  MAIN                                 <built-in>                                                   337           0    0.0    0.0   100.0  100.0      0       728
+ CAF                                  Options.Applicative.Builder          <entire-module>                                              532           0    0.0    0.0     0.0    0.0      0        16
+  defaultPrefs                        Options.Applicative.Builder          src/Options/Applicative/Builder.hs:558:1-24                  694           1    0.0    0.0     0.0    0.0      0         0
+   idm                                Options.Applicative.Builder          src/Options/Applicative/Builder.hs:554:1-12                  696           1    0.0    0.0     0.0    0.0      0         0
+   prefs                              Options.Applicative.Builder          src/Options/Applicative/Builder.hs:(537,1)-(548,31)          695           1    0.0    0.0     0.0    0.0      0        16
+  fullDesc                            Options.Applicative.Builder          src/Options/Applicative/Builder.hs:395:1-52                  703           1    0.0    0.0     0.0    0.0      0         0
+  hidden                              Options.Applicative.Builder          src/Options/Applicative/Builder.hs:(212,1)-(213,54)          761           1    0.0    0.0     0.0    0.0      0        56
+  option                              Options.Applicative.Builder          src/Options/Applicative/Builder.hs:(375,1)-(380,65)          725           0    0.0    0.0     0.0    0.0      0         0
+   metavar                            Options.Applicative.Builder          src/Options/Applicative/Builder.hs:206:1-55                  726           0    0.0    0.0     0.0    0.0      0        56
+ CAF                                  Options.Applicative.Builder.Internal <entire-module>                                              530           0    0.0    0.0     0.0    0.0      0        16
+  internal                            Options.Applicative.Builder.Internal src/Options/Applicative/Builder/Internal.hs:189:1-60         711           1    0.0    0.0     0.0    0.0      0        72
+  noGlobal                            Options.Applicative.Builder.Internal src/Options/Applicative/Builder/Internal.hs:194:1-59         757           1    0.0    0.0     0.0    0.0      0        56
+  optionMod                           Options.Applicative.Builder.Internal src/Options/Applicative/Builder/Internal.hs:130:1-25         712           1    0.0    0.0     0.0    0.0      0         0
+ CAF                                  Options.Applicative.Common           <entire-module>                                              529           0    0.0    0.0     0.0    0.0      0        80
+  liftOpt                             Options.Applicative.Common           src/Options/Applicative/Common.hs:81:1-14                    715           1    0.0    0.0     0.0    0.0      0         0
+ CAF                                  Options.Applicative.Extra            <entire-module>                                              528           0    0.0    0.0     0.0    0.0      0         0
+  execParser                          Options.Applicative.Extra            src/Options/Applicative/Extra.hs:115:1-42                    676           1    0.0    0.0     0.0    0.0      0        32
+  helper                              Options.Applicative.Extra            src/Options/Applicative/Extra.hs:(51,1)-(56,4)               746           1    0.0    0.0     0.0    0.0      0       256
+   help                               Options.Applicative.Builder          src/Options/Applicative/Builder.hs:190:1-55                  751           1    0.0    0.0     0.0    0.0      0        56
+   helperWith                         Options.Applicative.Extra            src/Options/Applicative/Extra.hs:(69,1)-(83,44)              752           1    0.0    0.0     0.0    0.0      0       216
+    metavar                           Options.Applicative.Builder          src/Options/Applicative/Builder.hs:206:1-55                  754           1    0.0    0.0     0.0    0.0      0         0
+    noArgError                        Options.Applicative.Builder          src/Options/Applicative/Builder.hs:199:1-61                  758           1    0.0    0.0     0.0    0.0      0         0
+    option                            Options.Applicative.Builder          src/Options/Applicative/Builder.hs:(375,1)-(380,65)          762           1    0.0    0.0     0.0    0.0      0       224
+     metavar                          Options.Applicative.Builder          src/Options/Applicative/Builder.hs:206:1-55                  763           1    0.0    0.0     0.0    0.0      0         0
+     mkParser                         Options.Applicative.Builder.Internal src/Options/Applicative/Builder/Internal.hs:(165,1)-(169,36) 764           1    0.0    0.0     0.0    0.0      0       240
+      mkOption                        Options.Applicative.Builder.Internal src/Options/Applicative/Builder/Internal.hs:175:1-43         765           1    0.0    0.0     0.0    0.0      0         0
+    value                             Options.Applicative.Builder          src/Options/Applicative/Builder.hs:178:1-50                  753           1    0.0    0.0     0.0    0.0      0         0
+   long                               Options.Applicative.Builder          src/Options/Applicative/Builder.hs:166:1-32                  747           1    0.0    0.0     0.0    0.0      0         0
+    fieldMod                          Options.Applicative.Builder.Internal src/Options/Applicative/Builder/Internal.hs:133:1-28         748           1    0.0    0.0     0.0    0.0      0         0
+   short                              Options.Applicative.Builder          src/Options/Applicative/Builder.hs:162:1-34                  749           1    0.0    0.0     0.0    0.0      0         0
+    fieldMod                          Options.Applicative.Builder.Internal src/Options/Applicative/Builder/Internal.hs:133:1-28         750           1    0.0    0.0     0.0    0.0      0         0
+  execParserPure                      Options.Applicative.Extra            src/Options/Applicative/Extra.hs:(155,1)-(164,33)            682           0    0.0    0.0     0.0    0.0      0         0
+   runP                               Options.Applicative.Internal         src/Options/Applicative/Internal.hs:91:1-59                  683           0    0.0    0.0     0.0    0.0      0         0
+    runParserInfo                     Options.Applicative.Common           src/Options/Applicative/Common.hs:233:1-62                   684           0    0.0    0.0     0.0    0.0      0       128
+     runParserFully                   Options.Applicative.Common           src/Options/Applicative/Common.hs:(236,1)-(240,33)           686           0    0.0    0.0     0.0    0.0      0       200
+      runParser                       Options.Applicative.Common           src/Options/Applicative/Common.hs:(203,1)-(220,24)           688           0    0.0    0.0     0.0    0.0      0       496
+       runParserStep                  Options.Applicative.Common           src/Options/Applicative/Common.hs:(223,1)-(227,35)           690           0    0.0    0.0     0.0    0.0      0       288
+        disamb                        Options.Applicative.Internal         src/Options/Applicative/Internal.hs:(258,1)-(265,18)         697           0    0.0    0.0     0.0    0.0      0         0
+         takeListT                    Options.Applicative.Internal         src/Options/Applicative/Internal.hs:(179,1)-(180,75)         698           2    0.0    0.0     0.0    0.0      0       152
+  helperWith                          Options.Applicative.Extra            src/Options/Applicative/Extra.hs:(69,1)-(83,44)              755           0    0.0    0.0     0.0    0.0      0         0
+   metavar                            Options.Applicative.Builder          src/Options/Applicative/Builder.hs:206:1-55                  756           0    0.0    0.0     0.0    0.0      0        56
+   noArgError                         Options.Applicative.Builder          src/Options/Applicative/Builder.hs:199:1-61                  759           0    0.0    0.0     0.0    0.0      0        32
+    fieldMod                          Options.Applicative.Builder.Internal src/Options/Applicative/Builder/Internal.hs:133:1-28         760           1    0.0    0.0     0.0    0.0      0         0
+ CAF                                  Options.Applicative.Types            <entire-module>                                              522           0    0.0    0.0     0.0    0.0      0        16
+  readerAsk                           Options.Applicative.Types            src/Options/Applicative/Types.hs:220:1-21                    851           1    0.0    0.0     0.0    0.0      0         0
+ CAF                                  Options.Applicative.BashCompletion   <entire-module>                                              520           0    0.0    0.0     0.0    0.0      0         0
+  bashCompletionParser                Options.Applicative.BashCompletion   src/Options/Applicative/BashCompletion.hs:(40,1)-(72,7)      708           0    0.0    0.0     0.0    0.0      0      1624
+   long                               Options.Applicative.Builder          src/Options/Applicative/Builder.hs:166:1-32                  709           8    0.0    0.0     0.0    0.0      0        16
+    fieldMod                          Options.Applicative.Builder.Internal src/Options/Applicative/Builder/Internal.hs:133:1-28         710           8    0.0    0.0     0.0    0.0      0         0
+   strOption                          Options.Applicative.Builder          src/Options/Applicative/Builder.hs:365:1-22                  733           4    0.0    0.0     0.0    0.0      0       128
+    option                            Options.Applicative.Builder          src/Options/Applicative/Builder.hs:(375,1)-(380,65)          734           4    0.0    0.0     0.0    0.0      0       896
+     metavar                          Options.Applicative.Builder          src/Options/Applicative/Builder.hs:206:1-55                  735           4    0.0    0.0     0.0    0.0      0         0
+     mkParser                         Options.Applicative.Builder.Internal src/Options/Applicative/Builder/Internal.hs:(165,1)-(169,36) 736           4    0.0    0.0     0.0    0.0      0       800
+      mkOption                        Options.Applicative.Builder.Internal src/Options/Applicative/Builder/Internal.hs:175:1-43         737           4    0.0    0.0     0.0    0.0      0         0
+   option                             Options.Applicative.Builder          src/Options/Applicative/Builder.hs:(375,1)-(380,65)          723           3    0.0    0.0     0.0    0.0      0       688
+    metavar                           Options.Applicative.Builder          src/Options/Applicative/Builder.hs:206:1-55                  724           3    0.0    0.0     0.0    0.0      0         0
+    mkParser                          Options.Applicative.Builder.Internal src/Options/Applicative/Builder/Internal.hs:(165,1)-(169,36) 727           3    0.0    0.0     0.0    0.0      0       680
+     mkOption                         Options.Applicative.Builder.Internal src/Options/Applicative/Builder/Internal.hs:175:1-43         728           3    0.0    0.0     0.0    0.0      0         0
+   value                              Options.Applicative.Builder          src/Options/Applicative/Builder.hs:178:1-50                  722           2    0.0    0.0     0.0    0.0      0         0
+   flag'                              Options.Applicative.Builder          src/Options/Applicative/Builder.hs:(332,1)-(336,43)          713           1    0.0    0.0     0.0    0.0      0       136
+    flagActive                        Options.Applicative.Builder.Internal src/Options/Applicative/Builder/Internal.hs:42:5-14          718           1    0.0    0.0     0.0    0.0      0         0
+    mkParser                          Options.Applicative.Builder.Internal src/Options/Applicative/Builder/Internal.hs:(165,1)-(169,36) 714           1    0.0    0.0     0.0    0.0      0       216
+     mkOption                         Options.Applicative.Builder.Internal src/Options/Applicative/Builder/Internal.hs:175:1-43         717           1    0.0    0.0     0.0    0.0      0         0
+    long                              Options.Applicative.Builder          src/Options/Applicative/Builder.hs:166:1-32                  720           0    0.0    0.0     0.0    0.0      0         0
+     fieldMod                         Options.Applicative.Builder.Internal src/Options/Applicative/Builder/Internal.hs:133:1-28         721           0    0.0    0.0     0.0    0.0      0        72
+   fromM                              Options.Applicative.Types            src/Options/Applicative/Types.hs:288:1-26                    729           1    0.0    0.0     0.0    0.0      0        16
+    manyM                             Options.Applicative.Types            src/Options/Applicative/Types.hs:(294,1)-(298,30)            731           0    0.0    0.0     0.0    0.0      0       136
+   manyM                              Options.Applicative.Types            src/Options/Applicative/Types.hs:(294,1)-(298,30)            730           1    0.0    0.0     0.0    0.0      0       296
+    oneM                              Options.Applicative.Types            src/Options/Applicative/Types.hs:291:1-26                    732           1    0.0    0.0     0.0    0.0      0         0
+ CAF                                  GHC.Conc.Signal                      <entire-module>                                              454           0    0.0    0.0     0.0    0.0      0       640
+ CAF                                  GHC.IO.Encoding                      <entire-module>                                              437           0    0.0    0.0     0.0    0.0      0      2976
+ CAF                                  GHC.IO.Encoding.Iconv                <entire-module>                                              435           0    0.0    0.0     0.0    0.0      0       200
+ CAF                                  GHC.IO.Exception                     <entire-module>                                              429           0    0.0    0.0     0.0    0.0      0       496
+ CAF                                  GHC.IO.FD                            <entire-module>                                              428           0    0.0    0.0     0.0    0.0      0        16
+ CAF                                  GHC.IO.Handle.FD                     <entire-module>                                              426           0    0.0    0.1     0.0    0.1      0     34704
+ CAF                                  GHC.IO.Handle.Internals              <entire-module>                                              425           0    0.0    0.0     0.0    0.0      0        24
+ CAF                                  GHC.Read                             <entire-module>                                              410           0    0.0    0.0     0.0    0.0      0        96
+ CAF:ds_r5B6                          Main                                 <no location info>                                           595           0    0.0    0.0     0.0    0.0      0         0
+  optionsParser                       Main                                 ghc-prof-flamegraph.hs:(35,1)-(55,57)                        869           0    0.0    0.0     0.0    0.0      0         0
+   manyM                              Options.Applicative.Types            src/Options/Applicative/Types.hs:(294,1)-(298,30)            870           1    0.0    0.0     0.0    0.0      0       176
+    oneM                              Options.Applicative.Types            src/Options/Applicative/Types.hs:291:1-26                    872           1    0.0    0.0     0.0    0.0      0         0
+ CAF:firstLineIncludesSources2_r3VA   ProfFile                             <no location info>                                           617           0    0.0    0.0     0.0    0.0      0        64
+ CAF:firstLineIncludesSources_r2x3    ProfFile                             ProfFile.hs:148:1-24                                         618           0    0.0    0.0     0.0    0.0      0        24
+  firstLineIncludesSources            ProfFile                             ProfFile.hs:148:1-118                                        893           1    0.0    0.0     0.0    0.0      0         0
+ CAF:firstLineNoSources10_r3Vm        ProfFile                             <no location info>                                           613           0    0.0    0.0     0.0    0.0      0       448
+ CAF:firstLineNoSources12_r3Vo        ProfFile                             <no location info>                                           614           0    0.0    0.0     0.0    0.0      0       320
+ CAF:firstLineNoSources14_r3Vq        ProfFile                             <no location info>                                           615           0    0.0    0.0     0.0    0.0      0       384
+ CAF:firstLineNoSources2_r3Ve         ProfFile                             <no location info>                                           609           0    0.0    0.0     0.0    0.0      0       256
+ CAF:firstLineNoSources4_r3Vg         ProfFile                             <no location info>                                           610           0    0.0    0.0     0.0    0.0      0       384
+ CAF:firstLineNoSources6_r3Vi         ProfFile                             <no location info>                                           611           0    0.0    0.0     0.0    0.0      0       384
+ CAF:firstLineNoSources8_r3Vk         ProfFile                             <no location info>                                           612           0    0.0    0.0     0.0    0.0      0       192
+ CAF:firstLineNoSources_r2x2          ProfFile                             ProfFile.hs:144:1-18                                         616           0    0.0    0.0     0.0    0.0      0        24
+  firstLineNoSources                  ProfFile                             ProfFile.hs:144:1-105                                        892           1    0.0    0.0     0.0    0.0      0         0
+ CAF:lIndividualTime                  ProfFile                             ProfFile.hs:41:1-15                                          605           0    0.0    0.0     0.0    0.0      0        16
+  lIndividualTime                     ProfFile                             ProfFile.hs:41:1-37                                          916           1    0.0    0.0     0.0    0.0      0         0
+ CAF:lvl13_r3Wl                       ProfFile                             <no location info>                                           627           0    0.0    0.0     0.0    0.0      0         0
+  parseLine.readEither'               ProfFile                             ProfFile.hs:(117,5)-(118,43)                                 904           0    0.0    0.0     0.0    0.0      0       104
+ CAF:lvl14_r3Wn                       ProfFile                             <no location info>                                           628           0    0.0    0.0     0.0    0.0      0         0
+  parseLine.readEither'               ProfFile                             ProfFile.hs:(117,5)-(118,43)                                 903           0    0.0    0.0     0.0    0.0      0       104
+ CAF:lvl15_r5zq                       Main                                 <no location info>                                           549           0    0.0    0.0     0.0    0.0      0         0
+  optionsParser                       Main                                 ghc-prof-flamegraph.hs:(35,1)-(55,57)                        788           0    0.0    0.0     0.0    0.0      0         0
+   long                               Options.Applicative.Builder          src/Options/Applicative/Builder.hs:166:1-32                  789           0    0.0    0.0     0.0    0.0      0        16
+ CAF:lvl18_r5zt                       Main                                 <no location info>                                           550           0    0.0    0.0     0.0    0.0      0         0
+  optionsParser                       Main                                 ghc-prof-flamegraph.hs:(35,1)-(55,57)                        780           0    0.0    0.0     0.0    0.0      0        64
+   flag'                              Options.Applicative.Builder          src/Options/Applicative/Builder.hs:(332,1)-(336,43)          784           1    0.0    0.0     0.0    0.0      0       120
+    flagActive                        Options.Applicative.Builder.Internal src/Options/Applicative/Builder/Internal.hs:42:5-14          787           1    0.0    0.0     0.0    0.0      0         0
+    mkParser                          Options.Applicative.Builder.Internal src/Options/Applicative/Builder/Internal.hs:(165,1)-(169,36) 785           1    0.0    0.0     0.0    0.0      0       200
+     mkOption                         Options.Applicative.Builder.Internal src/Options/Applicative/Builder/Internal.hs:175:1-43         786           1    0.0    0.0     0.0    0.0      0         0
+   help                               Options.Applicative.Builder          src/Options/Applicative/Builder.hs:190:1-55                  783           1    0.0    0.0     0.0    0.0      0        56
+   long                               Options.Applicative.Builder          src/Options/Applicative/Builder.hs:166:1-32                  781           1    0.0    0.0     0.0    0.0      0         0
+    fieldMod                          Options.Applicative.Builder.Internal src/Options/Applicative/Builder/Internal.hs:133:1-28         782           1    0.0    0.0     0.0    0.0      0        72
+ CAF:lvl25_r5zE                       Main                                 <no location info>                                           555           0    0.0    0.0     0.0    0.0      0         0
+  optionsParser                       Main                                 ghc-prof-flamegraph.hs:(35,1)-(55,57)                        800           0    0.0    0.0     0.0    0.0      0         0
+   long                               Options.Applicative.Builder          src/Options/Applicative/Builder.hs:166:1-32                  801           0    0.0    0.0     0.0    0.0      0        16
+ CAF:lvl28_r5zH                       Main                                 <no location info>                                           556           0    0.0    0.0     0.0    0.0      0         0
+  optionsParser                       Main                                 ghc-prof-flamegraph.hs:(35,1)-(55,57)                        792           0    0.0    0.0     0.0    0.0      0        64
+   flag'                              Options.Applicative.Builder          src/Options/Applicative/Builder.hs:(332,1)-(336,43)          796           1    0.0    0.0     0.0    0.0      0       120
+    flagActive                        Options.Applicative.Builder.Internal src/Options/Applicative/Builder/Internal.hs:42:5-14          799           1    0.0    0.0     0.0    0.0      0         0
+    mkParser                          Options.Applicative.Builder.Internal src/Options/Applicative/Builder/Internal.hs:(165,1)-(169,36) 797           1    0.0    0.0     0.0    0.0      0       200
+     mkOption                         Options.Applicative.Builder.Internal src/Options/Applicative/Builder/Internal.hs:175:1-43         798           1    0.0    0.0     0.0    0.0      0         0
+   help                               Options.Applicative.Builder          src/Options/Applicative/Builder.hs:190:1-55                  795           1    0.0    0.0     0.0    0.0      0        56
+   long                               Options.Applicative.Builder          src/Options/Applicative/Builder.hs:166:1-32                  793           1    0.0    0.0     0.0    0.0      0         0
+    fieldMod                          Options.Applicative.Builder.Internal src/Options/Applicative/Builder/Internal.hs:133:1-28         794           1    0.0    0.0     0.0    0.0      0        72
+ CAF:lvl35_r5zS                       Main                                 <no location info>                                           561           0    0.0    0.0     0.0    0.0      0         0
+  optionsParser                       Main                                 ghc-prof-flamegraph.hs:(35,1)-(55,57)                        812           0    0.0    0.0     0.0    0.0      0         0
+   long                               Options.Applicative.Builder          src/Options/Applicative/Builder.hs:166:1-32                  813           0    0.0    0.0     0.0    0.0      0        16
+ CAF:lvl38_r5zV                       Main                                 <no location info>                                           562           0    0.0    0.0     0.0    0.0      0         0
+  optionsParser                       Main                                 ghc-prof-flamegraph.hs:(35,1)-(55,57)                        804           0    0.0    0.0     0.0    0.0      0        64
+   flag'                              Options.Applicative.Builder          src/Options/Applicative/Builder.hs:(332,1)-(336,43)          808           1    0.0    0.0     0.0    0.0      0       120
+    flagActive                        Options.Applicative.Builder.Internal src/Options/Applicative/Builder/Internal.hs:42:5-14          811           1    0.0    0.0     0.0    0.0      0         0
+    mkParser                          Options.Applicative.Builder.Internal src/Options/Applicative/Builder/Internal.hs:(165,1)-(169,36) 809           1    0.0    0.0     0.0    0.0      0       200
+     mkOption                         Options.Applicative.Builder.Internal src/Options/Applicative/Builder/Internal.hs:175:1-43         810           1    0.0    0.0     0.0    0.0      0         0
+   help                               Options.Applicative.Builder          src/Options/Applicative/Builder.hs:190:1-55                  807           1    0.0    0.0     0.0    0.0      0        56
+   long                               Options.Applicative.Builder          src/Options/Applicative/Builder.hs:166:1-32                  805           1    0.0    0.0     0.0    0.0      0         0
+    fieldMod                          Options.Applicative.Builder.Internal src/Options/Applicative/Builder/Internal.hs:133:1-28         806           1    0.0    0.0     0.0    0.0      0        72
+ CAF:lvl45_r5A6                       Main                                 <no location info>                                           567           0    0.0    0.0     0.0    0.0      0         0
+  optionsParser                       Main                                 ghc-prof-flamegraph.hs:(35,1)-(55,57)                        828           0    0.0    0.0     0.0    0.0      0         0
+   long                               Options.Applicative.Builder          src/Options/Applicative/Builder.hs:166:1-32                  829           0    0.0    0.0     0.0    0.0      0        16
+ CAF:lvl47_r5A9                       Main                                 <no location info>                                           569           0    0.0    0.0     0.0    0.0      0         0
+  optionsParser                       Main                                 ghc-prof-flamegraph.hs:(35,1)-(55,57)                        818           0    0.0    0.0     0.0    0.0      0        48
+   flag                               Options.Applicative.Builder          src/Options/Applicative/Builder.hs:312:1-45                  819           0    0.0    0.0     0.0    0.0      0        16
+    flag'                             Options.Applicative.Builder          src/Options/Applicative/Builder.hs:(332,1)-(336,43)          824           1    0.0    0.0     0.0    0.0      0       104
+     flagActive                       Options.Applicative.Builder.Internal src/Options/Applicative/Builder/Internal.hs:42:5-14          827           1    0.0    0.0     0.0    0.0      0         0
+     mkParser                         Options.Applicative.Builder.Internal src/Options/Applicative/Builder/Internal.hs:(165,1)-(169,36) 825           1    0.0    0.0     0.0    0.0      0       176
+      mkOption                        Options.Applicative.Builder.Internal src/Options/Applicative/Builder/Internal.hs:175:1-43         826           1    0.0    0.0     0.0    0.0      0         0
+   long                               Options.Applicative.Builder          src/Options/Applicative/Builder.hs:166:1-32                  832           0    0.0    0.0     0.0    0.0      0         0
+    fieldMod                          Options.Applicative.Builder.Internal src/Options/Applicative/Builder/Internal.hs:133:1-28         833           0    0.0    0.0     0.0    0.0      0        72
+ CAF:lvl50_r5Ac                       Main                                 <no location info>                                           570           0    0.0    0.0     0.0    0.0      0         0
+  optionsParser                       Main                                 ghc-prof-flamegraph.hs:(35,1)-(55,57)                        816           0    0.0    0.0     0.0    0.0      0        24
+   flag                               Options.Applicative.Builder          src/Options/Applicative/Builder.hs:312:1-45                  817           1    0.0    0.0     0.0    0.0      0         0
+ CAF:lvl6_r5zd                        Main                                 <no location info>                                           543           0    0.0    0.0     0.0    0.0      0         0
+  optionsParser                       Main                                 ghc-prof-flamegraph.hs:(35,1)-(55,57)                        776           0    0.0    0.0     0.0    0.0      0         0
+   long                               Options.Applicative.Builder          src/Options/Applicative/Builder.hs:166:1-32                  777           0    0.0    0.0     0.0    0.0      0        16
+ CAF:lvl79_r5B5                       Main                                 <no location info>                                           594           0    0.0    0.0     0.0    0.0      0         0
+  optionsParser                       Main                                 ghc-prof-flamegraph.hs:(35,1)-(55,57)                        873           0    0.0    0.0     0.0    0.0      0         0
+   strOption                          Options.Applicative.Builder          src/Options/Applicative/Builder.hs:365:1-22                  874           1    0.0    0.0     0.0    0.0      0        32
+    option                            Options.Applicative.Builder          src/Options/Applicative/Builder.hs:(375,1)-(380,65)          880           1    0.0    0.0     0.0    0.0      0       224
+     metavar                          Options.Applicative.Builder          src/Options/Applicative/Builder.hs:206:1-55                  881           1    0.0    0.0     0.0    0.0      0         0
+     mkParser                         Options.Applicative.Builder.Internal src/Options/Applicative/Builder/Internal.hs:(165,1)-(169,36) 882           1    0.0    0.0     0.0    0.0      0       128
+ CAF:lvl87_r5Bf                       Main                                 <no location info>                                           600           0    0.0    0.0     0.0    0.0      0        64
+ CAF:lvl94_r5Bp                       Main                                 <no location info>                                           602           0    0.0    0.0     0.0    0.0      0         0
+  main                                Main                                 ghc-prof-flamegraph.hs:(108,1)-(120,56)                      701           0    0.0    0.0     0.0    0.0      0         0
+   info                               Options.Applicative.Builder          src/Options/Applicative/Builder.hs:(459,1)-(468,34)          702           1    0.0    0.0     0.0    0.0      0        16
+    fullDesc                          Options.Applicative.Builder          src/Options/Applicative/Builder.hs:395:1-52                  704           0    0.0    0.0     0.0    0.0      0        64
+ CAF:lvl9_r5zg                        Main                                 <no location info>                                           544           0    0.0    0.0     0.0    0.0      0         0
+  optionsParser                       Main                                 ghc-prof-flamegraph.hs:(35,1)-(55,57)                        768           0    0.0    0.0     0.0    0.0      0        64
+   flag'                              Options.Applicative.Builder          src/Options/Applicative/Builder.hs:(332,1)-(336,43)          772           1    0.0    0.0     0.0    0.0      0       120
+    flagActive                        Options.Applicative.Builder.Internal src/Options/Applicative/Builder/Internal.hs:42:5-14          775           1    0.0    0.0     0.0    0.0      0         0
+    mkParser                          Options.Applicative.Builder.Internal src/Options/Applicative/Builder/Internal.hs:(165,1)-(169,36) 773           1    0.0    0.0     0.0    0.0      0       200
+     mkOption                         Options.Applicative.Builder.Internal src/Options/Applicative/Builder/Internal.hs:175:1-43         774           1    0.0    0.0     0.0    0.0      0         0
+   help                               Options.Applicative.Builder          src/Options/Applicative/Builder.hs:190:1-55                  771           1    0.0    0.0     0.0    0.0      0        56
+   long                               Options.Applicative.Builder          src/Options/Applicative/Builder.hs:166:1-32                  769           1    0.0    0.0     0.0    0.0      0         0
+    fieldMod                          Options.Applicative.Builder.Internal src/Options/Applicative/Builder/Internal.hs:133:1-28         770           1    0.0    0.0     0.0    0.0      0        72
+ CAF:m1_r5Am                          Main                                 <no location info>                                           575           0    0.0    0.0     0.0    0.0      0         0
+  optionsParser                       Main                                 ghc-prof-flamegraph.hs:(35,1)-(55,57)                        836           0    0.0    0.0     0.0    0.0      0       200
+   help                               Options.Applicative.Builder          src/Options/Applicative/Builder.hs:190:1-55                  838           1    0.0    0.0     0.0    0.0      0        56
+   metavar                            Options.Applicative.Builder          src/Options/Applicative/Builder.hs:206:1-55                  837           1    0.0    0.0     0.0    0.0      0        56
+ CAF:m2_r5AM                          Main                                 <no location info>                                           585           0    0.0    0.0     0.0    0.0      0         0
+  optionsParser                       Main                                 ghc-prof-flamegraph.hs:(35,1)-(55,57)                        857           0    0.0    0.0     0.0    0.0      0       280
+   help                               Options.Applicative.Builder          src/Options/Applicative/Builder.hs:190:1-55                  863           1    0.0    0.0     0.0    0.0      0        56
+   long                               Options.Applicative.Builder          src/Options/Applicative/Builder.hs:166:1-32                  860           1    0.0    0.0     0.0    0.0      0         0
+    fieldMod                          Options.Applicative.Builder.Internal src/Options/Applicative/Builder/Internal.hs:133:1-28         861           1    0.0    0.0     0.0    0.0      0         0
+   metavar                            Options.Applicative.Builder          src/Options/Applicative/Builder.hs:206:1-55                  862           1    0.0    0.0     0.0    0.0      0        56
+   short                              Options.Applicative.Builder          src/Options/Applicative/Builder.hs:162:1-34                  858           1    0.0    0.0     0.0    0.0      0         0
+    fieldMod                          Options.Applicative.Builder.Internal src/Options/Applicative/Builder/Internal.hs:133:1-28         859           1    0.0    0.0     0.0    0.0      0         0
+ CAF:m3_r5B4                          Main                                 <no location info>                                           593           0    0.0    0.0     0.0    0.0      0         0
+  optionsParser                       Main                                 ghc-prof-flamegraph.hs:(35,1)-(55,57)                        875           0    0.0    0.0     0.0    0.0      0       240
+   help                               Options.Applicative.Builder          src/Options/Applicative/Builder.hs:190:1-55                  879           1    0.0    0.0     0.0    0.0      0        56
+   long                               Options.Applicative.Builder          src/Options/Applicative/Builder.hs:166:1-32                  876           1    0.0    0.0     0.0    0.0      0         0
+    fieldMod                          Options.Applicative.Builder.Internal src/Options/Applicative/Builder/Internal.hs:133:1-28         877           1    0.0    0.0     0.0    0.0      0         0
+   metavar                            Options.Applicative.Builder          src/Options/Applicative/Builder.hs:206:1-55                  878           1    0.0    0.0     0.0    0.0      0        56
+ CAF:m_r5A8                           Main                                 <no location info>                                           568           0    0.0    0.0     0.0    0.0      0         0
+  optionsParser                       Main                                 ghc-prof-flamegraph.hs:(35,1)-(55,57)                        820           0    0.0    0.0     0.0    0.0      0       200
+   help                               Options.Applicative.Builder          src/Options/Applicative/Builder.hs:190:1-55                  823           1    0.0    0.0     0.0    0.0      0        56
+   long                               Options.Applicative.Builder          src/Options/Applicative/Builder.hs:166:1-32                  821           1    0.0    0.0     0.0    0.0      0         0
+    fieldMod                          Options.Applicative.Builder.Internal src/Options/Applicative/Builder/Internal.hs:133:1-28         822           1    0.0    0.0     0.0    0.0      0         0
+ CAF:main1                            Main                                 <no location info>                                           603           0    0.0    0.0     0.0    0.0      0        16
+  main                                Main                                 ghc-prof-flamegraph.hs:(108,1)-(120,56)                      674           1    0.0    0.0     0.0    0.0      0         0
+ CAF:optionsParser10_r5B7             Main                                 <no location info>                                           596           0    0.0    0.0     0.0    0.0      0         0
+  optionsParser                       Main                                 ghc-prof-flamegraph.hs:(35,1)-(55,57)                        867           0    0.0    0.0     0.0    0.0      0         0
+   fromM                              Options.Applicative.Types            src/Options/Applicative/Types.hs:288:1-26                    868           1    0.0    0.0     0.0    0.0      0        16
+   manyM                              Options.Applicative.Types            src/Options/Applicative/Types.hs:(294,1)-(298,30)            871           0    0.0    0.0     0.0    0.0      0       136
+ CAF:optionsParser1_r5Ae              Main                                 <no location info>                                           571           0    0.0    0.0     0.0    0.0      0         0
+  optionsParser                       Main                                 ghc-prof-flamegraph.hs:(35,1)-(55,57)                        767           0    0.0    0.0     0.0    0.0      0      1464
+ CAF:optionsParser2_r5Ao              Main                                 <no location info>                                           576           0    0.0    0.0     0.0    0.0      0         0
+  optionsParser                       Main                                 ghc-prof-flamegraph.hs:(35,1)-(55,57)                        834           0    0.0    0.0     0.0    0.0      0       200
+   strArgument                        Options.Applicative.Builder          src/Options/Applicative/Builder.hs:298:1-26                  835           1    0.0    0.0     0.0    0.0      0        32
+    argument                          Options.Applicative.Builder          src/Options/Applicative/Builder.hs:(290,1)-(294,25)          839           1    0.0    0.0     0.0    0.0      0       136
+     mkParser                         Options.Applicative.Builder.Internal src/Options/Applicative/Builder/Internal.hs:(165,1)-(169,36) 840           1    0.0    0.0     0.0    0.0      0       200
+      mkOption                        Options.Applicative.Builder.Internal src/Options/Applicative/Builder/Internal.hs:175:1-43         841           1    0.0    0.0     0.0    0.0      0         0
+    str                               Options.Applicative.Builder          src/Options/Applicative/Builder.hs:134:1-30                  848           1    0.0    0.0     0.0    0.0      0         0
+ CAF:optionsParser7_r5AN              Main                                 <no location info>                                           586           0    0.0    0.0     0.0    0.0      0         0
+  optionsParser                       Main                                 ghc-prof-flamegraph.hs:(35,1)-(55,57)                        855           0    0.0    0.0     0.0    0.0      0        48
+   strOption                          Options.Applicative.Builder          src/Options/Applicative/Builder.hs:365:1-22                  856           1    0.0    0.0     0.0    0.0      0        32
+    option                            Options.Applicative.Builder          src/Options/Applicative/Builder.hs:(375,1)-(380,65)          864           1    0.0    0.0     0.0    0.0      0       224
+     metavar                          Options.Applicative.Builder          src/Options/Applicative/Builder.hs:206:1-55                  865           1    0.0    0.0     0.0    0.0      0         0
+     mkParser                         Options.Applicative.Builder.Internal src/Options/Applicative/Builder/Internal.hs:(165,1)-(169,36) 866           1    0.0    0.0     0.0    0.0      0       128
+ CAF:optionsParser_r33i               Main                                 ghc-prof-flamegraph.hs:35:1-13                               597           0    0.0    0.0     0.0    0.0      0        24
+  optionsParser                       Main                                 ghc-prof-flamegraph.hs:(35,1)-(55,57)                        766           1    0.0    0.0     0.0    0.0      0         0
+ main                                 Main                                 ghc-prof-flamegraph.hs:(108,1)-(120,56)                      675           0   30.4    9.4   100.0   99.9      7   5617272
+  checkNames                          Main                                 ghc-prof-flamegraph.hs:(58,1)-(66,83)                        905           1    0.0    0.0     0.0    0.0      0         0
+  generateFrames                      Main                                 ghc-prof-flamegraph.hs:(87,1)-(105,43)                       907           1    0.0    0.0    21.7   29.7      0       112
+   generateFrames.go                  Main                                 ghc-prof-flamegraph.hs:(90,5)-(98,88)                        910        1411    0.0    0.9    21.7   29.7      0    525080
+    generateFrames.go.(...)           Main                                 ghc-prof-flamegraph.hs:97:11-53                              925         705    0.0    0.0     0.0    0.0      0     16920
+    generateFrames.go.(...)           Main                                 ghc-prof-flamegraph.hs:96:11-87                              922         705    0.0    0.1     0.0    0.1      0     33840
+     lChildren                        ProfFile                             ProfFile.hs:37:5-13                                          923         705    0.0    0.0     0.0    0.0      0         0
+    generateFrames.go.childrenEntries Main                                 ghc-prof-flamegraph.hs:96:11-87                              921         705    0.0    0.0     0.0    0.0      0         0
+    generateFrames.go.childrenFrames  Main                                 ghc-prof-flamegraph.hs:96:11-87                              932         705    0.0    0.0     0.0    0.0      0         0
+    generateFrames.go.entries         Main                                 ghc-prof-flamegraph.hs:93:11-82                              911         705    0.0    0.0     0.0    0.1      0     22560
+     normalize                        Main                                 ghc-prof-flamegraph.hs:(69,1)-(71,23)                        912         705    0.0    0.0     0.0    0.0      0     11280
+     optionsReportType                Main                                 ghc-prof-flamegraph.hs:21:5-21                               913           1    0.0    0.0     0.0    0.0      0         0
+     generateFrames.individualMeasure Main                                 ghc-prof-flamegraph.hs:(100,5)-(105,43)                      917           0    0.0    0.0     0.0    0.0      0         0
+      lIndividualTime                 ProfFile                             ProfFile.hs:41:1-37                                          918           0    0.0    0.0     0.0    0.0      0         0
+       lTime                          ProfFile                             ProfFile.hs:33:5-9                                           919         705    0.0    0.0     0.0    0.0      0         0
+       tIndividual                    ProfFile                             ProfFile.hs:24:5-15                                          920         705    0.0    0.0     0.0    0.0      0         0
+    generateFrames.go.frame           Main                                 ghc-prof-flamegraph.hs:95:11-83                              928         705   17.4   27.5    17.4   27.5      4  16391432
+    generateFrames.go.restEntries     Main                                 ghc-prof-flamegraph.hs:97:11-53                              924         705    0.0    0.0     0.0    0.0      0         0
+    generateFrames.go.restFrames      Main                                 ghc-prof-flamegraph.hs:97:11-53                              933         705    0.0    0.0     0.0    0.0      0         0
+    generateFrames.go.symbol          Main                                 ghc-prof-flamegraph.hs:94:11-68                              929         705    4.3    1.2     4.3    1.2      1    699032
+     lCostCentre                      ProfFile                             ProfFile.hs:29:5-15                                          931         705    0.0    0.0     0.0    0.0      0         0
+     lModule                          ProfFile                             ProfFile.hs:30:5-11                                          930         705    0.0    0.0     0.0    0.0      0         0
+   addUnknown                         Main                                 ghc-prof-flamegraph.hs:(74,1)-(84,18)                        909           1    0.0    0.0     0.0    0.0      0         0
+    addUnknown.\                      Main                                 ghc-prof-flamegraph.hs:(75,3)-(78,16)                        926           1    0.0    0.0     0.0    0.0      0       728
+     addUnknown.\.unknown             Main                                 ghc-prof-flamegraph.hs:75:7-30                               927           1    0.0    0.0     0.0    0.0      0         0
+   generateFrames.individualMeasure   Main                                 ghc-prof-flamegraph.hs:(100,5)-(105,43)                      914           1    0.0    0.0     0.0    0.0      0        16
+    optionsReportType                 Main                                 ghc-prof-flamegraph.hs:21:5-21                               915           1    0.0    0.0     0.0    0.0      0         0
+   optionsReportType                  Main                                 ghc-prof-flamegraph.hs:21:5-21                               908           1    0.0    0.0     0.0    0.0      0         0
+  optionsProfFile                     Main                                 ghc-prof-flamegraph.hs:22:5-19                               889           1    0.0    0.0     0.0    0.0      0         0
+  optionsReportType                   Main                                 ghc-prof-flamegraph.hs:21:5-21                               906           1    0.0    0.0     0.0    0.0      0         0
+  parse                               ProfFile                             ProfFile.hs:(157,1)-(159,57)                                 890           1   26.1   23.5    47.8   60.5      6  13979640
+   findStart                          ProfFile                             ProfFile.hs:(151,1)-(154,73)                                 891          27    0.0    0.0     0.0    0.0      0     23160
+   processLines                       ProfFile                             ProfFile.hs:(123,1)-(141,74)                                 894           1    0.0    0.0    21.7   37.0      0        32
+    processLines.go                   ProfFile                             ProfFile.hs:(130,5)-(141,74)                                 895        1411    0.0    0.3    21.7   37.0      0    186184
+     processLines.go.(...)            ProfFile                             ProfFile.hs:133:11-53                                        896        1408    0.0    2.0     0.0    2.0      0   1191040
+     processLines.go.depth            ProfFile                             ProfFile.hs:134:11-31                                        898        1408    0.0    0.0     0.0    0.0      0         0
+     processLines.go.spaces           ProfFile                             ProfFile.hs:133:11-53                                        897        1408    0.0    0.0     0.0    0.0      0         0
+     parseLine                        ProfFile                             ProfFile.hs:(57,1)-(118,43)                                  900         705    0.0    7.7    21.7   34.7      0   4595648
+      parseLine.parse'                ProfFile                             ProfFile.hs:(106,5)-(115,78)                                 901         705    0.0    0.2    21.7   27.0      0    141000
+       parseLine.readEither'          ProfFile                             ProfFile.hs:(117,5)-(118,43)                                 902        4230   21.7   26.8    21.7   26.8      5  15935424
+     processLines.go.rest             ProfFile                             ProfFile.hs:133:11-53                                        899         705    0.0    0.0     0.0    0.0      0         0
+  execParser                          Options.Applicative.Extra            src/Options/Applicative/Extra.hs:115:1-42                    677           0    0.0    0.0     0.0    0.2      0        24
+   customExecParser                   Options.Applicative.Extra            src/Options/Applicative/Extra.hs:(119,1)-(121,23)            678           1    0.0    0.0     0.0    0.2      0      1280
+    execParserPure                    Options.Applicative.Extra            src/Options/Applicative/Extra.hs:(155,1)-(164,33)            679           1    0.0    0.0     0.0    0.2      0        16
+     runP                             Options.Applicative.Internal         src/Options/Applicative/Internal.hs:91:1-59                  680           1    0.0    0.0     0.0    0.2      0      2304
+      bashCompletionParser            Options.Applicative.BashCompletion   src/Options/Applicative/BashCompletion.hs:(40,1)-(72,7)      706           1    0.0    0.0     0.0    0.0      0      1160
+      infoParser                      Options.Applicative.Types            src/Options/Applicative/Types.hs:90:5-14                     745           1    0.0    0.0     0.0    0.0      0         0
+      runParserInfo                   Options.Applicative.Common           src/Options/Applicative/Common.hs:233:1-62                   681           1    0.0    0.0     0.0    0.2      0       136
+       infoParser                     Options.Applicative.Types            src/Options/Applicative/Types.hs:90:5-14                     705           1    0.0    0.0     0.0    0.0      0         0
+       infoPolicy                     Options.Applicative.Types            src/Options/Applicative/Types.hs:97:5-14                     700           1    0.0    0.0     0.0    0.0      0         0
+       runParserFully                 Options.Applicative.Common           src/Options/Applicative/Common.hs:(236,1)-(240,33)           685           1    0.0    0.0     0.0    0.2      0       184
+        runParser                     Options.Applicative.Common           src/Options/Applicative/Common.hs:(203,1)-(220,24)           687           2    0.0    0.0     0.0    0.2      0      1440
+         evalParser                   Options.Applicative.Common           src/Options/Applicative/Common.hs:(245,1)-(249,56)           854          27    0.0    0.0     0.0    0.0      0       360
+          optionsParser               Main                                 ghc-prof-flamegraph.hs:(35,1)-(55,57)                        884           0    0.0    0.0     0.0    0.0      0        40
+           manyM                      Options.Applicative.Types            src/Options/Applicative/Types.hs:(294,1)-(298,30)            885           0    0.0    0.0     0.0    0.0      0         0
+            runParserM                Options.Applicative.Types            src/Options/Applicative/Types.hs:274:5-14                    887           1    0.0    0.0     0.0    0.0      0         0
+            oneM                      Options.Applicative.Types            src/Options/Applicative/Types.hs:291:1-26                    886           0    0.0    0.0     0.0    0.0      0         0
+         runParserStep                Options.Applicative.Common           src/Options/Applicative/Common.hs:(223,1)-(227,35)           689           1    0.0    0.1     0.0    0.2      0     30432
+          optMain                     Options.Applicative.Types            src/Options/Applicative/Types.hs:172:5-11                    716          30    0.0    0.0     0.0    0.0      0         0
+          <!>                         Options.Applicative.Internal         src/Options/Applicative/Internal.hs:(249,1)-(252,15)         707           8    0.0    0.1     0.0    0.1      0     74688
+           cut                        Options.Applicative.Internal         src/Options/Applicative/Internal.hs:255:1-31                 843           0    0.0    0.0     0.0    0.0      0       480
+           runReadM                   Options.Applicative.Internal         src/Options/Applicative/Internal.hs:98:1-63                  852           0    0.0    0.0     0.0    0.0      0         0
+            hoistEither               Options.Applicative.Internal         src/Options/Applicative/Internal.hs:88:1-34                  853           0    0.0    0.0     0.0    0.0      0        80
+          evalParser                  Options.Applicative.Common           src/Options/Applicative/Common.hs:(245,1)-(249,56)           738           3    0.0    0.0     0.0    0.0      0         0
+          cut                         Options.Applicative.Internal         src/Options/Applicative/Internal.hs:255:1-31                 842           1    0.0    0.0     0.0    0.0      0         0
+          disamb                      Options.Applicative.Internal         src/Options/Applicative/Internal.hs:(258,1)-(265,18)         691           1    0.0    0.0     0.0    0.0      0       296
+           runListT                   Options.Applicative.Internal         src/Options/Applicative/Internal.hs:(183,1)-(187,43)         692           2    0.0    0.0     0.0    0.0      0       360
+           takeListT                  Options.Applicative.Internal         src/Options/Applicative/Internal.hs:(179,1)-(180,75)         699           0    0.0    0.0     0.0    0.0      0       160
+          prefDisambiguate            Options.Applicative.Types            src/Options/Applicative/Types.hs:113:5-20                    693           1    0.0    0.0     0.0    0.0      0         0
+          runReadM                    Options.Applicative.Internal         src/Options/Applicative/Internal.hs:98:1-63                  844           1    0.0    0.0     0.0    0.0      0        80
+           crReader                   Options.Applicative.Types            src/Options/Applicative/Types.hs:232:5-12                    846           1    0.0    0.0     0.0    0.0      0         0
+            optionsParser             Main                                 ghc-prof-flamegraph.hs:(35,1)-(55,57)                        847           0    0.0    0.0     0.0    0.0      0        64
+             strArgument              Options.Applicative.Builder          src/Options/Applicative/Builder.hs:298:1-26                  849           0    0.0    0.0     0.0    0.0      0         0
+              str                     Options.Applicative.Builder          src/Options/Applicative/Builder.hs:134:1-30                  850           0    0.0    0.0     0.0    0.0      0        32
+           hoistEither                Options.Applicative.Internal         src/Options/Applicative/Internal.hs:88:1-34                  845           1    0.0    0.0     0.0    0.0      0       104
+          bashCompletionParser        Options.Applicative.BashCompletion   src/Options/Applicative/BashCompletion.hs:(40,1)-(72,7)      740           0    0.0    0.0     0.0    0.0      0         0
+           fromM                      Options.Applicative.Types            src/Options/Applicative/Types.hs:288:1-26                    741           0    0.0    0.0     0.0    0.0      0         0
+            manyM                     Options.Applicative.Types            src/Options/Applicative/Types.hs:(294,1)-(298,30)            742           0    0.0    0.0     0.0    0.0      0         0
+             runParserM               Options.Applicative.Types            src/Options/Applicative/Types.hs:274:5-14                    744           1    0.0    0.0     0.0    0.0      0         0
+             oneM                     Options.Applicative.Types            src/Options/Applicative/Types.hs:291:1-26                    743           0    0.0    0.0     0.0    0.0      0         0
+    handleParseResult                 Options.Applicative.Extra            src/Options/Applicative/Extra.hs:(125,1)-(137,17)            888           1    0.0    0.0     0.0    0.0      0        16
