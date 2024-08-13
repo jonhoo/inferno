@@ -104,7 +104,7 @@ impl PaletteMap {
         let mut file = OpenOptions::new()
             .write(true)
             .create(true)
-            // TODO changes behaviour .truncate(true)
+            .truncate(true)
             .open(path)?;
         self.to_writer(&mut file)
     }
