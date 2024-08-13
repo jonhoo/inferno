@@ -101,7 +101,11 @@ impl PaletteMap {
     ///
     /// The file content will follow the format described in [`from_reader`](Self::from_reader).
     pub fn save_to_file(&self, path: &dyn AsRef<Path>) -> io::Result<()> {
-        let mut file = OpenOptions::new().write(true).create(true).open(path)?;
+        let mut file = OpenOptions::new()
+            .write(true)
+            .create(true)
+            // TODO changes behaviour .truncate(true)
+            .open(path)?;
         self.to_writer(&mut file)
     }
 

@@ -113,5 +113,5 @@ fn collapse_ghcprof_cli() {
         .arg("--bytes")
         .output()
         .expect("failed to execute process");
-    assert_eq!(output.status.success(), false);
+    assert!(!output.status.success());
 }
