@@ -384,15 +384,15 @@ pub(super) fn color(
             hash ^= *byte as u64;
             hash = hash.wrapping_mul(0x100000001b3);
         }
-        let hash1 = (hash as f64 / std::u64::MAX as f64) as f32;
+        let hash1 = (hash as f64 / u64::MAX as f64) as f32;
 
         // Rotate hash so we get two more distinct numbers
         hash ^= 0;
         hash = hash.wrapping_mul(0x100000001b3);
-        let hash2 = (hash as f64 / std::u64::MAX as f64) as f32;
+        let hash2 = (hash as f64 / u64::MAX as f64) as f32;
         hash ^= 0;
         hash = hash.wrapping_mul(0x100000001b3);
-        let hash3 = (hash as f64 / std::u64::MAX as f64) as f32;
+        let hash3 = (hash as f64 / u64::MAX as f64) as f32;
 
         (hash1, hash2, hash3)
     } else {
@@ -489,7 +489,7 @@ mod tests {
 
     macro_rules! test_hash {
         ($name:expr, $expected:expr) => {
-            assert!((dbg!(namehash($name.bytes())) - $expected).abs() < std::f32::EPSILON);
+            assert!((dbg!(namehash($name.bytes())) - $expected).abs() < f32::EPSILON);
         };
     }
 

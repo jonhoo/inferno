@@ -186,7 +186,7 @@ mod test {
 
     #[test]
     fn func_frame_attrs_map_from_reader() {
-        let foo = vec![
+        let foo = [
             "foo",
             // Without quotes
             "title=foo title",
@@ -201,7 +201,7 @@ mod test {
         ]
         .join("\t");
 
-        let bar = vec![
+        let bar = [
             "bar",
             "class=bar class",
             "href=bar href",
@@ -211,7 +211,7 @@ mod test {
         ]
         .join("\t");
 
-        let s = vec![foo, bar].join("\n");
+        let s = [foo, bar].join("\n");
         let r = s.as_bytes();
 
         let mut expected_inner = AHashMap::default();

@@ -549,10 +549,9 @@ impl Folder {
                 } else if self.opt.annotate_jit
                     && ((module.starts_with("/tmp/perf-") && module.ends_with(".map"))
                         || (module.contains("/jitted-") && module.ends_with(".so")))
+                    && !func.contains("_[j]")
                 {
-                    if !func.contains("_[j]") {
-                        func.push_str("_[j]"); // jitted
-                    }
+                    func.push_str("_[j]"); // jitted
                 }
 
                 self.cache_line.push(func);

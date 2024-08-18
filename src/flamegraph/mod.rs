@@ -617,7 +617,7 @@ where
                     function, samples_txt, opt.count_name, pct
                 ),
                 // Special case delta == 0 so we don't format percentage with a + sign.
-                Some(delta) if delta == 0 => write!(
+                Some(0) => write!(
                     buffer,
                     "{} ({} {}, {:.2}%; 0.00%)",
                     function, samples_txt, opt.count_name, pct,
@@ -755,18 +755,18 @@ fn write_container_start<'a, W: Write>(
     if let Some(frame_attributes) = frame_attributes {
         if frame_attributes.attrs.contains_key("xlink:href") {
             write_container_attributes(cache_a, frame_attributes);
-            svg.write_event(&cache_a)?;
+            svg.write_event(cache_a)?;
             has_href = true;
         } else {
             write_container_attributes(cache_g, frame_attributes);
-            svg.write_event(&cache_g)?;
+            svg.write_event(cache_g)?;
         }
         if let Some(ref t) = frame_attributes.title {
             title = t.as_str();
         }
     } else if let Event::Start(ref mut c) = cache_g {
         c.clear_attributes();
-        svg.write_event(&cache_g)?;
+        svg.write_event(cache_g)?;
     }
 
     Ok((has_href, title))
@@ -916,7 +916,7 @@ fn filled_rectangle<W: Write>(
     } else {
         unreachable!("cache wrapper was of wrong type: {:?}", cache_rect);
     }
-    svg.write_event(&cache_rect)
+    svg.write_event(cache_rect)
 }
 
 fn write_usize(buffer: &mut StrStack, value: usize) -> usize {
