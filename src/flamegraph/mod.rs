@@ -500,10 +500,9 @@ where
         )?;
         svg.write_event(Event::End(BytesEnd::new("svg")))?;
         svg.write_event(Event::Eof)?;
-        return Err(quick_xml::Error::Io(io::Error::new(
-            io::ErrorKind::InvalidData,
-            "No stack counts found",
-        )));
+        return Err(quick_xml::Error::Io(
+            io::Error::new(io::ErrorKind::InvalidData, "No stack counts found").into(),
+        ));
     }
 
     let image_width = opt.image_width.unwrap_or(DEFAULT_IMAGE_WIDTH) as f64;
@@ -724,9 +723,9 @@ where
 
         buffer.clear();
         if has_href {
-            svg.write_event(&cache_a_end)?;
+            svg.write_event(cache_a_end.borrow())?;
         } else {
-            svg.write_event(&cache_g_end)?;
+            svg.write_event(cache_g_end.borrow())?;
         }
     }
 
@@ -755,18 +754,18 @@ fn write_container_start<'a, W: Write>(
     if let Some(frame_attributes) = frame_attributes {
         if frame_attributes.attrs.contains_key("xlink:href") {
             write_container_attributes(cache_a, frame_attributes);
-            svg.write_event(cache_a)?;
+            svg.write_event(cache_a.borrow())?;
             has_href = true;
         } else {
             write_container_attributes(cache_g, frame_attributes);
-            svg.write_event(cache_g)?;
+            svg.write_event(cache_g.borrow())?;
         }
         if let Some(ref t) = frame_attributes.title {
             title = t.as_str();
         }
     } else if let Event::Start(ref mut c) = cache_g {
         c.clear_attributes();
-        svg.write_event(cache_g)?;
+        svg.write_event(cache_g.borrow())?;
     }
 
     Ok((has_href, title))
@@ -783,7 +782,7 @@ fn write_container_start<'a, W: Write>(
 ) -> quick_xml::Result<(bool, &'a str)> {
     if let Event::Start(ref mut c) = cache_g {
         c.clear_attributes();
-        svg.write_event(&cache_g)?;
+        svg.write_event(cache_g.borrow())?;
     }
 
     Ok((false, title))
@@ -833,6 +832,7 @@ where
     for mut reader in readers {
         reader
             .read_to_string(&mut input)
+            .map_err(std::sync::Arc::new)
             .map_err(quick_xml::Error::Io)?;
     }
     from_lines(opt, input.lines(), writer)
@@ -852,7 +852,9 @@ pub fn from_files<W: Write>(
         let r = BufReader::with_capacity(128 * 1024, stdin.lock());
         from_reader(opt, r, writer)
     } else if files.len() == 1 {
-        let r = File::open(&files[0]).map_err(quick_xml::Error::Io)?;
+        let r = File::open(&files[0])
+            .map_err(std::sync::Arc::new)
+            .map_err(quick_xml::Error::Io)?;
         from_reader(opt, r, writer)
     } else {
         let stdin = io::stdin();
@@ -866,7 +868,9 @@ pub fn from_files<W: Write>(
                     stdin_added = true;
                 }
             } else {
-                let r = File::open(infile).map_err(quick_xml::Error::Io)?;
+                let r = File::open(infile)
+                    .map_err(std::sync::Arc::new)
+                    .map_err(quick_xml::Error::Io)?;
                 readers.push(Box::new(r));
             }
         }
@@ -916,7 +920,7 @@ fn filled_rectangle<W: Write>(
     } else {
         unreachable!("cache wrapper was of wrong type: {:?}", cache_rect);
     }
-    svg.write_event(cache_rect)
+    svg.write_event(cache_rect.borrow())
 }
 
 fn write_usize(buffer: &mut StrStack, value: usize) -> usize {

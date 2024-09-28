@@ -343,7 +343,9 @@ fn main() -> quick_xml::Result<()> {
         )?;
     }
 
-    save_consistent_palette_if_needed(&palette_map, PALETTE_MAP_FILE).map_err(quick_xml::Error::Io)
+    save_consistent_palette_if_needed(&palette_map, PALETTE_MAP_FILE)
+        .map_err(std::sync::Arc::new)
+        .map_err(quick_xml::Error::Io)
 }
 
 fn fetch_consistent_palette_if_needed(

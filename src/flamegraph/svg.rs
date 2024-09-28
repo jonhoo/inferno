@@ -290,7 +290,7 @@ where
             unreachable!("cache wrapper was of wrong type: {:?}", start_event);
         }
 
-        svg.write_event(&*start_event.borrow())
+        svg.write_event(start_event.borrow().borrow())
     })?;
     let s = match text {
         TextArgument::String(ref s) => s,

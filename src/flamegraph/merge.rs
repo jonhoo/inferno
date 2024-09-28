@@ -128,10 +128,10 @@ where
         if !suppress_sort_check {
             if let Some(prev_line) = prev_line {
                 if prev_line > line {
-                    return Err(quick_xml::Error::Io(io::Error::new(
-                        io::ErrorKind::InvalidData,
-                        "unsorted input lines detected",
-                    )));
+                    return Err(quick_xml::Error::Io(
+                        io::Error::new(io::ErrorKind::InvalidData, "unsorted input lines detected")
+                            .into(),
+                    ));
                 }
             }
         }
