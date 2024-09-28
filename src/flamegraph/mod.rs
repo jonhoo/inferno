@@ -393,7 +393,7 @@ impl Rectangle {
 ///
 /// [differential flame graph]: http://www.brendangregg.com/blog/2014-11-09/differential-flame-graphs.html
 #[allow(clippy::cognitive_complexity)]
-pub fn from_lines<'a, I, W>(opt: &mut Options<'_>, lines: I, writer: W) -> quick_xml::Result<()>
+pub fn from_lines<'a, I, W>(opt: &mut Options<'_>, lines: I, writer: W) -> io::Result<()>
 where
     I: IntoIterator<Item = &'a str>,
     W: Write,
@@ -500,10 +500,10 @@ where
         )?;
         svg.write_event(Event::End(BytesEnd::new("svg")))?;
         svg.write_event(Event::Eof)?;
-        return Err(quick_xml::Error::Io(io::Error::new(
+        return Err(io::Error::new(
             io::ErrorKind::InvalidData,
             "No stack counts found",
-        )));
+        ));
     }
 
     let image_width = opt.image_width.unwrap_or(DEFAULT_IMAGE_WIDTH) as f64;
@@ -724,9 +724,9 @@ where
 
         buffer.clear();
         if has_href {
-            svg.write_event(&cache_a_end)?;
+            svg.write_event(cache_a_end.borrow())?;
         } else {
-            svg.write_event(&cache_g_end)?;
+            svg.write_event(cache_g_end.borrow())?;
         }
     }
 
@@ -746,7 +746,7 @@ fn write_container_start<'a, W: Write>(
     cache_g: &mut Event<'_>,
     frame: &merge::TimedFrame<'_>,
     mut title: &'a str,
-) -> quick_xml::Result<(bool, &'a str)> {
+) -> io::Result<(bool, &'a str)> {
     let frame_attributes = opt
         .func_frameattrs
         .frameattrs_for_func(frame.location.function);
@@ -755,18 +755,18 @@ fn write_container_start<'a, W: Write>(
     if let Some(frame_attributes) = frame_attributes {
         if frame_attributes.attrs.contains_key("xlink:href") {
             write_container_attributes(cache_a, frame_attributes);
-            svg.write_event(cache_a)?;
+            svg.write_event(cache_a.borrow())?;
             has_href = true;
         } else {
             write_container_attributes(cache_g, frame_attributes);
-            svg.write_event(cache_g)?;
+            svg.write_event(cache_g.borrow())?;
         }
         if let Some(ref t) = frame_attributes.title {
             title = t.as_str();
         }
     } else if let Event::Start(ref mut c) = cache_g {
         c.clear_attributes();
-        svg.write_event(cache_g)?;
+        svg.write_event(cache_g.borrow())?;
     }
 
     Ok((has_href, title))
@@ -780,10 +780,10 @@ fn write_container_start<'a, W: Write>(
     cache_g: &mut Event<'_>,
     _frame: &merge::TimedFrame<'_>,
     title: &'a str,
-) -> quick_xml::Result<(bool, &'a str)> {
+) -> io::Result<(bool, &'a str)> {
     if let Event::Start(ref mut c) = cache_g {
         c.clear_attributes();
-        svg.write_event(&cache_g)?;
+        svg.write_event(cache_g.borrow())?;
     }
 
     Ok((false, title))
@@ -810,7 +810,7 @@ fn write_container_attributes(event: &mut Event<'_>, frame_attributes: &FrameAtt
 /// See [`from_lines`] for the expected format of each line.
 ///
 /// The resulting flame graph will be written out to `writer` in SVG format.
-pub fn from_reader<R, W>(opt: &mut Options<'_>, reader: R, writer: W) -> quick_xml::Result<()>
+pub fn from_reader<R, W>(opt: &mut Options<'_>, reader: R, writer: W) -> io::Result<()>
 where
     R: Read,
     W: Write,
@@ -823,7 +823,7 @@ where
 /// See [`from_lines`] for the expected format of each line.
 ///
 /// The resulting flame graph will be written out to `writer` in SVG format.
-pub fn from_readers<R, W>(opt: &mut Options<'_>, readers: R, writer: W) -> quick_xml::Result<()>
+pub fn from_readers<R, W>(opt: &mut Options<'_>, readers: R, writer: W) -> io::Result<()>
 where
     R: IntoIterator,
     R::Item: Read,
@@ -831,9 +831,7 @@ where
 {
     let mut input = String::new();
     for mut reader in readers {
-        reader
-            .read_to_string(&mut input)
-            .map_err(quick_xml::Error::Io)?;
+        reader.read_to_string(&mut input)?;
     }
     from_lines(opt, input.lines(), writer)
 }
@@ -842,17 +840,13 @@ where
 /// and write the result to provided `writer`.
 ///
 /// If files is empty, STDIN will be used as input.
-pub fn from_files<W: Write>(
-    opt: &mut Options<'_>,
-    files: &[PathBuf],
-    writer: W,
-) -> quick_xml::Result<()> {
+pub fn from_files<W: Write>(opt: &mut Options<'_>, files: &[PathBuf], writer: W) -> io::Result<()> {
     if files.is_empty() || files.len() == 1 && files[0].to_str() == Some("-") {
         let stdin = io::stdin();
         let r = BufReader::with_capacity(128 * 1024, stdin.lock());
         from_reader(opt, r, writer)
     } else if files.len() == 1 {
-        let r = File::open(&files[0]).map_err(quick_xml::Error::Io)?;
+        let r = File::open(&files[0])?;
         from_reader(opt, r, writer)
     } else {
         let stdin = io::stdin();
@@ -866,7 +860,7 @@ pub fn from_files<W: Write>(
                     stdin_added = true;
                 }
             } else {
-                let r = File::open(infile).map_err(quick_xml::Error::Io)?;
+                let r = File::open(infile)?;
                 readers.push(Box::new(r));
             }
         }
@@ -892,7 +886,7 @@ fn filled_rectangle<W: Write>(
     rect: &Rectangle,
     color: Color,
     cache_rect: &mut Event<'_>,
-) -> quick_xml::Result<()> {
+) -> io::Result<()> {
     let x = write!(buffer, "{:.4}%", rect.x1_pct);
     let y = write_usize(buffer, rect.y1);
     let width = write!(buffer, "{:.4}%", rect.width_pct());
@@ -916,7 +910,7 @@ fn filled_rectangle<W: Write>(
     } else {
         unreachable!("cache wrapper was of wrong type: {:?}", cache_rect);
     }
-    svg.write_event(cache_rect)
+    svg.write_event(cache_rect.borrow())
 }
 
 fn write_usize(buffer: &mut StrStack, value: usize) -> usize {

@@ -109,7 +109,7 @@ fn flow<'a, LI, TI>(
 pub(super) fn frames<'a, I>(
     lines: I,
     suppress_sort_check: bool,
-) -> quick_xml::Result<(Vec<TimedFrame<'a>>, usize, usize, usize)>
+) -> io::Result<(Vec<TimedFrame<'a>>, usize, usize, usize)>
 where
     I: IntoIterator<Item = &'a str>,
 {
@@ -128,10 +128,10 @@ where
         if !suppress_sort_check {
             if let Some(prev_line) = prev_line {
                 if prev_line > line {
-                    return Err(quick_xml::Error::Io(io::Error::new(
+                    return Err(io::Error::new(
                         io::ErrorKind::InvalidData,
                         "unsorted input lines detected",
-                    )));
+                    ));
                 }
             }
         }
