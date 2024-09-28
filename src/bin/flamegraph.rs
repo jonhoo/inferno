@@ -309,7 +309,7 @@ impl<'a> Opt {
 
 const PALETTE_MAP_FILE: &str = "palette.map"; // default name for the palette map file
 
-fn main() -> quick_xml::Result<()> {
+fn main() -> io::Result<()> {
     let opt = Opt::parse();
 
     // Initialize logger
@@ -343,7 +343,7 @@ fn main() -> quick_xml::Result<()> {
         )?;
     }
 
-    save_consistent_palette_if_needed(&palette_map, PALETTE_MAP_FILE).map_err(quick_xml::Error::Io)
+    save_consistent_palette_if_needed(&palette_map, PALETTE_MAP_FILE)
 }
 
 fn fetch_consistent_palette_if_needed(

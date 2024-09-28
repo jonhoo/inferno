@@ -1,13 +1,13 @@
 use std::borrow::Cow;
 use std::cell::RefCell;
-use std::io::prelude::*;
+use std::io::{self, prelude::*};
 use std::iter;
 
 use quick_xml::events::{BytesCData, BytesDecl, BytesEnd, BytesStart, BytesText, Event};
 use quick_xml::Writer;
 use str_stack::StrStack;
 
-use super::{Direction, Options, TextTruncateDirection};
+use super::{to_io_err, Direction, Options, TextTruncateDirection};
 
 /// The generic font families should not have quotes around them in the CSS.
 const GENERIC_FONT_FAMILIES: &[&str] = &["cursive", "fantasy", "monospace", "serif", "sans-serif"];
@@ -59,12 +59,13 @@ pub(super) fn write_header<W>(
     svg: &mut Writer<W>,
     imageheight: usize,
     opt: &Options<'_>,
-) -> quick_xml::Result<()>
+) -> io::Result<()>
 where
     W: Write,
 {
-    svg.write_event(Event::Decl(BytesDecl::new("1.0", None, Some("no"))))?;
-    svg.write_event(Event::DocType(BytesText::from_escaped(r#"svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd""#)))?;
+    svg.write_event(Event::Decl(BytesDecl::new("1.0", None, Some("no"))))
+        .map_err(to_io_err)?;
+    svg.write_event(Event::DocType(BytesText::from_escaped(r#"svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd""#))).map_err(to_io_err)?;
     let imagewidth = opt.image_width.unwrap_or(super::DEFAULT_IMAGE_WIDTH);
     svg.write_event(Event::Start(BytesStart::new("svg").with_attributes(vec![
         ("version", "1.1"),
@@ -75,15 +76,18 @@ where
         ("xmlns", "http://www.w3.org/2000/svg"),
         ("xmlns:xlink", "http://www.w3.org/1999/xlink"),
         ("xmlns:fg", "http://github.com/jonhoo/inferno"),
-    ])))?;
+    ])))
+    .map_err(to_io_err)?;
     svg.write_event(Event::Comment(BytesText::new(
         "Flame graph stack visualization. \
          See https://github.com/brendangregg/FlameGraph for latest version, \
          and http://www.brendangregg.com/flamegraphs.html for examples.",
-    )))?;
+    )))
+    .map_err(to_io_err)?;
     svg.write_event(Event::Comment(BytesText::new(
         format!("NOTES: {}", opt.notes).as_str(),
-    )))?;
+    )))
+    .map_err(to_io_err)?;
     Ok(())
 }
 
@@ -91,27 +95,34 @@ pub(super) fn write_prelude<W>(
     svg: &mut Writer<W>,
     style_options: &StyleOptions,
     opt: &Options<'_>,
-) -> quick_xml::Result<()>
+) -> io::Result<()>
 where
     W: Write,
 {
-    svg.write_event(Event::Start(BytesStart::new("defs")))?;
+    svg.write_event(Event::Start(BytesStart::new("defs")))
+        .map_err(to_io_err)?;
     svg.write_event(Event::Start(BytesStart::from_content(
         r#"linearGradient id="background" y1="0" y2="1" x1="0" x2="0""#,
         "linearGradient".len(),
-    )))?;
+    )))
+    .map_err(to_io_err)?;
     svg.write_event(Event::Empty(BytesStart::new("stop").with_attributes(
         iter::once(("stop-color", &*style_options.bgcolor1)).chain(iter::once(("offset", "5%"))),
-    )))?;
+    )))
+    .map_err(to_io_err)?;
     svg.write_event(Event::Empty(BytesStart::new("stop").with_attributes(
         iter::once(("stop-color", &*style_options.bgcolor2)).chain(iter::once(("offset", "95%"))),
-    )))?;
-    svg.write_event(Event::End(BytesEnd::new("linearGradient")))?;
-    svg.write_event(Event::End(BytesEnd::new("defs")))?;
+    )))
+    .map_err(to_io_err)?;
+    svg.write_event(Event::End(BytesEnd::new("linearGradient")))
+        .map_err(to_io_err)?;
+    svg.write_event(Event::End(BytesEnd::new("defs")))
+        .map_err(to_io_err)?;
 
     svg.write_event(Event::Start(
         BytesStart::new("style").with_attributes(iter::once(("type", "text/css"))),
-    ))?;
+    ))
+    .map_err(to_io_err)?;
 
     let font_type: Cow<str> = if GENERIC_FONT_FAMILIES.contains(&opt.font_type.as_str()) {
         Cow::Borrowed(&opt.font_type)
@@ -126,21 +137,26 @@ text {{ font-family:{}; font-size:{}px }}
 #title {{ text-anchor:middle; font-size:{}px; }}
 ",
         font_type, &opt.font_size, titlesize,
-    ))))?;
+    ))))
+    .map_err(to_io_err)?;
     if let Some(strokecolor) = &style_options.strokecolor {
         svg.write_event(Event::Text(BytesText::from_escaped(&format!(
             "#frames > g > rect {{ stroke:{}; stroke-width:1; }}\n",
             strokecolor
-        ))))?;
+        ))))
+        .map_err(to_io_err)?;
     }
     svg.write_event(Event::Text(BytesText::from_escaped(include_str!(
         "flamegraph.css"
-    ))))?;
-    svg.write_event(Event::End(BytesEnd::new("style")))?;
+    ))))
+    .map_err(to_io_err)?;
+    svg.write_event(Event::End(BytesEnd::new("style")))
+        .map_err(to_io_err)?;
 
     svg.write_event(Event::Start(
         BytesStart::new("script").with_attributes(iter::once(("type", "text/ecmascript"))),
-    ))?;
+    ))
+    .map_err(to_io_err)?;
     svg.write_event(Event::CData(BytesCData::new(&format!(
         "
         var nametype = {};
@@ -159,11 +175,14 @@ text {{ font-family:{}; font-size:{}px }}
         opt.search_color,
         opt.image_width.is_none(),
         opt.text_truncate_direction == TextTruncateDirection::Right
-    ))))?;
+    ))))
+    .map_err(to_io_err)?;
     if !opt.no_javascript {
-        svg.write_event(Event::CData(BytesCData::new(include_str!("flamegraph.js"))))?;
+        svg.write_event(Event::CData(BytesCData::new(include_str!("flamegraph.js"))))
+            .map_err(to_io_err)?;
     }
-    svg.write_event(Event::End(BytesEnd::new("script")))?;
+    svg.write_event(Event::End(BytesEnd::new("script")))
+        .map_err(to_io_err)?;
 
     svg.write_event(Event::Empty(BytesStart::new("rect").with_attributes(vec![
         ("x", "0"),
@@ -171,7 +190,8 @@ text {{ font-family:{}; font-size:{}px }}
         ("width", "100%"),
         ("height", &*format!("{}", style_options.imageheight)),
         ("fill", "url(#background)"),
-    ])))?;
+    ])))
+    .map_err(to_io_err)?;
 
     // We don't care too much about allocating just for the prelude
     let mut buf = StrStack::new();
@@ -261,7 +281,7 @@ pub(super) fn write_str<'a, W, I>(
     svg: &mut Writer<W>,
     buf: &mut StrStack,
     item: TextItem<'a, I>,
-) -> quick_xml::Result<()>
+) -> std::io::Result<()>
 where
     W: Write,
     I: IntoIterator<Item = (&'a str, &'a str)>,
@@ -290,14 +310,17 @@ where
             unreachable!("cache wrapper was of wrong type: {:?}", start_event);
         }
 
-        svg.write_event(&*start_event.borrow())
-    })?;
+        svg.write_event(start_event.borrow().borrow())
+    })
+    .map_err(to_io_err)?;
     let s = match text {
         TextArgument::String(ref s) => s,
         TextArgument::FromBuffer(i) => &buf[i],
     };
-    svg.write_event(Event::Text(BytesText::new(s)))?;
+    svg.write_event(Event::Text(BytesText::new(s)))
+        .map_err(to_io_err)?;
     svg.write_event(Event::End(BytesEnd::new("text")))
+        .map_err(to_io_err)
 }
 
 // Imported from the `enquote` crate @ 1.0.3.
