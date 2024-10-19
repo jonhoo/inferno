@@ -118,8 +118,8 @@
 //!
 //! # Feature flags
 //! All features below are enabled by default
-//! - `cli`: Enabled when inferno compiled to a standalone binary and is used from the command line
-//! - `multithreaded`: Enables multithreading aggregating values for [`collapse`]
+//! - `cli`: Also builds the `inferno` command-line tools
+//! - `multithreaded`: Enables multithreaded stack-collapsing
 //! - `nameattr`: Allows for adding customizing and adding attributes to the svg of [`flamegraph`]. See the `--nameattr` option for the flamegraph cli
 //!
 //! # Development
