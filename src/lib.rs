@@ -53,6 +53,11 @@
 //!
 //! For more advanced uses, see Brendan Gregg's excellent [perf examples] page.
 //!
+//! Note: For larger binaries (like Firefox), the perf script can be significantly slowed down
+//! by a non-optimal performance of the addr2line tool. Starting from perf version 6.12, you can
+//! use an alternative addr2line tool (by using `perf script --addr2line=/path/to/addr2line`),
+//! where the recommended one would be the Rust implementation from [Gimli project].
+//!
 //! ### DTrace (macOS)
 //!
 //! ```console
@@ -146,6 +151,7 @@
 //!   [differential flame graphs]: http://www.brendangregg.com/blog/2014-11-09/differential-flame-graphs.html
 //!   [sample]: https://gist.github.com/loderunner/36724cc9ee8db66db305#profiling-with-sample
 //!   [VTune]: https://software.intel.com/en-us/vtune-amplifier-help-command-line-interface
+//!   [gimli project]: https://github.com/gimli-rs/addr2line
 
 #![cfg_attr(doc, warn(rustdoc::all))]
 #![cfg_attr(doc, allow(rustdoc::missing_doc_code_examples))]
