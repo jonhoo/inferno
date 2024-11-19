@@ -67,15 +67,13 @@ pub mod vsprof;
 ///   [crate-level documentation]: ../../index.html
 pub mod ghcprof;
 
-use is_terminal::IsTerminal;
-
 // DEFAULT_NTHREADS is public because we use it in the help text of the binaries,
 // but it doesn't need to be exposed to library users, hence #[doc(hidden)].
 #[doc(hidden)]
 pub use self::common::DEFAULT_NTHREADS;
 
 use std::fs::File;
-use std::io;
+use std::io::{self, IsTerminal};
 use std::path::Path;
 
 use self::common::{CollapsePrivate, CAPACITY_READER};

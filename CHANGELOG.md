@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Remove `quick_xml::Error` from the public API. [#332](https://github.com/jonhoo/inferno/pull/332)
+- Remove reliance on the `is_terminal` crate. [#301](https://github.com/jonhoo/inferno/pull/301)
 
 ### Removed
 
