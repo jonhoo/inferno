@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Remove `quick_xml::Error` from the public API. [#332](https://github.com/jonhoo/inferno/pull/332)
+
 ### Removed
 
 ## [0.11.21] - 2024-08-03

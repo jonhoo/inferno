@@ -17,7 +17,7 @@ fn test_flamegraph(
     input_file: &str,
     expected_result_file: &str,
     options: Options<'_>,
-) -> quick_xml::Result<()> {
+) -> io::Result<()> {
     test_flamegraph_multiple_files(
         vec![PathBuf::from_str(input_file).unwrap()],
         expected_result_file,
@@ -29,7 +29,7 @@ fn test_flamegraph_multiple_files(
     input_files: Vec<PathBuf>,
     expected_result_file: &str,
     mut options: Options<'_>,
-) -> quick_xml::Result<()> {
+) -> io::Result<()> {
     // Always pretty print XML to make it easier to find differences when tests fail.
     options.pretty_xml = true;
     // Never include static JavaScript in tests so we don't have to have it duplicated
@@ -45,7 +45,7 @@ fn test_flamegraph_multiple_files(
                 flamegraph::from_files(&mut options, &input_files, &mut f)?;
                 fs::metadata(expected_result_file).unwrap()
             } else {
-                return Err(e.into());
+                return Err(e);
             }
         }
     };

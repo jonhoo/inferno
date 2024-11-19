@@ -1,6 +1,6 @@
 use std::borrow::Cow;
 use std::cell::RefCell;
-use std::io::prelude::*;
+use std::io::{self, prelude::*};
 use std::iter;
 
 use quick_xml::events::{BytesCData, BytesDecl, BytesEnd, BytesStart, BytesText, Event};
@@ -59,7 +59,7 @@ pub(super) fn write_header<W>(
     svg: &mut Writer<W>,
     imageheight: usize,
     opt: &Options<'_>,
-) -> quick_xml::Result<()>
+) -> io::Result<()>
 where
     W: Write,
 {
@@ -91,7 +91,7 @@ pub(super) fn write_prelude<W>(
     svg: &mut Writer<W>,
     style_options: &StyleOptions,
     opt: &Options<'_>,
-) -> quick_xml::Result<()>
+) -> io::Result<()>
 where
     W: Write,
 {
@@ -261,7 +261,7 @@ pub(super) fn write_str<'a, W, I>(
     svg: &mut Writer<W>,
     buf: &mut StrStack,
     item: TextItem<'a, I>,
-) -> quick_xml::Result<()>
+) -> std::io::Result<()>
 where
     W: Write,
     I: IntoIterator<Item = (&'a str, &'a str)>,
@@ -290,7 +290,7 @@ where
             unreachable!("cache wrapper was of wrong type: {:?}", start_event);
         }
 
-        svg.write_event(&*start_event.borrow())
+        svg.write_event(start_event.borrow().borrow())
     })?;
     let s = match text {
         TextArgument::String(ref s) => s,
