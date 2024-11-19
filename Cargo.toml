@@ -1,6 +1,6 @@
 [package]
 name = "inferno"
-version = "0.11.21"
+version = "0.12.0"
 edition = "2021"
 authors = ["Jon Gjengset <jon@thesquareplanet.com>"]
 rust-version = "1.71.0"
