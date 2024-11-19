@@ -5,14 +5,31 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
 ### Added
+
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [0.12.0] - 2024-11-19
+
+This is a breaking change since we've changed inferno's error type. It
+no longer directly exposes `quick_xml`, which will allow us to adopt new
+versions of `quick_xml` (or indeed change the XML crate altogether
+should we wish) without a breaking change in the future. For most users,
+this change should be an easy upgrade.
 
 ### Changed
 
 - Remove `quick_xml::Error` from the public API. [#332](https://github.com/jonhoo/inferno/pull/332)
 - Remove reliance on the `is_terminal` crate. [#301](https://github.com/jonhoo/inferno/pull/301)
-
-### Removed
 
 ## [0.11.21] - 2024-08-03
 ### Added
@@ -318,7 +335,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Moved to `IndexMap` and FNV hashing ([#127](https://github.com/jonhoo/inferno/pull/127))
 - Moved CI to Azure DevOps Pipelines
 
-[Unreleased]: https://github.com/jonhoo/inferno/compare/v0.11.21...HEAD
+[Unreleased]: https://github.com/jonhoo/inferno/compare/v0.12.0...HEAD
+[0.12.0]: https://github.com/jonhoo/inferno/compare/v0.11.21...v0.12.0
 [0.11.21]: https://github.com/jonhoo/inferno/compare/v0.11.20...v0.11.21
 [0.11.20]: https://github.com/jonhoo/inferno/compare/v0.11.19...v0.11.20
 [0.11.19]: https://github.com/jonhoo/inferno/compare/v0.11.18...v0.11.19
