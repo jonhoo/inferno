@@ -178,7 +178,6 @@ fn unescape_xctrace_text(x: Cow<'_, [u8]>) -> Vec<u8> {
 fn get_ref_id_from_attributes(attributes: &Attributes) -> io::Result<u64> {
     let ref_id = attributes
         .clone()
-        .into_iter()
         .filter_map(|x| x.ok())
         .find_map(|x| (x.key.into_inner() == REF).then_some(x.value));
     let ref_id = match ref_id {
@@ -188,14 +187,13 @@ fn get_ref_id_from_attributes(attributes: &Attributes) -> io::Result<u64> {
     let ref_id = String::from_utf8_lossy(&ref_id);
     match ref_id.parse() {
         Ok(x) => Ok(x),
-        Err(e) => return invalid_data_error!("Unrecognized ref id: {}: {:?}", ref_id, e),
+        Err(e) => invalid_data_error!("Unrecognized ref id: {}: {:?}", ref_id, e),
     }
 }
 
 fn get_id_from_attributes(attributes: &Attributes) -> io::Result<u64> {
     let id = attributes
         .clone()
-        .into_iter()
         .filter_map(|x| x.ok())
         .find_map(|x| (x.key.into_inner() == ID).then_some(x.value));
     let id = match id {
@@ -205,14 +203,13 @@ fn get_id_from_attributes(attributes: &Attributes) -> io::Result<u64> {
     let id = String::from_utf8_lossy(&id);
     match id.parse() {
         Ok(x) => Ok(x),
-        Err(e) => return invalid_data_error!("Unrecognized id: {}: {:?}", id, e),
+        Err(e) => invalid_data_error!("Unrecognized id: {}: {:?}", id, e),
     }
 }
 
 fn get_name_from_attributes(attributes: &Attributes) -> io::Result<Vec<u8>> {
     let name = attributes
         .clone()
-        .into_iter()
         .filter_map(|x| x.ok())
         .find_map(|x| (x.key.into_inner() == NAME).then_some(x.value));
     match name {
@@ -434,8 +431,7 @@ impl Folder {
 
         let backtraces = nodes
             .into_iter()
-            .map(|Node { rows }| rows)
-            .flatten()
+            .flat_map(|Node { rows }| rows)
             .map(|Row { backtrace }| backtrace);
 
         // backtrace_id <--> BacktraceOccurrences
