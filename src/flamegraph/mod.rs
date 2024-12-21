@@ -429,6 +429,7 @@ where
             }
             stack.push(' ');
             stack.push_str(&line[samples_idx..]);
+            let stack = stack.trim();
             reversed.push(&stack);
         }
         let mut reversed: Vec<&str> = reversed.iter().collect();
