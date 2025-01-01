@@ -162,17 +162,16 @@ impl Backtrace {
 }
 
 /// Unescapes the text in xml exported from xctrace.
-fn unescape_xctrace_text(x: Cow<'_, [u8]>) -> Vec<u8> {
+fn unescape_xctrace_text(text: Cow<'_, [u8]>) -> Vec<u8> {
     // xctrace shouldn't give us invalid xml text here, therefore
     // we don't expect the error branch being hit:
     //
     // `quick_xml::escape::unescape` will error out if the input is not a valid xml text:
     // https://github.com/tafia/quick-xml/blob/0793d6a8d006cb5dabf66bf2a25ddbf198305b46/src/escape.rs#L253
-    if let Ok(x) = quick_xml::escape::unescape(&String::from_utf8_lossy(&x)) {
-        x.into_owned().into_bytes()
-    } else {
-        x.into_owned()
-    }
+    quick_xml::escape::unescape(&String::from_utf8_lossy(&text))
+        .expect("Invalid xml text from xctrace, which is not expected")
+        .into_owned()
+        .into_bytes()
 }
 
 fn get_ref_id_from_attributes(attributes: &Attributes) -> io::Result<u64> {
@@ -180,9 +179,8 @@ fn get_ref_id_from_attributes(attributes: &Attributes) -> io::Result<u64> {
         .clone()
         .filter_map(|x| x.ok())
         .find_map(|x| (x.key.into_inner() == REF).then_some(x.value));
-    let ref_id = match ref_id {
-        Some(x) => x,
-        None => return invalid_data_error!("No ref id found in attributes"),
+    let Some(ref_id) = ref_id else {
+        return invalid_data_error!("No ref id found in attributes");
     };
     let ref_id = String::from_utf8_lossy(&ref_id);
     match ref_id.parse() {
@@ -196,9 +194,8 @@ fn get_id_from_attributes(attributes: &Attributes) -> io::Result<u64> {
         .clone()
         .filter_map(|x| x.ok())
         .find_map(|x| (x.key.into_inner() == ID).then_some(x.value));
-    let id = match id {
-        Some(x) => x,
-        None => return invalid_data_error!("No id found in attributes"),
+    let Some(id) = id else {
+        return invalid_data_error!("No id found in attributes");
     };
     let id = String::from_utf8_lossy(&id);
     match id.parse() {
