@@ -174,33 +174,23 @@ fn unescape_xctrace_text(text: Cow<'_, [u8]>) -> Vec<u8> {
         .into_bytes()
 }
 
-fn get_ref_id_from_attributes(attributes: &Attributes) -> io::Result<u64> {
-    let ref_id = attributes
-        .clone()
-        .filter_map(|x| x.ok())
-        .find_map(|x| (x.key.into_inner() == REF).then_some(x.value));
-    let Some(ref_id) = ref_id else {
-        return invalid_data_error!("No ref id found in attributes");
-    };
-    let ref_id = String::from_utf8_lossy(&ref_id);
-    match ref_id.parse() {
-        Ok(x) => Ok(x),
-        Err(e) => invalid_data_error!("Unrecognized ref id: {}: {:?}", ref_id, e),
-    }
-}
-
-fn get_id_from_attributes(attributes: &Attributes) -> io::Result<u64> {
+fn get_u64_from_attributes(key: &'static [u8], attributes: &Attributes) -> io::Result<u64> {
     let id = attributes
         .clone()
         .filter_map(|x| x.ok())
-        .find_map(|x| (x.key.into_inner() == ID).then_some(x.value));
+        .find_map(|x| (x.key.into_inner() == key).then_some(x.value));
     let Some(id) = id else {
-        return invalid_data_error!("No id found in attributes");
+        return invalid_data_error!("No {} found in attributes", String::from_utf8_lossy(key));
     };
     let id = String::from_utf8_lossy(&id);
     match id.parse() {
         Ok(x) => Ok(x),
-        Err(e) => invalid_data_error!("Unrecognized id: {}: {:?}", id, e),
+        Err(e) => invalid_data_error!(
+            "Unrecognized {}: {}: {:?}",
+            String::from_utf8_lossy(key),
+            id,
+            e
+        ),
     }
 }
 
@@ -217,12 +207,12 @@ fn get_name_from_attributes(attributes: &Attributes) -> io::Result<Vec<u8>> {
 
 /// Extract necessary info from attributes for constructing backtrace.
 fn attributes_to_backtrace(attributes: &Attributes) -> io::Result<u64> {
-    get_id_from_attributes(attributes)
+    get_u64_from_attributes(ID, attributes)
 }
 
 /// Extract necessary info from attributes for constructing frame.
 fn attributes_to_frame(attributes: &Attributes) -> io::Result<(u64, Vec<u8>)> {
-    let id = get_id_from_attributes(attributes)?;
+    let id = get_u64_from_attributes(ID, attributes)?;
     let name = get_name_from_attributes(attributes)?;
     Ok((id, name))
 }
@@ -309,14 +299,11 @@ impl Folder {
                 }
                 Event::End(end) => {
                     let name = end.name().into_inner();
-                    let state = match context.state_backtrace.pop_with_name(name) {
-                        Ok(state) => state,
-                        Err(()) => {
-                            return invalid_data_error!(
-                                "Unpaired tag: {}",
-                                String::from_utf8_lossy(name)
-                            )
-                        }
+                    let Some(state) = context.state_backtrace.pop_with_name(name) else {
+                        return invalid_data_error!(
+                            "Unpaired tag: {}",
+                            String::from_utf8_lossy(name)
+                        );
                     };
                     match (context.state_backtrace.top_mut(), state) {
                         (None, CurrentTag::TraceQueryResult(trace_query_result_state)) => {
@@ -366,7 +353,7 @@ impl Folder {
                     match (context.state_backtrace.top_mut(), name) {
                         (Some(CurrentTag::Row(row_state)), BACKTRACE) => {
                             let backtrace =
-                                if let Ok(ref_id) = get_ref_id_from_attributes(&attributes) {
+                                if let Ok(ref_id) = get_u64_from_attributes(REF, &attributes) {
                                     match context.backtraces.get(&ref_id) {
                                         Some(x) => x.clone(),
                                         None => {
@@ -391,26 +378,26 @@ impl Folder {
                             row_state.backtrace = Some(backtrace);
                         }
                         (Some(CurrentTag::Backtrace(backtrace_state)), FRAME) => {
-                            let frame = if let Ok(ref_id) = get_ref_id_from_attributes(&attributes)
-                            {
-                                match context.frames.get(&ref_id) {
-                                    Some(x) => x.clone(),
-                                    None => {
-                                        return invalid_data_error!(
-                                            "Invalid frame ref id: {}",
-                                            ref_id
-                                        )
+                            let frame =
+                                if let Ok(ref_id) = get_u64_from_attributes(REF, &attributes) {
+                                    match context.frames.get(&ref_id) {
+                                        Some(x) => x.clone(),
+                                        None => {
+                                            return invalid_data_error!(
+                                                "Invalid frame ref id: {}",
+                                                ref_id
+                                            )
+                                        }
                                     }
-                                }
-                            } else if let Ok((id, name)) = attributes_to_frame(&attributes) {
-                                let frame = Arc::new(Frame { id, name });
-                                context.frames.insert(id, frame.clone());
-                                frame
-                            } else {
-                                return invalid_data_error!(
-                                    "Get ref_id or attributes of frame failed."
-                                );
-                            };
+                                } else if let Ok((id, name)) = attributes_to_frame(&attributes) {
+                                    let frame = Arc::new(Frame { id, name });
+                                    context.frames.insert(id, frame.clone());
+                                    frame
+                                } else {
+                                    return invalid_data_error!(
+                                        "Get ref_id or attributes of frame failed."
+                                    );
+                                };
                             backtrace_state.frames.push(frame);
                         }
                         _ => {}
