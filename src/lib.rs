@@ -79,7 +79,7 @@
 //! $ xctrace export --input out.trace --xpath '/trace-toc/*/data/table[@schema="time-profile"]' | inferno-collapse-xctrace | inferno-flamegraph > flamegraph.svg
 //! ```
 //!
-//! If you want demangled output(xctrace won't demangle rust symbols for you), you can use rustfilt:
+//! If you want demangled output(xctrace won't demangle rust symbols for you), you can use [rustfilt]:
 //!
 //! ```console
 //! $ xctrace export --input out.trace --xpath '/trace-toc/*/data/table[@schema="time-profile"]' | inferno-collapse-xctrace | rustfilt | inferno-flamegraph > flamegraph.svg
@@ -165,6 +165,7 @@
 //!   [perf examples]: http://www.brendangregg.com/perf.html
 //!   [DTrace examples]: http://www.brendangregg.com/FlameGraphs/cpuflamegraphs.html#DTrace
 //!   [NodeJS's ustack helper]: http://dtrace.org/blogs/dap/2012/01/05/where-does-your-node-program-spend-its-time/
+//!   [rustfilt]: https://github.com/luser/rustfilt
 //!   [a series of live coding sessions]: https://www.youtube.com/watch?v=jTpK-bNZiA4&list=PLqbS7AVVErFimAvMW-kIJUwxpPvcPBCsz
 //!   [differential flame graphs]: http://www.brendangregg.com/blog/2014-11-09/differential-flame-graphs.html
 //!   [sample]: https://gist.github.com/loderunner/36724cc9ee8db66db305#profiling-with-sample
