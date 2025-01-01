@@ -44,7 +44,7 @@ struct BacktraceOccurrences {
     backtrace: Arc<Backtrace>,
 }
 
-/// Backtrace of scanning xml tags.
+/// Backtrace of scanned xml tags.
 #[derive(Default)]
 struct TagBacktrace {
     backtrace: Vec<CurrentTag>,
@@ -55,8 +55,8 @@ impl TagBacktrace {
         self.backtrace.push(tag);
     }
 
-    /// Remove the top tag and return it. Return `Err(())` on tag mismatching.
-    fn collide(&mut self, name: &[u8]) -> Result<CurrentTag, ()> {
+    /// If `name` matches the top tag of the stack, the tag is popped.
+    fn pop_with_name(&mut self, name: &[u8]) -> Option<CurrentTag> {
         if self
             .backtrace
             .last()
@@ -64,9 +64,9 @@ impl TagBacktrace {
             .unwrap_or_default()
         {
             // There is at least one element in backtrace, hence this unwrap is safe.
-            Ok(self.backtrace.pop().unwrap())
+            Some(self.backtrace.pop().unwrap())
         } else {
-            Err(())
+            None
         }
     }
 
@@ -309,7 +309,7 @@ impl Folder {
                 }
                 Event::End(end) => {
                     let name = end.name().into_inner();
-                    let state = match context.state_backtrace.collide(name) {
+                    let state = match context.state_backtrace.pop_with_name(name) {
                         Ok(state) => state,
                         Err(()) => {
                             return invalid_data_error!(
