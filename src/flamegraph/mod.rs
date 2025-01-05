@@ -429,6 +429,9 @@ where
             }
             stack.push(' ');
             stack.push_str(&line[samples_idx..]);
+            // Trim to handle the case where functions names internally contain `;`.
+            // This can happen, for example, with types like `[u8; 8]` in Rust.
+            // See https://github.com/jonhoo/inferno/pull/338.
             let stack = stack.trim();
             reversed.push(&stack);
         }
