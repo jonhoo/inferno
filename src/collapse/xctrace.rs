@@ -85,51 +85,24 @@ impl TagBacktrace {
 
 /// The tag we are scanning, with additional states.
 enum CurrentTag {
-    TraceQueryResult(TraceQueryResultState),
-    Node(NodeState),
-    Row(RowState),
-    Backtrace(BacktraceState),
-    Frame(FrameState),
+    TraceQueryResult { nodes: Vec<Node> },
+    Node { rows: Vec<Row> },
+    Row { backtrace: Option<Arc<Backtrace>> },
+    Backtrace { id: u64, frames: Vec<Arc<Frame>> },
+    Frame { id: u64, name: Vec<u8> },
 }
 
 impl CurrentTag {
     fn matches(&self, name: &[u8]) -> bool {
         match name {
-            TRACE_QUERY_RESULT => matches!(self, Self::TraceQueryResult(_)),
-            NODE => matches!(self, Self::Node(_)),
-            ROW => matches!(self, Self::Row(_)),
-            BACKTRACE => matches!(self, Self::Backtrace(_)),
-            FRAME => matches!(self, Self::Frame(_)),
+            TRACE_QUERY_RESULT => matches!(self, Self::TraceQueryResult { .. }),
+            NODE => matches!(self, Self::Node { .. }),
+            ROW => matches!(self, Self::Row { .. }),
+            BACKTRACE => matches!(self, Self::Backtrace { .. }),
+            FRAME => matches!(self, Self::Frame { .. }),
             _ => false,
         }
     }
-}
-
-#[derive(Default)]
-struct TraceQueryResultState {
-    nodes: Vec<Node>,
-}
-
-#[derive(Default)]
-struct NodeState {
-    rows: Vec<Row>,
-}
-
-#[derive(Default)]
-struct RowState {
-    backtrace: Option<Arc<Backtrace>>,
-}
-
-#[derive(Default)]
-struct BacktraceState {
-    id: u64,
-    frames: Vec<Arc<Frame>>,
-}
-
-#[derive(Default)]
-struct FrameState {
-    id: u64,
-    name: Vec<u8>,
 }
 
 struct Node {
@@ -281,31 +254,29 @@ impl Folder {
                     let attributes = start.attributes();
                     let name = start.name().into_inner();
                     let new_state = match (context.state_backtrace.top_mut(), name) {
-                        (None, TRACE_QUERY_RESULT) => Some(CurrentTag::TraceQueryResult(
-                            TraceQueryResultState::default(),
-                        )),
+                        (None, TRACE_QUERY_RESULT) => {
+                            Some(CurrentTag::TraceQueryResult { nodes: Vec::new() })
+                        }
                         (None, _) => {
                             // skip unknown root tags
                             None
                         }
-                        (Some(CurrentTag::TraceQueryResult(_)), NODE) => {
-                            let node_state = NodeState { rows: Vec::new() };
-                            Some(CurrentTag::Node(node_state))
+                        (Some(CurrentTag::TraceQueryResult { .. }), NODE) => {
+                            Some(CurrentTag::Node { rows: Vec::new() })
                         }
-                        (Some(CurrentTag::Node(_)), ROW) => {
-                            let row_state = RowState { backtrace: None };
-                            Some(CurrentTag::Row(row_state))
+                        (Some(CurrentTag::Node { .. }), ROW) => {
+                            Some(CurrentTag::Row { backtrace: None })
                         }
-                        (Some(CurrentTag::Row(_)), BACKTRACE) => {
+                        (Some(CurrentTag::Row { .. }), BACKTRACE) => {
                             let id = attributes_to_backtrace(&attributes)?;
-                            Some(CurrentTag::Backtrace(BacktraceState {
+                            Some(CurrentTag::Backtrace {
                                 id,
                                 frames: Vec::new(),
-                            }))
+                            })
                         }
-                        (Some(CurrentTag::Backtrace(_)), FRAME) => {
+                        (Some(CurrentTag::Backtrace { .. }), FRAME) => {
                             let (id, name) = attributes_to_frame(&attributes)?;
-                            Some(CurrentTag::Frame(FrameState { id, name }))
+                            Some(CurrentTag::Frame { id, name })
                         }
                         (Some(_), _) => {
                             // Skip tag combination we are not interested in.
@@ -333,43 +304,40 @@ impl Folder {
                     };
                     // Retrieve information when a tag span ends.
                     match (context.state_backtrace.top_mut(), state) {
-                        (None, CurrentTag::TraceQueryResult(trace_query_result_state)) => {
-                            let TraceQueryResultState { nodes } = trace_query_result_state;
+                        (None, CurrentTag::TraceQueryResult { nodes }) => {
                             break nodes;
                         }
                         (
-                            Some(CurrentTag::TraceQueryResult(trace_query_result_state)),
-                            CurrentTag::Node(node_state),
+                            Some(CurrentTag::TraceQueryResult { nodes }),
+                            CurrentTag::Node { rows },
                         ) => {
-                            let NodeState { rows } = node_state;
-                            trace_query_result_state.nodes.push(Node { rows });
+                            nodes.push(Node { rows });
                         }
-                        (Some(CurrentTag::Node(node_state)), CurrentTag::Row(row_state)) => {
-                            let RowState { backtrace } = row_state;
+                        (Some(CurrentTag::Node { rows }), CurrentTag::Row { backtrace }) => {
                             // <backtrace/> in some row is replaced with <sentinel/>, hence we ignore thess rows.
                             if let Some(backtrace) = backtrace {
-                                node_state.rows.push(Row { backtrace });
+                                rows.push(Row { backtrace });
                             }
                         }
                         (
-                            Some(CurrentTag::Row(row_state)),
-                            CurrentTag::Backtrace(backtrace_state),
+                            Some(CurrentTag::Row { backtrace }),
+                            CurrentTag::Backtrace { id, frames },
                         ) => {
-                            let BacktraceState { id, frames } = backtrace_state;
-                            let backtrace = Arc::new(Backtrace { id, frames });
-                            let ret = context.backtraces.insert(backtrace.id, backtrace.clone());
+                            let new_backtrace = Arc::new(Backtrace { id, frames });
+                            let ret = context
+                                .backtraces
+                                .insert(new_backtrace.id, new_backtrace.clone());
                             assert!(ret.is_none());
-                            row_state.backtrace = Some(backtrace);
+                            *backtrace = Some(new_backtrace);
                         }
                         (
-                            Some(CurrentTag::Backtrace(backtrace_state)),
-                            CurrentTag::Frame(frame_state),
+                            Some(CurrentTag::Backtrace { id: _, frames }),
+                            CurrentTag::Frame { id, name },
                         ) => {
-                            let FrameState { id, name } = frame_state;
                             let frame = Arc::new(Frame { id, name });
                             let ret = context.frames.insert(frame.id, frame.clone());
                             assert!(ret.is_none());
-                            backtrace_state.frames.push(frame);
+                            frames.push(frame);
                         }
                         _ => unreachable!("Bad tag stack, this is a bug of inferno."),
                     }
@@ -378,8 +346,8 @@ impl Folder {
                     let attributes = empty.attributes();
                     let name = empty.name().into_inner();
                     match (context.state_backtrace.top_mut(), name) {
-                        (Some(CurrentTag::Row(row_state)), BACKTRACE) => {
-                            let backtrace =
+                        (Some(CurrentTag::Row { backtrace }), BACKTRACE) => {
+                            let new_backtrace =
                                 if let Ok(ref_id) = get_u64_from_attributes(REF, &attributes) {
                                     match context.backtraces.get(&ref_id) {
                                         Some(x) => x.clone(),
@@ -402,9 +370,9 @@ impl Folder {
                                         "Get ref_id or attributes of backtrace failed."
                                     );
                                 };
-                            row_state.backtrace = Some(backtrace);
+                            *backtrace = Some(new_backtrace);
                         }
-                        (Some(CurrentTag::Backtrace(backtrace_state)), FRAME) => {
+                        (Some(CurrentTag::Backtrace { id: _, frames }), FRAME) => {
                             let frame =
                                 if let Ok(ref_id) = get_u64_from_attributes(REF, &attributes) {
                                     match context.frames.get(&ref_id) {
@@ -425,7 +393,7 @@ impl Folder {
                                         "Get ref_id or attributes of frame failed."
                                     );
                                 };
-                            backtrace_state.frames.push(frame);
+                            frames.push(frame);
                         }
                         _ => {}
                     }
