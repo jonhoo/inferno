@@ -14,14 +14,22 @@ use super::{
     Collapse,
 };
 
+// attribute names
 const REF: &[u8] = b"ref";
 const ID: &[u8] = b"id";
 const NAME: &[u8] = b"name";
+
+// tag names
 const TRACE_QUERY_RESULT: &[u8] = b"trace-query-result";
 const NODE: &[u8] = b"node";
 const ROW: &[u8] = b"row";
 const BACKTRACE: &[u8] = b"backtrace";
 const FRAME: &[u8] = b"frame";
+
+// Is this a tag we are interested in?
+fn is_interested_tag(tag: &[u8]) -> bool {
+    matches!(tag, TRACE_QUERY_RESULT | NODE | ROW | BACKTRACE | FRAME)
+}
 
 /// Context of collapsing a xctrace's `Time Profiler` xml
 #[derive(Default)]
@@ -82,7 +90,6 @@ enum CurrentTag {
     Row(RowState),
     Backtrace(BacktraceState),
     Frame(FrameState),
-    Other(String),
 }
 
 impl CurrentTag {
@@ -93,7 +100,7 @@ impl CurrentTag {
             ROW => matches!(self, Self::Row(_)),
             BACKTRACE => matches!(self, Self::Backtrace(_)),
             FRAME => matches!(self, Self::Frame(_)),
-            other => matches!(self, Self::Other(tag) if tag.as_bytes() == other),
+            _ => false,
         }
     }
 }
@@ -274,40 +281,57 @@ impl Folder {
                     let attributes = start.attributes();
                     let name = start.name().into_inner();
                     let new_state = match (context.state_backtrace.top_mut(), name) {
-                        (None, TRACE_QUERY_RESULT) => {
-                            CurrentTag::TraceQueryResult(TraceQueryResultState::default())
+                        (None, TRACE_QUERY_RESULT) => Some(CurrentTag::TraceQueryResult(
+                            TraceQueryResultState::default(),
+                        )),
+                        (None, _) => {
+                            // skip unknown root tags
+                            None
                         }
                         (Some(CurrentTag::TraceQueryResult(_)), NODE) => {
                             let node_state = NodeState { rows: Vec::new() };
-                            CurrentTag::Node(node_state)
+                            Some(CurrentTag::Node(node_state))
                         }
                         (Some(CurrentTag::Node(_)), ROW) => {
                             let row_state = RowState { backtrace: None };
-                            CurrentTag::Row(row_state)
+                            Some(CurrentTag::Row(row_state))
                         }
                         (Some(CurrentTag::Row(_)), BACKTRACE) => {
                             let id = attributes_to_backtrace(&attributes)?;
-                            CurrentTag::Backtrace(BacktraceState {
+                            Some(CurrentTag::Backtrace(BacktraceState {
                                 id,
                                 frames: Vec::new(),
-                            })
+                            }))
                         }
                         (Some(CurrentTag::Backtrace(_)), FRAME) => {
                             let (id, name) = attributes_to_frame(&attributes)?;
-                            CurrentTag::Frame(FrameState { id, name })
+                            Some(CurrentTag::Frame(FrameState { id, name }))
                         }
-                        _ => CurrentTag::Other(String::from_utf8_lossy(name).into_owned()),
+                        (Some(_), _) => {
+                            // Skip tag combination we are not interested in.
+                            // Tags' matchedness&validity have alreay been checked by quick_xml:
+                            // - https://docs.rs/quick-xml/latest/quick_xml/reader/struct.Config.html#structfield.allow_unmatched_ends
+                            // - https://docs.rs/quick-xml/latest/quick_xml/reader/struct.Config.html#structfield.check_end_names
+                            None
+                        }
                     };
-                    context.state_backtrace.push_back(new_state);
+                    if let Some(new_state) = new_state {
+                        context.state_backtrace.push_back(new_state);
+                    }
                 }
                 Event::End(end) => {
                     let name = end.name().into_inner();
+                    // Skip unknown tags
+                    if !is_interested_tag(name) {
+                        continue;
+                    }
                     let Some(state) = context.state_backtrace.pop_with_name(name) else {
                         return invalid_data_error!(
                             "Unpaired tag: {}",
                             String::from_utf8_lossy(name)
                         );
                     };
+                    // Retrieve information when a tag span ends.
                     match (context.state_backtrace.top_mut(), state) {
                         (None, CurrentTag::TraceQueryResult(trace_query_result_state)) => {
                             let TraceQueryResultState { nodes } = trace_query_result_state;
@@ -347,7 +371,7 @@ impl Folder {
                             assert!(ret.is_none());
                             backtrace_state.frames.push(frame);
                         }
-                        _ => {}
+                        _ => unreachable!("Bad tag stack, this is a bug of inferno."),
                     }
                 }
                 Event::Empty(empty) => {
