@@ -807,6 +807,18 @@ fn flamegraph_reversed_stack_ordering_with_fractional_samples() {
 }
 
 #[test]
+fn flamegraph_reversed_stack_ordering_with_space() {
+    let input_file = "./tests/data/flamegraph/fractional-samples/with-space.txt";
+    let expected_result_file = "./tests/data/flamegraph/fractional-samples/with-space-reversed.svg";
+
+    let mut options = flamegraph::Options::default();
+    options.hash = true;
+    options.reverse_stack_order = true;
+
+    test_flamegraph(input_file, expected_result_file, options).unwrap();
+}
+
+#[test]
 fn flamegraph_should_warn_about_no_sort_when_reversing_stack_ordering() {
     let mut options = flamegraph::Options::default();
     options.no_sort = true;
