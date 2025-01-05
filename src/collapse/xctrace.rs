@@ -150,7 +150,7 @@ enum CurrentTag {
     },
     Frame {
         id: FrameId,
-        name: Vec<u8>,
+        name: Box<[u8]>,
     },
 }
 
@@ -189,7 +189,7 @@ struct Backtrace {
 
 struct Frame {
     id: FrameId,
-    name: Vec<u8>,
+    name: Box<[u8]>,
 }
 
 impl BacktraceId {
@@ -219,14 +219,14 @@ impl BacktraceId {
 }
 
 /// Unescapes the text in xml exported from xctrace.
-fn unescape_xctrace_text(text: Cow<'_, [u8]>) -> io::Result<Vec<u8>> {
+fn unescape_xctrace_text(text: Cow<'_, [u8]>) -> io::Result<Box<[u8]>> {
     // xctrace shouldn't give us invalid xml text here, therefore
     // we don't expect the error branch being hit:
     //
     // `quick_xml::escape::unescape` will error out if the input is not a valid xml text:
     // https://github.com/tafia/quick-xml/blob/0793d6a8d006cb5dabf66bf2a25ddbf198305b46/src/escape.rs#L253
     match quick_xml::escape::unescape(&String::from_utf8_lossy(&text)) {
-        Ok(x) => Ok(x.into_owned().into_bytes()),
+        Ok(x) => Ok(x.into_owned().into_bytes().into_boxed_slice()),
         Err(e) => invalid_data_error!(
             "Invalid xml text from xctrace, which is not expected: {:?}",
             e
@@ -254,7 +254,7 @@ fn get_u64_from_attributes(key: &'static [u8], attributes: &Attributes) -> io::R
     }
 }
 
-fn get_name_from_attributes(attributes: &Attributes) -> io::Result<Vec<u8>> {
+fn get_name_from_attributes(attributes: &Attributes) -> io::Result<Box<[u8]>> {
     let name = attributes
         .clone()
         .filter_map(|x| x.ok())
@@ -271,7 +271,7 @@ fn attributes_to_backtrace(attributes: &Attributes) -> io::Result<BacktraceId> {
 }
 
 /// Extract necessary info from attributes for constructing frame.
-fn attributes_to_frame(attributes: &Attributes) -> io::Result<(FrameId, Vec<u8>)> {
+fn attributes_to_frame(attributes: &Attributes) -> io::Result<(FrameId, Box<[u8]>)> {
     let id = get_u64_from_attributes(ID, attributes)?;
     let name = get_name_from_attributes(attributes)?;
     Ok((FrameId(id), name))
