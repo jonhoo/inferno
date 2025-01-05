@@ -162,16 +162,19 @@ impl Backtrace {
 }
 
 /// Unescapes the text in xml exported from xctrace.
-fn unescape_xctrace_text(text: Cow<'_, [u8]>) -> Vec<u8> {
+fn unescape_xctrace_text(text: Cow<'_, [u8]>) -> io::Result<Vec<u8>> {
     // xctrace shouldn't give us invalid xml text here, therefore
     // we don't expect the error branch being hit:
     //
     // `quick_xml::escape::unescape` will error out if the input is not a valid xml text:
     // https://github.com/tafia/quick-xml/blob/0793d6a8d006cb5dabf66bf2a25ddbf198305b46/src/escape.rs#L253
-    quick_xml::escape::unescape(&String::from_utf8_lossy(&text))
-        .expect("Invalid xml text from xctrace, which is not expected")
-        .into_owned()
-        .into_bytes()
+    match quick_xml::escape::unescape(&String::from_utf8_lossy(&text)) {
+        Ok(x) => Ok(x.into_owned().into_bytes()),
+        Err(e) => invalid_data_error!(
+            "Invalid xml text from xctrace, which is not expected: {:?}",
+            e
+        ),
+    }
 }
 
 fn get_u64_from_attributes(key: &'static [u8], attributes: &Attributes) -> io::Result<u64> {
@@ -200,7 +203,7 @@ fn get_name_from_attributes(attributes: &Attributes) -> io::Result<Vec<u8>> {
         .filter_map(|x| x.ok())
         .find_map(|x| (x.key.into_inner() == NAME).then_some(x.value));
     match name {
-        Some(x) => Ok(unescape_xctrace_text(x)),
+        Some(x) => unescape_xctrace_text(x),
         None => invalid_data_error!("No name(symbol) found in attributes"),
     }
 }
