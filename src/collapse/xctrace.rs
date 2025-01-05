@@ -62,7 +62,6 @@ use super::{
 ```
  */
 
-
 // ----------- attribute names -----------
 
 /// Reference to a previous declared backtrace/frame, it's value is id.
@@ -124,17 +123,10 @@ impl TagBacktrace {
 
     /// If `name` matches the top tag of the stack, the tag is popped.
     fn pop_with_name(&mut self, name: &[u8]) -> Option<CurrentTag> {
-        if self
-            .backtrace
+        self.backtrace
             .last()
-            .map(|t| t.matches(name))
-            .unwrap_or_default()
-        {
-            // There is at least one element in backtrace, hence this unwrap is safe.
-            Some(self.backtrace.pop().unwrap())
-        } else {
-            None
-        }
+            .is_some_and(|t| t.matches(name))
+            .then(|| self.backtrace.pop())?
     }
 
     fn top_mut(&mut self) -> Option<&mut CurrentTag> {
