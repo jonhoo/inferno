@@ -18,6 +18,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+## [0.12.1] - 2025-01-05
+
+### Fixed
+
+- Trim reversed stacks for when function names contain `; `. [#338](https://github.com/jonhoo/inferno/pull/338)
+
 ## [0.12.0] - 2024-11-19
 
 This is a breaking change since we've changed inferno's error type. It
