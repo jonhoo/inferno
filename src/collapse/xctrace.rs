@@ -217,6 +217,8 @@ impl Collapse for Folder {
     fn is_applicable(&mut self, input: &str) -> Option<bool> {
         let mut input = input.as_bytes();
         let mut line = String::new();
+        let mut is_xml = false;
+        let mut is_xctrace = false;
         loop {
             if let Ok(n) = input.read_line(&mut line) {
                 if n == 0 {
@@ -228,7 +230,12 @@ impl Collapse for Folder {
 
             let trimmed = line.trim();
             if !trimmed.is_empty() {
-                return Some(trimmed.contains(r#"<?xml version="1.0"?>"#));
+                // Remove right bracket in pattern for possibility of adding attributes in the future.
+                is_xml = is_xml || trimmed.contains(r#"<?xml version="1.0""#);
+                is_xctrace = is_xctrace || trimmed.contains("<trace-query-result");
+                if is_xml && is_xctrace {
+                    return Some(true);
+                }
             }
             line.clear();
         }
