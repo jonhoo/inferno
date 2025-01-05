@@ -1,3 +1,4 @@
+//! Collapser of xctrace-exported xml files.
 use quick_xml::{
     events::{attributes::Attributes, Event},
     reader::Reader,
@@ -14,16 +15,74 @@ use super::{
     Collapse,
 };
 
-// attribute names
+/* A simplified xctrace xml example:
+
+```xml
+<?xml version="1.0"?>
+<trace-query-result>
+<node xpath='//trace-toc[1]/run[1]/data[1]/table[11]'>
+    <row>
+        <backtrace id="10">
+            <frame id="11" name="0x18d3df0f1" addr="0x18d3df0f1"></frame>
+            <frame id="13" name="start" addr="0x18d373904"></frame>
+        </backtrace>
+    </row>
+    <row>
+        <backtrace id="15">
+            <frame id="16" name="dyld4::prepare(dyld4::APIs&amp;, dyld3::MachOAnalyzer const*)" addr="0x18d374c1d"></frame>
+            <frame id="17" name="start" addr="0x18d373dc4"></frame>
+        </backtrace>
+    </row>
+    <row>
+        <backtrace ref="15"/>
+    </row>
+    <row>
+        <backtrace id="20">
+            <frame id="21" name="rust_test2::foo::ha31fba0d06a8a3eb" addr="0x102af5d99"></frame>
+            <frame id="24" name="rust_test2::main::h2640131654657f56" addr="0x102af5f30"></frame>
+            <frame id="25" name="std::sys_common::backtrace::__rust_begin_short_backtrace::h4f1b05744198b1bb" addr="0x102af5d04"></frame>
+            <frame id="27" name="std::rt::lang_start::_$u7b$$u7b$closure$u7d$$u7d$::h7d0ebd26afb1a225" addr="0x102af5d1c"></frame>
+            <frame id="29" name="std::rt::lang_start_internal::hfc27b745d167a74d" addr="0x102b0a324"></frame>
+            <frame id="30" name="main" addr="0x102af5fa0"></frame>
+            <frame id="31" name="start" addr="0x18d373e50"></frame>
+        </backtrace>
+    </row>
+    <row>
+        <backtrace id="39">
+            <frame id="40" name="rust_test2::foo::ha31fba0d06a8a3eb" addr="0x102af5d95"></frame>
+            <frame ref="24"/>
+            <frame ref="25"/>
+            <frame ref="27"/>
+            <frame ref="29"/>
+            <frame ref="30"/>
+            <frame ref="31"/>
+        </backtrace></row>
+</node>
+</trace-query-result>
+```
+ */
+
+
+// ----------- attribute names -----------
+
+/// Reference to a previous declared backtrace/frame, it's value is id.
 const REF: &[u8] = b"ref";
+/// Id of a backtrace/frame
 const ID: &[u8] = b"id";
+/// Symbolicated name of a frame
 const NAME: &[u8] = b"name";
 
-// tag names
+// -----------    tag names    -----------
+
+/// Root tag of xctrace's xml output
 const TRACE_QUERY_RESULT: &[u8] = b"trace-query-result";
+/// Container of a sample set
 const NODE: &[u8] = b"node";
+/// Container of a sample.
 const ROW: &[u8] = b"row";
+/// Stack backtrace
 const BACKTRACE: &[u8] = b"backtrace";
+/// Stack frame
 const FRAME: &[u8] = b"frame";
 
 // Is this a tag we are interested in?
