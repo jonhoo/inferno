@@ -100,11 +100,37 @@ struct CollapseContext {
     frames: BTreeMap<FrameId, Frame>,
 }
 
-// Note that sometimes same Backtrace have different id, we need to merge them
-// before writing folded file.
+// xctrace's sample backtrace is address-based. Two identical backtraces might
+// have different addresses. Therefore, same Backtrace could have different id,
+// we need to merge them before writing folded file.
+//
+// For example:
+//
+// ```rust
+// fn foo() {
+//     bar(); // 1
+//     bar(); // 2
+// }
+// ```
+//
+// Then there will be two identical symbolized backtraces with different address set:
+//
+// ```xml
+// <backtrace id="20">
+//   <frame id="21" name="rust_test2::bar::h2640131654657f56" addr="0x102af5c30"></frame>
+//   <frame id="22" name="rust_test2::foo::ha31fba0d06a8a3eb" addr="0x102af5d95"></frame>
+// </backtrace>
+// ```
+//
+// ```xml
+// <backtrace id="23">
+//   <frame ref="21"/>
+//   <frame id="24" name="rust_test2::foo::ha31fba0d06a8a3eb" addr="0x102af5d99"></frame>
+// </backtrace>
+// ```
 struct BacktraceOccurrences {
     /// How many times the backtrace occurred.
-    num: u64,
+    num: usize,
     /// Backtrace content
     backtrace: BacktraceId,
 }
@@ -193,18 +219,18 @@ struct Frame {
 }
 
 impl BacktraceId {
-    fn to_folded(&self, context: &CollapseContext) -> Vec<u8> {
+    fn to_folded(&self, context: &CollapseContext) -> String {
         let backtrace = context
             .backtraces
             .get(self)
             .expect("Backtrace id not registered in collapse context, this is a inferno bug.");
-        let mut folded = Vec::new();
+        let mut folded = String::new();
         let mut first = Some(());
         // Because stack frames are arranged from top to bottom in xctrace's
         // output, here we use `.rev(`.
         for frame in backtrace.frames.iter().rev() {
             if first.take().is_none() {
-                folded.push(b';');
+                folded.push(';');
             }
             let frame = context
                 .frames
@@ -212,7 +238,7 @@ impl BacktraceId {
                 .expect("Frame id not registered in collapse context, this is a inferno bug.");
             let frame_name = String::from_utf8_lossy(&frame.name);
             let frame_name = fix_partially_demangled_rust_symbol(&frame_name);
-            folded.extend(frame_name.as_bytes().iter().copied());
+            folded.push_str(&frame_name);
         }
         folded
     }
@@ -512,21 +538,19 @@ impl Folder {
             .map(|Row { backtrace }| backtrace);
 
         // backtrace_id <--> BacktraceOccurrences
-        let mut frames: BTreeMap<u64, BacktraceOccurrences> = BTreeMap::new();
-        for BacktraceId(id) in backtraces {
-            let frame = frames.entry(id).or_insert_with(|| BacktraceOccurrences {
-                num: 0,
-                backtrace: BacktraceId(id),
-            });
+        let mut backtrace_occurrences: BTreeMap<BacktraceId, BacktraceOccurrences> =
+            BTreeMap::new();
+        for backtrace in backtraces {
+            let frame = backtrace_occurrences
+                .entry(backtrace)
+                .or_insert_with(|| BacktraceOccurrences { num: 0, backtrace });
             frame.num += 1;
         }
 
         let mut occurrences = Occurrences::new(1);
 
-        for frame in frames.into_values() {
-            let BacktraceOccurrences { num, backtrace } = frame;
-            let folded = backtrace.to_folded(&context);
-            occurrences.insert_or_add(String::from_utf8_lossy(&folded).into_owned(), num as usize);
+        for BacktraceOccurrences { num, backtrace } in backtrace_occurrences.into_values() {
+            occurrences.insert_or_add(backtrace.to_folded(&context), num);
         }
         occurrences.write_and_clear(writer)
     }
