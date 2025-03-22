@@ -51,5 +51,5 @@ fn main() -> io::Result<()> {
         .init();
     }
 
-    Folder.collapse_file_to_stdout(opt.infile.as_ref())
+    Folder::default().collapse_file_to_stdout(opt.infile.as_ref())
 }

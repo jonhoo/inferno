@@ -63,7 +63,7 @@ pub(super) mod python {
     use crate::flamegraph::color::BasicPalette;
 
     fn split_any_path(path: &str) -> impl Iterator<Item = &str> {
-        path.split(|c| c == '/' || c == '\\')
+        path.split(['/', '\\'])
     }
 
     pub(in super::super) fn resolve(name: &str) -> BasicPalette {
@@ -72,9 +72,7 @@ pub(super) mod python {
         } else if split_any_path(name).any(|part| {
             part.strip_prefix("python")
                 .or_else(|| part.strip_prefix("Python"))
-                .map_or(false, |version| {
-                    version.chars().all(|c| c.is_ascii_digit() || c == '.')
-                })
+                .is_some_and(|version| version.chars().all(|c| c.is_ascii_digit() || c == '.'))
         }) || name.starts_with("<built-in")
             || name.starts_with("<method")
             || name.starts_with("<frozen")

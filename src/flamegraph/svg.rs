@@ -23,13 +23,13 @@ impl<'a> From<&'a str> for TextArgument<'a> {
     }
 }
 
-impl<'a> From<String> for TextArgument<'a> {
+impl From<String> for TextArgument<'_> {
     fn from(s: String) -> Self {
         TextArgument::String(Cow::from(s))
     }
 }
 
-impl<'a> From<usize> for TextArgument<'a> {
+impl From<usize> for TextArgument<'_> {
     fn from(i: usize) -> Self {
         TextArgument::FromBuffer(i)
     }
@@ -120,7 +120,7 @@ where
     };
 
     let titlesize = &opt.font_size + 5;
-    svg.write_event(Event::Text(BytesText::from_escaped(&format!(
+    svg.write_event(Event::Text(BytesText::from_escaped(format!(
         "
 text {{ font-family:{}; font-size:{}px }}
 #title {{ text-anchor:middle; font-size:{}px; }}
@@ -128,7 +128,7 @@ text {{ font-family:{}; font-size:{}px }}
         font_type, &opt.font_size, titlesize,
     ))))?;
     if let Some(strokecolor) = &style_options.strokecolor {
-        svg.write_event(Event::Text(BytesText::from_escaped(&format!(
+        svg.write_event(Event::Text(BytesText::from_escaped(format!(
             "#frames > g > rect {{ stroke:{}; stroke-width:1; }}\n",
             strokecolor
         ))))?;
@@ -141,7 +141,7 @@ text {{ font-family:{}; font-size:{}px }}
     svg.write_event(Event::Start(
         BytesStart::new("script").with_attributes(iter::once(("type", "text/ecmascript"))),
     ))?;
-    svg.write_event(Event::CData(BytesCData::new(&format!(
+    svg.write_event(Event::CData(BytesCData::new(format!(
         "
         var nametype = {};
         var fontsize = {};

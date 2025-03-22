@@ -8,8 +8,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Support for collapsing the xml output of the xctrace tool. [#286](https://github.com/jonhoo/inferno/pull/286)
-
 ### Changed
 
 ### Deprecated
@@ -19,6 +17,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 ### Security
+
+## [0.12.2] - 2025-03-22
+
+### Added
+
+- Support for collapsing the xml output of the xctrace tool. [#286](https://github.com/jonhoo/inferno/pull/286)
 
 ## [0.12.1] - 2025-01-05
 

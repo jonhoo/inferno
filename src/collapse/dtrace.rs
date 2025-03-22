@@ -261,7 +261,7 @@ impl Folder {
     // from https://github.com/brendangregg/FlameGraph/blob/1b1c6deede9c33c5134c920bdb7a44cc5528e9a7/stackcollapse.pl#L88
     fn uncpp(probe: &str) -> &str {
         if let Some(scope) = probe.find("::") {
-            if let Some(open) = probe[scope + 2..].rfind(|c| c == '(' || c == '<') {
+            if let Some(open) = probe[scope + 2..].rfind(['(', '<']) {
                 &probe[..scope + 2 + open]
             } else {
                 probe
@@ -413,6 +413,7 @@ mod tests {
     use super::*;
     use crate::collapse::common;
     use crate::collapse::Collapse;
+    use rand::rng;
 
     static INPUT: Lazy<Vec<PathBuf>> = Lazy::new(|| {
         common::testing::check_flamegraph_git_submodule_initialised();
@@ -553,7 +554,7 @@ mod tests {
     ///
     /// Command: `cargo test fuzz_collapse_dtrace --release -- --ignored --nocapture`
     fn fuzz_collapse_dtrace() -> io::Result<()> {
-        let seed = thread_rng().gen::<u64>();
+        let seed = rng().random::<u64>();
         println!("Random seed: {}", seed);
         let mut rng = SmallRng::seed_from_u64(seed);
 
@@ -564,10 +565,10 @@ mod tests {
         let inputs = common::testing::read_inputs(&INPUT)?;
 
         loop {
-            let nstacks_per_job = rng.gen_range(1..=500);
+            let nstacks_per_job = rng.random_range(1..=500);
             let options = Options {
-                includeoffset: rng.gen(),
-                nthreads: rng.gen_range(2..=32),
+                includeoffset: rng.random(),
+                nthreads: rng.random_range(2..=32),
             };
 
             for (path, input) in inputs.iter() {

@@ -131,7 +131,7 @@ impl Folder {
         let mut result = String::with_capacity(stack.len());
         let mut last = None;
         for frame in stack.split(';') {
-            if last.map_or(true, |l| l != frame) {
+            if last != Some(frame) {
                 result.push_str(frame);
                 result.push(';')
             }
