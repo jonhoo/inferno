@@ -88,18 +88,6 @@ fn is_interested_tag(tag: &[u8]) -> bool {
     matches!(tag, TRACE_QUERY_RESULT | NODE | ROW | BACKTRACE | FRAME)
 }
 
-/// Context of collapsing a xctrace's `Time Profiler` xml
-#[derive(Default)]
-struct CollapseContext {
-    /// xml tag backtrace
-    state_backtrace: TagBacktrace,
-    // --------- per-xml caches below -----------
-    /// backtrace_id <--> BackTrace
-    backtraces: BTreeMap<BacktraceId, Backtrace>,
-    /// backtrace_id <--> Frame
-    frames: BTreeMap<FrameId, Frame>,
-}
-
 // xctrace's sample backtrace is address-based. Two identical backtraces might
 // have different addresses. Therefore, same Backtrace could have different id,
 // we need to merge them before writing folded file.
@@ -219,7 +207,7 @@ struct Frame {
 }
 
 impl BacktraceId {
-    fn to_folded(&self, context: &CollapseContext) -> String {
+    fn resolve(&self, context: &Folder) -> String {
         let backtrace = context
             .backtraces
             .get(self)
@@ -303,9 +291,17 @@ fn attributes_to_frame(attributes: &Attributes) -> io::Result<(FrameId, Box<[u8]
     Ok((FrameId(id), name))
 }
 
-/// A stack collapser for the output of `xctrace export`.
+/// Context of collapsing a xctrace's `Time Profiler` xml
 #[derive(Default)]
-pub struct Folder;
+pub struct Folder {
+    /// xml tag backtrace
+    state_backtrace: TagBacktrace,
+    // --------- per-xml caches below -----------
+    /// backtrace_id <--> BackTrace
+    backtraces: BTreeMap<BacktraceId, Backtrace>,
+    /// backtrace_id <--> Frame
+    frames: BTreeMap<FrameId, Frame>,
+}
 
 impl Collapse for Folder {
     fn collapse<R, W>(&mut self, reader: R, writer: W) -> std::io::Result<()>
@@ -352,7 +348,6 @@ impl Folder {
         R: std::io::BufRead,
         W: std::io::Write,
     {
-        let mut context = CollapseContext::default();
         let mut buf = Vec::new();
         let nodes = loop {
             let event = match reader.read_event_into(&mut buf) {
@@ -363,7 +358,7 @@ impl Folder {
                 Event::Start(start) => {
                     let attributes = start.attributes();
                     let name = start.name().into_inner();
-                    let new_state = match (context.state_backtrace.top_mut(), name) {
+                    let new_state = match (self.state_backtrace.top_mut(), name) {
                         (None, TRACE_QUERY_RESULT) => {
                             Some(CurrentTag::TraceQueryResult { nodes: Vec::new() })
                         }
@@ -397,7 +392,7 @@ impl Folder {
                         }
                     };
                     if let Some(new_state) = new_state {
-                        context.state_backtrace.push_back(new_state);
+                        self.state_backtrace.push_back(new_state);
                     }
                 }
                 Event::End(end) => {
@@ -406,14 +401,14 @@ impl Folder {
                     if !is_interested_tag(name) {
                         continue;
                     }
-                    let Some(state) = context.state_backtrace.pop_with_name(name) else {
+                    let Some(state) = self.state_backtrace.pop_with_name(name) else {
                         return invalid_data_error!(
                             "Unpaired tag: {}",
                             String::from_utf8_lossy(name)
                         );
                     };
                     // Retrieve information when a tag span ends.
-                    match (context.state_backtrace.top_mut(), state) {
+                    match (self.state_backtrace.top_mut(), state) {
                         (None, CurrentTag::TraceQueryResult { nodes }) => {
                             break nodes;
                         }
@@ -434,7 +429,7 @@ impl Folder {
                             CurrentTag::Backtrace { id, frames },
                         ) => {
                             let new_backtrace = Backtrace { id, frames };
-                            let ret = context.backtraces.insert(new_backtrace.id, new_backtrace);
+                            let ret = self.backtraces.insert(new_backtrace.id, new_backtrace);
                             if ret.is_some() {
                                 return invalid_data_error!(
                                     "Repeated backtrace id in xctrace output: {:?}",
@@ -448,7 +443,7 @@ impl Folder {
                             CurrentTag::Frame { id, name },
                         ) => {
                             let frame = Frame { id, name };
-                            let ret = context.frames.insert(frame.id, frame);
+                            let ret = self.frames.insert(frame.id, frame);
                             if ret.is_some() {
                                 return invalid_data_error!(
                                     "Repeated frame id in xctrace output: {:?}",
@@ -463,11 +458,11 @@ impl Folder {
                 Event::Empty(empty) => {
                     let attributes = empty.attributes();
                     let name = empty.name().into_inner();
-                    match (context.state_backtrace.top_mut(), name) {
+                    match (self.state_backtrace.top_mut(), name) {
                         (Some(CurrentTag::Row { backtrace }), BACKTRACE) => {
                             let new_backtrace =
                                 if let Ok(ref_id) = get_u64_from_attributes(REF, &attributes) {
-                                    if !context.backtraces.contains_key(&BacktraceId(ref_id)) {
+                                    if !self.backtraces.contains_key(&BacktraceId(ref_id)) {
                                         return invalid_data_error!(
                                             "Invalid backtrace ref id: {}",
                                             ref_id
@@ -479,7 +474,7 @@ impl Folder {
                                         id,
                                         frames: Vec::new(),
                                     };
-                                    let ret = context.backtraces.insert(id, backtrace);
+                                    let ret = self.backtraces.insert(id, backtrace);
                                     if ret.is_some() {
                                         return invalid_data_error!(
                                             "Repeated backtrace id in xctrace output: {:?}",
@@ -498,13 +493,13 @@ impl Folder {
                             let frame = if let Ok(ref_id) =
                                 get_u64_from_attributes(REF, &attributes)
                             {
-                                if !context.frames.contains_key(&FrameId(ref_id)) {
+                                if !self.frames.contains_key(&FrameId(ref_id)) {
                                     return invalid_data_error!("Invalid frame ref id: {}", ref_id);
                                 }
                                 FrameId(ref_id)
                             } else if let Ok((id, name)) = attributes_to_frame(&attributes) {
                                 let frame = Frame { id, name };
-                                let ret = context.frames.insert(id, frame);
+                                let ret = self.frames.insert(id, frame);
                                 if ret.is_some() {
                                     return invalid_data_error!(
                                         "Repeated frame id in xctrace output: {:?}",
@@ -550,7 +545,7 @@ impl Folder {
         let mut occurrences = Occurrences::new(1);
 
         for BacktraceOccurrences { num, backtrace } in backtrace_occurrences.into_values() {
-            occurrences.insert_or_add(backtrace.to_folded(&context), num);
+            occurrences.insert_or_add(backtrace.resolve(self), num);
         }
         occurrences.write_and_clear(writer)
     }

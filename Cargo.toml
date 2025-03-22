@@ -1,6 +1,6 @@
 [package]
 name = "inferno"
-version = "0.12.1"
+version = "0.12.2"
 edition = "2021"
 authors = ["Jon Gjengset <jon@thesquareplanet.com>"]
 rust-version = "1.71.0"
@@ -48,7 +48,7 @@ criterion = "0.5"
 libflate = "2"
 maplit = "1.0.1"
 pretty_assertions = "1"
-rand = { version = "0.8", features = ["small_rng"] }
+rand = { version = "0.9", features = ["small_rng"] }
 serde = { version = "1.0.145" }
 testing_logger = "0.1.1"
 

@@ -413,10 +413,7 @@ impl Folder {
                 // the first should not be handled as a stack, whereas the latter two both should
                 // the trick is going to be to trim until we encounter a space or a :, whichever
                 // comes first, and then evaluate from there.
-                let post_event_start = post_event
-                    .find(|c| c == ':' || c == ' ')
-                    .map(|i| i + 1)
-                    .unwrap_or(0);
+                let post_event_start = post_event.find([':', ' ']).map(|i| i + 1).unwrap_or(0);
                 let post_event = post_event[post_event_start..].trim();
                 if !post_event.is_empty() {
                     // we have a stack!
@@ -722,6 +719,7 @@ mod tests {
     use super::*;
     use crate::collapse::common;
     use crate::collapse::Collapse;
+    use rand::rng;
 
     // Test some interesting edge cased for tidy_generic
     #[test]
@@ -873,7 +871,7 @@ mod tests {
     ///
     /// Command: `cargo test fuzz_collapse_perf --release -- --ignored --nocapture`
     fn fuzz_collapse_perf() -> io::Result<()> {
-        let seed = thread_rng().gen::<u64>();
+        let seed = rng().random::<u64>();
         println!("Random seed: {}", seed);
         let mut rng = SmallRng::seed_from_u64(seed);
 
@@ -884,15 +882,15 @@ mod tests {
         let inputs = common::testing::read_inputs(&INPUT)?;
 
         loop {
-            let nstacks_per_job = rng.gen_range(1..=500);
+            let nstacks_per_job = rng.random_range(1..=500);
             let options = Options {
-                annotate_jit: rng.gen(),
-                annotate_kernel: rng.gen(),
+                annotate_jit: rng.random(),
+                annotate_kernel: rng.random(),
                 event_filter: None,
-                include_addrs: rng.gen(),
-                include_pid: rng.gen(),
-                include_tid: rng.gen(),
-                nthreads: rng.gen_range(2..=32),
+                include_addrs: rng.random(),
+                include_pid: rng.random(),
+                include_tid: rng.random(),
+                nthreads: rng.random_range(2..=32),
                 skip_after: Vec::default(),
             };
 

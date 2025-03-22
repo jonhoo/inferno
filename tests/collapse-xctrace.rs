@@ -8,7 +8,7 @@ use assert_cmd::cargo::CommandCargoExt;
 use inferno::collapse::xctrace::Folder;
 
 fn test_collapse_xctrace(test_file: &str, expected_file: &str) -> io::Result<()> {
-    common::test_collapse(Folder, test_file, expected_file, false)?;
+    common::test_collapse(Folder::default(), test_file, expected_file, false)?;
     Ok(())
 }
 

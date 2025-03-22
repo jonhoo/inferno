@@ -153,7 +153,7 @@ struct Opt {
     )]
     height: usize,
 
-    /// Omit functions smaller than <FLOAT> percent
+    /// Omit functions smaller than `<FLOAT>` percent
     #[clap(
         long = "minwidth",
         default_value = &**defaults::str::MIN_WIDTH,

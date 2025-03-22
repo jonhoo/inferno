@@ -263,7 +263,7 @@ pub struct Options<'a> {
     pub base: Vec<String>,
 }
 
-impl<'a> Options<'a> {
+impl Options<'_> {
     /// Calculate pad top, including title and subtitle
     pub(super) fn ypad1(&self) -> usize {
         let subtitle_height = if self.subtitle.is_some() {
@@ -293,7 +293,7 @@ impl<'a> Options<'a> {
     }
 }
 
-impl<'a> Default for Options<'a> {
+impl Default for Options<'_> {
     fn default() -> Self {
         Options {
             colors: Palette::from_str(defaults::COLORS).unwrap(),
@@ -433,7 +433,7 @@ where
             // This can happen, for example, with types like `[u8; 8]` in Rust.
             // See https://github.com/jonhoo/inferno/pull/338.
             let stack = stack.trim();
-            reversed.push(&stack);
+            reversed.push(stack);
         }
         let mut reversed: Vec<&str> = reversed.iter().collect();
         reversed.sort_unstable();

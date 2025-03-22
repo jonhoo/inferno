@@ -134,7 +134,7 @@ struct AttrIter<'a> {
     s: &'a str,
 }
 
-impl<'a> Iterator for AttrIter<'a> {
+impl Iterator for AttrIter<'_> {
     type Item = (String, String);
 
     fn next(&mut self) -> Option<(String, String)> {
