@@ -70,6 +70,23 @@
 //! For more advanced uses, see also upstream FlameGraph's [DTrace examples].
 //! You may also be interested in something like [NodeJS's ustack helper].
 //!
+//! ### xctrace (macOS)
+//!
+//! ```console
+//! $ target/release/mybin &
+//! $ pid=$!
+//! # xctrace record --template 'Time Profiler' --attach $pid --output out.trace
+//! $ xctrace export --input out.trace --xpath '/trace-toc/*/data/table[@schema="time-profile"]' | inferno-collapse-xctrace | inferno-flamegraph > flamegraph.svg
+//! ```
+//!
+//! If you want demangled output(xctrace won't demangle rust symbols for you), you can use [rustfilt]:
+//!
+//! ```console
+//! $ xctrace export --input out.trace --xpath '/trace-toc/*/data/table[@schema="time-profile"]' | inferno-collapse-xctrace | rustfilt | inferno-flamegraph > flamegraph.svg
+//! ```
+//!
+//! For more advanced uses, see man page of xctrace [xctrace]
+//!
 //! ### sample (macOS)
 //!
 //! ```console
@@ -141,12 +158,14 @@
 //!   [stack traces]: https://en.wikipedia.org/wiki/Stack_trace
 //!   [`perf`]: https://perf.wiki.kernel.org/index.php/Main_Page
 //!   [DTrace]: https://www.joyent.com/dtrace
+//!   [xctrace]: https://keith.github.io/xcode-man-pages/xctrace.1.html
 //!   [hopefully coming soon]: https://twitter.com/DanielLockyer/status/1094605231155900416
 //!   [native support]: https://github.com/jonhoo/inferno/issues/51#issuecomment-466732304
 //!   [`bpftrace`]: https://github.com/iovisor/bpftrace
 //!   [perf examples]: http://www.brendangregg.com/perf.html
 //!   [DTrace examples]: http://www.brendangregg.com/FlameGraphs/cpuflamegraphs.html#DTrace
 //!   [NodeJS's ustack helper]: http://dtrace.org/blogs/dap/2012/01/05/where-does-your-node-program-spend-its-time/
+//!   [rustfilt]: https://github.com/luser/rustfilt
 //!   [a series of live coding sessions]: https://www.youtube.com/watch?v=jTpK-bNZiA4&list=PLqbS7AVVErFimAvMW-kIJUwxpPvcPBCsz
 //!   [differential flame graphs]: http://www.brendangregg.com/blog/2014-11-09/differential-flame-graphs.html
 //!   [sample]: https://gist.github.com/loderunner/36724cc9ee8db66db305#profiling-with-sample

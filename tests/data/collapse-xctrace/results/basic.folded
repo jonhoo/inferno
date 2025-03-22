@@ -1,0 +1,7 @@
+start;0x18d3df0f1 1
+start;dyld4::prepare(dyld4::APIs&, dyld3::MachOAnalyzer const*) 1
+start;main;std::rt::lang_start_internal;std::rt::lang_start::_{{closure}};std::sys_common::backtrace::__rust_begin_short_backtrace;core::cmp::impls::_<impl core::cmp::PartialOrd for i32>::lt 53
+start;main;std::rt::lang_start_internal;std::rt::lang_start::_{{closure}};std::sys_common::backtrace::__rust_begin_short_backtrace;rust_test2::main 1490
+start;main;std::rt::lang_start_internal;std::rt::lang_start::_{{closure}};std::sys_common::backtrace::__rust_begin_short_backtrace;rust_test2::main;<core::ops::range::Range<T> as core::iter::range::RangeIteratorImpl>::spec_next 1274
+start;main;std::rt::lang_start_internal;std::rt::lang_start::_{{closure}};std::sys_common::backtrace::__rust_begin_short_backtrace;rust_test2::main;rust_test2::bar 3548
+start;main;std::rt::lang_start_internal;std::rt::lang_start::_{{closure}};std::sys_common::backtrace::__rust_begin_short_backtrace;rust_test2::main;rust_test2::foo 3214
