@@ -26,12 +26,6 @@
             rust-analyzer
             bacon
           ];
-
-          shellHook = ''
-            alias ls=eza
-            alias find=fd
-            zsh
-          '';
         };
       }
     );
