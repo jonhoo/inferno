@@ -7,8 +7,11 @@ use std::process::{Command, Stdio};
 use std::str::FromStr;
 
 use assert_cmd::cargo::CommandCargoExt;
+use clap::ValueEnum;
 use inferno::flamegraph::color::{BackgroundColor, PaletteMap};
-use inferno::flamegraph::{self, Direction, Options, Palette, TextTruncateDirection};
+use inferno::flamegraph::{
+    self, Direction, FrameWidthSource, Options, Palette, TextTruncateDirection,
+};
 use log::Level;
 use pretty_assertions::assert_eq;
 use testing_logger::CapturedLog;
@@ -182,6 +185,63 @@ fn flamegraph_differential() {
         "./tests/data/flamegraph/differential/perf-cycles-instructions-01-collapsed-all-diff.txt";
     let expected_result_file = "./tests/data/flamegraph/differential/diff.svg";
     test_flamegraph(input_file, expected_result_file, Default::default()).unwrap();
+}
+
+#[test]
+fn flamegraph_differential_including_children() {
+    let input_file =
+        "./tests/data/flamegraph/differential/perf-cycles-instructions-01-collapsed-all-diff.txt";
+    let expected_result_file = "./tests/data/flamegraph/differential/diff-including-children.svg";
+    let mut options = flamegraph::Options::default();
+    options.include_children = true;
+    test_flamegraph(input_file, expected_result_file, options).unwrap();
+}
+#[test]
+fn flamegraph_differential_including_children_color_normalization() {
+    let input_file = "./tests/data/flamegraph/differential/stronger-parents-diff.txt";
+    let expected_result_file = "./tests/data/flamegraph/differential/stronger-parents-diff.svg";
+    let mut options = flamegraph::Options::default();
+    options.include_children = true;
+    test_flamegraph(input_file, expected_result_file, options).unwrap();
+}
+#[test]
+fn flamegraph_differential_with_different_frame_width_sources() {
+    let input_dir = "./tests/data/flamegraph/differential/";
+    let input_file_bases = [
+        "self-vs-total",
+        "unbalanced-sampling_more-before",
+        "unbalanced-sampling_more-after",
+        "before-vs-after"
+    ];
+    input_file_bases.into_iter().for_each(|input_file_base| {
+        let input_file = format!("{input_dir}{input_file_base}.txt");
+
+        for width_source in FrameWidthSource::value_variants() {
+            for include_children in [false, true].into_iter() {
+                let expected_result_file = format!(
+                    "{input_dir}{input_file_base}_width-from-{}_color-from-{}.svg",
+                    width_source.to_possible_value().unwrap().get_name(),
+                    if include_children { "total" } else { "self" }
+                );
+                let mut options = flamegraph::Options::default();
+                options.frame_width_source = *width_source;
+                options.include_children = include_children;
+                options.detailed_tooltips = true;
+                options.normalize = true;
+                test_flamegraph(&input_file, &expected_result_file, options).unwrap();
+            }
+        }
+    });
+}
+#[test]
+fn flamegraph_differential_difference_widths() {
+    let input_file = "./tests/data/flamegraph/differential/difference-widths.txt";
+    let expected_result_file = "./tests/data/flamegraph/differential/difference-widths.svg";
+    let mut options = flamegraph::Options::default();
+    options.include_children = true;
+    options.frame_width_source = FrameWidthSource::Difference;
+    options.detailed_tooltips = true;
+    test_flamegraph(input_file, expected_result_file, options).unwrap();
 }
 
 #[test]

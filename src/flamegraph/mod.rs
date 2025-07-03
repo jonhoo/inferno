@@ -19,7 +19,13 @@ use std::iter;
 use std::path::PathBuf;
 use std::str::FromStr;
 
+use clap::ValueEnum;
+
 use log::{error, warn};
+use merge::{
+    CountTypeRequirements, DiffCount, FrameSelfAndTotalCounts, FrameSelfAndTotalCountsEnum,
+    FrameSelfAndTotalCountsExt, StackSampleCount, StackSampleCountEnum, StackSampleCountExt,
+};
 use num_format::Locale;
 use quick_xml::events::{BytesEnd, BytesStart, BytesText, Event};
 use quick_xml::Writer;
@@ -261,6 +267,19 @@ pub struct Options<'a> {
 
     /// Base symbols
     pub base: Vec<String>,
+
+    /// When enabled, each frame's differential coloring includes the sum of all its children.
+    pub include_children: bool,
+
+    /// Source of frame width in differential flamegraphs
+    pub frame_width_source: FrameWidthSource,
+
+    /// More details in tooltips.  Implied if frame_width_source is other than 'before' or 'after'
+    pub detailed_tooltips: bool,
+
+    /// Compare differential samples based on percent of total rather than absolute number of
+    /// samples
+    pub normalize: bool,
 }
 
 impl Options<'_> {
@@ -326,6 +345,10 @@ impl Default for Options<'_> {
             color_diffusion: Default::default(),
             flame_chart: Default::default(),
             base: Default::default(),
+            include_children: Default::default(),
+            frame_width_source: Default::default(),
+            detailed_tooltips: false,
+            normalize: false,
 
             #[cfg(feature = "nameattr")]
             func_frameattrs: Default::default(),
@@ -359,6 +382,60 @@ pub enum TextTruncateDirection {
     Right,
 }
 
+/// Source of frame widths for differential flamegraphs, chosen on a per-stack basis.  Assumes two
+/// columns
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Default, ValueEnum)]
+pub enum FrameWidthSource {
+    /// Take shape from the first dataset.  Functions that have been added will not be visible. No
+    /// shape distortion.
+    Before,
+    #[default]
+    /// Take shape from the second dataset. Functions that have been removed will not be visible.
+    /// No shape distortion.
+    After,
+    /// Show only the differences between the two flamegraphs
+    Difference,
+    /// Show only commonalities between the two flamegraphs
+    Common,
+    /// Use all samples from both flamegraphs.
+    AllSamples,
+    /// Maximum (same as common + difference)
+    Max,
+}
+
+impl FrameWidthSource {
+    /// Apply the appropriate function for the frame width source
+    pub fn apply(&self, before: usize, after: usize) -> usize {
+        use FrameWidthSource::*;
+        match self {
+            Before => before,
+            After => after,
+            Difference => {
+                if before > after {
+                    before - after
+                } else {
+                    after - before
+                }
+            }
+            Common => {
+                if before < after {
+                    before
+                } else {
+                    after
+                }
+            }
+            AllSamples => before + after,
+            Max => {
+                if before > after {
+                    before
+                } else {
+                    after
+                }
+            }
+        }
+    }
+}
+
 struct Rectangle {
     x1_samples: usize,
     x1_pct: f64,
@@ -377,6 +454,13 @@ impl Rectangle {
     }
 }
 
+fn tidy_lines<'a>(lines: impl IntoIterator<Item = &'a str>) -> impl IntoIterator<Item = &'a str> {
+    lines
+        .into_iter()
+        .map(|line| line.trim())
+        .filter(|line| !(line.is_empty() || line.starts_with("# ")))
+}
+
 /// Produce a flame graph from an iterator over folded stack lines.
 ///
 /// This function expects each folded stack to contain the following whitespace-separated fields:
@@ -393,18 +477,18 @@ impl Rectangle {
 ///
 /// [differential flame graph]: http://www.brendangregg.com/blog/2014-11-09/differential-flame-graphs.html
 #[allow(clippy::cognitive_complexity)]
-pub fn from_lines<'a, I, W>(opt: &mut Options<'_>, lines: I, writer: W) -> io::Result<()>
+pub fn from_lines<'a, I, W, CountType>(opt: &mut Options<'_>, lines: I, writer: W) -> io::Result<()>
 where
     I: IntoIterator<Item = &'a str>,
     W: Write,
+    CountType: CountTypeRequirements,
+    StackSampleCount<CountType>: StackSampleCountExt,
+    FrameSelfAndTotalCounts<CountType>: FrameSelfAndTotalCountsExt,
 {
     let mut reversed = StrStack::new();
-    let lines = lines
-        .into_iter()
-        .map(|line| line.trim())
-        .filter(|line| !(line.is_empty() || line.starts_with("# ")));
+    let lines = tidy_lines(lines);
 
-    let (mut frames, time, ignored, delta_max) = if opt.reverse_stack_order {
+    let (mut frames, overall_total_sample_count, ignored, delta_max) = if opt.reverse_stack_order {
         if opt.no_sort {
             warn!(
                 "Input lines are always sorted when `reverse_stack_order` is `true`. \
@@ -437,15 +521,15 @@ where
         }
         let mut reversed: Vec<&str> = reversed.iter().collect();
         reversed.sort_unstable();
-        merge::frames(reversed, false)?
+        merge::frames::<_, CountType>(reversed, false, opt.frame_width_source)?
     } else if opt.flame_chart {
         // In flame chart mode, just reverse the data so time moves from left to right.
         let mut lines: Vec<&str> = lines.into_iter().collect();
         lines.reverse();
-        merge::frames(lines, true)?
+        merge::frames::<_, CountType>(lines, true, opt.frame_width_source)?
     } else if opt.no_sort {
         // Lines don't need sorting.
-        merge::frames(lines, false)?
+        merge::frames::<_, CountType>(lines, false, opt.frame_width_source)?
     } else {
         // Sort lines by default.
         let mut lines: Vec<&str> = if opt.base.is_empty() {
@@ -471,7 +555,7 @@ where
                 .collect()
         };
         lines.sort_unstable();
-        merge::frames(lines, false)?
+        merge::frames::<_, CountType>(lines, false, opt.frame_width_source)?
     };
 
     if ignored != 0 {
@@ -487,7 +571,7 @@ where
         Writer::new(writer)
     };
 
-    if time == 0 {
+    if overall_total_sample_count.is_none() {
         error!("No stack counts found");
         // emit an error message SVG, for tools automating flamegraph use
         let imageheight = opt.font_size * 5;
@@ -511,14 +595,13 @@ where
     }
 
     let image_width = opt.image_width.unwrap_or(DEFAULT_IMAGE_WIDTH) as f64;
-    let timemax = time;
-    let widthpertime_pct = 100.0 / timemax as f64;
-    let minwidth_time = opt.min_width / widthpertime_pct;
+    let sample_count_max = overall_total_sample_count.unwrap();
+    let minwidth_time = opt.min_width;
 
     // prune blocks that are too narrow
     let mut depthmax = 0;
     frames.retain(|frame| {
-        if ((frame.end_time - frame.start_time) as f64) < minwidth_time {
+        if frame.visual_width(overall_total_sample_count.unwrap()) < minwidth_time {
             false
         } else {
             depthmax = std::cmp::max(depthmax, frame.location.depth);
@@ -565,14 +648,51 @@ where
         ("id", "frames"),
         ("x", &container_x),
         ("width", &container_width),
-        ("total_samples", &format!("{}", timemax)),
+        (
+            "total_samples",
+            &format!("{}", sample_count_max.visual()),
+        ),
     ])))?;
 
     // draw frames
-    let mut samples_txt_buffer = num_format::Buffer::default();
+    // The rounding here can differ from the Perl version when the fractional part is `0.5`.
+    // The Perl version does `my $samples = sprintf "%.0f", ($etime - $stime) * $factor;`,
+    // but this can format in strange ways as shown in these examples:
+    //     `sprintf "%.0f", 1.5` produces "2"
+    //     `sprintf "%.0f", 2.5` produces "2"
+    //     `sprintf "%.0f", 3.5` produces "4"
+    let get_pct = |s: isize, s_max| -> f64 { (100 * s) as f64 / (s_max as f64 * opt.factor) };
+    let get_pct_txt = |pct: f64| -> String {
+        // let abs_delta_pct = (pct2 - pct1).abs();
+        format!("{pct:.2}%")
+    };
+    let get_count_and_pct_txt = |s, s_max, is_the_all_frame: bool| -> String {
+        let samples = (s as f64 * opt.factor).round() as usize;
+        // add thousands separators to `samples`
+        let mut samples_txt_buffer = num_format::Buffer::default();
+        let _ = samples_txt_buffer.write_formatted(&samples, &Locale::en);
+        let samples_txt = samples_txt_buffer.as_str();
+        let pct = get_pct(samples as isize, s_max);
+        let mut pct_text = get_pct_txt(pct);
+        if is_the_all_frame && &pct_text == "100.00%" {
+            pct_text = "100%".to_string()
+        }
+        format!("{samples_txt} {}, {pct_text}", opt.count_name)
+    };
+    let get_delta_pct_txt = |pct: f64| -> String {
+        let abs_pct = pct.abs();
+        let sign_txt = if pct < 0.0 {
+            "-"
+        } else if pct > 0.0 {
+            "+"
+        } else {
+            ""
+        };
+        // let abs_delta_pct = (pct2 - pct1).abs();
+        format!("{sign_txt}{abs_pct:.2}%")
+    };
     for frame in frames {
-        let x1_pct = frame.start_time as f64 * widthpertime_pct;
-        let x2_pct = frame.end_time as f64 * widthpertime_pct;
+        let (x1_pct, x2_pct) = frame.visual_start_and_end_pct(overall_total_sample_count.unwrap());
 
         let (y1, y2) = match opt.direction {
             Direction::Straight => {
@@ -590,54 +710,165 @@ where
 
         let rect = Rectangle {
             x1_pct,
-            x1_samples: frame.start_time,
+            x1_samples: frame.start_time.visual(),
             y1,
             x2_pct,
-            x2_samples: frame.end_time,
+            x2_samples: frame.end_time.visual(),
             y2,
         };
 
-        // The rounding here can differ from the Perl version when the fractional part is `0.5`.
-        // The Perl version does `my $samples = sprintf "%.0f", ($etime - $stime) * $factor;`,
-        // but this can format in strange ways as shown in these examples:
-        //     `sprintf "%.0f", 1.5` produces "2"
-        //     `sprintf "%.0f", 2.5` produces "2"
-        //     `sprintf "%.0f", 3.5` produces "4"
-        let samples = ((frame.end_time - frame.start_time) as f64 * opt.factor).round() as usize;
-
-        // add thousands separators to `samples`
-        let _ = samples_txt_buffer.write_formatted(&samples, &Locale::en);
-        let samples_txt = samples_txt_buffer.as_str();
-
-        let info = if frame.location.function.is_empty() && frame.location.depth == 0 {
-            write!(buffer, "all ({} {}, 100%)", samples_txt, opt.count_name)
+        let is_the_all_frame = frame.location.function.is_empty() && frame.location.depth == 0;
+        let function_name = if is_the_all_frame {
+            "all"
         } else {
-            let pct = (100 * samples) as f64 / (timemax as f64 * opt.factor);
-            let function = deannotate(frame.location.function);
-            match frame.delta {
-                None => write!(
-                    buffer,
-                    "{} ({} {}, {:.2}%)",
-                    function, samples_txt, opt.count_name, pct
-                ),
-                // Special case delta == 0 so we don't format percentage with a + sign.
-                Some(0) => write!(
-                    buffer,
-                    "{} ({} {}, {:.2}%; 0.00%)",
-                    function, samples_txt, opt.count_name, pct,
-                ),
-                Some(mut delta) => {
-                    if opt.negate_differentials {
-                        delta = -delta;
-                    }
-                    let delta_pct = (100 * delta) as f64 / (timemax as f64 * opt.factor);
+            deannotate(frame.location.function)
+        };
+        let info = match (
+            frame.self_and_total_sample_counts.split(),
+            overall_total_sample_count.unwrap().split(),
+        ) {
+            (
+                FrameSelfAndTotalCountsEnum::Single(frame_self_and_total_counts),
+                StackSampleCountEnum::Single(overall_total),
+            ) => {
+                let samples_txt = get_count_and_pct_txt(
+                    frame_self_and_total_counts.total_count,
+                    overall_total,
+                    is_the_all_frame,
+                );
+                write!(buffer, "{} ({})", function_name, samples_txt)
+            }
+            (
+                FrameSelfAndTotalCountsEnum::Diff(frame_self_and_total_counts),
+                StackSampleCountEnum::Diff(overall_total_count),
+            ) => {
+                let delta = if opt.include_children {
+                    frame_self_and_total_counts.total_count
+                } else {
+                    frame_self_and_total_counts.self_count
+                };
+                let mut delta_pct_pt = if opt.normalize {
+                    delta.delta_pct_pt(overall_total_count)
+                } else {
+                    delta.delta_pct_pt_assuming_both_datasets_have_the_same_number_of_samples(
+                        overall_total_count.after,
+                    )
+                };
+
+                if opt.detailed_tooltips
+                    || !matches!(
+                        opt.frame_width_source,
+                        FrameWidthSource::Before | FrameWidthSource::After
+                    )
+                {
+                    let self_pct_before = get_pct(
+                        frame_self_and_total_counts.self_count.before as isize,
+                        overall_total_count.before,
+                    );
+                    let self_pct_after = get_pct(
+                        frame_self_and_total_counts.self_count.after as isize,
+                        overall_total_count.after,
+                    );
+                    let self_pct_change = self_pct_after - self_pct_before;
+
+                    let total_pct_before = get_pct(
+                        frame_self_and_total_counts.total_count.before as isize,
+                        overall_total_count.before,
+                    );
+                    let total_pct_after = get_pct(
+                        frame_self_and_total_counts.total_count.after as isize,
+                        overall_total_count.after,
+                    );
+                    let total_pct_change = total_pct_after - total_pct_before;
+
                     write!(
                         buffer,
-                        "{} ({} {}, {:.2}%; {:+.2}%)",
-                        function, samples_txt, opt.count_name, pct, delta_pct
+                        "\
+                            {function_name}\n\
+                            Self:\n\
+                            \tBefore:\t({})\n\
+                            \tAfter:\t({})\n\
+                            \tChange:\t{}pt\n\
+                            Total:\n\
+                            \tBefore:\t({})\n\
+                            \tAfter:\t({})\n\
+                            \tChange:\t{}pt\n\
+                            \n\
+                            Visual Width:\t({})\
+                        ",
+                        get_count_and_pct_txt(
+                            frame_self_and_total_counts.self_count.before,
+                            overall_total_count.before,
+                            is_the_all_frame
+                        ),
+                        get_count_and_pct_txt(
+                            frame_self_and_total_counts.self_count.after,
+                            overall_total_count.after,
+                            is_the_all_frame
+                        ),
+                        get_delta_pct_txt(self_pct_change),
+                        get_count_and_pct_txt(
+                            frame_self_and_total_counts.total_count.before,
+                            overall_total_count.before,
+                            is_the_all_frame
+                        ),
+                        get_count_and_pct_txt(
+                            frame_self_and_total_counts.total_count.after,
+                            overall_total_count.after,
+                            is_the_all_frame
+                        ),
+                        get_delta_pct_txt(total_pct_change),
+                        get_count_and_pct_txt(
+                            frame.visual_samples(),
+                            overall_total_count.visual,
+                            is_the_all_frame
+                        ),
                     )
+                } else {
+                    let (frame_total_count, total_count) =
+                        if matches!(opt.frame_width_source, FrameWidthSource::After) {
+                            (
+                                frame_self_and_total_counts.total_count.after,
+                                overall_total_count.after,
+                            )
+                        } else {
+                            (
+                                frame_self_and_total_counts.total_count.before,
+                                overall_total_count.before,
+                            )
+                        };
+                    if opt.negate_differentials {
+                        delta_pct_pt = -delta_pct_pt;
+                        // std::mem::swap(&mut frame_count_before, &mut frame_count_after);
+                        // std::mem::swap(&mut total_samples_before, &mut total_samples_after);
+                    }
+
+                    // let txt1 = get_sample_txt(frame_total_count.before);
+                    // let pct1 = get_sample_pct(frame_total_count.before, total_count.before);
+                    let samples_txt =
+                        get_count_and_pct_txt(frame_total_count, total_count, is_the_all_frame);
+                    let delta_pct_txt = get_delta_pct_txt(delta_pct_pt);
+
+                    // write!(
+                    //     buffer,
+                    //     "{function} ({txt1} -> {txt2} {}, {pct1:.2}% -> {pct2:.2}%; {sign_txt}{abs_delta_pct:.2}%)",
+                    //     opt.count_name,
+                    // )
+                    if is_the_all_frame {
+                        write!(buffer, "{function_name} ({samples_txt})",)
+                    } else {
+                        write!(buffer, "{function_name} ({samples_txt}; {delta_pct_txt})",)
+                    }
                 }
+                // let (mut frame_count_before, mut frame_count_after) = if opt.include_children {
+                //     (frame_total_count.before, frame_total_count.after)
+                // } else {
+                //     (frame_self_count.before, frame_self_count.after)
+                // };
+                // let mut total_samples_before = total_count.before;
+                // let mut total_samples_after = total_count.after;
             }
+            e => unreachable!("Invalid sample counts: {e:#?}"),
         };
 
         let (has_href, title) = write_container_start(
@@ -665,9 +896,50 @@ where
             // to give it half the saturation of 100%. So we use sqrt to make
             // the red dropoff less linear.
             color::color_scale((((x2_pct - x1_pct) / 100.0).sqrt() * 2000.0) as isize, 2000)
-        } else if let Some(mut delta) = frame.delta {
+        } else if frame.self_and_total_sample_counts.is_diff() {
+            let Some(overall_total_diff_counts) =
+                overall_total_sample_count.map(|x| x.to_diff().unwrap())
+            else {
+                unreachable!("already confirmed is diff case");
+            };
+            let (mut delta, delta_max) = if opt.normalize {
+                let delta = frame
+                    .self_and_total_sample_counts
+                    .to_diff()
+                    .unwrap()
+                    .normalized_delta(opt.include_children, overall_total_diff_counts)
+                    .unwrap();
+
+                let delta_max = if opt.include_children {
+                    delta_max.as_ref().unwrap().max_abs_total_delta_pct_pt
+                } else {
+                    delta_max.as_ref().unwrap().max_abs_self_delta_pct_pt
+                } / 100.0;
+
+                // Convert to integers for colour mapping purposes
+                ((delta * 1e4) as isize, (delta_max * 1e4) as usize)
+            } else {
+                let delta = frame
+                    .self_and_total_sample_counts
+                    .to_diff()
+                    .unwrap()
+                    .delta(opt.include_children)
+                    .unwrap();
+                let delta_max = if opt.include_children {
+                    delta_max.as_ref().unwrap().max_abs_total_delta
+                } else {
+                    delta_max.as_ref().unwrap().max_abs_self_delta
+                };
+                (delta, delta_max)
+            };
             if opt.negate_differentials {
                 delta = -delta;
+            }
+            // Clamp because the 'all' frame can go over.
+            // Not strictly in line with the colouring scale, but without this, the 'all' frame
+            // totally dominates when dealing with several processes at once.
+            if delta.unsigned_abs() > delta_max {
+                delta = delta_max as isize * delta.signum();
             }
             color::color_scale(delta, delta_max)
         } else if let Some(ref mut palette_map) = opt.palette_map {
@@ -743,12 +1015,12 @@ where
 }
 
 #[cfg(feature = "nameattr")]
-fn write_container_start<'a, W: Write>(
+fn write_container_start<'a, W: Write, CountType>(
     opt: &'a Options<'a>,
     svg: &mut Writer<W>,
     cache_a: &mut Event<'_>,
     cache_g: &mut Event<'_>,
-    frame: &merge::TimedFrame<'_>,
+    frame: &merge::TimedFrame<'_, CountType>,
     mut title: &'a str,
 ) -> io::Result<(bool, &'a str)> {
     let frame_attributes = opt
@@ -837,7 +1109,37 @@ where
     for mut reader in readers {
         reader.read_to_string(&mut input)?;
     }
-    from_lines(opt, input.lines(), writer)
+
+    if is_diff_case(&input) {
+        from_lines::<_, _, DiffCount>(opt, input.lines(), writer)
+    } else {
+        from_lines::<_, _, usize>(opt, input.lines(), writer)
+    }
+}
+
+fn is_diff_case(input: &str) -> bool {
+    for mut line in tidy_lines(input.lines()) {
+        let mut skip_warning = true;
+        let found2 = StackSampleCount::<DiffCount>::parse_from_line(
+            &mut line,
+            &mut skip_warning,
+            FrameWidthSource::After,
+        )
+        .is_some();
+        if found2 {
+            return true;
+        }
+        let found1 = StackSampleCount::<usize>::parse_from_line(
+            &mut line,
+            &mut skip_warning,
+            FrameWidthSource::After,
+        )
+        .is_some();
+        if found1 {
+            return false;
+        }
+    }
+    return false;
 }
 
 /// Produce a flame graph from files that contain folded stack lines

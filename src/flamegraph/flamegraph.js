@@ -196,7 +196,7 @@ function update_text_for_elements(elements) {
         var r = find_child(e, "rect");
         var t = find_child(e, "text");
         var w = parseFloat(r.attributes.width.value) * frames.attributes.width.value / 100 - 3;
-        var txt = find_child(e, "title").textContent.replace(/\([^(]*\)$/,"");
+        var txt = find_child(e, "title").textContent.split("\n", 1)[0].replace(/\([^(]*\)$/,"");
         var newX = format_percent((parseFloat(r.attributes.x.value) + (100 * 3 / frames.attributes.width.value)));
 
         // Smaller than this size won't fit anything

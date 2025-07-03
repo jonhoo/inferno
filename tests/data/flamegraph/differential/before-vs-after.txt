@@ -1,0 +1,2 @@
+before 10 1
+after;a 1 10

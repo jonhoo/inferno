@@ -1,0 +1,462 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" width="1200" height="118" onload="init(evt)" viewBox="0 0 1200 118" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:fg="http://github.com/jonhoo/inferno">
+    <!--Flame graph stack visualization. See https://github.com/brendangregg/FlameGraph for latest version, and http://www.brendangregg.com/flamegraphs.html for examples.-->
+    <!--NOTES: -->
+    <defs>
+        <linearGradient id="background" y1="0" y2="1" x1="0" x2="0">
+            <stop stop-color="#eeeeee" offset="5%"/>
+            <stop stop-color="#eeeeb0" offset="95%"/>
+        </linearGradient>
+    </defs>
+    <style type="text/css">
+text { font-family:monospace; font-size:12px }
+#title { text-anchor:middle; font-size:17px; }
+#matched { text-anchor:end; }
+#search { text-anchor:end; opacity:0.1; cursor:pointer; }
+#search:hover, #search.show { opacity:1; }
+#subtitle { text-anchor:middle; font-color:rgb(160,160,160); }
+#unzoom { cursor:pointer; }
+#frames > *:hover { stroke:black; stroke-width:0.5; cursor:pointer; }
+.hide { display:none; }
+.parent { opacity:0.5; }
+</style>
+    <script type="text/ecmascript"><![CDATA[
+        var nametype = 'Function:';
+        var fontsize = 12;
+        var fontwidth = 0.59;
+        var xpad = 10;
+        var inverted = false;
+        var searchcolor = 'rgb(230,0,230)';
+        var fluiddrawing = true;
+        var truncate_text_right = false;
+    ]]></script>
+    <rect x="0" y="0" width="100%" height="118" fill="url(#background)"/>
+    <text id="title" fill="rgb(0,0,0)" x="50.0000%" y="24.00">Flame Graph</text>
+    <text id="details" fill="rgb(0,0,0)" x="10" y="101.00"> </text>
+    <text id="unzoom" class="hide" fill="rgb(0,0,0)" x="10" y="24.00">Reset Zoom</text>
+    <text id="search" fill="rgb(0,0,0)" x="1190" y="24.00">Search</text>
+    <text id="matched" fill="rgb(0,0,0)" x="1190" y="101.00"> </text>
+    <svg id="frames" x="10" width="1180" total_samples="42">
+        <g>
+            <title>a
+Self:
+	Before:	(2 samples, 5.56%)
+	After:	(1 samples, 5.56%)
+	Change:	0.00%pt
+Total:
+	Before:	(2 samples, 5.56%)
+	After:	(1 samples, 5.56%)
+	Change:	0.00%pt
+
+Visual Width:	(1 samples, 2.38%)</title>
+            <rect x="0.0000%" y="37" width="2.3810%" height="15" fill="rgb(250,250,250)" fg:x="0" fg:w="1"/>
+            <text x="0.2500%" y="47.50">a</text>
+        </g>
+        <g>
+            <title>b
+Self:
+	Before:	(2 samples, 5.56%)
+	After:	(1 samples, 5.56%)
+	Change:	0.00%pt
+Total:
+	Before:	(2 samples, 5.56%)
+	After:	(1 samples, 5.56%)
+	Change:	0.00%pt
+
+Visual Width:	(1 samples, 2.38%)</title>
+            <rect x="2.3810%" y="37" width="2.3810%" height="15" fill="rgb(250,250,250)" fg:x="1" fg:w="1"/>
+            <text x="2.6310%" y="47.50">b</text>
+        </g>
+        <g>
+            <title>c
+Self:
+	Before:	(2 samples, 5.56%)
+	After:	(1 samples, 5.56%)
+	Change:	0.00%pt
+Total:
+	Before:	(2 samples, 5.56%)
+	After:	(1 samples, 5.56%)
+	Change:	0.00%pt
+
+Visual Width:	(1 samples, 2.38%)</title>
+            <rect x="4.7619%" y="37" width="2.3810%" height="15" fill="rgb(250,250,250)" fg:x="2" fg:w="1"/>
+            <text x="5.0119%" y="47.50">c</text>
+        </g>
+        <g>
+            <title>d
+Self:
+	Before:	(2 samples, 5.56%)
+	After:	(1 samples, 5.56%)
+	Change:	0.00%pt
+Total:
+	Before:	(2 samples, 5.56%)
+	After:	(1 samples, 5.56%)
+	Change:	0.00%pt
+
+Visual Width:	(1 samples, 2.38%)</title>
+            <rect x="7.1429%" y="37" width="2.3810%" height="15" fill="rgb(250,250,250)" fg:x="3" fg:w="1"/>
+            <text x="7.3929%" y="47.50">d</text>
+        </g>
+        <g>
+            <title>e
+Self:
+	Before:	(2 samples, 5.56%)
+	After:	(1 samples, 5.56%)
+	Change:	0.00%pt
+Total:
+	Before:	(2 samples, 5.56%)
+	After:	(1 samples, 5.56%)
+	Change:	0.00%pt
+
+Visual Width:	(1 samples, 2.38%)</title>
+            <rect x="9.5238%" y="37" width="2.3810%" height="15" fill="rgb(250,250,250)" fg:x="4" fg:w="1"/>
+            <text x="9.7738%" y="47.50">e</text>
+        </g>
+        <g>
+            <title>many_to_many
+Self:
+	Before:	(0 samples, 0.00%)
+	After:	(0 samples, 0.00%)
+	Change:	0.00%pt
+Total:
+	Before:	(12 samples, 33.33%)
+	After:	(6 samples, 33.33%)
+	Change:	0.00%pt
+
+Visual Width:	(6 samples, 14.29%)</title>
+            <rect x="0.0000%" y="53" width="14.2857%" height="15" fill="rgb(250,250,250)" fg:x="0" fg:w="6"/>
+            <text x="0.2500%" y="63.50">many_to_many</text>
+        </g>
+        <g>
+            <title>f
+Self:
+	Before:	(2 samples, 5.56%)
+	After:	(1 samples, 5.56%)
+	Change:	0.00%pt
+Total:
+	Before:	(2 samples, 5.56%)
+	After:	(1 samples, 5.56%)
+	Change:	0.00%pt
+
+Visual Width:	(1 samples, 2.38%)</title>
+            <rect x="11.9048%" y="37" width="2.3810%" height="15" fill="rgb(250,250,250)" fg:x="5" fg:w="1"/>
+            <text x="12.1548%" y="47.50">f</text>
+        </g>
+        <g>
+            <title>after_only
+Self:
+	Before:	(0 samples, 0.00%)
+	After:	(4 samples, 22.22%)
+	Change:	+22.22%pt
+Total:
+	Before:	(0 samples, 0.00%)
+	After:	(4 samples, 22.22%)
+	Change:	+22.22%pt
+
+Visual Width:	(4 samples, 9.52%)</title>
+            <rect x="14.2857%" y="37" width="9.5238%" height="15" fill="rgb(255,175,175)" fg:x="6" fg:w="4"/>
+            <text x="14.5357%" y="47.50">after_only</text>
+        </g>
+        <g>
+            <title>before_only_1
+Self:
+	Before:	(1 samples, 2.78%)
+	After:	(0 samples, 0.00%)
+	Change:	-2.78%pt
+Total:
+	Before:	(1 samples, 2.78%)
+	After:	(0 samples, 0.00%)
+	Change:	-2.78%pt
+
+Visual Width:	(1 samples, 2.38%)</title>
+            <rect x="23.8095%" y="37" width="2.3810%" height="15" fill="rgb(240,240,255)" fg:x="10" fg:w="1"/>
+            <text x="24.0595%" y="47.50">be..</text>
+        </g>
+        <g>
+            <title>before_only_2
+Self:
+	Before:	(1 samples, 2.78%)
+	After:	(0 samples, 0.00%)
+	Change:	-2.78%pt
+Total:
+	Before:	(1 samples, 2.78%)
+	After:	(0 samples, 0.00%)
+	Change:	-2.78%pt
+
+Visual Width:	(1 samples, 2.38%)</title>
+            <rect x="26.1905%" y="37" width="2.3810%" height="15" fill="rgb(240,240,255)" fg:x="11" fg:w="1"/>
+            <text x="26.4405%" y="47.50">be..</text>
+        </g>
+        <g>
+            <title>before_only_3
+Self:
+	Before:	(1 samples, 2.78%)
+	After:	(0 samples, 0.00%)
+	Change:	-2.78%pt
+Total:
+	Before:	(1 samples, 2.78%)
+	After:	(0 samples, 0.00%)
+	Change:	-2.78%pt
+
+Visual Width:	(1 samples, 2.38%)</title>
+            <rect x="28.5714%" y="37" width="2.3810%" height="15" fill="rgb(240,240,255)" fg:x="12" fg:w="1"/>
+            <text x="28.8214%" y="47.50">be..</text>
+        </g>
+        <g>
+            <title>before_only_4
+Self:
+	Before:	(1 samples, 2.78%)
+	After:	(0 samples, 0.00%)
+	Change:	-2.78%pt
+Total:
+	Before:	(1 samples, 2.78%)
+	After:	(0 samples, 0.00%)
+	Change:	-2.78%pt
+
+Visual Width:	(1 samples, 2.38%)</title>
+            <rect x="30.9524%" y="37" width="2.3810%" height="15" fill="rgb(240,240,255)" fg:x="13" fg:w="1"/>
+            <text x="31.2024%" y="47.50">be..</text>
+        </g>
+        <g>
+            <title>before_only_5
+Self:
+	Before:	(1 samples, 2.78%)
+	After:	(0 samples, 0.00%)
+	Change:	-2.78%pt
+Total:
+	Before:	(1 samples, 2.78%)
+	After:	(0 samples, 0.00%)
+	Change:	-2.78%pt
+
+Visual Width:	(1 samples, 2.38%)</title>
+            <rect x="33.3333%" y="37" width="2.3810%" height="15" fill="rgb(240,240,255)" fg:x="14" fg:w="1"/>
+            <text x="33.5833%" y="47.50">be..</text>
+        </g>
+        <g>
+            <title>before_only_6
+Self:
+	Before:	(1 samples, 2.78%)
+	After:	(0 samples, 0.00%)
+	Change:	-2.78%pt
+Total:
+	Before:	(1 samples, 2.78%)
+	After:	(0 samples, 0.00%)
+	Change:	-2.78%pt
+
+Visual Width:	(1 samples, 2.38%)</title>
+            <rect x="35.7143%" y="37" width="2.3810%" height="15" fill="rgb(240,240,255)" fg:x="15" fg:w="1"/>
+            <text x="35.9643%" y="47.50">be..</text>
+        </g>
+        <g>
+            <title>before_only_7
+Self:
+	Before:	(1 samples, 2.78%)
+	After:	(0 samples, 0.00%)
+	Change:	-2.78%pt
+Total:
+	Before:	(1 samples, 2.78%)
+	After:	(0 samples, 0.00%)
+	Change:	-2.78%pt
+
+Visual Width:	(1 samples, 2.38%)</title>
+            <rect x="38.0952%" y="37" width="2.3810%" height="15" fill="rgb(240,240,255)" fg:x="16" fg:w="1"/>
+            <text x="38.3452%" y="47.50">be..</text>
+        </g>
+        <g>
+            <title>many_to_one
+Self:
+	Before:	(0 samples, 0.00%)
+	After:	(0 samples, 0.00%)
+	Change:	0.00%pt
+Total:
+	Before:	(8 samples, 22.22%)
+	After:	(4 samples, 22.22%)
+	Change:	0.00%pt
+
+Visual Width:	(12 samples, 28.57%)</title>
+            <rect x="14.2857%" y="53" width="28.5714%" height="15" fill="rgb(250,250,250)" fg:x="6" fg:w="12"/>
+            <text x="14.5357%" y="63.50">many_to_one</text>
+        </g>
+        <g>
+            <title>before_only_8
+Self:
+	Before:	(1 samples, 2.78%)
+	After:	(0 samples, 0.00%)
+	Change:	-2.78%pt
+Total:
+	Before:	(1 samples, 2.78%)
+	After:	(0 samples, 0.00%)
+	Change:	-2.78%pt
+
+Visual Width:	(1 samples, 2.38%)</title>
+            <rect x="40.4762%" y="37" width="2.3810%" height="15" fill="rgb(240,240,255)" fg:x="17" fg:w="1"/>
+            <text x="40.7262%" y="47.50">be..</text>
+        </g>
+        <g>
+            <title>after_only_1
+Self:
+	Before:	(0 samples, 0.00%)
+	After:	(1 samples, 5.56%)
+	Change:	+5.56%pt
+Total:
+	Before:	(0 samples, 0.00%)
+	After:	(1 samples, 5.56%)
+	Change:	+5.56%pt
+
+Visual Width:	(1 samples, 2.38%)</title>
+            <rect x="42.8571%" y="37" width="2.3810%" height="15" fill="rgb(255,231,231)" fg:x="18" fg:w="1"/>
+            <text x="43.1071%" y="47.50">af..</text>
+        </g>
+        <g>
+            <title>after_only_2
+Self:
+	Before:	(0 samples, 0.00%)
+	After:	(1 samples, 5.56%)
+	Change:	+5.56%pt
+Total:
+	Before:	(0 samples, 0.00%)
+	After:	(1 samples, 5.56%)
+	Change:	+5.56%pt
+
+Visual Width:	(1 samples, 2.38%)</title>
+            <rect x="45.2381%" y="37" width="2.3810%" height="15" fill="rgb(255,231,231)" fg:x="19" fg:w="1"/>
+            <text x="45.4881%" y="47.50">af..</text>
+        </g>
+        <g>
+            <title>after_only_3
+Self:
+	Before:	(0 samples, 0.00%)
+	After:	(1 samples, 5.56%)
+	Change:	+5.56%pt
+Total:
+	Before:	(0 samples, 0.00%)
+	After:	(1 samples, 5.56%)
+	Change:	+5.56%pt
+
+Visual Width:	(1 samples, 2.38%)</title>
+            <rect x="47.6190%" y="37" width="2.3810%" height="15" fill="rgb(255,231,231)" fg:x="20" fg:w="1"/>
+            <text x="47.8690%" y="47.50">af..</text>
+        </g>
+        <g>
+            <title>after_only_4
+Self:
+	Before:	(0 samples, 0.00%)
+	After:	(1 samples, 5.56%)
+	Change:	+5.56%pt
+Total:
+	Before:	(0 samples, 0.00%)
+	After:	(1 samples, 5.56%)
+	Change:	+5.56%pt
+
+Visual Width:	(1 samples, 2.38%)</title>
+            <rect x="50.0000%" y="37" width="2.3810%" height="15" fill="rgb(255,231,231)" fg:x="21" fg:w="1"/>
+            <text x="50.2500%" y="47.50">af..</text>
+        </g>
+        <g>
+            <title>after_only_5
+Self:
+	Before:	(0 samples, 0.00%)
+	After:	(1 samples, 5.56%)
+	Change:	+5.56%pt
+Total:
+	Before:	(0 samples, 0.00%)
+	After:	(1 samples, 5.56%)
+	Change:	+5.56%pt
+
+Visual Width:	(1 samples, 2.38%)</title>
+            <rect x="52.3810%" y="37" width="2.3810%" height="15" fill="rgb(255,231,231)" fg:x="22" fg:w="1"/>
+            <text x="52.6310%" y="47.50">af..</text>
+        </g>
+        <g>
+            <title>after_only_6
+Self:
+	Before:	(0 samples, 0.00%)
+	After:	(1 samples, 5.56%)
+	Change:	+5.56%pt
+Total:
+	Before:	(0 samples, 0.00%)
+	After:	(1 samples, 5.56%)
+	Change:	+5.56%pt
+
+Visual Width:	(1 samples, 2.38%)</title>
+            <rect x="54.7619%" y="37" width="2.3810%" height="15" fill="rgb(255,231,231)" fg:x="23" fg:w="1"/>
+            <text x="55.0119%" y="47.50">af..</text>
+        </g>
+        <g>
+            <title>after_only_7
+Self:
+	Before:	(0 samples, 0.00%)
+	After:	(1 samples, 5.56%)
+	Change:	+5.56%pt
+Total:
+	Before:	(0 samples, 0.00%)
+	After:	(1 samples, 5.56%)
+	Change:	+5.56%pt
+
+Visual Width:	(1 samples, 2.38%)</title>
+            <rect x="57.1429%" y="37" width="2.3810%" height="15" fill="rgb(255,231,231)" fg:x="24" fg:w="1"/>
+            <text x="57.3929%" y="47.50">af..</text>
+        </g>
+        <g>
+            <title>after_only_8
+Self:
+	Before:	(0 samples, 0.00%)
+	After:	(1 samples, 5.56%)
+	Change:	+5.56%pt
+Total:
+	Before:	(0 samples, 0.00%)
+	After:	(1 samples, 5.56%)
+	Change:	+5.56%pt
+
+Visual Width:	(1 samples, 2.38%)</title>
+            <rect x="59.5238%" y="37" width="2.3810%" height="15" fill="rgb(255,231,231)" fg:x="25" fg:w="1"/>
+            <text x="59.7738%" y="47.50">af..</text>
+        </g>
+        <g>
+            <title>all
+Self:
+	Before:	(0 samples, 0.00%)
+	After:	(0 samples, 0.00%)
+	Change:	0.00%pt
+Total:
+	Before:	(36 samples, 100%)
+	After:	(18 samples, 100%)
+	Change:	0.00%pt
+
+Visual Width:	(42 samples, 100%)</title>
+            <rect x="0.0000%" y="69" width="100.0000%" height="15" fill="rgb(250,250,250)" fg:x="0" fg:w="42"/>
+            <text x="0.2500%" y="79.50"></text>
+        </g>
+        <g>
+            <title>one_to_many
+Self:
+	Before:	(0 samples, 0.00%)
+	After:	(0 samples, 0.00%)
+	Change:	0.00%pt
+Total:
+	Before:	(16 samples, 44.44%)
+	After:	(8 samples, 44.44%)
+	Change:	0.00%pt
+
+Visual Width:	(24 samples, 57.14%)</title>
+            <rect x="42.8571%" y="53" width="57.1429%" height="15" fill="rgb(250,250,250)" fg:x="18" fg:w="24"/>
+            <text x="43.1071%" y="63.50">one_to_many</text>
+        </g>
+        <g>
+            <title>before_only
+Self:
+	Before:	(16 samples, 44.44%)
+	After:	(0 samples, 0.00%)
+	Change:	-44.44%pt
+Total:
+	Before:	(16 samples, 44.44%)
+	After:	(0 samples, 0.00%)
+	Change:	-44.44%pt
+
+Visual Width:	(16 samples, 38.10%)</title>
+            <rect x="61.9048%" y="37" width="38.0952%" height="15" fill="rgb(100,100,255)" fg:x="26" fg:w="16"/>
+            <text x="62.1548%" y="47.50">before_only</text>
+        </g>
+    </svg>
+</svg>
