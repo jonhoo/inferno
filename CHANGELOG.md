@@ -18,6 +18,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+## [0.12.3] - 2025-07-05
+
+### Changed
+
+- Fix for consumers trying to use `-Zminimal-versions`. [#343](https://github.com/jonhoo/inferno/pull/343)
+
 ## [0.12.2] - 2025-03-22
 
 ### Added
@@ -347,7 +353,10 @@ this change should be an easy upgrade.
 - Moved to `IndexMap` and FNV hashing ([#127](https://github.com/jonhoo/inferno/pull/127))
 - Moved CI to Azure DevOps Pipelines
 
-[Unreleased]: https://github.com/jonhoo/inferno/compare/v0.12.0...HEAD
+[Unreleased]: https://github.com/jonhoo/inferno/compare/v0.12.3...HEAD
+[0.12.3]: https://github.com/jonhoo/inferno/compare/v0.12.2...v0.12.3
+[0.12.2]: https://github.com/jonhoo/inferno/compare/v0.12.1...v0.12.2
+[0.12.1]: https://github.com/jonhoo/inferno/compare/v0.12.0...v0.12.1
 [0.12.0]: https://github.com/jonhoo/inferno/compare/v0.11.21...v0.12.0
 [0.11.21]: https://github.com/jonhoo/inferno/compare/v0.11.20...v0.11.21
 [0.11.20]: https://github.com/jonhoo/inferno/compare/v0.11.19...v0.11.20
