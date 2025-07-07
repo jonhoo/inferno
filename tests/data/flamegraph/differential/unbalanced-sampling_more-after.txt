@@ -1,0 +1,17 @@
+many_to_one;before_only_1 1 0
+many_to_one;before_only_2 1 0
+many_to_one;before_only_3 1 0
+many_to_one;before_only_4 1 0
+many_to_one;before_only_5 1 0
+many_to_one;after_only 0 10
+many_to_many;a 1 2
+many_to_many;b 1 2
+many_to_many;c 1 2
+many_to_many;d 1 2
+many_to_many;e 1 2
+many_to_many;f 1 2
+one_to_many;before_only 2 0
+one_to_many;after_only_1 0 1
+one_to_many;after_only_2 0 1
+one_to_many;after_only_3 0 1
+one_to_many;after_only_4 0 1

@@ -7,7 +7,7 @@ use env_logger::Env;
 use inferno::flamegraph::color::{
     parse_hex_color, BackgroundColor, Color, PaletteMap, SearchColor, StrokeColor,
 };
-use inferno::flamegraph::{self, defaults, Direction, Options, Palette, TextTruncateDirection};
+use inferno::flamegraph::{self, defaults, Direction, Options, Palette, TextTruncateDirection, FrameWidthSource};
 
 #[cfg(feature = "nameattr")]
 use inferno::flamegraph::FuncFrameAttrsMap;
@@ -67,6 +67,22 @@ struct Opt {
     /// Generate stack-reversed flame graph
     #[clap(long = "reverse", conflicts_with = "no-sort")]
     reverse: bool,
+
+    /// Source of frame width data for differential flamegraphs
+    #[clap(
+        short = 'w',
+        long = "frame-width-source",
+        default_value_t = FrameWidthSource::default(),
+        value_enum,
+        value_name = "STRING"
+    )]
+    frame_width_source: FrameWidthSource,
+
+    #[clap(short = 'd', long = "detailed-tooltips")]
+    detailed_tooltips: bool,
+
+    #[clap(short = 'n', long = "normalize")]
+    normalize: bool,
 
     /// Verbose logging mode (-v, -vv, -vvv)
     #[clap(short = 'v', long = "verbose", action = ArgAction::Count)]
@@ -219,6 +235,11 @@ struct Opt {
     #[clap(long = "base", value_name = "STRING")]
     base: Vec<String>,
 
+    /// Include child functions in the diff of each function
+    #[clap(long = "include-children")]
+    include_children: bool,
+
+
     // ************ //
     // *** ARGS *** //
     // ************ //
@@ -264,6 +285,10 @@ impl<'a> Opt {
         options.reverse_stack_order = self.reverse;
         options.flame_chart = self.flame_chart;
         options.base = self.base;
+        options.include_children = self.include_children;
+        options.frame_width_source = self.frame_width_source;
+        options.detailed_tooltips = self.detailed_tooltips;
+        options.normalize = self.normalize;
 
         if self.flame_chart && self.title == defaults::TITLE {
             options.title = defaults::CHART_TITLE.to_owned();
@@ -375,7 +400,7 @@ fn save_consistent_palette_if_needed(
 mod tests {
     use super::Opt;
     use clap::Parser;
-    use inferno::flamegraph::{color, Direction, Options, Palette, TextTruncateDirection};
+    use inferno::flamegraph::{color, Direction, Options, Palette, TextTruncateDirection, FrameWidthSource};
     use pretty_assertions::assert_eq;
     use std::path::PathBuf;
     use std::str::FromStr;
@@ -430,6 +455,11 @@ mod tests {
             "--pretty-xml",
             "--reverse",
             "--no-javascript",
+            "--include-children",
+            "--frame-width-source",
+            "difference",
+            "--detailed-tooltips",
+            "--normalize",
             "test_infile1",
             "test_infile2",
         ];
@@ -460,6 +490,11 @@ mod tests {
         expected_options.reverse_stack_order = true;
         expected_options.no_javascript = true;
         expected_options.color_diffusion = false;
+        expected_options.include_children = true;
+        expected_options.frame_width_source = FrameWidthSource::Difference;
+        expected_options.detailed_tooltips = true;
+        expected_options.normalize = true;
+
 
         assert_eq!(options, expected_options);
         assert_eq!(infiles.len(), 2, "expected 2 input files");
