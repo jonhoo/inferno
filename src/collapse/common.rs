@@ -480,7 +480,7 @@ impl Occurrences {
 ///
 /// Based on code in https://github.com/alexcrichton/rustc-demangle/blob/master/src/legacy.rs
 #[allow(clippy::cognitive_complexity)]
-pub(crate) fn fix_partially_demangled_rust_symbol(symbol: &str) -> Cow<str> {
+pub(crate) fn fix_partially_demangled_rust_symbol<'s>(symbol: &'s str) -> Cow<'s, str> {
     // Rust hashes are hex digits with an `h` prepended.
     let is_rust_hash =
         |s: &str| s.starts_with('h') && s[1..].chars().all(|c| c.is_ascii_hexdigit());
