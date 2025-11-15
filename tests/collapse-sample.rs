@@ -4,7 +4,6 @@ use std::fs::File;
 use std::io::{self, BufReader, Cursor};
 use std::process::{Command, Stdio};
 
-use assert_cmd::prelude::*;
 use inferno::collapse::sample::{Folder, Options};
 use log::Level;
 use pretty_assertions::assert_eq;
@@ -142,8 +141,7 @@ fn collapse_sample_cli() {
     let expected_file = "./tests/data/collapse-sample/results/sample-default.txt";
 
     // Test with file passed in
-    let output = Command::cargo_bin("inferno-collapse-sample")
-        .unwrap()
+    let output = Command::new(assert_cmd::cargo::cargo_bin!("inferno-collapse-sample"))
         .arg(input_file)
         .output()
         .expect("failed to execute process");
@@ -151,8 +149,7 @@ fn collapse_sample_cli() {
     common::compare_results(Cursor::new(output.stdout), expected, expected_file, false);
 
     // Test with STDIN
-    let mut child = Command::cargo_bin("inferno-collapse-sample")
-        .unwrap()
+    let mut child = Command::new(assert_cmd::cargo::cargo_bin!("inferno-collapse-sample"))
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .spawn()

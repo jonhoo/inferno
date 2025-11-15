@@ -4,7 +4,6 @@ use std::fs::File;
 use std::io::{self, BufReader, Cursor};
 use std::process::{Command, Stdio};
 
-use assert_cmd::prelude::CommandCargoExt;
 use inferno::collapse::ghcprof::{Folder, Options, Source};
 
 fn test_collapse_ghcprof(test_file: &str, expected_file: &str, options: Options) -> io::Result<()> {
@@ -83,8 +82,7 @@ fn collapse_ghcprof_cli() {
     let expected_file = "./tests/data/collapse-ghcprof/results/ticks.txt";
 
     // Test with file passed in
-    let output = Command::cargo_bin("inferno-collapse-ghcprof")
-        .unwrap()
+    let output = Command::new(assert_cmd::cargo::cargo_bin!("inferno-collapse-ghcprof"))
         .arg(input_file)
         .output()
         .expect("failed to execute process");
@@ -92,8 +90,7 @@ fn collapse_ghcprof_cli() {
     common::compare_results(Cursor::new(output.stdout), expected, expected_file, false);
 
     // Test with STDIN
-    let mut child = Command::cargo_bin("inferno-collapse-ghcprof")
-        .unwrap()
+    let mut child = Command::new(assert_cmd::cargo::cargo_bin!("inferno-collapse-ghcprof"))
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .spawn()
@@ -106,8 +103,7 @@ fn collapse_ghcprof_cli() {
     common::compare_results(Cursor::new(output.stdout), expected, expected_file, false);
 
     // Test --ticks and --bytes conflict
-    let output = Command::cargo_bin("inferno-collapse-ghcprof")
-        .unwrap()
+    let output = Command::new(assert_cmd::cargo::cargo_bin!("inferno-collapse-ghcprof"))
         .arg(input_file)
         .arg("--ticks")
         .arg("--bytes")

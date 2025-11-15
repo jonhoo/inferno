@@ -5,7 +5,6 @@ use std::io::{self, BufReader, Cursor};
 use std::path::Path;
 use std::process::{Command, Stdio};
 
-use assert_cmd::cargo::CommandCargoExt;
 use inferno::collapse::perf::{Folder, Options};
 use log::Level;
 use pretty_assertions::assert_eq;
@@ -294,8 +293,7 @@ fn collapse_perf_cli() {
     let expected_file = "./flamegraph/test/results/perf-vertx-stacks-01-collapsed-all.txt";
 
     // Test with file passed in
-    let output = Command::cargo_bin("inferno-collapse-perf")
-        .unwrap()
+    let output = Command::new(assert_cmd::cargo::cargo_bin!("inferno-collapse-perf"))
         .arg("--all")
         .arg(input_file)
         .output()
@@ -304,8 +302,7 @@ fn collapse_perf_cli() {
     common::compare_results(Cursor::new(output.stdout), expected, expected_file, true);
 
     // Test with STDIN
-    let mut child = Command::cargo_bin("inferno-collapse-perf")
-        .unwrap()
+    let mut child = Command::new(assert_cmd::cargo::cargo_bin!("inferno-collapse-perf"))
         .arg("--all")
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
