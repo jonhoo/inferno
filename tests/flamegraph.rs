@@ -6,7 +6,6 @@ use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::str::FromStr;
 
-use assert_cmd::cargo::CommandCargoExt;
 use inferno::flamegraph::color::{BackgroundColor, PaletteMap};
 use inferno::flamegraph::{self, Direction, Options, Palette, TextTruncateDirection};
 use log::Level;
@@ -873,8 +872,7 @@ fn flamegraph_cli() {
     let expected_file =
         "./tests/data/flamegraph/perf-vertx-stacks/perf-vertx-stacks-01-collapsed-all.svg";
     // Test with file passed in
-    let output = Command::cargo_bin("inferno-flamegraph")
-        .unwrap()
+    let output = Command::new(assert_cmd::cargo::cargo_bin!("inferno-flamegraph"))
         .arg("--pretty-xml")
         .arg("--no-javascript")
         .arg("--hash")
@@ -885,8 +883,7 @@ fn flamegraph_cli() {
     compare_results(Cursor::new(output.stdout), expected, expected_file);
 
     // Test with STDIN
-    let mut child = Command::cargo_bin("inferno-flamegraph")
-        .unwrap()
+    let mut child = Command::new(assert_cmd::cargo::cargo_bin!("inferno-flamegraph"))
         .arg("--pretty-xml")
         .arg("--no-javascript")
         .arg("--hash")
@@ -906,8 +903,7 @@ fn flamegraph_cli() {
         "./tests/data/flamegraph/multiple-inputs/perf-vertx-stacks-01-collapsed-all-unsorted-1.txt";
     let input_file_part2 =
         "./tests/data/flamegraph/multiple-inputs/perf-vertx-stacks-01-collapsed-all-unsorted-2.txt";
-    let output = Command::cargo_bin("inferno-flamegraph")
-        .unwrap()
+    let output = Command::new(assert_cmd::cargo::cargo_bin!("inferno-flamegraph"))
         .arg("--pretty-xml")
         .arg("--no-javascript")
         .arg("--hash")

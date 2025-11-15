@@ -522,7 +522,8 @@ impl Folder {
                 | Event::CData(_)
                 | Event::Decl(_)
                 | Event::PI(_)
-                | Event::DocType(_) => {}
+                | Event::DocType(_)
+                | Event::GeneralRef(_) => {}
                 Event::Eof => return invalid_data_error!("Unexpected EOF"),
             }
         };

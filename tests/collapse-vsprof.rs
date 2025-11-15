@@ -4,7 +4,6 @@ use std::fs::File;
 use std::io::{self, BufReader, Cursor};
 use std::process::{Command, Stdio};
 
-use assert_cmd::prelude::*;
 use inferno::collapse::vsprof::Folder;
 use log::Level;
 use pretty_assertions::assert_eq;
@@ -108,8 +107,7 @@ fn collapse_vsprof_cli() {
     let expected_file = "./tests/data/collapse-vsprof/results/sample-default.txt";
 
     // Test with file passed in
-    let output = Command::cargo_bin("inferno-collapse-vsprof")
-        .unwrap()
+    let output = Command::new(assert_cmd::cargo::cargo_bin!("inferno-collapse-vsprof"))
         .arg(input_file)
         .output()
         .expect("failed to execute process");
@@ -117,8 +115,7 @@ fn collapse_vsprof_cli() {
     common::compare_results(Cursor::new(output.stdout), expected, expected_file, false);
 
     // Test with STDIN
-    let mut child = Command::cargo_bin("inferno-collapse-vsprof")
-        .unwrap()
+    let mut child = Command::new(assert_cmd::cargo::cargo_bin!("inferno-collapse-vsprof"))
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .spawn()

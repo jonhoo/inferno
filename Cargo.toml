@@ -1,6 +1,6 @@
 [package]
 name = "inferno"
-version = "0.12.3"
+version = "0.12.4"
 edition = "2021"
 authors = ["Jon Gjengset <jon@thesquareplanet.com>"]
 rust-version = "1.71.0"
@@ -36,15 +36,15 @@ indexmap = { version = "2.0", optional = true }
 itoa = "1"
 log = "0.4"
 num-format = { version = "0.4.3", default-features = false }
-quick-xml = { version = "0.37", default-features = false }
+quick-xml = { version = "0.38", default-features = false }
 rgb = "0.8.13"
 str_stack = "0.1"
 clap = { version = "4.0.1", optional = true, features = ["derive"] }
 once_cell = "1.12.0"
 
 [dev-dependencies]
-assert_cmd = "2"
-criterion = "0.5"
+assert_cmd = "2.1.1"
+criterion = "0.7"
 libflate = "2"
 maplit = "1.0.1"
 pretty_assertions = "1"
@@ -54,18 +54,6 @@ testing_logger = "0.1.1"
 
 # for -Zminimal-versions
 [target.'cfg(any())'.dependencies]
-# Force criterion to pull in regex 1.6 instead of 1.5 during minimal version CI;
-# otherwise compilation fails with...
-# ```
-# error[E0433]: failed to resolve: use of undeclared crate or module `syntax`
-#  --> <$HOME>/.cargo/registry/src/github.com-1ecc6299db9ec823/regex-1.5.0/src/literal/mod.rs:9:9
-#   |
-# 9 |     use syntax::hir::literal::Literals;
-#   |         ^^^^^^ use of undeclared crate or module `syntax`
-# ```
-# Forcing >= 1.5.1 would be enough to solve this issue, but since regex 1.6.0
-# supports our minimum supported rust version of 1.59.0, regex 1.6.x is fine
-regex = { version = "1.6", default-features = false, optional = true }
 # rle-decode-fast 1.0.0 no longer builds with newer Rust
 rle-decode-fast = { version = "1.0.3", default-features = false, optional = true }
 

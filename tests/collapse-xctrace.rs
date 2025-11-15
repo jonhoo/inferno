@@ -4,7 +4,6 @@ use std::fs::File;
 use std::io::{self, BufReader, Cursor};
 use std::process::{Command, Stdio};
 
-use assert_cmd::cargo::CommandCargoExt;
 use inferno::collapse::xctrace::Folder;
 
 fn test_collapse_xctrace(test_file: &str, expected_file: &str) -> io::Result<()> {
@@ -33,8 +32,7 @@ fn collapse_xctrace_cli() {
     let expected_file = "./tests/data/collapse-xctrace/results/basic.folded";
 
     // Test with file passed in
-    let output = Command::cargo_bin("inferno-collapse-xctrace")
-        .unwrap()
+    let output = Command::new(assert_cmd::cargo::cargo_bin!("inferno-collapse-xctrace"))
         .arg(input_file)
         .output()
         .expect("failed to execute process");
@@ -42,8 +40,7 @@ fn collapse_xctrace_cli() {
     common::compare_results(Cursor::new(output.stdout), expected, expected_file, false);
 
     // Test with STDIN
-    let mut child = Command::cargo_bin("inferno-collapse-xctrace")
-        .unwrap()
+    let mut child = Command::new(assert_cmd::cargo::cargo_bin!("inferno-collapse-xctrace"))
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .spawn()
