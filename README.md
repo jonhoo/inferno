@@ -76,7 +76,7 @@ You'll end up with an image like this:
 ### Obtaining profiling data
 
 To profile your application, you'll need to have a "profiler" installed.
-This will likely be [`perf`]() or [`bpftrace`] on Linux, and [DTrace] on
+This will likely be [`perf`] or [`bpftrace`] on Linux, and [DTrace] on
 macOS. There are some great instructions on how to get started with
 these tools on Brendan Gregg's [CPU Flame Graphs page].
 
