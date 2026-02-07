@@ -131,7 +131,7 @@ pub struct Folder {
     stack: VecDeque<String>,
 
     /// period of current event
-    period: Option<usize>,
+    period: Option<u64>,
 
     // Options...
     opt: Options,
@@ -383,7 +383,7 @@ impl Folder {
             let event = by_colons.next().and_then(|period_and_event| {
                 let mut it = period_and_event.rsplit(' ');
                 let event_name = it.next();
-                self.period = it.next().and_then(|s| s.parse::<usize>().ok());
+                self.period = it.next().and_then(|s| s.parse::<u64>().ok());
                 event_name
             });
             if let Some(event) = event {

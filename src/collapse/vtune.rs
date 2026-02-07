@@ -146,7 +146,7 @@ impl Folder {
 
             if let Some((func, time, module)) = self.line_parts(&line[spaces..]) {
                 if let Ok(time) = time.parse::<f64>() {
-                    let time_ms = (time * 1000.0).round() as usize;
+                    let time_ms = (time * 1000.0).round() as u64;
                     if module.is_empty() {
                         self.stack.push(func.to_string());
                     } else {
@@ -166,7 +166,7 @@ impl Folder {
         Ok(())
     }
 
-    fn write_stack(&self, occurrences: &mut Occurrences, time: usize) {
+    fn write_stack(&self, occurrences: &mut Occurrences, time: u64) {
         occurrences.insert(self.stack.join(";"), time);
     }
 }

@@ -38,7 +38,7 @@ pub enum Source {
 #[derive(Clone, Default)]
 pub struct Folder {
     /// Cost for the current stack frame.
-    current_cost: usize,
+    current_cost: u64,
 
     /// Function on the stack in this entry thus far.
     stack: Vec<String>,
@@ -223,11 +223,11 @@ impl Folder {
                 let module = string_range(cols.module);
                 // The columns we extract costs from all exclude the cost of their children
                 self.current_cost = match self.opt.source {
-                    // We must `insert_or_add` a `usize` so convert to per-mille to not lose the 1dp
+                    // We must `insert_or_add` a `u64` so convert to per-mille to not lose the 1dp
                     Source::PercentTime => cost * 10.0,
                     Source::Ticks => cost,
                     Source::Bytes => cost,
-                } as usize;
+                } as u64;
                 self.stack
                     .push(format!("{}.{}", module.trim(), func.trim()));
                 // identical stacks from other threads can appear so need to insert or add

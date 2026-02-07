@@ -109,7 +109,7 @@ impl CollapsePrivate for Folder {
             let line = s.trim();
             if line.is_empty() {
                 continue;
-            } else if let Ok(count) = line.parse::<usize>() {
+            } else if let Ok(count) = line.parse::<u64>() {
                 self.on_stack_end(count, occurrences);
             } else {
                 self.on_stack_line(line);
@@ -148,10 +148,10 @@ impl CollapsePrivate for Folder {
             if line.is_empty() {
                 found_empty_line = true;
             } else if found_empty_line {
-                if line.parse::<usize>().is_ok() {
+                if line.parse::<u64>().is_ok() {
                     return Some(found_stack_line);
                 } else if line.contains('`')
-                    || (line.starts_with("0x") && usize::from_str_radix(&line[2..], 16).is_ok())
+                    || (line.starts_with("0x") && u64::from_str_radix(&line[2..], 16).is_ok())
                 {
                     found_stack_line = true;
                 } else {
@@ -371,7 +371,7 @@ impl Folder {
         }
     }
 
-    fn on_stack_end(&mut self, count: usize, occurrences: &mut Occurrences) {
+    fn on_stack_end(&mut self, count: u64, occurrences: &mut Occurrences) {
         // allocate a string that is long enough to hold the entire stack string
         let mut stack_str = String::with_capacity(self.stack_str_size);
 
