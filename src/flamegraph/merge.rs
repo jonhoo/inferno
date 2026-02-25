@@ -89,40 +89,36 @@ impl Sample {
     }
 }
 
-fn flow<'a, LI, TI>(
+fn flow<'a>(
     tmp: &mut HashMap<Frame<'a>, FrameTime>,
     frames: &mut Vec<TimedFrame<'a>>,
-    previous_it: LI,
-    current_it: TI,
+    previous_frames: &[&'a str],
+    current_frames: &[&'a str],
     acc_samples: usize,
     delta: Option<isize>,
-) where
-    LI: IntoIterator<Item = &'a str>,
-    TI: IntoIterator<Item = &'a str>,
-{
-    let mut current_it = current_it.into_iter().peekable();
-    let mut previous_it = previous_it.into_iter().peekable();
+) {
+    debug_assert!(
+        previous_frames.len() > 0 || current_frames.len() > 0,
+        "At least one of the frames must be non-empty",
+    );
 
-    // remove the prefix values shared among the current and previous values
-    let mut shared_depth = 0;
-    while previous_it.peek() == current_it.peek() {
-        // they must both be None, so let's stop looping
-        if previous_it.peek().is_none() {
+    // find common prefix among previous and current frames
+    let mut first_different = 0;
+    let max_depth = previous_frames.len().min(current_frames.len());
+    while first_different < max_depth {
+        if previous_frames[first_different] != current_frames[first_different] {
             break;
         }
-
-        // move along prefix iterators
-        previous_it.next();
-        current_it.next();
-        shared_depth += 1;
+        first_different += 1;
     }
 
     // remove the frames from the last iteration which are not shared with the
     // current
-    for (i, func) in previous_it.enumerate() {
+    let mut depth = first_different;
+    while depth < previous_frames.len() {
         let key = Frame {
-            function: func,
-            depth: shared_depth + i,
+            function: previous_frames[depth],
+            depth,
         };
 
         // the previous value was processed on the previous iteration, so this
@@ -138,21 +134,39 @@ fn flow<'a, LI, TI>(
             delta: frame_time.delta,
         };
         frames.push(frame);
+
+        depth += 1;
     }
 
     // push the frames new to the current iteration
-    let mut i = 0;
-    while let Some(func) = current_it.next() {
+    let mut depth = first_different;
+    let inner_delta = delta.clone().and(Some(0)); // None and Some(0) render differently
+    while depth < current_frames.len().saturating_sub(1) {
         let key = Frame {
-            function: func,
-            depth: shared_depth + i,
+            function: current_frames[depth],
+            depth,
         };
 
-        let is_last = current_it.peek().is_none();
-        let delta = match delta {
-            Some(_) if !is_last => Some(0),
-            d => d,
+        let frame_time = FrameTime {
+            start_time: acc_samples,
+            delta: inner_delta.clone(),
         };
+
+        let previous = tmp.insert(key, frame_time);
+        debug_assert!(
+            previous.is_none(),
+            "Unexpected frame key. This key should be unique to current value",
+        );
+
+        depth += 1;
+    }
+
+    if depth < current_frames.len() {
+        let key = Frame {
+            function: current_frames[depth],
+            depth,
+        };
+
         let frame_time = FrameTime {
             start_time: acc_samples,
             // For some reason the Perl version does a `+=` for `delta`, but I can't figure out why.
@@ -165,8 +179,6 @@ fn flow<'a, LI, TI>(
             previous.is_none(),
             "Unexpected frame key. This key should be unique to current value",
         );
-
-        i += 1;
     }
 }
 
@@ -186,6 +198,8 @@ where
     let mut delta_max = 1;
     let mut stripped_fractional_samples = false;
     let mut prev_line = None;
+    let mut previous = smallvec::SmallVec::<[&str; 6]>::new();
+
     for line in lines {
         let mut line = line.trim();
 
@@ -226,40 +240,32 @@ where
         let current_trace = line;
 
         // inject empty first-level stack frame to capture "all"
-        let current_it = iter::once("").chain(current_trace.split(';'));
+        let current = smallvec::SmallVec::<[&str; 6]>::from_iter(
+            iter::once("").chain(current_trace.split(';')),
+        );
 
-        // need to special-case this, because otherwise iter("") + "".split(';') == ["", ""]
-        if previous_trace.is_empty() {
-            flow(
-                &mut tmp,
-                &mut timed_frames,
-                iter::empty(),
-                current_it,
-                acc_samples,
-                delta,
-            );
-        } else {
-            flow(
-                &mut tmp,
-                &mut timed_frames,
-                iter::once("").chain(previous_trace.split(';')),
-                current_it,
-                acc_samples,
-                delta,
-            );
-        }
+        flow(
+            &mut tmp,
+            &mut timed_frames,
+            &previous,
+            &current,
+            acc_samples,
+            delta,
+        );
 
         previous_trace = current_trace;
+        previous = current;
         acc_samples += nsamples;
         prev_line = Some(line);
     }
 
     if !previous_trace.is_empty() {
+        let current = smallvec::SmallVec::<[&str; 6]>::new();
         flow(
             &mut tmp,
             &mut timed_frames,
-            iter::once("").chain(previous_trace.split(';')),
-            None,
+            &previous,
+            &current,
             acc_samples,
             delta,
         );

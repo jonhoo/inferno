@@ -501,6 +501,7 @@ dependencies = [
  "rgb",
  "rle-decode-fast",
  "serde",
+ "smallvec",
  "str_stack",
  "testing_logger",
 ]
