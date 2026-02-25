@@ -92,39 +92,41 @@ impl Sample {
 fn flow<'a, LI, TI>(
     tmp: &mut HashMap<Frame<'a>, FrameTime>,
     frames: &mut Vec<TimedFrame<'a>>,
-    last: LI,
-    this: TI,
+    previous_it: LI,
+    current_it: TI,
     time: usize,
     delta: Option<isize>,
 ) where
     LI: IntoIterator<Item = &'a str>,
     TI: IntoIterator<Item = &'a str>,
 {
-    let mut this = this.into_iter().peekable();
-    let mut last = last.into_iter().peekable();
+    let mut current_it = current_it.into_iter().peekable();
+    let mut previous_it = previous_it.into_iter().peekable();
 
-    // remove common prefix
+    // remove the prefix values shared among the current and previous values
     let mut shared_depth = 0;
-    while last.peek() == this.peek() {
+    while previous_it.peek() == current_it.peek() {
         // they must both be None, so let's stop looping
-        if last.peek().is_none() {
+        if previous_it.peek().is_none() {
             break;
         }
 
         // move along prefix iterators
-        last.next();
-        this.next();
+        previous_it.next();
+        current_it.next();
         shared_depth += 1;
     }
 
-    // TODO: document this..
-
-    for (i, func) in last.enumerate() {
+    // remove the frames from the last iteration which are not shared with the
+    // current
+    for (i, func) in previous_it.enumerate() {
         let key = Frame {
             function: func,
             depth: shared_depth + i,
         };
 
+        // the previous value was processed on the previous iteration, so this
+        // value must exist
         let frame_time = tmp.remove(&key).unwrap_or_else(|| {
             unreachable!("did not have start time for {:?}", key);
         });
@@ -138,15 +140,15 @@ fn flow<'a, LI, TI>(
         frames.push(frame);
     }
 
+    // push the frames new to the current iteration
     let mut i = 0;
-    while this.peek().is_some() {
-        let func = this.next().unwrap();
+    while let Some(func) = current_it.next() {
         let key = Frame {
             function: func,
             depth: shared_depth + i,
         };
 
-        let is_last = this.peek().is_none();
+        let is_last = current_it.peek().is_none();
         let delta = match delta {
             Some(_) if !is_last => Some(0),
             d => d,
@@ -158,12 +160,11 @@ fn flow<'a, LI, TI>(
             delta,
         };
 
-        if let Some(frame_time) = tmp.insert(key, frame_time) {
-            unreachable!(
-                "start time {} already registered for frame",
-                frame_time.start_time
-            );
-        }
+        let previous = tmp.insert(key, frame_time);
+        debug_assert!(
+            previous.is_none(),
+            "Unexpected frame key. This key should be unique to current value",
+        );
 
         i += 1;
     }
