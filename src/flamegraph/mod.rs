@@ -25,6 +25,8 @@ use quick_xml::events::{BytesEnd, BytesStart, BytesText, Event};
 use quick_xml::Writer;
 use str_stack::StrStack;
 
+use crate::flamegraph::merge::Frames;
+
 #[cfg(feature = "nameattr")]
 use self::attrs::FrameAttrs;
 
@@ -404,7 +406,11 @@ where
         .map(|line| line.trim())
         .filter(|line| !(line.is_empty() || line.starts_with("# ")));
 
-    let (mut frames, time, delta_max) = if opt.reverse_stack_order {
+    let Frames {
+        mut frames,
+        accumulated_samples: time,
+        delta_max,
+    } = if opt.reverse_stack_order {
         if opt.no_sort {
             warn!(
                 "Input lines are always sorted when `reverse_stack_order` is `true`. \

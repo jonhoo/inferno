@@ -5,6 +5,12 @@ use std::mem;
 
 use log::warn;
 
+pub(super) struct Frames<'a> {
+    pub(super) frames: Vec<TimedFrame<'a>>,
+    pub(super) accumulated_samples: usize,
+    pub(super) delta_max: usize,
+}
+
 #[derive(Debug, PartialEq)]
 pub(super) struct TimedFrame<'a> {
     /// Name of the measured function
@@ -153,14 +159,12 @@ fn flow<'a>(
     }
 }
 
-pub(super) fn frames<'a, I>(
-    lines: I,
-    suppress_sort_check: bool,
-) -> io::Result<(Vec<TimedFrame<'a>>, usize, usize)>
+/// Group common frames of sorted folded lines and accumulate their measurements.
+pub(super) fn frames<'a, I>(lines: I, suppress_sort_check: bool) -> io::Result<Frames<'a>>
 where
     I: IntoIterator<Item = &'a str>,
 {
-    let mut acc_samples = 0; // accumulator for all valid samples
+    let mut accumulated_samples = 0; // accumulator for all valid samples
     let mut ignored = 0;
     let mut open_frames = Default::default();
     let mut closed_frames = Default::default();
@@ -219,13 +223,13 @@ where
             &mut closed_frames,
             &previous,
             &current,
-            acc_samples,
+            accumulated_samples,
             delta,
         );
 
         mem::swap(&mut current, &mut previous);
         current.clear();
-        acc_samples += nsamples;
+        accumulated_samples += nsamples;
     }
 
     if !previous.is_empty() {
@@ -234,7 +238,7 @@ where
             &mut closed_frames,
             &previous,
             &current,
-            acc_samples,
+            accumulated_samples,
             delta,
         );
     }
@@ -248,7 +252,11 @@ where
         "Not all open frames have been consumed",
     );
 
-    Ok((closed_frames, acc_samples, delta_max))
+    Ok(Frames {
+        frames: closed_frames,
+        accumulated_samples,
+        delta_max,
+    })
 }
 
 // Tries to find a sample count at the end of a line.
