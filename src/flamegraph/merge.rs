@@ -1,3 +1,4 @@
+use std::cmp::Ordering;
 use std::io;
 use std::iter;
 
@@ -92,7 +93,7 @@ impl Sample {
 
 fn flow<'a>(
     open_frames: &mut Vec<TimedFrame<'a>>,
-    frames: &mut Vec<TimedFrame<'a>>,
+    closed_frames: &mut Vec<TimedFrame<'a>>,
     previous_frames: &[&'a str],
     current_frames: &[&'a str],
     acc_samples: usize,
@@ -115,7 +116,7 @@ fn flow<'a>(
 
     // remove the frames from the last iteration which are not shared with the
     // current
-    frames.extend(open_frames.drain(first_different..).map(|mut frame| {
+    closed_frames.extend(open_frames.drain(first_different..).map(|mut frame| {
         frame.end_time = acc_samples;
         frame
     }));
@@ -160,30 +161,15 @@ where
 {
     let mut acc_samples = 0; // accumulator for all valid samples
     let mut ignored = 0;
-    let mut previous_trace = "";
     let mut open_frames = Default::default();
-    let mut timed_frames = Default::default(); // compute timings for a frame
+    let mut closed_frames = Default::default();
     let mut delta = None;
     let mut delta_max = 1;
     let mut stripped_fractional_samples = false;
-    let mut prev_line = None;
     let mut previous = smallvec::SmallVec::<[&str; 6]>::new();
 
-    for line in lines {
-        let mut line = line.trim();
-
-        if !suppress_sort_check {
-            if let Some(prev_line) = prev_line {
-                if prev_line > line {
-                    return Err(io::Error::new(
-                        io::ErrorKind::InvalidData,
-                        "unsorted input lines detected",
-                    ));
-                }
-            }
-        }
-
-        let nsamples = match Sample::parse(line, &mut stripped_fractional_samples) {
+    for mut line in lines {
+        let nsamples = match Sample::parse(line.trim_end(), &mut stripped_fractional_samples) {
             Some((sample, samplesi)) => {
                 match sample.delta {
                     Some(sample_delta) => {
@@ -193,7 +179,11 @@ where
                     None => (),
                 };
 
-                line = &line[..samplesi].trim_end();
+                line = &line[..samplesi].trim();
+                if line.is_empty() {
+                    ignored += 1;
+                    continue;
+                }
                 sample.samples
             }
             None => {
@@ -202,10 +192,6 @@ where
             }
         };
 
-        if line.is_empty() {
-            ignored += 1;
-            continue;
-        }
         let current_trace = line;
 
         // inject empty first-level stack frame to capture "all"
@@ -213,26 +199,38 @@ where
             iter::once("").chain(current_trace.split(';')),
         );
 
+        if !suppress_sort_check {
+            let is_sorted = previous
+                .iter()
+                .zip(current.iter())
+                .map(|(prev, curr)| prev.cmp(curr))
+                .find(|ord| !ord.is_eq());
+            if is_sorted == Some(Ordering::Greater) {
+                return Err(io::Error::new(
+                    io::ErrorKind::InvalidData,
+                    "unsorted input lines detected",
+                ));
+            }
+        }
+
         flow(
             &mut open_frames,
-            &mut timed_frames,
+            &mut closed_frames,
             &previous,
             &current,
             acc_samples,
             delta,
         );
 
-        previous_trace = current_trace;
         previous = current;
         acc_samples += nsamples;
-        prev_line = Some(line);
     }
 
-    if !previous_trace.is_empty() {
+    if !previous.is_empty() {
         let current = smallvec::SmallVec::<[&str; 6]>::new();
         flow(
             &mut open_frames,
-            &mut timed_frames,
+            &mut closed_frames,
             &previous,
             &current,
             acc_samples,
@@ -249,7 +247,7 @@ where
         "Not all open frames have been consumed",
     );
 
-    Ok((timed_frames, acc_samples, delta_max))
+    Ok((closed_frames, acc_samples, delta_max))
 }
 
 // Tries to find a sample count at the end of a line.
