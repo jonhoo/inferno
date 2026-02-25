@@ -121,34 +121,33 @@ fn flow<'a>(
     }));
 
     // push the frames new to the current iteration
-    let mut depth = first_different;
-    let inner_delta = delta.clone().and(Some(0)); // None and Some(0) render differently
-    while depth < current_frames.len().saturating_sub(1) {
-        let frame = TimedFrame {
-            function: current_frames[depth],
-            depth,
-            start_time: acc_samples,
-            delta: inner_delta.clone(),
-            end_time: 0,
-        };
+    if first_different < current_frames.len() {
+        let last = current_frames.len().saturating_sub(1);
+        let new_open_frames = current_frames[first_different..last]
+            .iter()
+            .enumerate()
+            .map(|(i, function)| TimedFrame {
+                function,
+                depth: first_different + i,
+                start_time: acc_samples,
+                delta: delta.clone().and(Some(0)),
+                end_time: 0,
+            });
+        open_frames.extend(new_open_frames);
 
-        open_frames.push(frame);
+        if let Some(function) = current_frames.get(last) {
+            let frame = TimedFrame {
+                function,
+                depth: last,
+                start_time: acc_samples,
+                // For some reason the Perl version does a `+=` for `delta`, but I can't figure out why.
+                // See https://github.com/brendangregg/FlameGraph/blob/1b1c6deede9c33c5134c920bdb7a44cc5528e9a7/flamegraph.pl#L588
+                delta,
+                end_time: 0,
+            };
 
-        depth += 1;
-    }
-
-    if depth < current_frames.len() {
-        let frame = TimedFrame {
-            function: current_frames[depth],
-            depth,
-            start_time: acc_samples,
-            // For some reason the Perl version does a `+=` for `delta`, but I can't figure out why.
-            // See https://github.com/brendangregg/FlameGraph/blob/1b1c6deede9c33c5134c920bdb7a44cc5528e9a7/flamegraph.pl#L588
-            delta,
-            end_time: 0,
-        };
-
-        open_frames.push(frame);
+            open_frames.push(frame);
+        }
     }
 }
 
