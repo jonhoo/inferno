@@ -41,7 +41,6 @@ rgb = "0.8.13"
 str_stack = "0.1"
 clap = { version = "4.0.1", optional = true, features = ["derive"] }
 once_cell = "1.12.0"
-smallvec = { version = "1.15.1", features = ["union", "const_generics"] }
 
 [dev-dependencies]
 assert_cmd = "2.1.1"

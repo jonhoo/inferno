@@ -1,6 +1,7 @@
 use std::cmp::Ordering;
 use std::io;
 use std::iter;
+use std::mem;
 
 use log::warn;
 
@@ -166,7 +167,9 @@ where
     let mut delta = None;
     let mut delta_max = 1;
     let mut stripped_fractional_samples = false;
-    let mut previous = smallvec::SmallVec::<[&str; 6]>::new();
+
+    let mut previous: Vec<&'a str> = Vec::new();
+    let mut current: Vec<&'a str> = Vec::new();
 
     for mut line in lines {
         let nsamples = match Sample::parse(line.trim_end(), &mut stripped_fractional_samples) {
@@ -195,9 +198,7 @@ where
         let current_trace = line;
 
         // inject empty first-level stack frame to capture "all"
-        let current = smallvec::SmallVec::<[&str; 6]>::from_iter(
-            iter::once("").chain(current_trace.split(';')),
-        );
+        current.extend(iter::once("").chain(current_trace.split(';')));
 
         if !suppress_sort_check {
             let is_sorted = previous
@@ -222,12 +223,12 @@ where
             delta,
         );
 
-        previous = current;
+        mem::swap(&mut current, &mut previous);
+        current.clear();
         acc_samples += nsamples;
     }
 
     if !previous.is_empty() {
-        let current = smallvec::SmallVec::<[&str; 6]>::new();
         flow(
             &mut open_frames,
             &mut closed_frames,
