@@ -173,7 +173,7 @@ fn flow<'a, LI, TI>(
 pub(super) fn frames<'a, I>(
     lines: I,
     suppress_sort_check: bool,
-) -> io::Result<(Vec<TimedFrame<'a>>, usize, usize, usize)>
+) -> io::Result<(Vec<TimedFrame<'a>>, usize, usize)>
 where
     I: IntoIterator<Item = &'a str>,
 {
@@ -257,7 +257,11 @@ where
         );
     }
 
-    Ok((timed_frames, acc_samples, ignored, delta_max))
+    if ignored != 0 {
+        warn!("Ignored {} lines with invalid format", ignored);
+    }
+
+    Ok((timed_frames, acc_samples, delta_max))
 }
 
 // Tries to find a sample count at the end of a line.

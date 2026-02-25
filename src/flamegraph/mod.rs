@@ -404,7 +404,7 @@ where
         .map(|line| line.trim())
         .filter(|line| !(line.is_empty() || line.starts_with("# ")));
 
-    let (mut frames, time, ignored, delta_max) = if opt.reverse_stack_order {
+    let (mut frames, time, delta_max) = if opt.reverse_stack_order {
         if opt.no_sort {
             warn!(
                 "Input lines are always sorted when `reverse_stack_order` is `true`. \
@@ -473,10 +473,6 @@ where
         lines.sort_unstable();
         merge::frames(lines, false)?
     };
-
-    if ignored != 0 {
-        warn!("Ignored {} lines with invalid format", ignored);
-    }
 
     let mut buffer = StrStack::new();
 
