@@ -199,10 +199,8 @@ where
             }
         };
 
-        let current_trace = line;
-
         // inject empty first-level stack frame to capture "all"
-        current.extend(iter::once("").chain(current_trace.split(';')));
+        current.extend(iter::once("").chain(line.split(';')));
 
         if !suppress_sort_check {
             let is_sorted = previous
