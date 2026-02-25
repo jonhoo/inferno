@@ -226,16 +226,24 @@ where
         let current_trace = line;
 
         // inject empty first-level stack frame to capture "all"
-        let this = iter::once("").chain(current_trace.split(';'));
+        let current_it = iter::once("").chain(current_trace.split(';'));
+
+        // need to special-case this, because otherwise iter("") + "".split(';') == ["", ""]
         if previous_trace.is_empty() {
-            // need to special-case this, because otherwise iter("") + "".split(';') == ["", ""]
-            flow(&mut tmp, &mut timed_frames, None, this, acc_samples, delta);
+            flow(
+                &mut tmp,
+                &mut timed_frames,
+                iter::empty(),
+                current_it,
+                acc_samples,
+                delta,
+            );
         } else {
             flow(
                 &mut tmp,
                 &mut timed_frames,
                 iter::once("").chain(previous_trace.split(';')),
-                this,
+                current_it,
                 acc_samples,
                 delta,
             );
