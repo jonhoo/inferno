@@ -517,7 +517,7 @@ where
         if ((frame.end_time - frame.start_time) as f64) < minwidth_time {
             false
         } else {
-            depthmax = std::cmp::max(depthmax, frame.location.depth);
+            depthmax = std::cmp::max(depthmax, frame.depth);
             true
         }
     });
@@ -572,14 +572,14 @@ where
 
         let (y1, y2) = match opt.direction {
             Direction::Straight => {
-                let y1 = imageheight - opt.ypad2() - (frame.location.depth + 1) * opt.frame_height
-                    + FRAMEPAD;
-                let y2 = imageheight - opt.ypad2() - frame.location.depth * opt.frame_height;
+                let y1 =
+                    imageheight - opt.ypad2() - (frame.depth + 1) * opt.frame_height + FRAMEPAD;
+                let y2 = imageheight - opt.ypad2() - frame.depth * opt.frame_height;
                 (y1, y2)
             }
             Direction::Inverted => {
-                let y1 = opt.ypad1() + frame.location.depth * opt.frame_height;
-                let y2 = opt.ypad1() + (frame.location.depth + 1) * opt.frame_height - FRAMEPAD;
+                let y1 = opt.ypad1() + frame.depth * opt.frame_height;
+                let y2 = opt.ypad1() + (frame.depth + 1) * opt.frame_height - FRAMEPAD;
                 (y1, y2)
             }
         };
@@ -605,11 +605,11 @@ where
         let _ = samples_txt_buffer.write_formatted(&samples, &Locale::en);
         let samples_txt = samples_txt_buffer.as_str();
 
-        let info = if frame.location.function.is_empty() && frame.location.depth == 0 {
+        let info = if frame.function.is_empty() && frame.depth == 0 {
             write!(buffer, "all ({} {}, 100%)", samples_txt, opt.count_name)
         } else {
             let pct = (100 * samples) as f64 / (timemax as f64 * opt.factor);
-            let function = deannotate(frame.location.function);
+            let function = deannotate(frame.function);
             match frame.delta {
                 None => write!(
                     buffer,
@@ -650,9 +650,9 @@ where
         svg.write_event(Event::End(BytesEnd::new("title")))?;
 
         // select the color of the rectangle
-        let color = if frame.location.function == "--" {
+        let color = if frame.function == "--" {
             color::VDGREY
-        } else if frame.location.function == "-" {
+        } else if frame.function == "-" {
             color::DGREY
         } else if opt.color_diffusion {
             // We want to visually highlight high priority regions for
@@ -670,7 +670,7 @@ where
             let colors = opt.colors;
             let hash = opt.hash;
             let deterministic = opt.deterministic;
-            palette_map.find_color_for(frame.location.function, |name| {
+            palette_map.find_color_for(frame.function, |name| {
                 color::color(colors, hash, deterministic, name, &mut thread_rng)
             })
         } else {
@@ -678,7 +678,7 @@ where
                 opt.colors,
                 opt.hash,
                 opt.deterministic,
-                frame.location.function,
+                frame.function,
                 &mut thread_rng,
             )
         };
@@ -689,7 +689,7 @@ where
             .trunc() as usize;
         let text: svg::TextArgument<'_> = if fitchars >= 3 {
             // room for one char plus two dots
-            let f = deannotate(frame.location.function);
+            let f = deannotate(frame.function);
 
             // TODO: use Unicode grapheme clusters instead
             if f.len() < fitchars {
@@ -747,9 +747,7 @@ fn write_container_start<'a, W: Write>(
     frame: &merge::TimedFrame<'_>,
     mut title: &'a str,
 ) -> io::Result<(bool, &'a str)> {
-    let frame_attributes = opt
-        .func_frameattrs
-        .frameattrs_for_func(frame.location.function);
+    let frame_attributes = opt.func_frameattrs.frameattrs_for_func(frame.function);
 
     let mut has_href = false;
     if let Some(frame_attributes) = frame_attributes {

@@ -3,23 +3,25 @@ use std::iter;
 
 use log::warn;
 
-#[derive(Debug, PartialEq, Eq, Hash)]
-pub(super) struct Frame<'a> {
-    pub(super) function: &'a str,
-    pub(super) depth: usize,
-}
-
 #[derive(Debug, PartialEq)]
 pub(super) struct TimedFrame<'a> {
-    pub(super) location: Frame<'a>,
-    pub(super) start_time: usize,
-    pub(super) end_time: usize,
-    pub(super) delta: Option<isize>,
-}
+    /// Name of the measured function
+    pub(super) function: &'a str,
 
-#[derive(Copy, Clone, Debug, PartialEq)]
-pub(super) struct FrameTime {
+    /// The depth in the function call for this function
+    pub(super) depth: usize,
+
+    /// First sample timestamp for this function
     pub(super) start_time: usize,
+
+    /// Last timestamp for this function.
+    ///
+    /// Together with `start_time` it defined the amount of time spent in it.
+    pub(super) end_time: usize,
+
+    /// Present for delta frames
+    ///
+    /// Difference among two measured values.
     pub(super) delta: Option<isize>,
 }
 
@@ -89,7 +91,7 @@ impl Sample {
 }
 
 fn flow<'a>(
-    open_frames: &mut Vec<(Frame<'a>, FrameTime)>,
+    open_frames: &mut Vec<TimedFrame<'a>>,
     frames: &mut Vec<TimedFrame<'a>>,
     previous_frames: &[&'a str],
     current_frames: &[&'a str],
@@ -113,60 +115,40 @@ fn flow<'a>(
 
     // remove the frames from the last iteration which are not shared with the
     // current
-    let mut depth = first_different;
-    for (key, frame_time) in open_frames.drain(first_different..) {
-        debug_assert_eq!(
-            key,
-            Frame {
-                function: previous_frames[depth],
-                depth,
-            },
-        );
-
-        let frame = TimedFrame {
-            location: key,
-            start_time: frame_time.start_time,
-            end_time: acc_samples,
-            delta: frame_time.delta,
-        };
-        frames.push(frame);
-
-        depth += 1;
-    }
+    frames.extend(open_frames.drain(first_different..).map(|mut frame| {
+        frame.end_time = acc_samples;
+        frame
+    }));
 
     // push the frames new to the current iteration
     let mut depth = first_different;
     let inner_delta = delta.clone().and(Some(0)); // None and Some(0) render differently
     while depth < current_frames.len().saturating_sub(1) {
-        let key = Frame {
+        let frame = TimedFrame {
             function: current_frames[depth],
             depth,
-        };
-
-        let frame_time = FrameTime {
             start_time: acc_samples,
             delta: inner_delta.clone(),
+            end_time: 0,
         };
 
-        open_frames.push((key, frame_time));
+        open_frames.push(frame);
 
         depth += 1;
     }
 
     if depth < current_frames.len() {
-        let key = Frame {
+        let frame = TimedFrame {
             function: current_frames[depth],
             depth,
-        };
-
-        let frame_time = FrameTime {
             start_time: acc_samples,
             // For some reason the Perl version does a `+=` for `delta`, but I can't figure out why.
             // See https://github.com/brendangregg/FlameGraph/blob/1b1c6deede9c33c5134c920bdb7a44cc5528e9a7/flamegraph.pl#L588
             delta,
+            end_time: 0,
         };
 
-        open_frames.push((key, frame_time));
+        open_frames.push(frame);
     }
 }
 
