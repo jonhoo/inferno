@@ -94,7 +94,7 @@ fn flow<'a, LI, TI>(
     frames: &mut Vec<TimedFrame<'a>>,
     previous_it: LI,
     current_it: TI,
-    time: usize,
+    acc_samples: usize,
     delta: Option<isize>,
 ) where
     LI: IntoIterator<Item = &'a str>,
@@ -134,7 +134,7 @@ fn flow<'a, LI, TI>(
         let frame = TimedFrame {
             location: key,
             start_time: frame_time.start_time,
-            end_time: time,
+            end_time: acc_samples,
             delta: frame_time.delta,
         };
         frames.push(frame);
@@ -154,7 +154,7 @@ fn flow<'a, LI, TI>(
             d => d,
         };
         let frame_time = FrameTime {
-            start_time: time,
+            start_time: acc_samples,
             // For some reason the Perl version does a `+=` for `delta`, but I can't figure out why.
             // See https://github.com/brendangregg/FlameGraph/blob/1b1c6deede9c33c5134c920bdb7a44cc5528e9a7/flamegraph.pl#L588
             delta,
@@ -177,11 +177,11 @@ pub(super) fn frames<'a, I>(
 where
     I: IntoIterator<Item = &'a str>,
 {
-    let mut time = 0;
+    let mut acc_samples = 0; // accumulator for all valid samples
     let mut ignored = 0;
-    let mut last = "";
+    let mut previous_trace = "";
     let mut tmp = Default::default();
-    let mut frames = Default::default();
+    let mut timed_frames = Default::default(); // compute timmings for a frame
     let mut delta = None;
     let mut delta_max = 1;
     let mut stripped_fractional_samples = false;
@@ -223,41 +223,41 @@ where
             ignored += 1;
             continue;
         }
-        let stack = line;
+        let current_trace = line;
 
         // inject empty first-level stack frame to capture "all"
-        let this = iter::once("").chain(stack.split(';'));
-        if last.is_empty() {
+        let this = iter::once("").chain(current_trace.split(';'));
+        if previous_trace.is_empty() {
             // need to special-case this, because otherwise iter("") + "".split(';') == ["", ""]
-            flow(&mut tmp, &mut frames, None, this, time, delta);
+            flow(&mut tmp, &mut timed_frames, None, this, acc_samples, delta);
         } else {
             flow(
                 &mut tmp,
-                &mut frames,
-                iter::once("").chain(last.split(';')),
+                &mut timed_frames,
+                iter::once("").chain(previous_trace.split(';')),
                 this,
-                time,
+                acc_samples,
                 delta,
             );
         }
 
-        last = stack;
-        time += nsamples;
+        previous_trace = current_trace;
+        acc_samples += nsamples;
         prev_line = Some(line);
     }
 
-    if !last.is_empty() {
+    if !previous_trace.is_empty() {
         flow(
             &mut tmp,
-            &mut frames,
-            iter::once("").chain(last.split(';')),
+            &mut timed_frames,
+            iter::once("").chain(previous_trace.split(';')),
             None,
-            time,
+            acc_samples,
             delta,
         );
     }
 
-    Ok((frames, time, ignored, delta_max))
+    Ok((timed_frames, acc_samples, ignored, delta_max))
 }
 
 // Tries to find a sample count at the end of a line.
