@@ -1,4 +1,3 @@
-use std::collections::HashMap;
 use std::io;
 use std::iter;
 
@@ -90,7 +89,7 @@ impl Sample {
 }
 
 fn flow<'a>(
-    tmp: &mut HashMap<Frame<'a>, FrameTime>,
+    open_frames: &mut Vec<(Frame<'a>, FrameTime)>,
     frames: &mut Vec<TimedFrame<'a>>,
     previous_frames: &[&'a str],
     current_frames: &[&'a str],
@@ -115,17 +114,14 @@ fn flow<'a>(
     // remove the frames from the last iteration which are not shared with the
     // current
     let mut depth = first_different;
-    while depth < previous_frames.len() {
-        let key = Frame {
-            function: previous_frames[depth],
-            depth,
-        };
-
-        // the previous value was processed on the previous iteration, so this
-        // value must exist
-        let frame_time = tmp.remove(&key).unwrap_or_else(|| {
-            unreachable!("did not have start time for {:?}", key);
-        });
+    for (key, frame_time) in open_frames.drain(first_different..) {
+        debug_assert_eq!(
+            key,
+            Frame {
+                function: previous_frames[depth],
+                depth,
+            },
+        );
 
         let frame = TimedFrame {
             location: key,
@@ -152,11 +148,7 @@ fn flow<'a>(
             delta: inner_delta.clone(),
         };
 
-        let previous = tmp.insert(key, frame_time);
-        debug_assert!(
-            previous.is_none(),
-            "Unexpected frame key. This key should be unique to current value",
-        );
+        open_frames.push((key, frame_time));
 
         depth += 1;
     }
@@ -174,11 +166,7 @@ fn flow<'a>(
             delta,
         };
 
-        let previous = tmp.insert(key, frame_time);
-        debug_assert!(
-            previous.is_none(),
-            "Unexpected frame key. This key should be unique to current value",
-        );
+        open_frames.push((key, frame_time));
     }
 }
 
@@ -192,8 +180,8 @@ where
     let mut acc_samples = 0; // accumulator for all valid samples
     let mut ignored = 0;
     let mut previous_trace = "";
-    let mut tmp = Default::default();
-    let mut timed_frames = Default::default(); // compute timmings for a frame
+    let mut open_frames = Default::default();
+    let mut timed_frames = Default::default(); // compute timings for a frame
     let mut delta = None;
     let mut delta_max = 1;
     let mut stripped_fractional_samples = false;
@@ -245,7 +233,7 @@ where
         );
 
         flow(
-            &mut tmp,
+            &mut open_frames,
             &mut timed_frames,
             &previous,
             &current,
@@ -262,7 +250,7 @@ where
     if !previous_trace.is_empty() {
         let current = smallvec::SmallVec::<[&str; 6]>::new();
         flow(
-            &mut tmp,
+            &mut open_frames,
             &mut timed_frames,
             &previous,
             &current,
@@ -274,6 +262,11 @@ where
     if ignored != 0 {
         warn!("Ignored {} lines with invalid format", ignored);
     }
+
+    debug_assert!(
+        open_frames.is_empty(),
+        "Not all open frames have been consumed",
+    );
 
     Ok((timed_frames, acc_samples, delta_max))
 }
