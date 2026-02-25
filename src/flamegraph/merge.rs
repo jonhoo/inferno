@@ -24,6 +24,71 @@ pub(super) struct FrameTime {
     pub(super) delta: Option<isize>,
 }
 
+struct Sample {
+    samples: usize,
+    delta: Option<isize>,
+}
+
+impl Sample {
+    /// Parse and remove a single sample from the end of a line.
+    fn parse_nsamples(
+        line: &str,
+        stripped_fractional_samples: &mut bool,
+    ) -> Option<(usize, usize)> {
+        if let Some((samplesi, doti)) = rfind_samples(line) {
+            let mut samples = &line[samplesi..];
+            // Strip fractional part (if any);
+            // foobar 1.klwdjlakdj
+            //
+            // The Perl version keeps the fractional part but this can be problematic
+            // because of cumulative floating point errors. Instead we recommend to
+            // use the --factor option. See https://github.com/brendangregg/FlameGraph/pull/18
+            //
+            // Warn if we're stripping a non-zero fractional part, but only the first time.
+            if !*stripped_fractional_samples
+                && doti < samples.len() - 1
+                && !samples[doti + 1..].chars().all(|c| c == '0')
+            {
+                *stripped_fractional_samples = true;
+                warn!(
+                    "The input data has fractional sample counts that will be truncated to integers. \
+                     If you need to retain the extra precision you can scale up the sample data and \
+                     use the --factor option to scale it back down."
+                );
+            }
+            samples = &samples[..doti];
+            let nsamples = samples.parse::<usize>().ok()?;
+            // remove nsamples part we just parsed from line
+            Some((nsamples, samplesi))
+        } else {
+            None
+        }
+    }
+
+    /// Parses the number of samples in a line.
+    ///
+    /// # Returns
+    ///
+    /// - None if the line has no sample data.
+    /// - Otherwise a sample and the amount of unconsumed data.
+    fn parse(line: &str, stripped_fractional_samples: &mut bool) -> Option<(Self, usize)> {
+        let (samples, samplei) = Sample::parse_nsamples(line, stripped_fractional_samples)?;
+
+        // handle differential column
+        let (delta, samplei) = match Sample::parse_nsamples(
+            &line[..samplei].trim_end(),
+            stripped_fractional_samples,
+        ) {
+            Some((original_samples, samplei)) => {
+                (Some(samples as isize - original_samples as isize), samplei)
+            }
+            None => (None, samplei),
+        };
+
+        Some((Sample { samples, delta }, samplei))
+    }
+}
+
 fn flow<'a, LI, TI>(
     tmp: &mut HashMap<Frame<'a>, FrameTime>,
     frames: &mut Vec<TimedFrame<'a>>,
@@ -134,24 +199,24 @@ where
             }
         }
 
-        // Parse the number of samples for the purpose of computing overall time passed.
-        // Usually there will only be one samples column at the end of a line,
-        // but for differentials there will be two. When there are two we compute the
-        // delta between them and use the second one.
-        let nsamples =
-            if let Some(samples) = parse_nsamples(&mut line, &mut stripped_fractional_samples) {
-                // See if there's also a differential column present
-                if let Some(original_samples) =
-                    parse_nsamples(&mut line, &mut stripped_fractional_samples)
-                {
-                    delta = Some(samples as isize - original_samples as isize);
-                    delta_max = std::cmp::max(delta.unwrap().unsigned_abs(), delta_max);
-                }
-                samples
-            } else {
+        let nsamples = match Sample::parse(line, &mut stripped_fractional_samples) {
+            Some((sample, samplesi)) => {
+                match sample.delta {
+                    Some(sample_delta) => {
+                        delta = Some(sample_delta);
+                        delta_max = std::cmp::max(sample_delta.unsigned_abs(), delta_max);
+                    }
+                    None => (),
+                };
+
+                line = &line[..samplesi].trim_end();
+                sample.samples
+            }
+            None => {
                 ignored += 1;
                 continue;
-            };
+            }
+        };
 
         if line.is_empty() {
             ignored += 1;
@@ -192,39 +257,6 @@ where
     }
 
     Ok((frames, time, ignored, delta_max))
-}
-
-// Parse and remove the number of samples from the end of a line.
-fn parse_nsamples(line: &mut &str, stripped_fractional_samples: &mut bool) -> Option<usize> {
-    if let Some((samplesi, doti)) = rfind_samples(line) {
-        let mut samples = &line[samplesi..];
-        // Strip fractional part (if any);
-        // foobar 1.klwdjlakdj
-        //
-        // The Perl version keeps the fractional part but this can be problematic
-        // because of cumulative floating point errors. Instead we recommend to
-        // use the --factor option. See https://github.com/brendangregg/FlameGraph/pull/18
-        //
-        // Warn if we're stripping a non-zero fractional part, but only the first time.
-        if !*stripped_fractional_samples
-            && doti < samples.len() - 1
-            && !samples[doti + 1..].chars().all(|c| c == '0')
-        {
-            *stripped_fractional_samples = true;
-            warn!(
-                "The input data has fractional sample counts that will be truncated to integers. \
-                 If you need to retain the extra precision you can scale up the sample data and \
-                 use the --factor option to scale it back down."
-            );
-        }
-        samples = &samples[..doti];
-        let nsamples = samples.parse::<usize>().ok()?;
-        // remove nsamples part we just parsed from line
-        *line = line[..samplesi].trim_end();
-        Some(nsamples)
-    } else {
-        None
-    }
 }
 
 // Tries to find a sample count at the end of a line.
