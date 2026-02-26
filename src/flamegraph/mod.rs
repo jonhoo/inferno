@@ -400,11 +400,13 @@ where
     I: IntoIterator<Item = &'a str>,
     W: Write,
 {
-    let mut reversed = StrStack::new();
     let lines = lines
         .into_iter()
         .map(|line| line.trim())
         .filter(|line| !(line.is_empty() || line.starts_with("# ")));
+
+    #[allow(unused)]
+    let mut reversed = Vec::new(); // extend lifetime of reversed
 
     let Frames {
         mut frames,
@@ -417,29 +419,8 @@ where
                  The `no_sort` option is being ignored."
             );
         }
-        // Reverse order of stacks and sort.
-        let mut stack = String::new();
-        for line in lines {
-            stack.clear();
-            let samples_idx = rfind_samples(line).unwrap_or_else(|| line.len());
-            let samples_idx = rfind_samples(&line[..samples_idx - 1]).unwrap_or(samples_idx);
-            for (i, func) in line[..samples_idx].trim().split(';').rev().enumerate() {
-                if i != 0 {
-                    stack.push(';');
-                }
-                stack.push_str(func);
-            }
-            stack.push(' ');
-            stack.push_str(&line[samples_idx..]);
-            // Trim to handle the case where functions names internally contain `;`.
-            // This can happen, for example, with types like `[u8; 8]` in Rust.
-            // See https://github.com/jonhoo/inferno/pull/338.
-            let stack = stack.trim();
-            reversed.push(stack);
-        }
-        let mut reversed: Vec<&str> = reversed.iter().collect();
-        reversed.sort_unstable();
-        merge::frames::<false, _>(reversed)?
+        reversed = reverse_stack_order(lines);
+        merge::frames::<false, _>(reversed.iter().map(|s| s.as_str()))?
     } else if opt.flame_chart {
         // In flame chart mode, just reverse the data so time moves from left to right.
         let mut lines: Vec<&str> = lines.into_iter().collect();
@@ -945,6 +926,41 @@ fn rfind_samples(line: &str) -> Option<usize> {
         // NOTE: this accepts a whitespace and a dot " ." as a sample
         None => Some(samplesi),
     }
+}
+
+/// Reverse the stack order.
+///
+/// This function will parse all lines, reverse the frames, and sort the lines
+/// with the new order.
+fn reverse_stack_order<'a, I>(lines: I) -> Vec<String>
+where
+    I: IntoIterator<Item = &'a str>,
+{
+    let mut reversed = Vec::new();
+    for line in lines {
+        let mut stack = String::new();
+        let samples_idx = rfind_samples(line).unwrap_or(line.len());
+        let samples_idx = rfind_samples(&line[..samples_idx - 1]).unwrap_or(samples_idx);
+        for (i, func) in line[..samples_idx].trim().split(';').rev().enumerate() {
+            if i != 0 {
+                stack.push(';');
+            }
+            stack.push_str(func);
+        }
+        stack.push(' ');
+        stack.push_str(&line[samples_idx..]);
+        // Trim to handle the case where functions names internally contain `;`.
+        // This can happen, for example, with types like `[u8; 8]` in Rust.
+        // See https://github.com/jonhoo/inferno/pull/338.
+        stack.truncate(stack.trim_end().len());
+        let start = stack.len() - stack.trim_start().len();
+        if start > 0 {
+            stack.drain(..start);
+        }
+        reversed.push(stack);
+    }
+    reversed.sort_unstable();
+    reversed
 }
 
 #[cfg(test)]
