@@ -44,8 +44,9 @@ impl Sample {
         line: &str,
         stripped_fractional_samples: &mut bool,
     ) -> Option<(usize, usize)> {
-        if let Some((samplesi, doti)) = rfind_samples(line) {
-            let mut samples = &line[samplesi..];
+        if let Some(samplesi) = line.rfind(" ") {
+            let samples = &line[samplesi + 1..];
+
             // Strip fractional part (if any);
             // foobar 1.klwdjlakdj
             //
@@ -54,20 +55,27 @@ impl Sample {
             // use the --factor option. See https://github.com/brendangregg/FlameGraph/pull/18
             //
             // Warn if we're stripping a non-zero fractional part, but only the first time.
-            if !*stripped_fractional_samples
-                && doti < samples.len() - 1
-                && !samples[doti + 1..].chars().all(|c| c == '0')
-            {
-                *stripped_fractional_samples = true;
-                warn!(
-                    "The input data has fractional sample counts that will be truncated to integers. \
-                     If you need to retain the extra precision you can scale up the sample data and \
-                     use the --factor option to scale it back down."
-                );
-            }
-            samples = &samples[..doti];
-            let nsamples = samples.parse::<usize>().ok()?;
-            // remove nsamples part we just parsed from line
+            let nsamples = if let Some(doti) = samples.find('.') {
+                let not_a_number = samples[doti + 1..].chars().any(|c| !c.is_ascii_digit());
+                if not_a_number {
+                    return None;
+                }
+
+                if !*stripped_fractional_samples {
+                    let frac_is_zero = samples[doti + 1..].chars().all(|c| c == '0');
+                    if !frac_is_zero {
+                        *stripped_fractional_samples = true;
+                        warn!(
+                            "The input data has fractional sample counts that will be truncated to integers. \
+                             If you need to retain the extra precision you can scale up the sample data and \
+                             use the --factor option to scale it back down."
+                        );
+                    }
+                }
+                samples[..doti].parse::<usize>().ok()?
+            } else {
+                samples.parse::<usize>().ok()?
+            };
             Some((nsamples, samplesi))
         } else {
             None
