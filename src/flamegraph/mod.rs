@@ -900,6 +900,9 @@ fn write_usize(buffer: &mut StrStack, value: usize) -> usize {
 
 /// Tries to find a sample count at the end of a line.
 ///
+/// NOTE: This function expects lines to be trimed with empty lines and comments
+/// removed.
+///
 /// # Returns
 ///
 /// - None if no sample with the expected format was found
@@ -908,22 +911,20 @@ fn write_usize(buffer: &mut StrStack, value: usize) -> usize {
 fn rfind_samples(line: &str) -> Option<usize> {
     let samplesi = line.rfind(' ')? + 1;
     let mut samples = (&line[samplesi..])
-        .chars()
+        .chars() // <- can not be empty because the lines have been trimmed
         .skip_while(|c| c.is_ascii_digit());
     match samples.next() {
-        // found a dot, proceed to check if this is a float ` [0-9]*[.][0-9]*`
+        // found `[0-9]+[.]`, proceed to parse the data after the dot
         Some('.') => (),
         // found an unexpected charater, not a sample
         Some(_char) => return None,
-        // all characters are numbers, string ` [0-9]*` found, return it
-        // NOTE: this accepts a single whitespace as a sample.
+        // found `[0-9]+$` found, return it
         None => return Some(samplesi),
     }
     match samples.skip_while(|c| c.is_ascii_digit()).next() {
         // dangling data, not a sample
         Some(_char) => None,
-        // all characters were consumed, this matches the pattern ` [0-9]*[.][0-9]*`.
-        // NOTE: this accepts a whitespace and a dot " ." as a sample
+        // found `[0-9]+[.][0-9]*$` found, return it
         None => Some(samplesi),
     }
 }
@@ -932,6 +933,9 @@ fn rfind_samples(line: &str) -> Option<usize> {
 ///
 /// This function will parse all lines, reverse the frames, and sort the lines
 /// with the new order.
+///
+/// NOTE: This function expects lines to be trimed with empty lines and comments
+/// removed.
 fn reverse_stack_order<'a, I>(lines: I) -> Vec<String>
 where
     I: IntoIterator<Item = &'a str>,
