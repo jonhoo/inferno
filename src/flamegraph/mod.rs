@@ -443,15 +443,15 @@ where
         }
         let mut reversed: Vec<&str> = reversed.iter().collect();
         reversed.sort_unstable();
-        merge::frames(reversed, false)?
+        merge::frames::<false, _>(reversed)?
     } else if opt.flame_chart {
         // In flame chart mode, just reverse the data so time moves from left to right.
         let mut lines: Vec<&str> = lines.into_iter().collect();
         lines.reverse();
-        merge::frames(lines, true)?
+        merge::frames::<true, _>(lines)?
     } else if opt.no_sort {
         // Lines don't need sorting.
-        merge::frames(lines, false)?
+        merge::frames::<false, _>(lines)?
     } else {
         // Sort lines by default.
         let mut lines: Vec<&str> = if opt.base.is_empty() {
@@ -477,7 +477,7 @@ where
                 .collect()
         };
         lines.sort_unstable();
-        merge::frames(lines, false)?
+        merge::frames::<false, _>(lines)?
     };
 
     let mut buffer = StrStack::new();

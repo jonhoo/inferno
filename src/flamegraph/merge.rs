@@ -168,7 +168,7 @@ fn flow<'a>(
 }
 
 /// Group common frames of sorted folded lines and accumulate their measurements.
-pub(super) fn frames<'a, I>(lines: I, suppress_sort_check: bool) -> io::Result<Frames<'a>>
+pub(super) fn frames<'a, const SUPPRESS_SORT_CHECK: bool, I>(lines: I) -> io::Result<Frames<'a>>
 where
     I: IntoIterator<Item = &'a str>,
 {
@@ -210,7 +210,7 @@ where
         // inject empty first-level stack frame to capture "all"
         current.extend(iter::once("").chain(line.split(';')));
 
-        if !suppress_sort_check {
+        if !SUPPRESS_SORT_CHECK {
             let is_sorted = previous
                 .iter()
                 .zip(current.iter())
