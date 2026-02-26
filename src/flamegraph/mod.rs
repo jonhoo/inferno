@@ -421,12 +421,8 @@ where
         let mut stack = String::new();
         for line in lines {
             stack.clear();
-            let samples_idx = merge::rfind_samples(line)
-                .map(|(i, _)| i)
-                .unwrap_or_else(|| line.len());
-            let samples_idx = merge::rfind_samples(&line[..samples_idx - 1])
-                .map(|(i, _)| i)
-                .unwrap_or(samples_idx);
+            let samples_idx = rfind_samples(line).unwrap_or_else(|| line.len());
+            let samples_idx = rfind_samples(&line[..samples_idx - 1]).unwrap_or(samples_idx);
             for (i, func) in line[..samples_idx].trim().split(';').rev().enumerate() {
                 if i != 0 {
                     stack.push(';');
@@ -919,6 +915,36 @@ fn filled_rectangle<W: Write>(
 
 fn write_usize(buffer: &mut StrStack, value: usize) -> usize {
     buffer.push(itoa::Buffer::new().format(value))
+}
+
+/// Tries to find a sample count at the end of a line.
+///
+/// # Returns
+///
+/// - None if no sample with the expected format was found
+/// - Some with the index determining the data that was consumed (NOTE: this
+///   consumes data at the end of the string)
+fn rfind_samples(line: &str) -> Option<usize> {
+    let samplesi = line.rfind(' ')? + 1;
+    let mut samples = (&line[samplesi..])
+        .chars()
+        .skip_while(|c| c.is_ascii_digit());
+    match samples.next() {
+        // found a dot, proceed to check if this is a float ` [0-9]*[.][0-9]*`
+        Some('.') => (),
+        // found an unexpected charater, not a sample
+        Some(_char) => return None,
+        // all characters are numbers, string ` [0-9]*` found, return it
+        // NOTE: this accepts a single whitespace as a sample.
+        None => return Some(samplesi),
+    }
+    match samples.skip_while(|c| c.is_ascii_digit()).next() {
+        // dangling data, not a sample
+        Some(_char) => None,
+        // all characters were consumed, this matches the pattern ` [0-9]*[.][0-9]*`.
+        // NOTE: this accepts a whitespace and a dot " ." as a sample
+        None => Some(samplesi),
+    }
 }
 
 #[cfg(test)]

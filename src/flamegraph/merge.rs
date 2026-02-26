@@ -264,32 +264,3 @@ where
         delta_max,
     })
 }
-
-// Tries to find a sample count at the end of a line.
-//
-// On success, the first value of the returned tuple will be the index to the sample count.
-// If the sample count is fractional, the second value will be the offset of the dot within
-// the sample count.
-// If the sample count is not fractional, the second value returned is the offset
-// to the last digit in the sample count.
-//
-// If no sample count is found, `None` will be returned.
-pub(super) fn rfind_samples(line: &str) -> Option<(usize, usize)> {
-    let samplesi = line.rfind(' ')? + 1;
-    let samples = &line[samplesi..];
-    if let Some(doti) = samples.find('.') {
-        if samples[..doti]
-            .chars()
-            .chain(samples[doti + 1..].chars())
-            .all(|c| c.is_ascii_digit())
-        {
-            Some((samplesi, doti))
-        } else {
-            None
-        }
-    } else if !samples.chars().all(|c| c.is_ascii_digit()) {
-        None
-    } else {
-        Some((samplesi, line.len() - samplesi))
-    }
-}
