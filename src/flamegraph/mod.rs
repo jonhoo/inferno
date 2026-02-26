@@ -410,7 +410,7 @@ where
 
     let Frames {
         mut frames,
-        accumulated_samples: time,
+        accumulated_samples,
         delta_max,
     } = if opt.reverse_stack_order {
         if opt.no_sort {
@@ -466,7 +466,7 @@ where
         Writer::new(writer)
     };
 
-    if time == 0 {
+    if accumulated_samples == 0 {
         error!("No stack counts found");
         // emit an error message SVG, for tools automating flamegraph use
         let imageheight = opt.font_size * 5;
@@ -490,8 +490,7 @@ where
     }
 
     let image_width = opt.image_width.unwrap_or(DEFAULT_IMAGE_WIDTH) as f64;
-    let timemax = time;
-    let widthpertime_pct = 100.0 / timemax as f64;
+    let widthpertime_pct = 100.0 / accumulated_samples as f64;
     let minwidth_time = opt.min_width / widthpertime_pct;
 
     // prune blocks that are too narrow
@@ -544,7 +543,7 @@ where
         ("id", "frames"),
         ("x", &container_x),
         ("width", &container_width),
-        ("total_samples", &format!("{}", timemax)),
+        ("total_samples", &format!("{}", accumulated_samples)),
     ])))?;
 
     // draw frames
@@ -591,7 +590,7 @@ where
         let info = if frame.function.is_empty() && frame.depth == 0 {
             write!(buffer, "all ({} {}, 100%)", samples_txt, opt.count_name)
         } else {
-            let pct = (100 * samples) as f64 / (timemax as f64 * opt.factor);
+            let pct = (100 * samples) as f64 / (accumulated_samples as f64 * opt.factor);
             let function = deannotate(frame.function);
             match frame.delta {
                 None => write!(
@@ -609,7 +608,8 @@ where
                     if opt.negate_differentials {
                         delta = -delta;
                     }
-                    let delta_pct = (100 * delta) as f64 / (timemax as f64 * opt.factor);
+                    let delta_pct =
+                        (100 * delta) as f64 / (accumulated_samples as f64 * opt.factor);
                     write!(
                         buffer,
                         "{} ({} {}, {:.2}%; {:+.2}%)",
