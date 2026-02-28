@@ -366,7 +366,9 @@ this change should be an easy upgrade.
 - Moved to `IndexMap` and FNV hashing ([#127](https://github.com/jonhoo/inferno/pull/127))
 - Moved CI to Azure DevOps Pipelines
 
-[Unreleased]: https://github.com/jonhoo/inferno/compare/v0.12.3...HEAD
+[Unreleased]: https://github.com/jonhoo/inferno/compare/v0.12.5...HEAD
+[0.12.4]: https://github.com/jonhoo/inferno/compare/v0.12.4...v0.12.5
+[0.12.4]: https://github.com/jonhoo/inferno/compare/v0.12.3...v0.12.4
 [0.12.3]: https://github.com/jonhoo/inferno/compare/v0.12.2...v0.12.3
 [0.12.2]: https://github.com/jonhoo/inferno/compare/v0.12.1...v0.12.2
 [0.12.1]: https://github.com/jonhoo/inferno/compare/v0.12.0...v0.12.1
