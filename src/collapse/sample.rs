@@ -45,7 +45,7 @@ pub struct Options {
 #[derive(Clone, Default)]
 pub struct Folder {
     /// Number of samples for the current stack frame.
-    current_samples: usize,
+    current_samples: u64,
 
     /// Function on the stack in this entry thus far.
     stack: Vec<String>,
@@ -208,7 +208,7 @@ impl Folder {
             }
 
             if let Some((samples, func, module)) = self.line_parts(&line[4 + indent_chars..]) {
-                if let Ok(samples) = samples.parse::<usize>() {
+                if let Ok(samples) = samples.parse::<u64>() {
                     // The sample counts of the direct children of a non-leaf entry will always
                     // add up to that node's sample count so we only need to keep track of the
                     // sample count at the top of the stack.

@@ -113,7 +113,7 @@ impl CollapsePrivate for Folder {
 }
 
 impl Folder {
-    fn line_parts(line: &str) -> Option<(&str, usize)> {
+    fn line_parts(line: &str) -> Option<(&str, u64)> {
         line.rsplit_once(' ')
             .and_then(|(stack, count)| Some((stack, count.parse().ok()?)))
     }

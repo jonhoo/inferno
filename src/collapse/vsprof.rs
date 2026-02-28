@@ -10,7 +10,7 @@ static START_LINE: &str = "Level,Function Name,Number of Calls,Elapsed Inclusive
 #[derive(Default)]
 pub struct Folder {
     /// Function entries on the stack in this entry thus far.
-    stack: Vec<(String, usize)>,
+    stack: Vec<(String, u64)>,
 }
 
 impl Collapse for Folder {
@@ -94,7 +94,7 @@ impl Folder {
         if let Some((function_name, remainder)) = split {
             let (number_of_calls, _) = get_next_number(remainder)?;
 
-            let prev_depth = self.stack.len();
+            let prev_depth = self.stack.len() as u64;
             // There are 3 separate cases to handle regarding the depth:
             // 1. prev_depth + 1 == depth -> a new function is called, we only need to
             //    store the function name and the number of times it is called from the
@@ -183,7 +183,7 @@ impl Folder {
 /// ### Example inputs
 /// - Number <1000: `471,91.25,18.39,401.92,81.02,"Raytracer.exe",`
 /// - Number >1000: `"2,893,824",54.37,4.21,0.04,0.00,"Raytracer.exe",`
-fn get_next_number(line: &str) -> io::Result<(usize, &str)> {
+fn get_next_number(line: &str) -> io::Result<(u64, &str)> {
     // Trim the leading comma, if any
     let line = line.strip_prefix(',').unwrap_or(line);
 
@@ -213,7 +213,7 @@ fn get_next_number(line: &str) -> io::Result<(usize, &str)> {
                 }
 
                 n *= 10;
-                n += c as u32 - '0' as u32;
+                n += c as u64 - '0' as u64;
 
                 current_group_count += 1;
                 continue;
@@ -250,7 +250,7 @@ fn get_next_number(line: &str) -> io::Result<(usize, &str)> {
             remainder = remainder.strip_prefix(',').unwrap_or(remainder);
         }
 
-        return Ok((n as usize, remainder));
+        return Ok((n, remainder));
     }
 
     invalid_data_error!("Invalid number in line:\n{}", line)

@@ -118,7 +118,7 @@ fn is_interested_tag(tag: &[u8]) -> bool {
 // ```
 struct BacktraceOccurrences {
     /// How many times the backtrace occurred.
-    num: usize,
+    num: u64,
     /// Backtrace content
     backtrace: BacktraceId,
 }

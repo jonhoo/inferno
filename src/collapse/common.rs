@@ -357,9 +357,9 @@ pub trait CollapsePrivate: Send + Sized {
 /// is in a crate-private module so is not nameable by downstream library users.
 #[derive(Clone, Debug)]
 pub enum Occurrences {
-    SingleThreaded(AHashMap<String, usize>),
+    SingleThreaded(AHashMap<String, u64>),
     #[cfg(feature = "multithreaded")]
-    MultiThreaded(Arc<DashMap<String, usize, ahash::RandomState>>),
+    MultiThreaded(Arc<DashMap<String, u64, ahash::RandomState>>),
 }
 
 impl Occurrences {
@@ -395,7 +395,7 @@ impl Occurrences {
     /// Inserts a key-count pair into the map. If the map did not have this key
     /// present, `None` is returned. If the map did have this key present, the
     /// value is updated, and the old value is returned.
-    pub(crate) fn insert(&mut self, key: String, count: usize) -> Option<usize> {
+    pub(crate) fn insert(&mut self, key: String, count: u64) -> Option<u64> {
         use self::Occurrences::*;
         match self {
             SingleThreaded(map) => map.insert(key, count),
@@ -407,7 +407,7 @@ impl Occurrences {
     /// Inserts a key-count pair into the map if the key does not already exist.
     /// If the key does already exist, adds count to the current value of the
     /// existing key.
-    pub(crate) fn insert_or_add(&mut self, key: String, count: usize) {
+    pub(crate) fn insert_or_add(&mut self, key: String, count: u64) {
         use self::Occurrences::*;
         match self {
             SingleThreaded(map) => *map.entry(key).or_insert(0) += count,
