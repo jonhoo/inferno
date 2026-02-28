@@ -18,6 +18,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+## [0.12.5] - 2026-02-28
+
+### Changed
+
+- Mitigate overflow risk on 32-bit architectures. [#354](https://github.com/jonhoo/inferno/pull/354)
+- Upgrade quick-xml to 0.39 and rand to 0.10. [#356](https://github.com/jonhoo/inferno/pull/356)
+
+## [0.12.4] - 2025-11-15
+
+### Changed
+
+- Upgrade quick-xml to 0.38. [#351](https://github.com/jonhoo/inferno/pull/351)
+
 ## [0.12.3] - 2025-07-05
 
 ### Changed
