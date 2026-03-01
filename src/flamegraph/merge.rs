@@ -13,14 +13,14 @@ pub(super) struct Frame<'a> {
 #[derive(Debug, PartialEq)]
 pub(super) struct TimedFrame<'a> {
     pub(super) location: Frame<'a>,
-    pub(super) start_time: usize,
-    pub(super) end_time: usize,
+    pub(super) start_time: u64,
+    pub(super) end_time: u64,
     pub(super) delta: Option<isize>,
 }
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub(super) struct FrameTime {
-    pub(super) start_time: usize,
+    pub(super) start_time: u64,
     pub(super) delta: Option<isize>,
 }
 
@@ -29,7 +29,7 @@ fn flow<'a, LI, TI>(
     frames: &mut Vec<TimedFrame<'a>>,
     last: LI,
     this: TI,
-    time: usize,
+    time: u64,
     delta: Option<isize>,
 ) where
     LI: IntoIterator<Item = &'a str>,
@@ -109,7 +109,7 @@ fn flow<'a, LI, TI>(
 pub(super) fn frames<'a, I>(
     lines: I,
     suppress_sort_check: bool,
-) -> io::Result<(Vec<TimedFrame<'a>>, usize, usize, usize)>
+) -> io::Result<(Vec<TimedFrame<'a>>, u64, usize, usize)>
 where
     I: IntoIterator<Item = &'a str>,
 {
@@ -200,7 +200,7 @@ where
 }
 
 // Parse and remove the number of samples from the end of a line.
-fn parse_nsamples(line: &mut &str, stripped_fractional_samples: &mut bool) -> Option<usize> {
+fn parse_nsamples(line: &mut &str, stripped_fractional_samples: &mut bool) -> Option<u64> {
     if let Some((samplesi, doti)) = rfind_samples(line) {
         let mut samples = &line[samplesi..];
         // Strip fractional part (if any);
@@ -223,7 +223,7 @@ fn parse_nsamples(line: &mut &str, stripped_fractional_samples: &mut bool) -> Op
             );
         }
         samples = &samples[..doti];
-        let nsamples = samples.parse::<usize>().ok()?;
+        let nsamples = samples.parse::<u64>().ok()?;
         // remove nsamples part we just parsed from line
         *line = line[..samplesi].trim_end();
         Some(nsamples)
