@@ -173,7 +173,6 @@
 //!   [gimli project]: https://github.com/gimli-rs/addr2line
 
 #![cfg_attr(doc, warn(rustdoc::all))]
-#![cfg_attr(doc, allow(rustdoc::missing_doc_code_examples))]
 #![deny(missing_docs)]
 #![warn(unreachable_pub)]
 #![allow(clippy::disallowed_names)]
