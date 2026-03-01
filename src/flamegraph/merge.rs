@@ -118,12 +118,14 @@ where
     let mut last = "";
     let mut tmp = Default::default();
     let mut frames = Default::default();
-    let mut delta = None;
     let mut delta_max = 1;
-    let mut stripped_fractional_samples = false;
     let mut prev_line = None;
+    let mut stripped_fractional_samples = false;
     for line in lines {
         let mut line = line.trim();
+
+        // NOTE: delta has to be per-line so it doesn't bleed across lines
+        let mut delta = None;
 
         if !suppress_sort_check {
             if let Some(prev_line) = prev_line {
@@ -186,13 +188,16 @@ where
 
     if !last.is_empty() {
         //eprintln!("flow({}, _, {})", last, time);
+        // NOTE: the `delta` parameter is unused by `flow` when `this` is `None` (which is the case
+        // here), so we can pass any arbitrary value in that position. but `None` seems the most
+        // reasonable.
         flow(
             &mut tmp,
             &mut frames,
             iter::once("").chain(last.split(';')),
             None,
             time,
-            delta,
+            None,
         );
     }
 
@@ -229,6 +234,31 @@ fn parse_nsamples(line: &mut &str, stripped_fractional_samples: &mut bool) -> Op
         Some(nsamples)
     } else {
         None
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn delta_does_not_leak_across_non_differential_lines() {
+        // A differential line (two sample columns) followed by a
+        // non-differential line (one column). The non-differential
+        // frame should have delta = None, not the stale value from
+        // the previous line.
+        let lines = vec!["a;b 10 5", "a;c 3"];
+        let (frames, _time, _ignored, _delta_max) = frames(lines, true).unwrap();
+
+        let c_frame = frames
+            .iter()
+            .find(|f| f.location.function == "c")
+            .expect("should have a frame for 'c'");
+        assert_eq!(
+            c_frame.delta, None,
+            "non-differential line's frame should have delta = None, \
+             but stale delta leaked from the previous differential line"
+        );
     }
 }
 
