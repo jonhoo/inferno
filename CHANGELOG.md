@@ -18,11 +18,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+## [0.12.6] - 2026-03-01
+
+### Changed
+
+- Mitigate overflow risk on 32-bit architectures for flamegraph. [#357](https://github.com/jonhoo/inferno/pull/357)
+
 ## [0.12.5] - 2026-02-28
 
 ### Changed
 
-- Mitigate overflow risk on 32-bit architectures. [#354](https://github.com/jonhoo/inferno/pull/354)
+- Mitigate overflow risk on 32-bit architectures for collapsers. [#354](https://github.com/jonhoo/inferno/pull/354)
 - Upgrade quick-xml to 0.39 and rand to 0.10. [#356](https://github.com/jonhoo/inferno/pull/356)
 
 ## [0.12.4] - 2025-11-15
@@ -366,8 +372,9 @@ this change should be an easy upgrade.
 - Moved to `IndexMap` and FNV hashing ([#127](https://github.com/jonhoo/inferno/pull/127))
 - Moved CI to Azure DevOps Pipelines
 
-[Unreleased]: https://github.com/jonhoo/inferno/compare/v0.12.5...HEAD
-[0.12.4]: https://github.com/jonhoo/inferno/compare/v0.12.4...v0.12.5
+[Unreleased]: https://github.com/jonhoo/inferno/compare/v0.12.6...HEAD
+[0.12.6]: https://github.com/jonhoo/inferno/compare/v0.12.5...v0.12.6
+[0.12.5]: https://github.com/jonhoo/inferno/compare/v0.12.4...v0.12.5
 [0.12.4]: https://github.com/jonhoo/inferno/compare/v0.12.3...v0.12.4
 [0.12.3]: https://github.com/jonhoo/inferno/compare/v0.12.2...v0.12.3
 [0.12.2]: https://github.com/jonhoo/inferno/compare/v0.12.1...v0.12.2

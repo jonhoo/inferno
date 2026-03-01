@@ -360,10 +360,10 @@ pub enum TextTruncateDirection {
 }
 
 struct Rectangle {
-    x1_samples: usize,
+    x1_samples: u64,
     x1_pct: f64,
     y1: usize,
-    x2_samples: usize,
+    x2_samples: u64,
     x2_pct: f64,
     y2: usize,
 }
@@ -892,12 +892,12 @@ fn filled_rectangle<W: Write>(
     cache_rect: &mut Event<'_>,
 ) -> io::Result<()> {
     let x = write!(buffer, "{:.4}%", rect.x1_pct);
-    let y = write_usize(buffer, rect.y1);
+    let y = write_itoa(buffer, rect.y1);
     let width = write!(buffer, "{:.4}%", rect.width_pct());
-    let height = write_usize(buffer, rect.height());
+    let height = write_itoa(buffer, rect.height());
     let color = write!(buffer, "rgb({},{},{})", color.r, color.g, color.b);
-    let x_samples = write_usize(buffer, rect.x1_samples);
-    let width_samples = write_usize(buffer, rect.x2_samples - rect.x1_samples);
+    let x_samples = write_itoa(buffer, rect.x1_samples);
+    let width_samples = write_itoa(buffer, rect.x2_samples - rect.x1_samples);
 
     if let Event::Empty(bytes_start) = cache_rect {
         // clear the state
@@ -917,7 +917,7 @@ fn filled_rectangle<W: Write>(
     svg.write_event(cache_rect.borrow())
 }
 
-fn write_usize(buffer: &mut StrStack, value: usize) -> usize {
+fn write_itoa<V: itoa::Integer>(buffer: &mut StrStack, value: V) -> usize {
     buffer.push(itoa::Buffer::new().format(value))
 }
 
