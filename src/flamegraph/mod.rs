@@ -35,6 +35,71 @@ pub use self::color::Palette;
 use self::color::{Color, SearchColor, StrokeColor};
 use self::svg::{Dimension, StyleOptions};
 
+/// A pre-collapsed stack sample for flamegraph rendering.
+///
+/// The type parameter `S` is the stack frame iterator/collection type.
+/// For most callers this is inferred and never needs to be named.
+///
+/// # Examples
+///
+/// ```
+/// use inferno::flamegraph::Sample;
+///
+/// let frames = ["main", "handle_request", "parse_json"];
+/// let sample = Sample::new(frames.into_iter(), 42);
+///
+/// // Differential: 120 "after" samples, delta of +20 vs "before"
+/// let diff = Sample::with_delta(["main", "handle_request", "parse_json"].into_iter(), 120, 20);
+/// ```
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Sample<S> {
+    /// Stack frames from root (outermost) to leaf (innermost).
+    pub stack: S,
+    /// Number of times this stack was observed.
+    pub count: u64,
+    /// For differential flamegraphs: `after_count - before_count`.
+    /// `None` for non-differential.
+    pub delta: Option<isize>,
+}
+
+impl<S> Sample<S> {
+    /// Create a new non-differential sample.
+    pub fn new(stack: S, count: u64) -> Self {
+        Sample {
+            stack,
+            count,
+            delta: None,
+        }
+    }
+
+    /// Create a differential sample with a delta value.
+    pub fn with_delta(stack: S, count: u64, delta: isize) -> Self {
+        Sample {
+            stack,
+            count,
+            delta: Some(delta),
+        }
+    }
+
+    /// Borrow the stack, preserving count and delta.
+    pub fn borrow_stack(&self) -> Sample<&S> {
+        Sample {
+            stack: &self.stack,
+            count: self.count,
+            delta: self.delta,
+        }
+    }
+
+    /// Transform the stack, preserving count and delta.
+    pub fn map_stack<T>(self, f: impl FnOnce(S) -> T) -> Sample<T> {
+        Sample {
+            stack: f(self.stack),
+            count: self.count,
+            delta: self.delta,
+        }
+    }
+}
+
 const XPAD: usize = 10; // pad left and right
 const FRAMEPAD: usize = 1; // vertical padding for frames
 
@@ -94,7 +159,7 @@ pub mod defaults {
 /// Configure the flame graph.
 #[derive(Debug, PartialEq)]
 #[non_exhaustive]
-pub struct Options<'a> {
+pub struct Options {
     /// The color palette to use when plotting.
     pub colors: color::Palette,
 
@@ -114,18 +179,6 @@ pub struct Options<'a> {
     /// Choose names based on the hashes of function names, without the weighting scheme that
     /// `hash` uses.
     pub deterministic: bool,
-
-    /// Store the choice of color for each function so that later invocations use the same colors.
-    ///
-    /// With this option enabled, a file called `palette.map` will be created the first time a
-    /// flame graph is generated, and the color chosen for each function will be written into it.
-    /// On subsequent invocations, functions that already have a color registered in that file will
-    /// be given the stored color rather than be assigned a new one. New functions will have their
-    /// colors persisted for future runs.
-    ///
-    /// This feature was first implemented [by Shawn
-    /// Sterling](https://github.com/brendangregg/FlameGraph/pull/25).
-    pub palette_map: Option<&'a mut color::PaletteMap>,
 
     /// Assign extra attributes to particular functions.
     ///
@@ -225,22 +278,6 @@ pub struct Options<'a> {
     /// Pretty print XML with newlines and indentation.
     pub pretty_xml: bool,
 
-    /// Don't sort the input lines.
-    ///
-    /// If you know for sure that your folded stack lines are sorted you can set this flag to get
-    /// a performance boost. If you have multiple input files, the lines will be merged and sorted
-    /// regardless.
-    ///
-    /// Note that if you use `from_lines` directly, the it is always your responsibility to make
-    /// sure the lines are sorted.
-    pub no_sort: bool,
-
-    /// Generate stack-reversed flame graph.
-    ///
-    /// Note that stack lines must always be sorted after reversing the stacks so the `no_sort`
-    /// option will be ignored.
-    pub reverse_stack_order: bool,
-
     /// Don't include static JavaScript in flame graph.
     /// This is only meant to be used in tests.
     #[doc(hidden)]
@@ -253,17 +290,44 @@ pub struct Options<'a> {
     /// useful visual cue of what to focus on, especially if you are showing
     /// flamegraphs to someone for the first time.
     pub color_diffusion: bool,
+}
 
-    /// Produce a flame chart (sort by time, do not merge stacks)
+/// Text-processing options that control how input stack lines are interpreted.
+///
+/// These options only affect the parsing and ordering of the folded stack input,
+/// not the visual appearance of the resulting flame graph.
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+#[non_exhaustive]
+pub struct PreProcessingOptions {
+    /// Don't sort the input lines.
     ///
-    /// Note that stack is not sorted and will be reversed
+    /// If you know for sure that your folded stack lines are sorted you can set this flag to get
+    /// a performance boost. If you have multiple input files, the lines will be merged and sorted
+    /// regardless.
+    ///
+    /// Note that if you use `from_lines` directly, it is always your responsibility to make
+    /// sure the lines are sorted.
+    pub no_sort: bool,
+
+    /// Generate stack-reversed flame graph.
+    ///
+    /// Note that stack lines must always be sorted after reversing the stacks so the `no_sort`
+    /// option will be ignored.
+    pub reverse_stack_order: bool,
+
+    /// Produce a flame chart (sort by time, do not merge stacks).
+    ///
+    /// Note that the stack is not sorted and will be reversed.
     pub flame_chart: bool,
 
-    /// Base symbols
+    /// Base symbols.
+    ///
+    /// Omit samples whose stacks do not contain one of these symbols. When a symbol is found,
+    /// the call stack is truncated so that the matching symbol becomes the bottom-most frame.
     pub base: Vec<String>,
 }
 
-impl Options<'_> {
+impl Options {
     /// Calculate pad top, including title and subtitle
     pub(super) fn ypad1(&self) -> usize {
         let subtitle_height = if self.subtitle.is_some() {
@@ -293,7 +357,7 @@ impl Options<'_> {
     }
 }
 
-impl Default for Options<'_> {
+impl Default for Options {
     fn default() -> Self {
         Options {
             colors: Palette::from_str(defaults::COLORS).unwrap(),
@@ -316,16 +380,11 @@ impl Default for Options<'_> {
             uicolor: Default::default(),
             hash: Default::default(),
             deterministic: Default::default(),
-            palette_map: Default::default(),
             direction: Default::default(),
             negate_differentials: Default::default(),
             pretty_xml: Default::default(),
-            no_sort: Default::default(),
-            reverse_stack_order: Default::default(),
             no_javascript: Default::default(),
             color_diffusion: Default::default(),
-            flame_chart: Default::default(),
-            base: Default::default(),
 
             #[cfg(feature = "nameattr")]
             func_frameattrs: Default::default(),
@@ -393,19 +452,25 @@ impl Rectangle {
 ///
 /// [differential flame graph]: http://www.brendangregg.com/blog/2014-11-09/differential-flame-graphs.html
 #[allow(clippy::cognitive_complexity)]
-pub fn from_lines<'a, I, W>(opt: &mut Options<'_>, lines: I, writer: W) -> io::Result<()>
+pub fn from_lines<'a, I, W>(
+    opt: &Options,
+    prep_opt: &PreProcessingOptions,
+    palette_map: Option<&mut color::PaletteMap>,
+    lines: I,
+    writer: W,
+) -> io::Result<()>
 where
     I: IntoIterator<Item = &'a str>,
     W: Write,
 {
-    let mut reversed = StrStack::new();
     let lines = lines
         .into_iter()
         .map(|line| line.trim())
         .filter(|line| !(line.is_empty() || line.starts_with("# ")));
 
-    let (mut frames, time, ignored, delta_max) = if opt.reverse_stack_order {
-        if opt.no_sort {
+    let mut reversed = StrStack::new();
+    let (frames, time, ignored, delta_max) = if prep_opt.reverse_stack_order {
+        if prep_opt.no_sort {
             warn!(
                 "Input lines are always sorted when `reverse_stack_order` is `true`. \
                  The `no_sort` option is being ignored."
@@ -438,17 +503,17 @@ where
         let mut reversed: Vec<&str> = reversed.iter().collect();
         reversed.sort_unstable();
         merge::frames(reversed, false)?
-    } else if opt.flame_chart {
+    } else if prep_opt.flame_chart {
         // In flame chart mode, just reverse the data so time moves from left to right.
         let mut lines: Vec<&str> = lines.into_iter().collect();
         lines.reverse();
         merge::frames(lines, true)?
-    } else if opt.no_sort {
+    } else if prep_opt.no_sort {
         // Lines don't need sorting.
         merge::frames(lines, false)?
     } else {
         // Sort lines by default.
-        let mut lines: Vec<&str> = if opt.base.is_empty() {
+        let mut lines: Vec<&str> = if prep_opt.base.is_empty() {
             lines.into_iter().collect()
         } else {
             lines
@@ -457,7 +522,7 @@ where
                     let mut cursor = line.len();
                     for symbol in line.rsplit(';') {
                         cursor -= symbol.len();
-                        if opt.base.iter().any(|b| b == symbol) {
+                        if prep_opt.base.iter().any(|b| b == symbol) {
                             break;
                         }
                         cursor = cursor.saturating_sub(1);
@@ -478,6 +543,134 @@ where
         warn!("Ignored {} lines with invalid format", ignored);
     }
 
+    render_svg(opt, palette_map, frames, time, delta_max, writer)
+}
+
+/// Produce a flame graph from pre-sorted, pre-collapsed stack samples.
+///
+/// Each [`Sample`] provides a stack (root-to-leaf frame iterator) and a
+/// sample count.  Samples **must** be sorted lexicographically by their
+/// stack frames; an error is returned if unsorted input is detected.
+///
+/// This is the primary typed entry point. Use [`from_stacks`] if your
+/// data is not already sorted.
+///
+/// # Examples
+///
+/// ```
+/// use inferno::flamegraph::{self, Options, Sample};
+///
+/// let samples = vec![
+///     Sample::new(["main", "alpha"].into_iter(), 3),
+///     Sample::new(["main", "beta"].into_iter(), 5),
+/// ];
+/// let mut buf = Vec::new();
+/// flamegraph::from_sorted_stacks(&Options::default(), None, samples, &mut buf).unwrap();
+/// assert!(!buf.is_empty());
+/// ```
+pub fn from_sorted_stacks<'a, I, S, W>(
+    opt: &Options,
+    palette_map: Option<&mut color::PaletteMap>,
+    stacks: I,
+    writer: W,
+) -> io::Result<()>
+where
+    I: IntoIterator<Item = Sample<S>>,
+    S: IntoIterator<Item = &'a str>,
+    W: Write,
+{
+    let (frames, time, delta_max) = merge::frames_from_stacks(stacks, false)?;
+    render_svg(opt, palette_map, frames, time, delta_max, writer)
+}
+
+/// Produce a flame graph from unsorted, pre-collapsed stack samples.
+///
+/// Like [`from_sorted_stacks`], but accepts samples in any order.
+/// Internally collects and sorts the stacks before rendering.
+///
+/// # Examples
+///
+/// ```
+/// use inferno::flamegraph::{self, Options, Sample};
+///
+/// let samples = vec![
+///     Sample::new(["main", "beta"].into_iter(), 5),
+///     Sample::new(["main", "alpha"].into_iter(), 3),
+/// ];
+/// let mut buf = Vec::new();
+/// flamegraph::from_stacks(&Options::default(), None, samples, &mut buf).unwrap();
+/// assert!(!buf.is_empty());
+/// ```
+pub fn from_stacks<'a, I, S, W>(
+    opt: &Options,
+    palette_map: Option<&mut color::PaletteMap>,
+    stacks: I,
+    writer: W,
+) -> io::Result<()>
+where
+    I: IntoIterator<Item = Sample<S>>,
+    S: IntoIterator<Item = &'a str>,
+    W: Write,
+{
+    let mut samples: Vec<Sample<Vec<&'a str>>> = stacks
+        .into_iter()
+        .map(|s| s.map_stack(|stack| stack.into_iter().collect()))
+        .collect();
+    samples.sort_unstable_by(|a, b| a.stack.cmp(&b.stack));
+    // We just sorted so skip the redundant O(n) sort check.
+    let sorted = samples
+        .iter()
+        .map(|s| s.borrow_stack().map_stack(|stack| stack.iter().copied()));
+    let (frames, time, delta_max) = merge::frames_from_stacks(sorted, true)?;
+    render_svg(opt, palette_map, frames, time, delta_max, writer)
+}
+
+/// Produce a flame chart from pre-collapsed stack samples.
+///
+/// Unlike [`from_sorted_stacks`], this preserves time ordering and does
+/// not merge identical stacks.  Samples are rendered in reverse order
+/// (newest on the left) to match flame chart conventions.
+///
+/// # Examples
+///
+/// ```
+/// use inferno::flamegraph::{self, Options, Sample};
+///
+/// // Samples in time order so identical stacks are kept separate.
+/// let samples = vec![
+///     Sample::new(["main", "handle_request"].into_iter(), 10),
+///     Sample::new(["main", "idle"].into_iter(), 5),
+///     Sample::new(["main", "handle_request"].into_iter(), 8),
+/// ];
+/// let mut buf = Vec::new();
+/// flamegraph::flame_chart_from_stacks(&Options::default(), None, samples, &mut buf).unwrap();
+/// assert!(!buf.is_empty());
+/// ```
+pub fn flame_chart_from_stacks<'a, I, S, W>(
+    opt: &Options,
+    palette_map: Option<&mut color::PaletteMap>,
+    stacks: I,
+    writer: W,
+) -> io::Result<()>
+where
+    I: IntoIterator<Item = Sample<S>>,
+    I::IntoIter: DoubleEndedIterator,
+    S: IntoIterator<Item = &'a str>,
+    W: Write,
+{
+    let (frames, time, delta_max) = merge::frames_from_stacks(stacks.into_iter().rev(), true)?;
+    // Flame charts preserve time ordering so skip the sort check.
+    render_svg(opt, palette_map, frames, time, delta_max, writer)
+}
+
+fn render_svg<W: Write>(
+    opt: &Options,
+    mut palette_map: Option<&mut color::PaletteMap>,
+    mut frames: Vec<merge::TimedFrame<'_>>,
+    time: u64,
+    delta_max: usize,
+    writer: W,
+) -> io::Result<()> {
     let mut buffer = StrStack::new();
 
     // let's start writing the svg!
@@ -603,7 +796,7 @@ where
         //     `sprintf "%.0f", 1.5` produces "2"
         //     `sprintf "%.0f", 2.5` produces "2"
         //     `sprintf "%.0f", 3.5` produces "4"
-        let samples = ((frame.end_time - frame.start_time) as f64 * opt.factor).round() as usize;
+        let samples = ((frame.end_time - frame.start_time) as f64 * opt.factor).round() as u64;
 
         // add thousands separators to `samples`
         let _ = samples_txt_buffer.write_formatted(&samples, &Locale::en);
@@ -670,7 +863,7 @@ where
                 delta = -delta;
             }
             color::color_scale(delta, delta_max)
-        } else if let Some(ref mut palette_map) = opt.palette_map {
+        } else if let Some(ref mut palette_map) = palette_map {
             let colors = opt.colors;
             let hash = opt.hash;
             let deterministic = opt.deterministic;
@@ -744,7 +937,7 @@ where
 
 #[cfg(feature = "nameattr")]
 fn write_container_start<'a, W: Write>(
-    opt: &'a Options<'a>,
+    opt: &'a Options,
     svg: &mut Writer<W>,
     cache_a: &mut Event<'_>,
     cache_g: &mut Event<'_>,
@@ -778,7 +971,7 @@ fn write_container_start<'a, W: Write>(
 
 #[cfg(not(feature = "nameattr"))]
 fn write_container_start<'a, W: Write>(
-    _opt: &Options<'_>,
+    _opt: &Options,
     svg: &mut Writer<W>,
     _cache_a: &mut Event<'_>,
     cache_g: &mut Event<'_>,
@@ -814,12 +1007,18 @@ fn write_container_attributes(event: &mut Event<'_>, frame_attributes: &FrameAtt
 /// See [`from_lines`] for the expected format of each line.
 ///
 /// The resulting flame graph will be written out to `writer` in SVG format.
-pub fn from_reader<R, W>(opt: &mut Options<'_>, reader: R, writer: W) -> io::Result<()>
+pub fn from_reader<R, W>(
+    opt: &Options,
+    prep_opt: &PreProcessingOptions,
+    palette_map: Option<&mut color::PaletteMap>,
+    reader: R,
+    writer: W,
+) -> io::Result<()>
 where
     R: Read,
     W: Write,
 {
-    from_readers(opt, iter::once(reader), writer)
+    from_readers(opt, prep_opt, palette_map, iter::once(reader), writer)
 }
 
 /// Produce a flame graph from a set of readers that contain folded stack lines.
@@ -827,7 +1026,13 @@ where
 /// See [`from_lines`] for the expected format of each line.
 ///
 /// The resulting flame graph will be written out to `writer` in SVG format.
-pub fn from_readers<R, W>(opt: &mut Options<'_>, readers: R, writer: W) -> io::Result<()>
+pub fn from_readers<R, W>(
+    opt: &Options,
+    prep_opt: &PreProcessingOptions,
+    palette_map: Option<&mut color::PaletteMap>,
+    readers: R,
+    writer: W,
+) -> io::Result<()>
 where
     R: IntoIterator,
     R::Item: Read,
@@ -837,21 +1042,27 @@ where
     for mut reader in readers {
         reader.read_to_string(&mut input)?;
     }
-    from_lines(opt, input.lines(), writer)
+    from_lines(opt, prep_opt, palette_map, input.lines(), writer)
 }
 
 /// Produce a flame graph from files that contain folded stack lines
 /// and write the result to provided `writer`.
 ///
 /// If files is empty, STDIN will be used as input.
-pub fn from_files<W: Write>(opt: &mut Options<'_>, files: &[PathBuf], writer: W) -> io::Result<()> {
+pub fn from_files<W: Write>(
+    opt: &Options,
+    prep_opt: &PreProcessingOptions,
+    palette_map: Option<&mut color::PaletteMap>,
+    files: &[PathBuf],
+    writer: W,
+) -> io::Result<()> {
     if files.is_empty() || files.len() == 1 && files[0].to_str() == Some("-") {
         let stdin = io::stdin();
         let r = BufReader::with_capacity(128 * 1024, stdin.lock());
-        from_reader(opt, r, writer)
+        from_reader(opt, prep_opt, palette_map, r, writer)
     } else if files.len() == 1 {
         let r = File::open(&files[0])?;
-        from_reader(opt, r, writer)
+        from_reader(opt, prep_opt, palette_map, r, writer)
     } else {
         let stdin = io::stdin();
         let mut stdin_added = false;
@@ -869,7 +1080,7 @@ pub fn from_files<W: Write>(opt: &mut Options<'_>, files: &[PathBuf], writer: W)
             }
         }
 
-        from_readers(opt, readers, writer)
+        from_readers(opt, prep_opt, palette_map, readers, writer)
     }
 }
 

@@ -58,7 +58,7 @@ pub(super) struct StyleOptions<'a> {
 pub(super) fn write_header<W>(
     svg: &mut Writer<W>,
     imageheight: usize,
-    opt: &Options<'_>,
+    opt: &Options,
 ) -> io::Result<()>
 where
     W: Write,
@@ -90,7 +90,7 @@ where
 pub(super) fn write_prelude<W>(
     svg: &mut Writer<W>,
     style_options: &StyleOptions,
-    opt: &Options<'_>,
+    opt: &Options,
 ) -> io::Result<()>
 where
     W: Write,
