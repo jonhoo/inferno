@@ -2,9 +2,15 @@ use std::fs::File;
 use std::io::{self, BufReader, Read};
 
 use criterion::*;
-use inferno::flamegraph::{self, Options};
+use inferno::flamegraph::{self, Options, PreProcessingOptions};
 
-fn flamegraph_benchmark(c: &mut Criterion, id: &str, infile: &str, mut opt: Options<'static>) {
+fn flamegraph_benchmark(
+    c: &mut Criterion,
+    id: &str,
+    infile: &str,
+    opt: Options,
+    prep_opt: PreProcessingOptions,
+) {
     let mut f = File::open(infile).expect("file not found");
 
     let mut bytes = Vec::new();
@@ -16,7 +22,7 @@ fn flamegraph_benchmark(c: &mut Criterion, id: &str, infile: &str, mut opt: Opti
         .bench_with_input("flamegraph", &bytes, move |b, data| {
             b.iter(|| {
                 let reader = BufReader::new(data.as_slice());
-                let _folder = flamegraph::from_reader(&mut opt, reader, io::sink());
+                let _folder = flamegraph::from_reader(&opt, &prep_opt, None, reader, io::sink());
             })
         })
         .throughput(Throughput::Bytes(bytes.len() as u64));
@@ -25,11 +31,11 @@ fn flamegraph_benchmark(c: &mut Criterion, id: &str, infile: &str, mut opt: Opti
 }
 
 macro_rules! flamegraph_benchmarks {
-    ($($name:ident : ($infile:expr, $opt:expr)),*) => {
+    ($($name:ident : ($infile:expr, $opt:expr, $prep_opt:expr)),*) => {
         $(
             fn $name(c: &mut Criterion) {
                 let id = stringify!($name);
-                flamegraph_benchmark(c, id, $infile, $opt);
+                flamegraph_benchmark(c, id, $infile, $opt, $prep_opt);
             }
         )*
 
@@ -39,6 +45,9 @@ macro_rules! flamegraph_benchmarks {
 }
 
 flamegraph_benchmarks! {
-    flamegraph: ("tests/data/collapse-perf/results/example-perf-stacks-collapsed.txt",
-                 { let mut opt = Options::default(); opt.reverse_stack_order = true; opt })
+    flamegraph: (
+        "tests/data/collapse-perf/results/example-perf-stacks-collapsed.txt",
+        Options::default(),
+        { let mut t = PreProcessingOptions::default(); t.reverse_stack_order = true; t }
+    )
 }
