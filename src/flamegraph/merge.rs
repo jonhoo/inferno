@@ -1,6 +1,6 @@
-use std::collections::HashMap;
 use std::io;
 use std::iter;
+use std::mem;
 
 use log::warn;
 
@@ -24,98 +24,77 @@ pub(super) struct FrameTime {
     pub(super) delta: Option<isize>,
 }
 
-fn flow<'a, LI, TI>(
-    tmp: &mut HashMap<Frame<'a>, FrameTime>,
+fn flow<'a>(
+    tmp: &mut Vec<(Frame<'a>, FrameTime)>,
     frames: &mut Vec<TimedFrame<'a>>,
-    last: LI,
-    this: TI,
+    last: &[&'a str],
+    this: &[&'a str],
     time: u64,
     delta: Option<isize>,
-) where
-    LI: IntoIterator<Item = &'a str>,
-    TI: IntoIterator<Item = &'a str>,
-{
-    let mut this = this.into_iter().peekable();
-    let mut last = last.into_iter().peekable();
-
-    // remove common prefix
+) {
+    // find common prefix
     let mut shared_depth = 0;
-    while last.peek() == this.peek() {
-        // they must both be None, so let's stop looping
-        if last.peek().is_none() {
+    let max_depth = last.len().min(this.len());
+    while shared_depth < max_depth {
+        if last[shared_depth] != this[shared_depth] {
             break;
         }
-
-        // move along prefix iterators
-        last.next();
-        this.next();
         shared_depth += 1;
     }
 
-    // TODO: document this..
+    // take the frames that are no longer shared
+    frames.extend(
+        tmp.drain(shared_depth..)
+            .map(|(key, frame_time)| TimedFrame {
+                location: key,
+                start_time: frame_time.start_time,
+                end_time: time,
+                delta: frame_time.delta,
+            }),
+    );
 
-    for (i, func) in last.enumerate() {
-        let key = Frame {
-            function: func,
-            depth: shared_depth + i,
-        };
+    // push new frames
+    if shared_depth < this.len() {
+        let last = this.len() - shared_depth - 1;
+        let new_frames = this[shared_depth..]
+            .iter()
+            .enumerate()
+            .map(|(i, function)| {
+                let key = Frame {
+                    function,
+                    depth: shared_depth + i,
+                };
 
-        //eprintln!("at {} ending frame {:?}", time, key);
-        let frame_time = tmp.remove(&key).unwrap_or_else(|| {
-            unreachable!("did not have start time for {:?}", key);
-        });
+                // ensures all frames have `Some(0)` if a delta is provided,
+                // delta rendering handles it differently to `None`
+                let delta = match delta {
+                    Some(_) if i != last => Some(0),
+                    d => d,
+                };
 
-        let frame = TimedFrame {
-            location: key,
-            start_time: frame_time.start_time,
-            end_time: time,
-            delta: frame_time.delta,
-        };
-        frames.push(frame);
-    }
-
-    let mut i = 0;
-    while this.peek().is_some() {
-        let func = this.next().unwrap();
-        let key = Frame {
-            function: func,
-            depth: shared_depth + i,
-        };
-
-        let is_last = this.peek().is_none();
-        let delta = match delta {
-            Some(_) if !is_last => Some(0),
-            d => d,
-        };
-        let frame_time = FrameTime {
-            start_time: time,
-            // For some reason the Perl version does a `+=` for `delta`, but I can't figure out why.
-            // See https://github.com/brendangregg/FlameGraph/blob/1b1c6deede9c33c5134c920bdb7a44cc5528e9a7/flamegraph.pl#L588
-            delta,
-        };
-
-        //eprintln!("stored tmp for time {}: {:?}", time, key);
-        if let Some(frame_time) = tmp.insert(key, frame_time) {
-            unreachable!(
-                "start time {} already registered for frame",
-                frame_time.start_time
-            );
-        }
-
-        i += 1;
+                let frame_time = FrameTime {
+                    start_time: time,
+                    // For some reason the Perl version does a `+=` for `delta`, but I can't figure out why.
+                    // See https://github.com/brendangregg/FlameGraph/blob/1b1c6deede9c33c5134c920bdb7a44cc5528e9a7/flamegraph.pl#L588
+                    delta,
+                };
+                (key, frame_time)
+            });
+        tmp.extend(new_frames);
     }
 }
 
 pub(super) fn frames<'a, I>(
     lines: I,
     suppress_sort_check: bool,
-) -> io::Result<(Vec<TimedFrame<'a>>, u64, usize, usize)>
+) -> io::Result<(Vec<TimedFrame<'a>>, u64, usize)>
 where
     I: IntoIterator<Item = &'a str>,
 {
     let mut time = 0;
     let mut ignored = 0;
-    let mut last = "";
+    let mut last = Vec::new();
+    let mut this = Vec::new();
     let mut tmp = Default::default();
     let mut frames = Default::default();
     let mut delta_max = 1;
@@ -164,44 +143,28 @@ where
         let stack = line;
 
         // inject empty first-level stack frame to capture "all"
-        let this = iter::once("").chain(stack.split(';'));
-        if last.is_empty() {
-            // need to special-case this, because otherwise iter("") + "".split(';') == ["", ""]
-            //eprintln!("flow(_, {}, {})", stack, time);
-            flow(&mut tmp, &mut frames, None, this, time, delta);
-        } else {
-            //eprintln!("flow({}, {}, {})", last, stack, time);
-            flow(
-                &mut tmp,
-                &mut frames,
-                iter::once("").chain(last.split(';')),
-                this,
-                time,
-                delta,
-            );
-        }
+        this.extend(iter::once("").chain(stack.split(';')));
 
-        last = stack;
+        flow(&mut tmp, &mut frames, &last, &this, time, delta);
+
+        mem::swap(&mut last, &mut this);
+        this.clear();
         time += nsamples;
         prev_line = Some(line);
     }
 
     if !last.is_empty() {
-        //eprintln!("flow({}, _, {})", last, time);
         // NOTE: the `delta` parameter is unused by `flow` when `this` is `None` (which is the case
         // here), so we can pass any arbitrary value in that position. but `None` seems the most
         // reasonable.
-        flow(
-            &mut tmp,
-            &mut frames,
-            iter::once("").chain(last.split(';')),
-            None,
-            time,
-            None,
-        );
+        flow(&mut tmp, &mut frames, &last, &this, time, None);
     }
 
-    Ok((frames, time, ignored, delta_max))
+    if ignored != 0 {
+        warn!("Ignored {} lines with invalid format", ignored);
+    }
+
+    Ok((frames, time, delta_max))
 }
 
 // Parse and remove the number of samples from the end of a line.
@@ -248,7 +211,7 @@ mod tests {
         // frame should have delta = None, not the stale value from
         // the previous line.
         let lines = vec!["a;b 10 5", "a;c 3"];
-        let (frames, _time, _ignored, _delta_max) = frames(lines, true).unwrap();
+        let (frames, _time, _delta_max) = frames(lines, true).unwrap();
 
         let c_frame = frames
             .iter()
