@@ -107,7 +107,7 @@ fn flow<'a, LI, TI>(
 pub(super) fn frames<'a, I>(
     lines: I,
     suppress_sort_check: bool,
-) -> io::Result<(Vec<TimedFrame<'a>>, u64, usize, usize)>
+) -> io::Result<(Vec<TimedFrame<'a>>, u64, usize)>
 where
     I: IntoIterator<Item = &'a str>,
 {
@@ -196,7 +196,11 @@ where
         );
     }
 
-    Ok((frames, time, ignored, delta_max))
+    if ignored != 0 {
+        warn!("Ignored {} lines with invalid format", ignored);
+    }
+
+    Ok((frames, time, delta_max))
 }
 
 // Parse and remove the number of samples from the end of a line.
@@ -243,7 +247,7 @@ mod tests {
         // frame should have delta = None, not the stale value from
         // the previous line.
         let lines = vec!["a;b 10 5", "a;c 3"];
-        let (frames, _time, _ignored, _delta_max) = frames(lines, true).unwrap();
+        let (frames, _time, _delta_max) = frames(lines, true).unwrap();
 
         let c_frame = frames
             .iter()
