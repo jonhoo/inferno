@@ -60,7 +60,6 @@ fn flow<'a, LI, TI>(
             depth: shared_depth + i,
         };
 
-        //eprintln!("at {} ending frame {:?}", time, key);
         let frame_time = tmp.remove(&key).unwrap_or_else(|| {
             unreachable!("did not have start time for {:?}", key);
         });
@@ -94,7 +93,6 @@ fn flow<'a, LI, TI>(
             delta,
         };
 
-        //eprintln!("stored tmp for time {}: {:?}", time, key);
         if let Some(frame_time) = tmp.insert(key, frame_time) {
             unreachable!(
                 "start time {} already registered for frame",
@@ -167,10 +165,8 @@ where
         let this = iter::once("").chain(stack.split(';'));
         if last.is_empty() {
             // need to special-case this, because otherwise iter("") + "".split(';') == ["", ""]
-            //eprintln!("flow(_, {}, {})", stack, time);
             flow(&mut tmp, &mut frames, None, this, time, delta);
         } else {
-            //eprintln!("flow({}, {}, {})", last, stack, time);
             flow(
                 &mut tmp,
                 &mut frames,
@@ -187,7 +183,6 @@ where
     }
 
     if !last.is_empty() {
-        //eprintln!("flow({}, _, {})", last, time);
         // NOTE: the `delta` parameter is unused by `flow` when `this` is `None` (which is the case
         // here), so we can pass any arbitrary value in that position. but `None` seems the most
         // reasonable.
