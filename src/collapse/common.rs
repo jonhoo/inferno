@@ -573,7 +573,7 @@ pub(crate) mod testing {
     use std::path::{Path, PathBuf};
     use std::time::Instant;
 
-    use libflate::gzip::Decoder;
+    use flate2::read::GzDecoder;
 
     use super::*;
     use crate::collapse::Collapse;
@@ -589,7 +589,7 @@ pub(crate) mod testing {
                 let mut buf = Vec::new();
                 let mut file = File::open(path)?;
                 if path.to_str().unwrap().ends_with(".gz") {
-                    let mut reader = Decoder::new(file)?;
+                    let mut reader = GzDecoder::new(file);
                     reader.read_to_end(&mut buf)?;
                 } else {
                     file.read_to_end(&mut buf)?;

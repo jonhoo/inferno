@@ -1,8 +1,8 @@
 use std::fs::{self, File};
 use std::io::{self, BufRead, BufReader, Cursor};
 
+use flate2::read::GzDecoder;
 use inferno::collapse::Collapse;
-use libflate::gzip::Decoder;
 use pretty_assertions::assert_eq;
 use testing_logger::CapturedLog;
 
@@ -55,7 +55,7 @@ where
     let mut collapse = move |out: &mut dyn io::Write| {
         if test_filename.ends_with(".gz") {
             let test_file = File::open(test_filename)?;
-            let r = BufReader::new(Decoder::new(test_file).unwrap());
+            let r = BufReader::new(GzDecoder::new(test_file));
             collapser.collapse(r, out)
         } else {
             collapser.collapse_file(Some(test_filename), out)
@@ -123,7 +123,7 @@ where
     let mut collapse = move |out: &mut dyn io::Write| {
         if test_filename.ends_with(".gz") {
             let test_file = File::open(test_filename)?;
-            let r = BufReader::new(Decoder::new(test_file).unwrap());
+            let r = BufReader::new(GzDecoder::new(test_file));
             collapser.collapse(r, out)
         } else {
             collapser.collapse_file(Some(test_filename), out)
