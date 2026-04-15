@@ -2,8 +2,8 @@ use std::fs::File;
 use std::io::{self, Read};
 
 use criterion::*;
+use flate2::read::GzDecoder;
 use inferno::collapse::{dtrace, perf, sample, Collapse};
-use libflate::gzip::Decoder;
 use once_cell::sync::Lazy;
 
 const INFILE_DTRACE: &str = "flamegraph/example-dtrace-stacks.txt";
@@ -16,7 +16,7 @@ static NTHREADS: Lazy<usize> = Lazy::new(|| std::thread::available_parallelism()
 fn read_infile(infile: &str, buf: &mut Vec<u8>) -> io::Result<()> {
     let mut f = File::open(infile)?;
     if infile.ends_with(".gz") {
-        let mut r = io::BufReader::new(Decoder::new(f)?);
+        let mut r = GzDecoder::new(f);
         r.read_to_end(buf)?;
     } else {
         f.read_to_end(buf)?;
