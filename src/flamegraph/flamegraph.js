@@ -1,8 +1,9 @@
 "use strict";
-var details, searchbtn, unzoombtn, matchedtxt, svg, searching, frames, known_font_width;
+var details, searchbtn, ignorecasebtn, unzoombtn, matchedtxt, svg, searching, frames, known_font_width, case_insensitive, current_search_term;
 function init(evt) {
     details = document.getElementById("details").firstChild;
     searchbtn = document.getElementById("search");
+    ignorecasebtn = document.getElementById("ignorecase");
     unzoombtn = document.getElementById("unzoom");
     matchedtxt = document.getElementById("matched");
     svg = document.getElementsByTagName("svg")[0];
@@ -10,6 +11,8 @@ function init(evt) {
     known_font_width = get_monospace_width(frames);
     total_samples = parseInt(frames.attributes.total_samples.value);
     searching = 0;
+    case_insensitive = 0;
+    current_search_term = null;
 
     // Use GET parameters to restore a flamegraph's state.
     var restore_state = function() {
@@ -41,7 +44,8 @@ function init(evt) {
 
             // Keep search elements at a fixed distance from right edge.
             var svgWidth = svg.width.baseVal.value;
-            searchbtn.attributes.x.value = svgWidth - xpad;
+            ignorecasebtn.attributes.x.value = svgWidth - xpad;
+            searchbtn.attributes.x.value = svgWidth - xpad - fontsize * fontwidth * 4;
             matchedtxt.attributes.x.value = svgWidth - xpad;
         };
         window.addEventListener('resize', function() {
@@ -87,6 +91,7 @@ window.addEventListener("click", function(e) {
         history.replaceState(null, null, parse_params(params));
     }
     else if (e.target.id == "search") search_prompt();
+    else if (e.target.id == "ignorecase") toggle_ignorecase();
 }, false)
 // mouse-over for info
 // show
@@ -104,6 +109,13 @@ window.addEventListener("keydown",function (e) {
     if (e.keyCode === 114 || (e.ctrlKey && e.keyCode === 70)) {
         e.preventDefault();
         search_prompt();
+    }
+}, false)
+// ctrl-I to toggle case-insensitive search
+window.addEventListener("keydown",function (e) {
+    if (e.ctrlKey && e.keyCode === 73) {
+        e.preventDefault();
+        toggle_ignorecase();
     }
 }, false)
 // functions
@@ -375,14 +387,17 @@ function reset_search() {
 }
 function search_prompt() {
     if (!searching) {
+        var casemsg = case_insensitive ? ", ignoring case" : "";
         var term = prompt("Enter a search term (regexp " +
-            "allowed, eg: ^ext4_)", "");
+            "allowed, eg: ^ext4_)" + casemsg + "\nPress Ctrl+i to toggle case sensitivity", "");
         if (term != null) {
+            current_search_term = term;
             search(term)
         }
     } else {
         reset_search();
         searching = 0;
+        current_search_term = null;
         searchbtn.classList.remove("show");
         searchbtn.firstChild.nodeValue = "Search"
         matchedtxt.classList.add("hide");
@@ -390,7 +405,7 @@ function search_prompt() {
     }
 }
 function search(term) {
-    var re = new RegExp(term);
+    var re = new RegExp(term, case_insensitive ? "i" : "");
     var el = frames.children;
     var matches = new Object();
     var maxwidth = 0;
@@ -464,6 +479,19 @@ function search(term) {
     var pct = 100 * count / maxwidth;
     if (pct != 100) pct = pct.toFixed(1);
     matchedtxt.firstChild.nodeValue = "Matched: " + pct + "%";
+}
+function toggle_ignorecase() {
+    case_insensitive = !case_insensitive;
+    if (case_insensitive) {
+        ignorecasebtn.classList.add("show");
+    } else {
+        ignorecasebtn.classList.remove("show");
+    }
+    if (searching && current_search_term != null) {
+        reset_search();
+        searching = 0;
+        search(current_search_term);
+    }
 }
 function format_percent(n) {
     return n.toFixed(4) + "%";

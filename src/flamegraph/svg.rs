@@ -232,11 +232,25 @@ text {{ font-family:{}; font-size:{}px }}
         },
     )?;
 
+    // "ic" indicator for case-insensitive search, right-aligned at the edge
     write_str(
         svg,
         &mut buf,
         TextItem {
             x: Dimension::Pixels(image_width as usize - super::XPAD),
+            y: (opt.font_size * 2) as f64,
+            text: "ic".into(),
+            extra: vec![("id", "ignorecase"), ("fill", &style_options.uicolor)],
+        },
+    )?;
+
+    // Search button, shifted left to make room for the "ic" indicator
+    let ic_offset = (opt.font_size as f64 * opt.font_width * 4.0) as usize;
+    write_str(
+        svg,
+        &mut buf,
+        TextItem {
+            x: Dimension::Pixels(image_width as usize - super::XPAD - ic_offset),
             y: (opt.font_size * 2) as f64,
             text: "Search".into(),
             extra: vec![("id", "search"), ("fill", &style_options.uicolor)],
