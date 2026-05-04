@@ -19,8 +19,14 @@ function init(evt) {
         var params = get_params();
         if (params.x && params.y)
             zoom(find_group(document.querySelector('[*|x="' + params.x + '"][y="' + params.y + '"]')));
-        if (params.s)
+        if (params.s) {
+            if (params.ic) {
+                case_insensitive = 1;
+                ignorecasebtn.classList.add("show");
+            }
+            current_search_term = params.s;
             search(params.s);
+        }
     };
 
     if (fluiddrawing) {
@@ -383,6 +389,7 @@ function reset_search() {
     }
     var params = get_params();
     delete params.s;
+    delete params.ic;
     history.replaceState(null, null, parse_params(params));
 }
 function search_prompt() {
@@ -444,6 +451,11 @@ function search(term) {
         return;
     var params = get_params();
     params.s = term;
+    if (case_insensitive) {
+        params.ic = "1";
+    } else {
+        delete params.ic;
+    }
     history.replaceState(null, null, parse_params(params));
 
     searchbtn.classList.add("show");
