@@ -232,19 +232,24 @@ text {{ font-family:{}; font-size:{}px }}
         },
     )?;
 
-    // "ic" indicator for case-insensitive search, right-aligned at the edge
-    write_str(
-        svg,
-        &mut buf,
-        TextItem {
-            x: Dimension::Pixels(image_width as usize - super::XPAD),
-            y: (opt.font_size * 2) as f64,
-            text: "ic".into(),
-            extra: vec![("id", "ignorecase"), ("fill", &style_options.uicolor)],
-        },
-    )?;
+    {
+        let x = write!(buf, "{:.2}", image_width as usize - super::XPAD);
+        let y = write!(buf, "{:.2}", (opt.font_size * 2) as f64);
+        svg.write_event(Event::Start(BytesStart::new("text").with_attributes(
+            args!(
+                "id" => "ignorecase",
+                "fill" => &*style_options.uicolor,
+                "x" => &buf[x],
+                "y" => &buf[y]
+            ),
+        )))?;
+        svg.write_event(Event::Start(BytesStart::new("title")))?;
+        svg.write_event(Event::Text(BytesText::new("ignore case")))?;
+        svg.write_event(Event::End(BytesEnd::new("title")))?;
+        svg.write_event(Event::Text(BytesText::new("ic")))?;
+        svg.write_event(Event::End(BytesEnd::new("text")))?;
+    }
 
-    // Search button, shifted left to make room for the "ic" indicator
     let ic_offset = (opt.font_size as f64 * opt.font_width * 4.0) as usize;
     write_str(
         svg,
