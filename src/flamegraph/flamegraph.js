@@ -487,7 +487,7 @@ function toggle_ignorecase() {
     } else {
         ignorecasebtn.classList.remove("show");
     }
-    if (searching && current_search_term != null) {
+    if (current_search_term != null) {
         reset_search();
         searching = 0;
         search(current_search_term);
