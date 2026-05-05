@@ -447,8 +447,13 @@ function search(term) {
             searching = 1;
         }
     }
-    if (!searching)
+    if (!searching) {
+        searchbtn.classList.remove("show");
+        searchbtn.firstChild.nodeValue = "Search";
+        matchedtxt.classList.add("hide");
+        matchedtxt.firstChild.nodeValue = "";
         return;
+    }
     var params = get_params();
     params.s = term;
     if (case_insensitive) {
