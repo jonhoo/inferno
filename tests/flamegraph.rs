@@ -973,3 +973,17 @@ fn flamegraph_austin() {
     let opts = flamegraph::Options::default();
     test_flamegraph(input_file, expected_result_file, opts).unwrap();
 }
+
+// Regression test for https://github.com/jonhoo/inferno/issues/170
+// Sample counts large enough that `100 * samples` overflowed the integer
+// type used to compute the percentage caused a panic.
+#[test]
+fn flamegraph_huge_sample_counts() {
+    let lines = "\
+swapper/0;start_kernel;do_idle 239807672958951499
+swapper/1;start_secondary;do_idle 129127208516546613
+";
+    let mut opts = flamegraph::Options::default();
+    let mut result = Cursor::new(Vec::new());
+    flamegraph::from_lines(&mut opts, lines.lines(), &mut result).unwrap();
+}

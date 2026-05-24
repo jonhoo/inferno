@@ -612,7 +612,7 @@ where
         let info = if frame.location.function.is_empty() && frame.location.depth == 0 {
             write!(buffer, "all ({} {}, 100%)", samples_txt, opt.count_name)
         } else {
-            let pct = (100 * samples) as f64 / (timemax as f64 * opt.factor);
+            let pct = 100.0 * samples as f64 / (timemax as f64 * opt.factor);
             let function = deannotate(frame.location.function);
             match frame.delta {
                 None => write!(
@@ -630,7 +630,7 @@ where
                     if opt.negate_differentials {
                         delta = -delta;
                     }
-                    let delta_pct = (100 * delta) as f64 / (timemax as f64 * opt.factor);
+                    let delta_pct = 100.0 * delta as f64 / (timemax as f64 * opt.factor);
                     write!(
                         buffer,
                         "{} ({} {}, {:.2}%; {:+.2}%)",
