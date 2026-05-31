@@ -11,7 +11,7 @@ output from various profiling tools into the "folded" format expected by
 the `flamegraph` plotting tool. So far, the focus has been on parsing
 profiling results from
 [`perf`](https://perf.wiki.kernel.org/index.php/Main_Page) and
-[DTrace](https://www.joyent.com/dtrace). At the time of writing,
+[DTrace](https://dtrace.org/). At the time of writing,
 `inferno-collapse-perf` is ~20x faster than `stackcollapse-perf.pl` and
 `inferno-collapse-dtrace` is ~20x faster than `stackcollapse.pl` (see
 `compare.sh`).
@@ -83,7 +83,7 @@ these tools on Brendan Gregg's [CPU Flame Graphs page].
   [profiler]: https://en.wikipedia.org/wiki/Profiling_(computer_programming
   [`perf`]: https://perf.wiki.kernel.org/index.php/Main_Page
   [`bpftrace`]: https://github.com/iovisor/bpftrace/
-  [DTrace]: https://www.joyent.com/dtrace
+  [DTrace]: https://dtrace.org/
   [CPU Flame Graphs page]: http://www.brendangregg.com/FlameGraphs/cpuflamegraphs.html#Instructions
 
 On Linux, you may need to tweak a kernel config such as
