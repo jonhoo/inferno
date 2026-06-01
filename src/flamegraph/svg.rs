@@ -232,11 +232,30 @@ text {{ font-family:{}; font-size:{}px }}
         },
     )?;
 
+    {
+        let x = write!(buf, "{:.2}", image_width as usize - super::XPAD);
+        let y = write!(buf, "{:.2}", (opt.font_size * 2) as f64);
+        svg.write_event(Event::Start(BytesStart::new("text").with_attributes(
+            args!(
+                "id" => "ignorecase",
+                "fill" => &*style_options.uicolor,
+                "x" => &buf[x],
+                "y" => &buf[y]
+            ),
+        )))?;
+        svg.write_event(Event::Start(BytesStart::new("title")))?;
+        svg.write_event(Event::Text(BytesText::new("ignore case")))?;
+        svg.write_event(Event::End(BytesEnd::new("title")))?;
+        svg.write_event(Event::Text(BytesText::new("ic")))?;
+        svg.write_event(Event::End(BytesEnd::new("text")))?;
+    }
+
+    let ic_offset = (opt.font_size as f64 * opt.font_width * 4.0) as usize;
     write_str(
         svg,
         &mut buf,
         TextItem {
-            x: Dimension::Pixels(image_width as usize - super::XPAD),
+            x: Dimension::Pixels(image_width as usize - super::XPAD - ic_offset),
             y: (opt.font_size * 2) as f64,
             text: "Search".into(),
             extra: vec![("id", "search"), ("fill", &style_options.uicolor)],
