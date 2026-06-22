@@ -7,7 +7,9 @@ use std::process::{Command, Stdio};
 use std::str::FromStr;
 
 use inferno::flamegraph::color::{BackgroundColor, PaletteMap};
-use inferno::flamegraph::{self, Direction, Options, Palette, TextTruncateDirection};
+use inferno::flamegraph::{
+    self, Direction, Options, Palette, PreProcessingOptions, TextTruncateDirection,
+};
 use log::Level;
 use pretty_assertions::assert_eq;
 use testing_logger::CapturedLog;
@@ -15,19 +17,51 @@ use testing_logger::CapturedLog;
 fn test_flamegraph(
     input_file: &str,
     expected_result_file: &str,
-    options: Options<'_>,
+    options: Options,
 ) -> io::Result<()> {
-    test_flamegraph_multiple_files(
+    test_flamegraph_with_prep_opts(
+        input_file,
+        expected_result_file,
+        options,
+        PreProcessingOptions::default(),
+    )
+}
+
+fn test_flamegraph_with_prep_opts(
+    input_file: &str,
+    expected_result_file: &str,
+    options: Options,
+    prep_options: PreProcessingOptions,
+) -> io::Result<()> {
+    test_flamegraph_multiple_files_with_prep_opts(
         vec![PathBuf::from_str(input_file).unwrap()],
         expected_result_file,
         options,
+        prep_options,
+        None,
     )
 }
 
 fn test_flamegraph_multiple_files(
     input_files: Vec<PathBuf>,
     expected_result_file: &str,
-    mut options: Options<'_>,
+    options: Options,
+) -> io::Result<()> {
+    test_flamegraph_multiple_files_with_prep_opts(
+        input_files,
+        expected_result_file,
+        options,
+        PreProcessingOptions::default(),
+        None,
+    )
+}
+
+fn test_flamegraph_multiple_files_with_prep_opts(
+    input_files: Vec<PathBuf>,
+    expected_result_file: &str,
+    mut options: Options,
+    prep_options: PreProcessingOptions,
+    mut palette_map: Option<&mut PaletteMap>,
 ) -> io::Result<()> {
     // Always pretty print XML to make it easier to find differences when tests fail.
     options.pretty_xml = true;
@@ -41,7 +75,13 @@ fn test_flamegraph_multiple_files(
             if e.kind() == io::ErrorKind::NotFound {
                 // be nice to the dev and make the file
                 let mut f = File::create(expected_result_file).unwrap();
-                flamegraph::from_files(&mut options, &input_files, &mut f)?;
+                flamegraph::from_files(
+                    &options,
+                    &prep_options,
+                    palette_map.as_deref_mut(),
+                    &input_files,
+                    &mut f,
+                )?;
                 fs::metadata(expected_result_file).unwrap()
             } else {
                 return Err(e);
@@ -51,7 +91,13 @@ fn test_flamegraph_multiple_files(
 
     let expected_len = metadata.len() as usize;
     let mut result = Cursor::new(Vec::with_capacity(expected_len));
-    flamegraph::from_files(&mut options, &input_files, &mut result)?;
+    flamegraph::from_files(
+        &options,
+        &prep_options,
+        palette_map,
+        &input_files,
+        &mut result,
+    )?;
     let expected = BufReader::new(File::open(expected_result_file).unwrap());
     // write out the expected result to /tmp for easy restoration
     result.set_position(0);
@@ -112,17 +158,25 @@ where
     test_flamegraph_logs_with_options(input_file, asserter, Default::default());
 }
 
-fn test_flamegraph_logs_with_options<F>(
+fn test_flamegraph_logs_with_options<F>(input_file: &str, asserter: F, options: flamegraph::Options)
+where
+    F: Fn(&Vec<CapturedLog>),
+{
+    test_flamegraph_logs_full(input_file, asserter, options, Default::default());
+}
+
+fn test_flamegraph_logs_full<F>(
     input_file: &str,
     asserter: F,
-    mut options: flamegraph::Options<'_>,
+    options: flamegraph::Options,
+    prep_options: flamegraph::PreProcessingOptions,
 ) where
     F: Fn(&Vec<CapturedLog>),
 {
     testing_logger::setup();
     let r = File::open(input_file).unwrap();
     let sink = io::sink();
-    let _ = flamegraph::from_reader(&mut options, r, sink);
+    let _ = flamegraph::from_reader(&options, &prep_options, None, r, sink);
     testing_logger::validate(asserter);
 }
 
@@ -387,10 +441,16 @@ fn flamegraph_palette_map() {
     let mut palette_map = load_palette_map_file(palette_file);
 
     let mut options = flamegraph::Options::default();
-    options.palette_map = Some(&mut palette_map);
     options.hash = true;
 
-    test_flamegraph(input_file, expected_result_file, options).unwrap();
+    test_flamegraph_multiple_files_with_prep_opts(
+        vec![PathBuf::from_str(input_file).unwrap()],
+        expected_result_file,
+        options,
+        PreProcessingOptions::default(),
+        Some(&mut palette_map),
+    )
+    .unwrap();
 }
 
 #[test]
@@ -515,10 +575,16 @@ fn flamegraph_example_perf_stacks() {
     let palette_file = "./tests/data/flamegraph/example-perf-stacks/palette.map";
     let mut palette_map = load_palette_map_file(palette_file);
 
-    let mut options = flamegraph::Options::default();
-    options.palette_map = Some(&mut palette_map);
+    let options = flamegraph::Options::default();
 
-    test_flamegraph(input_file, expected_result_file, options).unwrap();
+    test_flamegraph_multiple_files_with_prep_opts(
+        vec![PathBuf::from_str(input_file).unwrap()],
+        expected_result_file,
+        options,
+        PreProcessingOptions::default(),
+        Some(&mut palette_map),
+    )
+    .unwrap();
 }
 
 #[test]
@@ -773,10 +839,17 @@ fn flamegraph_no_sort_should_return_error_on_unsorted_input() {
     let expected_result_file =
         "./tests/data/flamegraph/perf-vertx-stacks/perf-vertx-stacks-01-collapsed-all.svg";
 
-    let mut options = flamegraph::Options::default();
-    options.no_sort = true;
+    let options = flamegraph::Options::default();
+    let mut prep_options = flamegraph::PreProcessingOptions::default();
+    prep_options.no_sort = true;
 
-    assert!(test_flamegraph(input_file, expected_result_file, options).is_err());
+    assert!(test_flamegraph_with_prep_opts(
+        input_file,
+        expected_result_file,
+        options,
+        prep_options
+    )
+    .is_err());
 }
 
 #[test]
@@ -788,9 +861,11 @@ fn flamegraph_reversed_stack_ordering() {
 
     let mut options = flamegraph::Options::default();
     options.hash = true;
-    options.reverse_stack_order = true;
+    let mut prep_options = flamegraph::PreProcessingOptions::default();
+    prep_options.reverse_stack_order = true;
 
-    test_flamegraph(input_file, expected_result_file, options).unwrap();
+    test_flamegraph_with_prep_opts(input_file, expected_result_file, options, prep_options)
+        .unwrap();
 }
 
 #[test]
@@ -800,9 +875,11 @@ fn flamegraph_reversed_stack_ordering_with_fractional_samples() {
 
     let mut options = flamegraph::Options::default();
     options.hash = true;
-    options.reverse_stack_order = true;
+    let mut prep_options = flamegraph::PreProcessingOptions::default();
+    prep_options.reverse_stack_order = true;
 
-    test_flamegraph(input_file, expected_result_file, options).unwrap();
+    test_flamegraph_with_prep_opts(input_file, expected_result_file, options, prep_options)
+        .unwrap();
 }
 
 #[test]
@@ -812,18 +889,20 @@ fn flamegraph_reversed_stack_ordering_with_space() {
 
     let mut options = flamegraph::Options::default();
     options.hash = true;
-    options.reverse_stack_order = true;
+    let mut prep_options = flamegraph::PreProcessingOptions::default();
+    prep_options.reverse_stack_order = true;
 
-    test_flamegraph(input_file, expected_result_file, options).unwrap();
+    test_flamegraph_with_prep_opts(input_file, expected_result_file, options, prep_options)
+        .unwrap();
 }
 
 #[test]
 fn flamegraph_should_warn_about_no_sort_when_reversing_stack_ordering() {
-    let mut options = flamegraph::Options::default();
-    options.no_sort = true;
-    options.reverse_stack_order = true;
+    let mut prep_options = flamegraph::PreProcessingOptions::default();
+    prep_options.no_sort = true;
+    prep_options.reverse_stack_order = true;
 
-    test_flamegraph_logs_with_options(
+    test_flamegraph_logs_full(
         "./flamegraph/test/results/perf-funcab-cmd-01-collapsed-all.txt",
         |captured_logs| {
             let nwarnings = captured_logs
@@ -836,16 +915,17 @@ fn flamegraph_should_warn_about_no_sort_when_reversing_stack_ordering() {
                 nwarnings
             );
         },
-        options,
+        Default::default(),
+        prep_options,
     );
 }
 
 #[test]
 fn flamegraph_should_warn_about_bad_input_lines_with_reversed_stack_ordering() {
-    let mut options = flamegraph::Options::default();
-    options.reverse_stack_order = true;
+    let mut prep_options = flamegraph::PreProcessingOptions::default();
+    prep_options.reverse_stack_order = true;
 
-    test_flamegraph_logs_with_options(
+    test_flamegraph_logs_full(
         "./tests/data/flamegraph/bad-lines/bad-lines.txt",
         |captured_logs| {
             let nwarnings = captured_logs
@@ -862,7 +942,8 @@ fn flamegraph_should_warn_about_bad_input_lines_with_reversed_stack_ordering() {
                 nwarnings
             );
         },
-        options,
+        Default::default(),
+        prep_options,
     );
 }
 
@@ -936,10 +1017,11 @@ fn flamegraph_flamechart() {
 
     let mut opts = flamegraph::Options::default();
     opts.title = flamegraph::defaults::CHART_TITLE.to_owned();
-    opts.flame_chart = true;
     opts.hash = true;
+    let mut prep_options = flamegraph::PreProcessingOptions::default();
+    prep_options.flame_chart = true;
 
-    test_flamegraph(input_file, expected_result_file, opts).unwrap();
+    test_flamegraph_with_prep_opts(input_file, expected_result_file, opts, prep_options).unwrap();
 }
 
 #[test]
@@ -949,9 +1031,10 @@ fn flamegraph_base_symbol() {
 
     let mut opts = flamegraph::Options::default();
     opts.title = flamegraph::defaults::CHART_TITLE.to_owned();
-    opts.base = vec!["Final".to_string()];
+    let mut prep_options = flamegraph::PreProcessingOptions::default();
+    prep_options.base = vec!["Final".to_string()];
 
-    test_flamegraph(input_file, expected_result_file, opts).unwrap();
+    test_flamegraph_with_prep_opts(input_file, expected_result_file, opts, prep_options).unwrap();
 }
 
 #[test]
@@ -961,9 +1044,10 @@ fn flamegraph_multiple_base_symbol() {
 
     let mut opts = flamegraph::Options::default();
     opts.title = flamegraph::defaults::CHART_TITLE.to_owned();
-    opts.base = vec!["Final".to_string(), "Samples".to_string()];
+    let mut prep_options = flamegraph::PreProcessingOptions::default();
+    prep_options.base = vec!["Final".to_string(), "Samples".to_string()];
 
-    test_flamegraph(input_file, expected_result_file, opts).unwrap();
+    test_flamegraph_with_prep_opts(input_file, expected_result_file, opts, prep_options).unwrap();
 }
 
 #[test]
@@ -972,4 +1056,175 @@ fn flamegraph_austin() {
     let expected_result_file = "./tests/data/flamegraph/austin/flame.svg";
     let opts = flamegraph::Options::default();
     test_flamegraph(input_file, expected_result_file, opts).unwrap();
+}
+
+// ==============================================================================
+// Typed API Tests
+// ==============================================================================
+
+#[test]
+fn typed_api_matches_text_path() {
+    // Deliberately unsorted samples to exercise from_stacks' internal sorting.
+    let folded = "main;alpha 3\nmain;alpha;alloc 1\nmain;beta 5\nmain;gamma 2\n";
+    let samples = vec![
+        flamegraph::Sample::new(vec!["main", "gamma"], 2),
+        flamegraph::Sample::new(vec!["main", "alpha"], 3),
+        flamegraph::Sample::new(vec!["main", "beta"], 5),
+        flamegraph::Sample::new(vec!["main", "alpha", "alloc"], 1),
+    ];
+
+    let mut options = flamegraph::Options::default();
+    options.pretty_xml = true;
+    options.no_javascript = true;
+    options.hash = true;
+
+    // Text path
+    let mut text_result = Cursor::new(Vec::new());
+    flamegraph::from_lines(
+        &options,
+        &flamegraph::PreProcessingOptions::default(),
+        None,
+        folded.lines(),
+        &mut text_result,
+    )
+    .unwrap();
+
+    // Typed path
+    let mut typed_result = Cursor::new(Vec::new());
+    flamegraph::from_stacks(&options, None, samples, &mut typed_result).unwrap();
+
+    assert_eq!(
+        String::from_utf8(text_result.into_inner()).unwrap(),
+        String::from_utf8(typed_result.into_inner()).unwrap(),
+        "typed API (from_stacks) should produce identical SVG to text API (from_lines)"
+    );
+}
+
+#[test]
+fn typed_api_sorted_matches_text_path() {
+    // Pre-sorted samples for from_sorted_stacks.
+    let folded = "main;alpha 3\nmain;alpha;alloc 1\nmain;beta 5\nmain;gamma 2\n";
+    let samples = vec![
+        flamegraph::Sample::new(vec!["main", "alpha"], 3),
+        flamegraph::Sample::new(vec!["main", "alpha", "alloc"], 1),
+        flamegraph::Sample::new(vec!["main", "beta"], 5),
+        flamegraph::Sample::new(vec!["main", "gamma"], 2),
+    ];
+
+    let mut options = flamegraph::Options::default();
+    options.pretty_xml = true;
+    options.no_javascript = true;
+    options.hash = true;
+
+    // Text path
+    let mut text_result = Cursor::new(Vec::new());
+    flamegraph::from_lines(
+        &options,
+        &flamegraph::PreProcessingOptions::default(),
+        None,
+        folded.lines(),
+        &mut text_result,
+    )
+    .unwrap();
+
+    // Typed path
+    let mut typed_result = Cursor::new(Vec::new());
+    flamegraph::from_sorted_stacks(&options, None, samples, &mut typed_result).unwrap();
+
+    assert_eq!(
+        String::from_utf8(text_result.into_inner()).unwrap(),
+        String::from_utf8(typed_result.into_inner()).unwrap(),
+        "from_sorted_stacks should produce identical SVG to from_lines for sorted input"
+    );
+}
+
+#[test]
+fn typed_api_sort_check_error() {
+    // Unsorted input to from_sorted_stacks should return an error
+    let samples = vec![
+        flamegraph::Sample::new(["main", "beta"].iter().copied(), 5),
+        flamegraph::Sample::new(["main", "alpha"].iter().copied(), 3),
+    ];
+    let options = flamegraph::Options::default();
+    let mut buf = Vec::new();
+    let result = flamegraph::from_sorted_stacks(&options, None, samples, &mut buf);
+    assert!(result.is_err(), "unsorted input should produce an error");
+    let err = result.unwrap_err();
+    assert_eq!(err.kind(), io::ErrorKind::InvalidData);
+    assert!(
+        err.to_string().contains("unsorted"),
+        "error message should mention 'unsorted', got: {}",
+        err
+    );
+}
+
+#[test]
+fn typed_api_differential() {
+    // Varied deltas: grow (+5), shrink (-8), unchanged (0), grow (+5).
+    let folded = "main;alpha 10 15\nmain;beta 20 12\nmain;gamma 5 5\nmain;gamma;inner 3 8\n";
+    let samples = vec![
+        flamegraph::Sample::with_delta(vec!["main", "alpha"], 15, 5),
+        flamegraph::Sample::with_delta(vec!["main", "beta"], 12, -8),
+        flamegraph::Sample::with_delta(vec!["main", "gamma"], 5, 0),
+        flamegraph::Sample::with_delta(vec!["main", "gamma", "inner"], 8, 5),
+    ];
+
+    let mut options = flamegraph::Options::default();
+    options.pretty_xml = true;
+    options.no_javascript = true;
+    // No hash since differential uses delta-based red/blue coloring.
+
+    // Text path
+    let mut text_result = Cursor::new(Vec::new());
+    flamegraph::from_lines(
+        &options,
+        &flamegraph::PreProcessingOptions::default(),
+        None,
+        folded.lines(),
+        &mut text_result,
+    )
+    .unwrap();
+
+    // Typed path
+    let mut typed_result = Cursor::new(Vec::new());
+    flamegraph::from_sorted_stacks(&options, None, samples, &mut typed_result).unwrap();
+
+    assert_eq!(
+        String::from_utf8(text_result.into_inner()).unwrap(),
+        String::from_utf8(typed_result.into_inner()).unwrap(),
+        "typed API should produce identical SVG for differential flamegraphs"
+    );
+}
+
+#[test]
+fn typed_flame_chart_matches_text_path() {
+    // Duplicate stacks exercise the "no merge" flame-chart behavior.
+    let folded = "main;handle_request 10\nmain;idle 5\nmain;handle_request 8\nmain;log_metrics 3\n";
+    let samples = vec![
+        flamegraph::Sample::new(vec!["main", "handle_request"], 10),
+        flamegraph::Sample::new(vec!["main", "idle"], 5),
+        flamegraph::Sample::new(vec!["main", "handle_request"], 8),
+        flamegraph::Sample::new(vec!["main", "log_metrics"], 3),
+    ];
+
+    let mut options = flamegraph::Options::default();
+    options.pretty_xml = true;
+    options.no_javascript = true;
+    options.hash = true;
+
+    // Text path with flame_chart: true
+    let mut prep_opts = flamegraph::PreProcessingOptions::default();
+    prep_opts.flame_chart = true;
+    let mut text_result = Cursor::new(Vec::new());
+    flamegraph::from_lines(&options, &prep_opts, None, folded.lines(), &mut text_result).unwrap();
+
+    // Typed path
+    let mut typed_result = Cursor::new(Vec::new());
+    flamegraph::flame_chart_from_stacks(&options, None, samples, &mut typed_result).unwrap();
+
+    assert_eq!(
+        String::from_utf8(text_result.into_inner()).unwrap(),
+        String::from_utf8(typed_result.into_inner()).unwrap(),
+        "flame_chart_from_stacks should produce identical SVG to from_lines with flame_chart=true"
+    );
 }

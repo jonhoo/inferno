@@ -84,6 +84,83 @@ use std::io::{self, IsTerminal};
 use std::path::Path;
 
 use self::common::{CollapsePrivate, CAPACITY_READER};
+use crate::flamegraph;
+
+/// Collapsed stack data, ready for flamegraph rendering.
+///
+/// Produced by [`Collapse::collapse_to_stacks`]. Can be passed to
+/// [`flamegraph::from_sorted_stacks`] via [`samples()`](Self::samples), or rendered directly via
+/// [`flame_graph()`](Self::flame_graph).
+///
+/// This wrapper performs no sorting or sort validation. When constructing this type, take care to
+/// order the stack entries correctly (usually: sorted) such that `samples` and `flame_graph`
+/// uphold the expected sorting.
+#[derive(Debug, Clone, Default)]
+pub struct FoldedStacks {
+    /// `(stack_string, count, delta)` tuples.
+    ///
+    /// Stacks use `;` as the frame delimiter internally (kept for storage efficiency).
+    ///
+    /// The delta is `Some` for differential flamegraph data.
+    entries: Vec<(String, u64, Option<isize>)>,
+}
+
+impl FoldedStacks {
+    /// Iterate over the stack entries as [`flamegraph::Sample`] values.
+    pub fn samples(
+        &self,
+    ) -> impl ExactSizeIterator<Item = flamegraph::Sample<std::str::Split<'_, char>>> + '_ {
+        self.entries.iter().map(|(stack, count, delta)| {
+            let mut sample = flamegraph::Sample::new(stack.split(';'), *count);
+            sample.delta = *delta;
+            sample
+        })
+    }
+
+    /// Render the collapsed stacks directly to SVG.
+    ///
+    /// Note that this function assumes that the stack entries are in sorted order.
+    pub fn flame_graph<W: io::Write>(
+        &self,
+        opt: &flamegraph::Options,
+        palette_map: Option<&mut flamegraph::color::PaletteMap>,
+        writer: W,
+    ) -> io::Result<()> {
+        flamegraph::from_sorted_stacks(opt, palette_map, self.samples(), writer)
+    }
+
+    /// Returns the number of distinct stacks.
+    pub fn len(&self) -> usize {
+        self.entries.len()
+    }
+
+    /// Returns `true` if there are no stacks.
+    pub fn is_empty(&self) -> bool {
+        self.entries.is_empty()
+    }
+}
+
+/// Construct `FoldedStacks` from an iterator of `(stack, count, delta)` tuples.
+///
+/// The caller is responsible for providing entries in sorted order (by stack
+/// string). No runtime sort is performed.
+impl FromIterator<(String, u64, Option<isize>)> for FoldedStacks {
+    fn from_iter<I: IntoIterator<Item = (String, u64, Option<isize>)>>(iter: I) -> Self {
+        FoldedStacks {
+            entries: iter.into_iter().collect(),
+        }
+    }
+}
+
+/// Extend `FoldedStacks` with additional `(stack, count, delta)` tuples.
+///
+/// The caller is responsible for maintaining sorted order across the
+/// combined entries. No runtime re-sort is performed.
+impl Extend<(String, u64, Option<isize>)> for FoldedStacks {
+    fn extend<I: IntoIterator<Item = (String, u64, Option<isize>)>>(&mut self, iter: I) {
+        self.entries.extend(iter);
+    }
+}
 
 /// The abstract behavior of stack collapsing.
 ///
@@ -146,6 +223,51 @@ pub trait Collapse {
     /// - `Some(false)` means "no, this implementation definitely won't work"
     #[allow(clippy::wrong_self_convention)]
     fn is_applicable(&mut self, input: &str) -> Option<bool>;
+
+    /// Collapses the contents of the provided `reader` into structured [`FoldedStacks`], bypassing
+    /// text serialization.
+    ///
+    /// The returned `FoldedStacks` can be rendered directly via [`FoldedStacks::flame_graph`] or
+    /// iterated as typed [`flamegraph::Sample`] values via [`FoldedStacks::samples`].
+    ///
+    /// The default implementation collapses to an intermediate text buffer and then parses it.
+    /// This is useful for collapser types that implement `Collapse` directly without going through
+    /// `CollapsePrivate`. Implementations that use `CollapsePrivate` get a more efficient override
+    /// via the blanket impl.
+    fn collapse_to_stacks<R>(&mut self, reader: R) -> io::Result<FoldedStacks>
+    where
+        R: io::BufRead,
+    {
+        // Collapse to a text buffer using the standard `collapse` path, then
+        // parse the "stack count" lines back into sorted `FoldedStacks` entries.
+        //
+        // Each line is either:
+        //   "<stack> <count>"                  (normal)
+        //   "<stack> <original_count> <count>" (differential)
+        let mut buf = Vec::new();
+        self.collapse(reader, &mut buf)?;
+        let text =
+            String::from_utf8(buf).map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))?;
+        let mut entries: Vec<_> = text
+            .lines()
+            .filter_map(|line| {
+                let (stack, last_num) = line.trim_end().rsplit_once(' ')?;
+                let last_num = last_num.parse::<u64>().ok()?;
+
+                // Check for a second trailing number (differential format).
+                if let Some((stack, penul_num)) = stack.trim_end().rsplit_once(' ') {
+                    if let Ok(penul_num) = penul_num.parse::<u64>() {
+                        let delta = last_num as i64 - penul_num as i64;
+                        return Some((stack.to_owned(), last_num, Some(delta as isize)));
+                    }
+                }
+
+                Some((stack.to_owned(), last_num, None))
+            })
+            .collect();
+        entries.sort_unstable();
+        Ok(FoldedStacks { entries })
+    }
 }
 
 impl<T> Collapse for T
@@ -162,5 +284,14 @@ where
 
     fn is_applicable(&mut self, input: &str) -> Option<bool> {
         <Self as CollapsePrivate>::is_applicable(self, input)
+    }
+
+    fn collapse_to_stacks<R>(&mut self, reader: R) -> io::Result<FoldedStacks>
+    where
+        R: io::BufRead,
+    {
+        let mut occurrences = <Self as CollapsePrivate>::collapse_to_occurrences(self, reader)?;
+        let entries = occurrences.drain_sorted_entries();
+        Ok(FoldedStacks { entries })
     }
 }

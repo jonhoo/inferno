@@ -1,8 +1,11 @@
 use std::collections::HashMap;
 use std::io;
 use std::iter;
+use std::mem;
 
 use log::warn;
+
+use super::Sample;
 
 #[derive(Debug, PartialEq, Eq, Hash)]
 pub(super) struct Frame<'a> {
@@ -113,77 +116,84 @@ pub(super) fn frames<'a, I>(
 where
     I: IntoIterator<Item = &'a str>,
 {
+    let mut parser = LineParser::default();
+    let samples = lines
+        .into_iter()
+        .filter_map(|line| parser.parse(line))
+        .map(|s| Sample {
+            stack: s.stack.split(';'),
+            count: s.count,
+            delta: s.delta,
+        });
+    let (frames, time, delta_max) = frames_from_stacks(samples, suppress_sort_check)?;
+    Ok((frames, time, parser.ignored, delta_max))
+}
+
+/// Parses folded stack text lines into [`Sample`] values.
+///
+/// Tracks state across lines: the `ignored` count and whether a
+/// fractional-samples warning has already been emitted.
+#[derive(Default)]
+pub(super) struct LineParser {
+    pub(super) ignored: usize,
+    stripped_fractional_samples: bool,
+}
+
+/// Merge pre-parsed stack samples into timed frames for SVG rendering.
+///
+/// The caller must provide sorted samples (unless `check_sort` is false).
+pub(super) fn frames_from_stacks<'a, I, S>(
+    stacks: I,
+    suppress_sort_check: bool,
+) -> io::Result<(Vec<TimedFrame<'a>>, u64, usize)>
+where
+    I: IntoIterator<Item = Sample<S>>,
+    S: IntoIterator<Item = &'a str>,
+{
     let mut time = 0;
-    let mut ignored = 0;
-    let mut last = "";
     let mut tmp = Default::default();
     let mut frames = Default::default();
     let mut delta_max = 1;
-    let mut prev_line = None;
-    let mut stripped_fractional_samples = false;
-    for line in lines {
-        let mut line = line.trim();
 
-        // NOTE: delta has to be per-line so it doesn't bleed across lines
-        let mut delta = None;
+    // Two reusable buffers for stack frames
+    let mut last: Vec<&'a str> = Vec::new();
+    let mut stack: Vec<&'a str> = Vec::new();
 
-        if !suppress_sort_check {
-            if let Some(prev_line) = prev_line {
-                if prev_line > line {
-                    return Err(io::Error::new(
-                        io::ErrorKind::InvalidData,
-                        "unsorted input lines detected",
-                    ));
-                }
-            }
+    for sample in stacks {
+        stack.clear();
+        stack.extend(sample.stack);
+
+        if !suppress_sort_check && !last.is_empty() && last > stack {
+            return Err(io::Error::new(
+                io::ErrorKind::InvalidData,
+                "unsorted input samples detected",
+            ));
         }
 
-        // Parse the number of samples for the purpose of computing overall time passed.
-        // Usually there will only be one samples column at the end of a line,
-        // but for differentials there will be two. When there are two we compute the
-        // delta between them and use the second one.
-        let nsamples =
-            if let Some(samples) = parse_nsamples(&mut line, &mut stripped_fractional_samples) {
-                // See if there's also a differential column present
-                if let Some(original_samples) =
-                    parse_nsamples(&mut line, &mut stripped_fractional_samples)
-                {
-                    delta = Some(samples as isize - original_samples as isize);
-                    delta_max = std::cmp::max(delta.unwrap().unsigned_abs(), delta_max);
-                }
-                samples
-            } else {
-                ignored += 1;
-                continue;
-            };
-
-        if line.is_empty() {
-            ignored += 1;
-            continue;
+        if let Some(d) = sample.delta {
+            delta_max = std::cmp::max(d.unsigned_abs(), delta_max);
         }
-        let stack = line;
 
         // inject empty first-level stack frame to capture "all"
-        let this = iter::once("").chain(stack.split(';'));
+        let this = iter::once("").chain(stack.iter().copied());
         if last.is_empty() {
             // need to special-case this, because otherwise iter("") + "".split(';') == ["", ""]
             //eprintln!("flow(_, {}, {})", stack, time);
-            flow(&mut tmp, &mut frames, None, this, time, delta);
+            flow(&mut tmp, &mut frames, None, this, time, sample.delta);
         } else {
             //eprintln!("flow({}, {}, {})", last, stack, time);
             flow(
                 &mut tmp,
                 &mut frames,
-                iter::once("").chain(last.split(';')),
+                iter::once("").chain(last.iter().copied()),
                 this,
                 time,
-                delta,
+                sample.delta,
             );
         }
 
-        last = stack;
-        time += nsamples;
-        prev_line = Some(line);
+        mem::swap(&mut stack, &mut last);
+        time += sample.count;
     }
 
     if !last.is_empty() {
@@ -194,14 +204,53 @@ where
         flow(
             &mut tmp,
             &mut frames,
-            iter::once("").chain(last.split(';')),
+            iter::once("").chain(last.iter().copied()),
             None,
             time,
             None,
         );
     }
 
-    Ok((frames, time, ignored, delta_max))
+    Ok((frames, time, delta_max))
+}
+
+impl LineParser {
+    /// Parse a single folded stack line into a `Sample`.
+    ///
+    /// Returns `None` for lines with invalid format (increments
+    /// `self.ignored`). The returned `Sample`'s stack is a `&str`
+    /// (the semicolon-delimited stack portion of the line), not yet
+    /// split into frames; the caller is responsible for splitting.
+    pub(super) fn parse<'line>(&mut self, line: &'line str) -> Option<Sample<&'line str>> {
+        let mut line = line.trim();
+
+        // Parse the number of samples.
+        // Usually there will only be one samples column at the end of a line,
+        // but for differentials there will be two. When there are two we compute the
+        // delta between them and use the second one.
+        let nsamples = if let Some(samples) =
+            parse_nsamples(&mut line, &mut self.stripped_fractional_samples)
+        {
+            // See if there's also a differential column present
+            let delta = parse_nsamples(&mut line, &mut self.stripped_fractional_samples)
+                .map(|original| samples as isize - original as isize);
+            (samples, delta)
+        } else {
+            self.ignored += 1;
+            return None;
+        };
+
+        if line.is_empty() {
+            self.ignored += 1;
+            return None;
+        }
+
+        Some(Sample {
+            stack: line,
+            count: nsamples.0,
+            delta: nsamples.1,
+        })
+    }
 }
 
 // Parse and remove the number of samples from the end of a line.

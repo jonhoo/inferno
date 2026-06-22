@@ -148,10 +148,9 @@ pub trait CollapsePrivate: Send + Sized {
     // ******************** PROVIDED METHODS ********************* //
     // *********************************************************** //
 
-    fn collapse<R, W>(&mut self, mut reader: R, writer: W) -> io::Result<()>
+    fn collapse_to_occurrences<R>(&mut self, mut reader: R) -> io::Result<Occurrences>
     where
         R: io::BufRead,
-        W: io::Write,
     {
         let mut occurrences = Occurrences::new(self.nthreads());
 
@@ -165,6 +164,16 @@ pub trait CollapsePrivate: Send + Sized {
         } else {
             self.collapse_single_threaded(reader, &mut occurrences)?;
         }
+
+        Ok(occurrences)
+    }
+
+    fn collapse<R, W>(&mut self, reader: R, writer: W) -> io::Result<()>
+    where
+        R: io::BufRead,
+        W: io::Write,
+    {
+        let mut occurrences = self.collapse_to_occurrences(reader)?;
 
         // Write results.
         occurrences.write_and_clear(writer)
@@ -422,6 +431,44 @@ impl Occurrences {
             SingleThreaded(_) => false,
             #[cfg(feature = "multithreaded")]
             MultiThreaded(_) => true,
+        }
+    }
+
+    /// Drain the occurrences into a sorted vector of `(stack, count, delta)` tuples.
+    ///
+    /// The delta is always `None` because `Occurrences` does not track per-stack deltas, only
+    /// accumulates total counts.
+    ///
+    /// This is used internally by `FoldedStacks` construction.
+    pub(crate) fn drain_sorted_entries(&mut self) -> Vec<(String, u64, Option<isize>)> {
+        use self::Occurrences::*;
+        match self {
+            SingleThreaded(ref mut map) => {
+                let mut entries: Vec<_> = map.drain().map(|(s, c)| (s, c, None)).collect();
+                entries.sort_unstable();
+                entries
+            }
+            #[cfg(feature = "multithreaded")]
+            MultiThreaded(ref mut arc) => {
+                let map = match Arc::get_mut(arc) {
+                    Some(map) => map,
+                    None => panic!(
+                        "Attempting to drain the contents of a concurrent HashMap \
+                         when more than one thread has access to it, which is \
+                         not allowed."
+                    ),
+                };
+                let map = mem::replace(
+                    map,
+                    DashMap::with_capacity_and_hasher(
+                        CAPACITY_HASHMAP,
+                        ahash::RandomState::default(),
+                    ),
+                );
+                let mut entries: Vec<_> = map.into_iter().map(|(s, c)| (s, c, None)).collect();
+                entries.sort_unstable();
+                entries
+            }
         }
     }
 

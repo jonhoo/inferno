@@ -7,7 +7,9 @@ use env_logger::Env;
 use inferno::flamegraph::color::{
     parse_hex_color, BackgroundColor, Color, PaletteMap, SearchColor, StrokeColor,
 };
-use inferno::flamegraph::{self, defaults, Direction, Options, Palette, TextTruncateDirection};
+use inferno::flamegraph::{
+    self, defaults, Direction, Options, Palette, PreProcessingOptions, TextTruncateDirection,
+};
 
 #[cfg(feature = "nameattr")]
 use inferno::flamegraph::FuncFrameAttrsMap;
@@ -235,8 +237,8 @@ struct Opt {
     flame_chart: bool,
 }
 
-impl<'a> Opt {
-    fn into_parts(self) -> (Vec<PathBuf>, Options<'a>) {
+impl Opt {
+    fn into_parts(self) -> (Vec<PathBuf>, Options, PreProcessingOptions) {
         let mut options = Options::default();
         options.title = self.title.clone();
         options.colors = self.colors;
@@ -258,12 +260,14 @@ impl<'a> Opt {
         options.negate_differentials = self.negate;
         options.factor = self.factor;
         options.pretty_xml = self.pretty_xml;
-        options.no_sort = self.no_sort;
         options.no_javascript = self.no_javascript;
         options.color_diffusion = self.color_diffusion;
-        options.reverse_stack_order = self.reverse;
-        options.flame_chart = self.flame_chart;
-        options.base = self.base;
+
+        let mut prep_options = PreProcessingOptions::default();
+        prep_options.no_sort = self.no_sort;
+        prep_options.reverse_stack_order = self.reverse;
+        prep_options.flame_chart = self.flame_chart;
+        prep_options.base = self.base;
 
         if self.flame_chart && self.title == defaults::TITLE {
             options.title = defaults::CHART_TITLE.to_owned();
@@ -287,7 +291,7 @@ impl<'a> Opt {
         options.search_color = self.search_color;
         options.stroke_color = self.stroke_color;
         options.uicolor = self.uicolor;
-        (self.infiles, options)
+        (self.infiles, options, prep_options)
     }
 
     #[cfg(feature = "nameattr")]
@@ -328,15 +332,21 @@ fn main() -> io::Result<()> {
         Err(e) => panic!("Error reading {}: {:?}", PALETTE_MAP_FILE, e),
     };
 
-    let (infiles, mut options) = opt.into_parts();
-
-    options.palette_map = palette_map.as_mut();
+    let (infiles, options, prep_options) = opt.into_parts();
 
     if std::io::stdout().is_terminal() {
-        flamegraph::from_files(&mut options, &infiles, io::stdout().lock())?;
+        flamegraph::from_files(
+            &options,
+            &prep_options,
+            palette_map.as_mut(),
+            &infiles,
+            io::stdout().lock(),
+        )?;
     } else {
         flamegraph::from_files(
-            &mut options,
+            &options,
+            &prep_options,
+            palette_map.as_mut(),
             &infiles,
             io::BufWriter::new(io::stdout().lock()),
         )?;
@@ -384,7 +394,7 @@ mod tests {
     fn default_options() {
         let args = vec!["inferno-flamegraph", "test_infile"];
         let opt = Opt::try_parse_from(args).unwrap();
-        let (_infiles, options) = opt.into_parts();
+        let (_infiles, options, _prep_options) = opt.into_parts();
         assert_eq!(options, Options::default());
     }
 
@@ -434,7 +444,7 @@ mod tests {
             "test_infile2",
         ];
         let opt = Opt::try_parse_from(args).unwrap();
-        let (infiles, options) = opt.into_parts();
+        let (infiles, options, prep_options) = opt.into_parts();
         let mut expected_options = Options::default();
         expected_options.colors = Palette::from_str("purple").unwrap();
         expected_options.search_color = color::SearchColor::from_str("#203040").unwrap();
@@ -456,12 +466,14 @@ mod tests {
         expected_options.direction = Direction::Inverted;
         expected_options.negate_differentials = true;
         expected_options.pretty_xml = true;
-        expected_options.no_sort = false;
-        expected_options.reverse_stack_order = true;
         expected_options.no_javascript = true;
         expected_options.color_diffusion = false;
 
         assert_eq!(options, expected_options);
+
+        assert!(!prep_options.no_sort);
+        assert!(prep_options.reverse_stack_order);
+
         assert_eq!(infiles.len(), 2, "expected 2 input files");
         assert_eq!(infiles[0], PathBuf::from_str("test_infile1").unwrap());
         assert_eq!(infiles[1], PathBuf::from_str("test_infile2").unwrap());
