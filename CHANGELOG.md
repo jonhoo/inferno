@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Upgrade quick-xml to 0.41. [#369](https://github.com/jonhoo/inferno/pull/369)
+  This addresses [RUSTSEC-2026-0194](https://rustsec.org/advisories/RUSTSEC-2026-0194)
+  and [RUSTSEC-2026-0195](https://rustsec.org/advisories/RUSTSEC-2026-0195).
+
 ### Deprecated
 
 ### Removed
