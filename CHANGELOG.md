@@ -18,6 +18,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+## [0.12.7] - 2026-07-05
+
+### Changed
+
+- Upgrade quick-xml to 0.41. [#369](https://github.com/jonhoo/inferno/pull/369)
+  This addresses [RUSTSEC-2026-0194](https://rustsec.org/advisories/RUSTSEC-2026-0194)
+  and [RUSTSEC-2026-0195](https://rustsec.org/advisories/RUSTSEC-2026-0195).
+- Moved from libflate to flate2. [#361](https://github.com/jonhoo/inferno/pull/361)
+
 ## [0.12.6] - 2026-03-01
 
 ### Changed
@@ -372,7 +381,8 @@ this change should be an easy upgrade.
 - Moved to `IndexMap` and FNV hashing ([#127](https://github.com/jonhoo/inferno/pull/127))
 - Moved CI to Azure DevOps Pipelines
 
-[Unreleased]: https://github.com/jonhoo/inferno/compare/v0.12.6...HEAD
+[Unreleased]: https://github.com/jonhoo/inferno/compare/v0.12.7...HEAD
+[0.12.7]: https://github.com/jonhoo/inferno/compare/v0.12.6...v0.12.7
 [0.12.6]: https://github.com/jonhoo/inferno/compare/v0.12.5...v0.12.6
 [0.12.5]: https://github.com/jonhoo/inferno/compare/v0.12.4...v0.12.5
 [0.12.4]: https://github.com/jonhoo/inferno/compare/v0.12.3...v0.12.4
