@@ -16,6 +16,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Avoid integer overflow when computing percentages for very large sample counts. [#367](https://github.com/jonhoo/inferno/pull/367)
+
 ### Security
 
 ## [0.12.7] - 2026-07-05
