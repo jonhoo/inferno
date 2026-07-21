@@ -1,3 +1,66 @@
+//! Plot a flame graph from folded stack samples.
+//!
+//! A flame graph is a visualization of profiled software, allowing the most frequent code-paths
+//! to be identified quickly and accurately. Each box represents a function in the stack, the
+//! width is proportional to how often that function (or any of its children) was on-CPU at sample
+//! time, and the y-axis shows stack depth (the root is at the bottom). The x-axis ordering carries
+//! no meaning: frames are sorted alphabetically so identical stacks merge.
+//!
+//! See the [crate-level documentation] for the bigger picture, including how stacks get collapsed
+//! into the input format this module expects.
+//!
+//! # Input format
+//!
+//! The plotter takes the "folded" stack output produced by the [`crate::collapse`] family of
+//! collapsers (or, equivalently, Brendan Gregg's `stackcollapse-*` Perl scripts). Each line is one
+//! semicolon-separated stack and a sample count:
+//!
+//! ```text
+//! swapper;start_kernel;rest_init;cpu_idle;default_idle;native_safe_halt 1
+//! ```
+//!
+//! An optional extra trailing count switches the renderer into [differential mode][differential],
+//! coloring frames red for "more" and blue for "less" - useful for non-regression testing.
+//!
+//! Frame names may carry single-character annotations recognized by some palettes (notably
+//! `--color=java`):
+//!
+//! - `_[k]` - kernel
+//! - `_[i]` - inlined
+//! - `_[j]` - JIT-compiled
+//! - `_[w]` - waker
+//!
+//! Some collapsers add these automatically (for example,
+//! `inferno-collapse-perf --kernel --jit`). Frames named `-` are rendered gray and conventionally
+//! used as separators (between user and kernel stacks, for instance).
+//!
+//! # Usage
+//!
+//! See [`from_lines()`](crate::flamegraph::from_lines) and
+//! [`from_readers()`](crate::flamegraph::from_readers) for programmatic entry points, and
+//! [`Options`](crate::flamegraph::Options) for the configuration surface (palette, title, count
+//! unit, frame height, hash seed, and so on). The `inferno-flamegraph` binary is a thin wrapper
+//! around these.
+//!
+//! # Performance vs. icicle graphs
+//!
+//! By default the root frame is at the bottom (a "flame" growing upward). Pass
+//! [`Direction::Inverted`](crate::flamegraph::Direction::Inverted) in
+//! [`Options::direction`](crate::flamegraph::Options::direction) to render with the root at the
+//! top, which is often called an icicle graph and is convenient for stack traces where you want
+//! the top of the stack to be the focal point.
+//!
+//! # History
+//!
+//! Flame graphs were introduced by Brendan Gregg in 2011, building on Neelakanth Nadgir's
+//! `function_call_graph.rb` (itself inspired by Roch Bourbonnais's `CallStackAnalyzer` and Jan
+//! Boerhout's `vftrace`). The reference implementation is the Perl
+//! [FlameGraph toolkit][flamegraph-toolkit], which inspired this Rust port.
+//!
+//!   [crate-level documentation]: crate
+//!   [differential]: https://www.brendangregg.com/blog/2014-11-09/differential-flame-graphs.html
+//!   [flamegraph-toolkit]: https://github.com/brendangregg/FlameGraph
+
 macro_rules! args {
     ($($key:expr => $value:expr),*) => {{
         [$(($key, $value),)*].iter().map(|(k, v): &(&str, &str)| (*k, *v))
