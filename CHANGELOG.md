@@ -18,6 +18,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+## [0.12.8] - 2026-07-18
+
+### Fixed
+
+- Avoid integer overflow when computing percentages for very large sample counts. [#367](https://github.com/jonhoo/inferno/pull/367)
+
 ## [0.12.7] - 2026-07-05
 
 ### Changed
@@ -381,7 +387,8 @@ this change should be an easy upgrade.
 - Moved to `IndexMap` and FNV hashing ([#127](https://github.com/jonhoo/inferno/pull/127))
 - Moved CI to Azure DevOps Pipelines
 
-[Unreleased]: https://github.com/jonhoo/inferno/compare/v0.12.7...HEAD
+[Unreleased]: https://github.com/jonhoo/inferno/compare/v0.12.8...HEAD
+[0.12.8]: https://github.com/jonhoo/inferno/compare/v0.12.7...v0.12.8
 [0.12.7]: https://github.com/jonhoo/inferno/compare/v0.12.6...v0.12.7
 [0.12.6]: https://github.com/jonhoo/inferno/compare/v0.12.5...v0.12.6
 [0.12.5]: https://github.com/jonhoo/inferno/compare/v0.12.4...v0.12.5
