@@ -78,14 +78,19 @@ const TRACE_QUERY_RESULT: &[u8] = b"trace-query-result";
 const NODE: &[u8] = b"node";
 /// Container of a sample.
 const ROW: &[u8] = b"row";
-/// Stack backtrace
+/// Stack backtrace (pre XCode 27)
 const BACKTRACE: &[u8] = b"backtrace";
+/// Stack backtrace (XCode 27+)
+const TAGGED_BACKTRACE: &[u8] = b"tagged-backtrace";
 /// Stack frame
 const FRAME: &[u8] = b"frame";
 
 // Is this a tag we are interested in?
 fn is_interested_tag(tag: &[u8]) -> bool {
-    matches!(tag, TRACE_QUERY_RESULT | NODE | ROW | BACKTRACE | FRAME)
+    matches!(
+        tag,
+        TRACE_QUERY_RESULT | NODE | ROW | BACKTRACE | TAGGED_BACKTRACE | FRAME
+    )
 }
 
 // xctrace's sample backtrace is address-based. Two identical backtraces might
@@ -181,7 +186,7 @@ impl CurrentTag {
             TRACE_QUERY_RESULT => matches!(self, Self::TraceQueryResult { .. }),
             NODE => matches!(self, Self::Node { .. }),
             ROW => matches!(self, Self::Row { .. }),
-            BACKTRACE => matches!(self, Self::Backtrace { .. }),
+            BACKTRACE | TAGGED_BACKTRACE => matches!(self, Self::Backtrace { .. }),
             FRAME => matches!(self, Self::Frame { .. }),
             _ => false,
         }
@@ -372,7 +377,8 @@ impl Folder {
                         (Some(CurrentTag::Node { .. }), ROW) => {
                             Some(CurrentTag::Row { backtrace: None })
                         }
-                        (Some(CurrentTag::Row { .. }), BACKTRACE) => {
+                        (Some(CurrentTag::Row { .. }), BACKTRACE)
+                        | (Some(CurrentTag::Row { .. }), TAGGED_BACKTRACE) => {
                             let id = attributes_to_backtrace(&attributes)?;
                             Some(CurrentTag::Backtrace {
                                 id,
@@ -459,7 +465,8 @@ impl Folder {
                     let attributes = empty.attributes();
                     let name = empty.name().into_inner();
                     match (self.state_backtrace.top_mut(), name) {
-                        (Some(CurrentTag::Row { backtrace }), BACKTRACE) => {
+                        (Some(CurrentTag::Row { backtrace }), BACKTRACE)
+                        | (Some(CurrentTag::Row { backtrace }), TAGGED_BACKTRACE) => {
                             let new_backtrace =
                                 if let Ok(ref_id) = get_u64_from_attributes(REF, &attributes) {
                                     if !self.backtraces.contains_key(&BacktraceId(ref_id)) {
