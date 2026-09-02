@@ -4,6 +4,7 @@ use std::fs::File;
 use std::io::{self, BufReader, Cursor};
 use std::process::{Command, Stdio};
 
+use assertables::assert_starts_with;
 use inferno::collapse::vtune::{Folder, Options};
 use log::Level;
 use pretty_assertions::assert_eq;
@@ -92,7 +93,7 @@ fn collapse_vtune_should_return_error_for_bad_stack_line() {
     let test_file = "./tests/data/collapse-vtune/bad-stack-line.csv";
     let error = test_collapse_vtune_error(test_file, Options::default());
     assert_eq!(error.kind(), io::ErrorKind::InvalidData);
-    assert!(error.to_string().starts_with("Unable to parse stack line"));
+    assert_starts_with!(error.to_string(), "Unable to parse stack line");
 }
 
 #[test]
