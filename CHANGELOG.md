@@ -16,6 +16,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Accept `tagged-backtrace` elements in xctrace exports from Xcode 27 in `inferno-collapse-xctrace`.
+
 ### Security
 
 ## [0.12.8] - 2026-07-18

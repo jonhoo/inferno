@@ -1,0 +1,2 @@
+start;main;std::sys::backtrace::__rust_begin_short_backtrace;rust_test2::main;rust_test2::bar 2
+start;main;std::sys::backtrace::__rust_begin_short_backtrace;rust_test2::main;rust_test2::foo 2
