@@ -1,0 +1,82 @@
+<?xml version="1.0"?>
+<trace-query-result>
+<node xpath='//trace-toc[1]/run[1]/data[1]/table[14]'>
+    <schema name="time-profile" documentation="When combined with other time-profile samples, creates a statistical picture of where your application is spending its time.">
+        <col><mnemonic>time</mnemonic><name>Sample Time</name><engineering-type>sample-time</engineering-type></col>
+        <col><mnemonic>thread</mnemonic><name>Thread</name><engineering-type>thread</engineering-type></col>
+        <col><mnemonic>process</mnemonic><name>Process</name><engineering-type>process</engineering-type></col>
+        <col><mnemonic>core</mnemonic><name>Core</name><engineering-type>core</engineering-type></col>
+        <col><mnemonic>thread-state</mnemonic><name>State</name><engineering-type>thread-state</engineering-type></col>
+        <col><mnemonic>weight</mnemonic><name>Weight</name><engineering-type>weight</engineering-type></col>
+        <col><mnemonic>stack</mnemonic><name>Backtrace</name><engineering-type>tagged-backtrace</engineering-type></col>
+    </schema>
+    <row>
+        <sample-time id="1" fmt="00:00.671.561">671561333</sample-time>
+        <thread id="2" fmt="Main Thread (0xbb48ce) (rust_test2, pid: 56430)">
+            <tid id="3" fmt="0xbb48ce">12273870</tid>
+            <process id="4" fmt="rust_test2 (56430)">
+                <pid id="5" fmt="56430">56430</pid>
+                <device-session id="6" fmt="TODO">TODO</device-session>
+            </process>
+        </thread>
+        <process ref="4"/>
+        <core id="7" fmt="CPU 12 (S Core)">12</core>
+        <thread-state id="8" fmt="Running">Running</thread-state>
+        <weight id="9" fmt="1.00 ms">1000000</weight>
+        <tagged-backtrace id="10">
+            <frame id="11" name="rust_test2::foo" addr="0x102af5d99">
+                <binary id="12" name="rust_test2" UUID="8BA6A995-8D99-3E44-802C-CA85A623739F" arch="arm64" load-addr="0x102af0000" path="/tmp/rust_test2/target/release/rust_test2"/>
+                <source line="7"><path id="13">/tmp/rust_test2/src/main.rs</path></source>
+            </frame>
+            <frame id="14" name="rust_test2::main" addr="0x102af5f30">
+                <binary ref="12"/>
+                <source line="12"><path ref="13"/></source>
+            </frame>
+            <frame id="15" name="std::sys::backtrace::__rust_begin_short_backtrace" addr="0x102af5d04">
+                <binary ref="12"/>
+                <source line="152"><path id="16">/rustc/48a229cea/library/std/src/sys/backtrace.rs</path></source>
+            </frame>
+            <frame id="17" name="main" addr="0x102af5fa0"><binary ref="12"/></frame>
+            <frame id="18" name="start" addr="0x1847b848b">
+                <binary id="19" name="dyld" UUID="74E52480-C2BD-3C8D-812D-95FE2B74A096" arch="arm64e" load-addr="0x184798000" path="/usr/lib/dyld"/>
+            </frame>
+        </tagged-backtrace>
+    </row>
+    <row>
+        <sample-time id="20" fmt="00:00.672.560">672560958</sample-time>
+        <thread ref="2"/>
+        <process ref="4"/>
+        <core ref="7"/>
+        <thread-state ref="8"/>
+        <weight ref="9"/>
+        <tagged-backtrace id="21">
+            <frame id="22" name="rust_test2::bar" addr="0x102af5dc0">
+                <binary ref="12"/>
+                <source line="3"><path ref="13"/></source>
+            </frame>
+            <frame ref="14"/>
+            <frame ref="15"/>
+            <frame ref="17"/>
+            <frame ref="18"/>
+        </tagged-backtrace>
+    </row>
+    <row>
+        <sample-time id="23" fmt="00:00.673.560">673560917</sample-time>
+        <thread ref="2"/>
+        <process ref="4"/>
+        <core ref="7"/>
+        <thread-state ref="8"/>
+        <weight ref="9"/>
+        <tagged-backtrace ref="10"/>
+    </row>
+    <row>
+        <sample-time id="24" fmt="00:00.674.560">674560875</sample-time>
+        <thread ref="2"/>
+        <process ref="4"/>
+        <core id="25" fmt="CPU 13 (S Core)">13</core>
+        <thread-state ref="8"/>
+        <weight ref="9"/>
+        <tagged-backtrace ref="21"/>
+    </row>
+</node>
+</trace-query-result>
