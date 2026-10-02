@@ -379,13 +379,29 @@ impl Folder {
         self.in_event = true;
 
         if let Some((comm, pid, tid, end)) = Self::event_line_parts(line) {
-            let mut by_colons = line[end..].splitn(3, ':').skip(1);
-            let event = by_colons.next().and_then(|period_and_event| {
-                let mut it = period_and_event.rsplit(' ');
-                let event_name = it.next();
-                self.period = it.next().and_then(|s| s.parse::<u64>().ok());
-                event_name
-            });
+            let header = line[end..].trim();
+            let event_fields = header
+                .split_once(':')
+                .filter(|(prefix, _)| {
+                    prefix
+                        .split_whitespace()
+                        .next_back()
+                        .is_some_and(|field| field.parse::<f64>().is_ok())
+                })
+                .map_or(header, |(_, rest)| rest.trim());
+            let event_and_stack = (|| {
+                let rest = event_fields;
+                let event = rest.split_whitespace().find(|field| field.ends_with(':'))?;
+                let event_start = rest.find(event)?;
+                self.period = rest[..event_start]
+                    .split_whitespace()
+                    .next_back()
+                    .and_then(|period| period.parse::<u64>().ok());
+                let stack = rest[event_start + event.len()..].trim();
+                let event = event.strip_suffix(':')?;
+                Some((event_without_modifiers(event), stack))
+            })();
+            let event = event_and_stack.map(|(event, _)| event);
             if let Some(event) = event {
                 if let Some(ref event_filter) = self.event_filter {
                     if event != event_filter {
@@ -401,29 +417,11 @@ impl Folder {
                 }
             }
 
-            // some event lines _include_ a stack line if the stack only has one frame.
-            // in that case, the event will be followed by the stack.
-            let single_stack = if let Some(post_event) = by_colons.next() {
-                // we need to deal with a couple of cases here:
-                //
-                //     vote   913    72.176760:     257597 cycles:uppp:
-                //     false 64414 20110.539270:      34467 cycles:u:  ffffffff9aa3c8de [unknown] ([unknown])
-                //     false 64414 20110.539270:      34467 cycles:  ffffffff9aa3c8de [unknown] ([unknown])
-                //
-                // the first should not be handled as a stack, whereas the latter two both should
-                // the trick is going to be to trim until we encounter a space or a :, whichever
-                // comes first, and then evaluate from there.
-                let post_event_start = post_event.find([':', ' ']).map(|i| i + 1).unwrap_or(0);
-                let post_event = post_event[post_event_start..].trim();
-                if !post_event.is_empty() {
-                    // we have a stack!
-                    Some(post_event)
-                } else {
-                    None
-                }
-            } else {
-                None
-            };
+            // Uprobe events may have sample data such as "(1843c20)" after the
+            // event name. Only treat it as an inline frame if it has stack syntax.
+            let single_stack = event_and_stack
+                .map(|(_, stack)| stack)
+                .filter(|stack| Self::stack_line_parts(stack).is_some());
 
             // XXX: re-use existing memory in pname if possible
             self.pname = comm.replace(' ', "_");
@@ -690,6 +688,37 @@ fn tidy_generic(mut func: String) -> String {
     func
 }
 
+// Event modifiers have a restricted alphabet; a tracepoint or uprobe name
+// after a colon must otherwise remain part of the event name.
+fn event_without_modifiers(event: &str) -> &str {
+    let Some((name, modifiers)) = event.rsplit_once(':') else {
+        return event;
+    };
+    if modifiers.is_empty() {
+        return event;
+    }
+    let mut seen = 0u16;
+    let mut precise = 0;
+    for modifier in modifiers.bytes() {
+        if modifier == b'p' {
+            precise += 1;
+            if precise > 3 {
+                return event;
+            }
+            continue;
+        }
+        let Some(index) = b"ukhIGHPSDWebRX".iter().position(|&c| c == modifier) else {
+            return event;
+        };
+        let mask = 1 << index;
+        if seen & mask != 0 {
+            return event;
+        }
+        seen |= mask;
+    }
+    name
+}
+
 fn tidy_java(mut func: String) -> String {
     // along with tidy_generic converts the following:
     //     Lorg/mozilla/javascript/ContextFactory;.call(Lorg/mozilla/javascript/ContextAction;)Ljava/lang/Object;
@@ -751,6 +780,83 @@ mod tests {
         for (input, expected) in test_expectations.iter() {
             assert_eq!(&tidy_generic(input.to_string()), expected);
         }
+    }
+
+    #[test]
+    fn test_event_modifiers() {
+        for (event, expected) in [
+            ("cycles", "cycles"),
+            ("cycles:u", "cycles"),
+            ("cycles:uppp", "cycles"),
+            ("cycles:bRX", "cycles"),
+            ("runtime:newobject", "runtime:newobject"),
+            ("runtime:newobject:uk", "runtime:newobject"),
+            ("runtime:pppp", "runtime:pppp"),
+            ("runtime:uu", "runtime:uu"),
+            ("runtime:", "runtime:"),
+            ("runtime:é", "runtime:é"),
+        ] {
+            assert_eq!(event_without_modifiers(event), expected);
+        }
+    }
+
+    #[test]
+    fn test_colon_event_names() -> io::Result<()> {
+        let input = b"tidb-server 123720 [000] 11736.070036: runtime:newobject: (1843c20)\n\
+                 1443c20 runtime.newobject+0x0 (/tmp/tidb-server)\n\
+                 14a9661 runtime.goexit.abi0+0x1 (/tmp/tidb-server)\n\n\
+                 tidb-server 123720 [000] 11736.070037: 3 runtime:newobject:u: (1843c20)\n\
+                 1443c20 runtime.newobject+0x0 (/tmp/tidb-server)\n\
+                 14a9661 runtime.goexit.abi0+0x1 (/tmp/tidb-server)\n\n\
+                 tidb-server 123720 [000] 11736.070038: 5 runtime:other: (1843c20)\n\
+                 1443c20 runtime.other+0x0 (/tmp/tidb-server)\n\
+                 14a9661 runtime.goexit.abi0+0x1 (/tmp/tidb-server)\n\n";
+        for nthreads in [1, 2] {
+            for event_filter in [None, Some("runtime:newobject".to_string())] {
+                let options = Options {
+                    nthreads,
+                    event_filter,
+                    ..Default::default()
+                };
+                let mut folder = Folder::from(options);
+                folder.nstacks_per_job = 1;
+                let mut actual = Vec::new();
+                <Folder as Collapse>::collapse(&mut folder, &input[..], &mut actual)?;
+                assert_eq!(
+                    std::str::from_utf8(&actual).unwrap(),
+                    "tidb-server;runtime.goexit.abi0;runtime.newobject 4\n"
+                );
+            }
+        }
+        Ok(())
+    }
+
+    #[test]
+    fn test_colon_event_names_with_inline_stacks() -> io::Result<()> {
+        for (input, expected) in [
+            (
+                "server 123 [000] 1.000000: 2 probe:function:  abc function+0x0 (/tmp/server)\n",
+                "server;function 2\n",
+            ),
+            (
+                "server 123 2 probe:function:  abc function+0x0 (/tmp/server)\n",
+                "server;function 2\n",
+            ),
+            (
+                "server 123 probe:function:  abc function+0x0 (/tmp/server)\n",
+                "server;function 1\n",
+            ),
+        ] {
+            let mut folder = Folder::from(Options {
+                nthreads: 1,
+                event_filter: Some("probe:function".to_string()),
+                ..Default::default()
+            });
+            let mut actual = Vec::new();
+            <Folder as Collapse>::collapse(&mut folder, input.as_bytes(), &mut actual)?;
+            assert_eq!(std::str::from_utf8(&actual).unwrap(), expected);
+        }
+        Ok(())
     }
 
     static INPUT: Lazy<Vec<PathBuf>> = Lazy::new(|| {
