@@ -48,6 +48,10 @@ struct Opt {
     #[clap(long = "tid")]
     tid: bool,
 
+    /// Include source locations from `perf script -F +srcline`
+    #[clap(long = "srcline")]
+    srcline: bool,
+
     /// Silence all log output
     #[clap(short = 'q', long = "quiet")]
     quiet: bool,
@@ -91,6 +95,7 @@ impl Opt {
         let mut options = Options::default();
         options.include_pid = self.pid;
         options.include_tid = self.tid;
+        options.include_srcline = self.srcline;
         options.include_addrs = self.addrs;
         options.annotate_jit = self.jit || self.all;
         options.annotate_kernel = self.kernel || self.all;

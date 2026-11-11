@@ -1,0 +1,4 @@
+demo;final:/src/final.cpp:23 13
+demo;main:/src/main.cpp:9;leaf:/src/my app.cpp:17 3
+demo;main:/src/main.cpp:9;leaf:/src/my app.cpp:18 5
+demo;schedule;caller:libexample.so;[libexample.so]:libexample.so 7

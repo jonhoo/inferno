@@ -60,6 +60,16 @@ $ pid=$!
 $ cat out.user_stacks | inferno-collapse-dtrace > stacks.folded
 ```
 
+On Linux, source locations can distinguish samples within the same function:
+
+```console
+$ perf script -F +srcline | inferno-collapse-perf --srcline > stacks.folded
+```
+
+This appends available source locations to frame names, for example
+`my_function:main.rs:42`. Source information requires debug symbols. The
+library equivalent is `inferno::collapse::perf::Options::include_srcline`.
+
 You can also use `inferno-collapse-guess` which should work on both
 perf and DTrace samples. In the end, you'll end up with a "folded stack"
 file. You can pass that file to `inferno-flamegraph` to generate a flame
