@@ -1,0 +1,27 @@
+demo 42 1.000: 3 cycles:
+        401001 leaf+0x1 (/tmp/demo)
+  /src/my app.cpp:17
+        401010 main+0x2 (/tmp/demo)
+  /src/main.cpp:9
+
+demo 42 2.000: 5 cycles:
+        401001 leaf+0x1 (/tmp/demo)
+  /src/my app.cpp:18
+        401010 main+0x2 (/tmp/demo)
+  /src/main.cpp:9
+
+demo 42 3.000: 7 cycles:
+        7f0001 [unknown] (/usr/lib/libexample.so)
+  libexample.so[1]
+        7f0010 caller+0x2 (/usr/lib/libexample.so)
+  libexample.so[10]
+        fffff1 schedule+0x3 ([kernel.kallsyms])
+  [kernel.kallsyms][fffff1]
+
+demo 42 4.000: 11 instructions:
+        401001 ignored+0x1 (/tmp/demo)
+  /src/ignored.cpp:1
+
+demo 42 5.000: 13 cycles:
+        401020 final+0x1 (/tmp/demo)
+  /src/final.cpp:23
