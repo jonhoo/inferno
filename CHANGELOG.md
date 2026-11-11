@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Support `perf script -F +srcline` source locations through `inferno-collapse-perf --srcline` and `perf::Options::include_srcline`.
+
 ### Changed
 
 ### Deprecated

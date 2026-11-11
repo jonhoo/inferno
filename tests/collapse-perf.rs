@@ -288,6 +288,22 @@ fn collapse_perf_should_warn_about_weird_input_lines() {
 }
 
 #[test]
+fn collapse_perf_srcline_cli() {
+    let input_file = "./tests/data/collapse-perf/source-lines.txt";
+    let expected_file = "./tests/data/collapse-perf/results/source-lines-collapsed.txt";
+    for nthreads in ["1", "2"] {
+        let output = Command::new(assert_cmd::cargo::cargo_bin!("inferno-collapse-perf"))
+            .args(["--srcline", "--nthreads", nthreads, input_file])
+            .output()
+            .expect("failed to execute process");
+        assert!(output.status.success(), "{:?}", output);
+        assert!(output.stderr.is_empty(), "{:?}", output.stderr);
+        let expected = BufReader::new(File::open(expected_file).unwrap());
+        common::compare_results(Cursor::new(output.stdout), expected, expected_file, false);
+    }
+}
+
+#[test]
 fn collapse_perf_cli() {
     let input_file = "./flamegraph/test/perf-vertx-stacks-01.txt";
     let expected_file = "./flamegraph/test/results/perf-vertx-stacks-01-collapsed-all.txt";

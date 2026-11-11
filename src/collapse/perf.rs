@@ -66,6 +66,11 @@ pub struct Options {
     /// Default is `false`.
     pub include_tid: bool,
 
+    /// Include source locations from `perf script -F +srcline` in frame names.
+    ///
+    /// Default is `false`.
+    pub include_srcline: bool,
+
     /// The number of threads to use.
     ///
     /// Default is the number of logical cores on your machine.
@@ -87,6 +92,7 @@ impl Default for Options {
             include_addrs: false,
             include_pid: false,
             include_tid: false,
+            include_srcline: false,
             nthreads: *common::DEFAULT_NTHREADS,
             skip_after: Vec::default(),
         }
@@ -133,6 +139,9 @@ pub struct Folder {
     /// period of current event
     period: Option<u64>,
 
+    /// Index of the frame awaiting the following source-location line.
+    pending_srcline: Option<usize>,
+
     // Options...
     opt: Options,
 }
@@ -152,6 +161,7 @@ impl From<Options> for Folder {
             stack_filter: StackFilter::Keep,
             stack: VecDeque::default(),
             period: None,
+            pending_srcline: None,
             opt,
         }
     }
@@ -267,6 +277,7 @@ impl CollapsePrivate for Folder {
             stack_filter: StackFilter::Keep,
             stack: VecDeque::default(),
             period: None,
+            pending_srcline: None,
             opt: self.opt.clone(),
         }
     }
@@ -315,12 +326,40 @@ impl Folder {
             if line.is_empty() {
                 self.after_event(occurrences);
                 return Ok(false);
-            } else if self.in_event {
+            }
+
+            if let Some(frame) = self.pending_srcline.take() {
+                // A location can be missing, so do not consume the next frame or event.
+                let is_stack = Self::stack_line_parts(line).is_some_and(|(pc, _, _)| {
+                    !pc.is_empty() && pc.bytes().all(|b| b.is_ascii_hexdigit())
+                });
+                let is_event = Self::event_line_parts(line).is_some_and(|(_, _, _, end)| {
+                    line[end..].split_once(':').is_some_and(|(prefix, _)| {
+                        prefix
+                            .split_whitespace()
+                            .last()
+                            .and_then(|timestamp| timestamp.parse::<f64>().ok())
+                            .is_some()
+                    })
+                });
+                if !is_stack && !is_event {
+                    self.on_source_line(line, frame);
+                    if !self.in_event {
+                        self.after_event(occurrences);
+                    }
+                    continue;
+                }
+                if !self.in_event {
+                    self.after_event(occurrences);
+                }
+            }
+
+            if self.in_event {
                 self.on_stack_line(line);
             } else {
                 assert!(self.stack.is_empty());
                 self.on_event_line(line);
-                if !self.stack.is_empty() {
+                if !self.stack.is_empty() && self.pending_srcline.is_none() {
                     // we must have hit a combined event/stack line
                     self.after_event(occurrences);
                 }
@@ -484,6 +523,7 @@ impl Folder {
     //     7f53389994d0 [unknown] ([unknown])
     //                0 [unknown] ([unknown])
     fn on_stack_line(&mut self, line: &str) {
+        self.pending_srcline = None;
         let should_omit = matches!(
             self.stack_filter,
             StackFilter::Skip | StackFilter::SkipRemaining
@@ -554,6 +594,11 @@ impl Folder {
                 self.cache_line.push(func);
             }
 
+            if self.opt.include_srcline && !(rawfunc == "[unknown]" && module == "[unknown]") {
+                // For an inlined chain, the sampled instruction belongs to its leaf.
+                self.pending_srcline = self.cache_line.len().checked_sub(1);
+            }
+
             while let Some(func) = self.cache_line.pop() {
                 self.stack.push_front(func);
             }
@@ -568,6 +613,28 @@ impl Folder {
             }
         } else {
             logging::weird_stack_line(line);
+        }
+    }
+
+    fn on_source_line(&mut self, mut line: &str, frame: usize) {
+        // perf falls back to module[address] when source information is unavailable.
+        // Match stackcollapse-perf.pl by removing bracketed addresses and module tags.
+        let mut location = String::with_capacity(line.len());
+        while let Some(start) = line.find('[') {
+            if let Some(end) = line[start..].find(']') {
+                location.push_str(&line[..start]);
+                line = &line[start + end + 1..];
+            } else {
+                break;
+            }
+        }
+        location.push_str(line);
+        let location = location.trim();
+        if !location.is_empty() {
+            if let Some(frame) = self.stack.get_mut(frame) {
+                frame.push(':');
+                frame.push_str(location);
+            }
         }
     }
 
@@ -602,6 +669,7 @@ impl Folder {
         self.stack_filter = StackFilter::Keep;
         self.stack.clear();
         self.period = None;
+        self.pending_srcline = None;
     }
 }
 
@@ -720,6 +788,90 @@ mod tests {
     use crate::collapse::common;
     use crate::collapse::Collapse;
     use rand::rng;
+
+    #[test]
+    fn source_lines_parallel_and_reuse() {
+        let input = include_bytes!("../../tests/data/collapse-perf/source-lines.txt");
+        let expected =
+            include_str!("../../tests/data/collapse-perf/results/source-lines-collapsed.txt");
+        for nthreads in [1, 2] {
+            let mut folder = Folder::from(Options {
+                include_srcline: true,
+                nthreads,
+                ..Default::default()
+            });
+            folder.set_nstacks_per_job(1);
+            for _ in 0..2 {
+                let mut output = Vec::new();
+                <Folder as Collapse>::collapse(&mut folder, &input[..], &mut output).unwrap();
+                assert_eq!(String::from_utf8(output).unwrap(), expected);
+            }
+        }
+    }
+
+    #[test]
+    fn source_line_boundaries() {
+        for (input, expected) in [
+            (
+                "demo 42 1.0: cycles:\n  1 leaf (/tmp/demo)\n  2 parent (/tmp/demo)\n  parent.cpp:5\n",
+                "demo;parent:parent.cpp:5;leaf 1\n",
+            ),
+            (
+                "demo 42 1.0: cycles:\n  1 [unknown] ([unknown])\n  2 parent (/tmp/demo)\n  parent.cpp:5\n",
+                "demo;parent:parent.cpp:5;[unknown] 1\n",
+            ),
+            (
+                "demo 42 1.0: 2 cycles: 1 first (/tmp/demo)\n  file.rs:1\ndemo 42 2.0: 3 cycles: 2 second (/tmp/demo)\n  file.rs:2\n",
+                "demo;first:file.rs:1 2\ndemo;second:file.rs:2 3\n",
+            ),
+            (
+                "demo 42 1.0: 2 cycles: 1 first (/tmp/demo)\ndemo 42 2.0: 3 cycles: 2 second (/tmp/demo)",
+                "demo;first 2\ndemo;second 3\n",
+            ),
+            (
+                "demo 42 1.0: cycles:\n  1 leaf (/tmp/demo)\n# comment\n  /src/文件.cpp:17\n",
+                "demo;leaf:/src/文件.cpp:17 1\n",
+            ),
+            (
+                "demo 42 1.0: cycles:\n  1 leaf (/tmp/demo)\n  /src/release 42 source.cpp:17\n",
+                "demo;leaf:/src/release 42 source.cpp:17 1\n",
+            ),
+            (
+                "demo 42 1.0: cycles:\n  1 leaf (/tmp/demo)\n  /lib/a b (copy)[7f1234]\n",
+                "demo;leaf:/lib/a b (copy) 1\n",
+            ),
+            (
+                "java 42 1.0: cycles:\n  1 outer->inner (/tmp/demo)\n  Example.java:7\n",
+                "java;outer;inner_[i]:Example.java:7 1\n",
+            ),
+        ] {
+            let mut folder = Folder::from(Options {
+                include_srcline: true,
+                nthreads: 1,
+                ..Default::default()
+            });
+            let mut output = Vec::new();
+            <Folder as Collapse>::collapse(&mut folder, input.as_bytes(), &mut output).unwrap();
+            assert_eq!(String::from_utf8(output).unwrap(), expected, "{input}");
+        }
+    }
+
+    #[test]
+    fn source_lines_with_skip_after() {
+        let input = b"demo 42 1.0: cycles:\n  1 leaf (/tmp/demo)\n  leaf.rs:1\n  2 stop (/tmp/demo)\n  stop.rs:2\n  3 parent (/tmp/demo)\n  parent.rs:3\n";
+        let mut folder = Folder::from(Options {
+            include_srcline: true,
+            skip_after: vec!["stop".to_owned()],
+            nthreads: 1,
+            ..Default::default()
+        });
+        let mut output = Vec::new();
+        <Folder as Collapse>::collapse(&mut folder, &input[..], &mut output).unwrap();
+        assert_eq!(
+            String::from_utf8(output).unwrap(),
+            "stop:stop.rs:2;leaf:leaf.rs:1 1\n"
+        );
+    }
 
     // Test some interesting edge cased for tidy_generic
     #[test]
@@ -890,6 +1042,7 @@ mod tests {
                 include_addrs: rng.random(),
                 include_pid: rng.random(),
                 include_tid: rng.random(),
+                include_srcline: false,
                 nthreads: rng.random_range(2..=32),
                 skip_after: Vec::default(),
             };
