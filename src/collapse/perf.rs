@@ -334,12 +334,13 @@ impl Folder {
                     !pc.is_empty() && pc.bytes().all(|b| b.is_ascii_hexdigit())
                 });
                 let is_event = Self::event_line_parts(line).is_some_and(|(_, _, _, end)| {
-                    line[end..].split_once(':').is_some_and(|(prefix, _)| {
-                        prefix
-                            .split_whitespace()
-                            .last()
-                            .and_then(|timestamp| timestamp.parse::<f64>().ok())
-                            .is_some()
+                    line[end..].split_once(':').is_some_and(|(prefix, event)| {
+                        event.contains(':')
+                            && prefix
+                                .split_whitespace()
+                                .last()
+                                .and_then(|timestamp| timestamp.parse::<f64>().ok())
+                                .is_some()
                     })
                 });
                 if !is_stack && !is_event {
@@ -835,6 +836,10 @@ mod tests {
             (
                 "demo 42 1.0: cycles:\n  1 leaf (/tmp/demo)\n  /src/release 42 source.cpp:17\n",
                 "demo;leaf:/src/release 42 source.cpp:17 1\n",
+            ),
+            (
+                "demo 42 1.0: cycles:\n  1 leaf (/tmp/demo)\n  /src/build 42 3.14:17\n",
+                "demo;leaf:/src/build 42 3.14:17 1\n",
             ),
             (
                 "demo 42 1.0: cycles:\n  1 leaf (/tmp/demo)\n  /lib/a b (copy)[7f1234]\n",
