@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Declared minimum supported Rust version is now 1.85, which is what the
+  `rand` 0.10 dev-dependency (edition 2024) requires and what CI already
+  tested; the previously declared 1.71 was not buildable.
+
 ### Deprecated
 
 ### Removed
