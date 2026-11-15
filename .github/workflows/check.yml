@@ -25,12 +25,13 @@ jobs:
     runs-on: ubuntu-latest
     name: stable / fmt
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # tag=v7.0.1
         with:
           submodules: true
       - name: Install stable
-        uses: dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@6c977a6ca4077a0ceb28ffbe03f59d46e9ac8772 # branch=master
         with:
+          toolchain: stable
           components: rustfmt
       - name: cargo fmt --check
         run: cargo fmt --check
@@ -46,16 +47,16 @@ jobs:
         # Get early warning of new lints which are regularly introduced in beta channels.
         toolchain: [stable, beta]
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # tag=v7.0.1
         with:
           submodules: true
       - name: Install ${{ matrix.toolchain }}
-        uses: dtolnay/rust-toolchain@master
+        uses: dtolnay/rust-toolchain@6c977a6ca4077a0ceb28ffbe03f59d46e9ac8772 # branch=master
         with:
           toolchain: ${{ matrix.toolchain }}
           components: clippy
       - name: cargo clippy
-        uses: giraffate/clippy-action@v1
+        uses: giraffate/clippy-action@13b9d32482f25d29ead141b79e7e04e7900281e0 # tag=v1.0.1
         with:
           reporter: 'github-pr-check'
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -63,15 +64,16 @@ jobs:
     runs-on: ubuntu-latest
     name: semver
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # tag=v7.0.1
         with:
           submodules: true
       - name: Install stable
-        uses: dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@6c977a6ca4077a0ceb28ffbe03f59d46e9ac8772 # branch=master
         with:
+          toolchain: stable
           components: rustfmt
       - name: cargo-semver-checks
-        uses: obi1kenobi/cargo-semver-checks-action@v2
+        uses: obi1kenobi/cargo-semver-checks-action@6b69fcf40e9b5fb17adeb57e4b6ecd020649a239 # tag=v2.9
   doc:
     # run docs generation on nightly rather than stable. This enables features like
     # https://doc.rust-lang.org/beta/unstable-book/language-features/doc-cfg.html which allows an
@@ -79,13 +81,15 @@ jobs:
     runs-on: ubuntu-latest
     name: nightly / doc
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # tag=v7.0.1
         with:
           submodules: true
       - name: Install nightly
-        uses: dtolnay/rust-toolchain@nightly
+        uses: dtolnay/rust-toolchain@6c977a6ca4077a0ceb28ffbe03f59d46e9ac8772 # branch=master
+        with:
+          toolchain: nightly
       - name: Install cargo-docs-rs
-        uses: dtolnay/install@cargo-docs-rs
+        uses: dtolnay/install@982daea0f5d846abc3c83e01a6a1d73c040047c1 # branch=cargo-docs-rs
       - name: cargo docs-rs
         run: cargo docs-rs
   hack:
@@ -94,13 +98,17 @@ jobs:
     runs-on: ubuntu-latest
     name: ubuntu / stable / features
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # tag=v7.0.1
         with:
           submodules: true
       - name: Install stable
-        uses: dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@6c977a6ca4077a0ceb28ffbe03f59d46e9ac8772 # branch=master
+        with:
+          toolchain: stable
       - name: cargo install cargo-hack
-        uses: taiki-e/install-action@cargo-hack
+        uses: taiki-e/install-action@4cef1412cce204788f482e778a0b9187f9626a29 # tag=v2.87.21
+        with:
+          tool: cargo-hack
       # intentionally no target specifier; see https://github.com/jonhoo/rust-ci-conf/pull/4
       # --feature-powerset runs for every combination of features
       - name: cargo hack
@@ -115,12 +123,50 @@ jobs:
         msrv: ["1.85.0"] # rand 0.10 (edition 2024)
     name: ubuntu / ${{ matrix.msrv }}
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # tag=v7.0.1
         with:
           submodules: true
+      # The MSRV is what this crate _could_ build with if its dependencies were downgraded as far as
+      # Cargo.toml allows, not whatever the newest release of each dependency happens to need. So
+      # rather than build against the latest (or committed) dependency versions, we re-resolve with
+      # the MSRV-aware resolver, which picks the newest versions whose `rust-version` is compatible
+      # with `package.rust-version`. That resolver needs cargo 1.84+, which the MSRV toolchain need
+      # not be, so we resolve with stable and only build with the MSRV toolchain. Stable is
+      # installed first so that the MSRV toolchain ends up as the default.
+      - name: Install stable
+        uses: dtolnay/rust-toolchain@6c977a6ca4077a0ceb28ffbe03f59d46e9ac8772 # branch=master
+        with:
+          toolchain: stable
       - name: Install ${{ matrix.msrv }}
-        uses: dtolnay/rust-toolchain@master
+        uses: dtolnay/rust-toolchain@6c977a6ca4077a0ceb28ffbe03f59d46e9ac8772 # branch=master
         with:
           toolchain: ${{ matrix.msrv }}
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # tag=v6.1.0
+        with:
+          path: ~/.cargo
+          key: ${{ runner.os }}-cargo
+      # The resolver targets `package.rust-version`, not the toolchain in the matrix, so warn if the
+      # two have drifted apart. Without a `rust-version`, the resolver targets stable instead, so
+      # dependencies aren't downgraded at all.
+      - name: Check that rust-version matches ${{ matrix.msrv }}
+        run: |
+          rvs=$(cargo +stable metadata --no-deps --format-version 1 | jq -r '.packages[].rust_version // empty' | sort -u | paste -sd ' ' -)
+          if [ -z "$rvs" ]; then
+            echo "::warning::no package sets rust-version, so dependencies will not be resolved to MSRV-compatible versions"
+            exit 0
+          fi
+          for rv in $rvs; do
+            case "${{ matrix.msrv }}" in "$rv" | "$rv".*) exit 0 ;; esac
+          done
+          echo "::warning::msrv in check.yml (${{ matrix.msrv }}) does not match any package rust-version ($rvs)"
+      # We use generate-lockfile rather than update since update keeps the format version of an
+      # existing Cargo.lock, and cargo older than 1.78 cannot read the v4 format. generate-lockfile
+      # instead picks a format that `rust-version` can read.
+      - name: cargo +stable generate-lockfile (MSRV-aware)
+        run: cargo +stable generate-lockfile
+        env:
+          CARGO_RESOLVER_INCOMPATIBLE_RUST_VERSIONS: fallback
+      # --locked so that an older cargo fails loudly rather than quietly re-resolving if it cannot
+      # use the versions picked above (e.g., because it cannot parse their index entries).
       - name: cargo +${{ matrix.msrv }} check
-        run: cargo check
+        run: cargo +${{ matrix.msrv }} check --locked
