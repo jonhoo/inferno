@@ -15,6 +15,8 @@ text { font-family:monospace; font-size:12px }
 #matched { text-anchor:end; }
 #search { text-anchor:end; opacity:0.1; cursor:pointer; }
 #search:hover, #search.show { opacity:1; }
+#ignorecase { text-anchor:end; opacity:0.1; cursor:pointer; }
+#ignorecase:hover, #ignorecase.show { opacity:1; }
 #subtitle { text-anchor:middle; font-color:rgb(160,160,160); }
 #unzoom { cursor:pointer; }
 #frames > *:hover { stroke:black; stroke-width:0.5; cursor:pointer; }
@@ -35,7 +37,9 @@ text { font-family:monospace; font-size:12px }
     <text id="title" fill="rgb(0,0,0)" x="50.0000%" y="24.00">Flame Chart</text>
     <text id="details" fill="rgb(0,0,0)" x="10" y="213.00"> </text>
     <text id="unzoom" class="hide" fill="rgb(0,0,0)" x="10" y="24.00">Reset Zoom</text>
-    <text id="search" fill="rgb(0,0,0)" x="1190" y="24.00">Search</text>
+    <text id="ignorecase" fill="rgb(0,0,0)" x="1190" y="24.00">
+        <title>ignore case</title>ic</text>
+    <text id="search" fill="rgb(0,0,0)" x="1162" y="24.00">Search</text>
     <text id="matched" fill="rgb(0,0,0)" x="1190" y="213.00"> </text>
     <svg id="frames" x="10" width="1180" total_samples="198800">
         <g>
