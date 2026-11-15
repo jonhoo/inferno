@@ -3,11 +3,23 @@ updates:
   - package-ecosystem: github-actions
     directory: /
     schedule:
-      interval: daily
+      interval: monthly
+    groups:
+      gha-bump:
+        applies-to: version-updates
+        update-types:
+          - "patch"
+          - "minor"
   - package-ecosystem: cargo
     directory: /
     schedule:
       interval: daily
+    # already the default for libraries, but we want it for everything
+    # unfortunately it's rejected in dependabot.yml at the moment despite being
+    # implemented inside dependabot. see
+    # https://github.com/dependabot/dependabot-core/issues/4009
+    #
+    # versioning-strategy: "increase-if-necessary"
     ignore:
       - dependency-name: "*"
         # patch and minor updates don't matter for libraries as consumers of this library build
