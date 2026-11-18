@@ -712,6 +712,7 @@ mod tests {
     use std::io::Read;
     use std::path::PathBuf;
 
+    use assertables::assert_starts_with;
     use once_cell::sync::Lazy;
     use pretty_assertions::assert_eq;
     use rand::prelude::*;
@@ -819,7 +820,8 @@ mod tests {
         // go;[unknown];x_cgo_notify_runtime_init_done;runtime.main;main.init;...
         for line in lines {
             if line.contains("main.init") {
-                assert!(line.starts_with("main.init;")); // we removed the frames above "main.init"
+                // we removed the frames above "main.init"
+                assert_starts_with!(line, "main.init;");
             }
         }
         Ok(())
@@ -845,7 +847,8 @@ mod tests {
         for line in lines {
             if line.contains("regexp.compile") {
                 // Collapse some other lines too, just to make sure it works.
-                assert!(line.starts_with("regexp.compile;")); // we removed the frames above "regexp.compile"
+                // we removed the frames above "regexp.compile"
+                assert_starts_with!(line, "regexp.compile;");
             } else if line.contains("main.init") {
                 // without `skip_after` some collapsed lines would look like:
                 // go;[unknown];x_cgo_notify_runtime_init_done;runtime.main;main.init;...

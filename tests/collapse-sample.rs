@@ -4,6 +4,7 @@ use std::fs::File;
 use std::io::{self, BufReader, Cursor};
 use std::process::{Command, Stdio};
 
+use assertables::assert_starts_with;
 use inferno::collapse::sample::{Folder, Options};
 use log::Level;
 use pretty_assertions::assert_eq;
@@ -114,7 +115,7 @@ fn collapse_sample_should_return_error_for_invalid_samples_field() {
     let test_file = "./tests/data/collapse-sample/invalid-samples-field.txt";
     let error = test_collapse_sample_error(test_file, Options::default());
     assert_eq!(error.kind(), io::ErrorKind::InvalidData);
-    assert!(error.to_string().starts_with("Invalid samples field"));
+    assert_starts_with!(error.to_string(), "Invalid samples field");
 }
 
 #[test]
@@ -122,7 +123,7 @@ fn collapse_sample_should_return_error_for_bad_stack_line() {
     let test_file = "./tests/data/collapse-sample/bad-stack-line.txt";
     let error = test_collapse_sample_error(test_file, Options::default());
     assert_eq!(error.kind(), io::ErrorKind::InvalidData);
-    assert!(error.to_string().starts_with("Unable to parse stack line"));
+    assert_starts_with!(error.to_string(), "Unable to parse stack line");
 }
 
 #[test]

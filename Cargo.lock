@@ -117,6 +117,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "assertables"
+version = "10.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b3c16d80246a076246d8b525d9f404543e90fe0818636cd89c249c2a4bee3bb1"
+dependencies = [
+ "regex",
+ "walkdir",
+]
+
+[[package]]
 name = "autocfg"
 version = "1.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -517,6 +527,7 @@ version = "0.12.8"
 dependencies = [
  "ahash",
  "assert_cmd",
+ "assertables",
  "clap",
  "criterion",
  "crossbeam-channel",

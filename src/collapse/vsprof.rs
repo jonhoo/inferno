@@ -267,14 +267,15 @@ fn line_matches_start_line(line: &str) -> bool {
 
 #[cfg(test)]
 mod tests {
+    use assertables::assert_ok;
+
     use super::get_next_number;
 
     #[test]
     fn get_next_number_default() {
         let result = get_next_number(r#"471,91.25,18.39,401.92,81.02,"Raytracer.exe","#);
-        assert!(result.is_ok());
 
-        let (result, _) = result.unwrap();
+        let (result, _) = assert_ok!(result);
         assert_eq!(result, 471);
     }
 
