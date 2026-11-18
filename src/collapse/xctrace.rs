@@ -59,6 +59,24 @@ use super::{
 </node>
 </trace-query-result>
 ```
+
+The backtrace element may also be called `tagged-backtrace`, and a frame may carry
+its binary and source location as children (which are ignored):
+
+```xml
+    <row>
+        <tagged-backtrace id="10">
+            <frame id="11" name="rust_test2::foo" addr="0x102af5d99">
+                <binary id="12" name="rust_test2" UUID="..." arch="arm64" load-addr="0x102af0000" path="/tmp/rust_test2"/>
+                <source line="7"><path id="13">/tmp/rust_test2/src/main.rs</path></source>
+            </frame>
+            <frame id="14" name="main" addr="0x102af5fa0"><binary ref="12"/></frame>
+        </tagged-backtrace>
+    </row>
+    <row>
+        <tagged-backtrace ref="10"/>
+    </row>
+```
  */
 
 // ----------- attribute names -----------
@@ -80,12 +98,17 @@ const NODE: &[u8] = b"node";
 const ROW: &[u8] = b"row";
 /// Stack backtrace
 const BACKTRACE: &[u8] = b"backtrace";
+/// Stack backtrace, newer element name
+const TAGGED_BACKTRACE: &[u8] = b"tagged-backtrace";
 /// Stack frame
 const FRAME: &[u8] = b"frame";
 
 // Is this a tag we are interested in?
 fn is_interested_tag(tag: &[u8]) -> bool {
-    matches!(tag, TRACE_QUERY_RESULT | NODE | ROW | BACKTRACE | FRAME)
+    matches!(
+        tag,
+        TRACE_QUERY_RESULT | NODE | ROW | BACKTRACE | TAGGED_BACKTRACE | FRAME
+    )
 }
 
 // xctrace's sample backtrace is address-based. Two identical backtraces might
@@ -181,7 +204,7 @@ impl CurrentTag {
             TRACE_QUERY_RESULT => matches!(self, Self::TraceQueryResult { .. }),
             NODE => matches!(self, Self::Node { .. }),
             ROW => matches!(self, Self::Row { .. }),
-            BACKTRACE => matches!(self, Self::Backtrace { .. }),
+            BACKTRACE | TAGGED_BACKTRACE => matches!(self, Self::Backtrace { .. }),
             FRAME => matches!(self, Self::Frame { .. }),
             _ => false,
         }
@@ -372,7 +395,7 @@ impl Folder {
                         (Some(CurrentTag::Node { .. }), ROW) => {
                             Some(CurrentTag::Row { backtrace: None })
                         }
-                        (Some(CurrentTag::Row { .. }), BACKTRACE) => {
+                        (Some(CurrentTag::Row { .. }), BACKTRACE | TAGGED_BACKTRACE) => {
                             let id = attributes_to_backtrace(&attributes)?;
                             Some(CurrentTag::Backtrace {
                                 id,
@@ -459,7 +482,7 @@ impl Folder {
                     let attributes = empty.attributes();
                     let name = empty.name().into_inner();
                     match (self.state_backtrace.top_mut(), name) {
-                        (Some(CurrentTag::Row { backtrace }), BACKTRACE) => {
+                        (Some(CurrentTag::Row { backtrace }), BACKTRACE | TAGGED_BACKTRACE) => {
                             let new_backtrace =
                                 if let Ok(ref_id) = get_u64_from_attributes(REF, &attributes) {
                                     if !self.backtraces.contains_key(&BacktraceId(ref_id)) {

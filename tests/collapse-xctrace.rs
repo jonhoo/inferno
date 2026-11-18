@@ -27,6 +27,13 @@ fn collapse_xctrace_simple_frame_without_binary_info() {
 }
 
 #[test]
+fn collapse_xctrace_tagged_backtrace() {
+    let test_file = "./tests/data/collapse-xctrace/tagged_backtrace.xml";
+    let result_file = "./tests/data/collapse-xctrace/results/tagged_backtrace.folded";
+    test_collapse_xctrace(test_file, result_file).unwrap()
+}
+
+#[test]
 fn collapse_xctrace_cli() {
     let input_file = "./tests/data/collapse-xctrace/basic.xml";
     let expected_file = "./tests/data/collapse-xctrace/results/basic.folded";
